@@ -147,7 +147,7 @@ body {
 
 /* HORIZONTAL SCROLL SECTION */
 .horizontal-section {
-  height: 200vh;
+  height: 210vh;
   position: relative;
 }
 
@@ -444,10 +444,17 @@ window.addEventListener('scroll', () => {
   const triggerTop = trigger.offsetTop;
 
   if (window.scrollY > triggerTop - 200) {
-    portrait.classList.add('scroll');
-  } else {
-    portrait.classList.remove('scroll');
-  }
+  portrait.classList.add('scroll');
+} else {
+  portrait.classList.remove('scroll');
+}
+
+// 🔥 VANISH AFTER MORE SCROLL
+if (window.scrollY > triggerTop + 300) {
+  portrait.classList.add('hide');
+} else {
+  portrait.classList.remove('hide');
+}
 });
 
 // HORIZONTAL SCROLL
