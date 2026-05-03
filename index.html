@@ -19,12 +19,12 @@ body {
 
 /* ── THEME ── */
 .dark-theme {
-  background: linear-gradient(135deg, #0f172a, #020617, #000000);
-  color: #e2e8f0;
+  background: linear-gradient(135deg, #1a1410, #0d0b08, #111010);
+  color: #f0ebe0;
 }
 
-.text-main  { color: #e2e8f0; }
-.text-glow  { text-shadow: 0 0 8px rgba(34, 211, 238, 0.4); }
+.text-main  { color: #f0ebe0; }
+.text-glow  { text-shadow: none; }
 
 /* ── NAME ── */
 .name {
@@ -46,8 +46,8 @@ body {
   width: 100%;
   pointer-events: none;
 }
-.glitch::before { color: red;  animation: glitchTop    0.6s infinite; }
-.glitch::after  { color: cyan; animation: glitchBottom 0.6s infinite; }
+.glitch::before { color: #ff4500;  animation: glitchTop    0.6s infinite; }
+.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s infinite; }
 
 @keyframes glitchTop {
   0%   { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px); }
@@ -71,11 +71,11 @@ body {
   pointer-events: none;
 }
 .glitch-on-scroll.glitch-active::before {
-  color: red;
+  color: #ff4500;
   animation: glitchTop 0.6s 2;
 }
 .glitch-on-scroll.glitch-active::after {
-  color: cyan;
+  color: #d6a03c;
   animation: glitchBottom 0.6s 2;
 }
 
@@ -92,9 +92,12 @@ body {
   height: auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  border-radius: 16px;
-  border: 1px solid #22d3ee;
-  box-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
+  border-radius: 4px;
+  border-left: 3px solid #d6a03c;
+  border-bottom: 3px solid #d6a03c;
+  border-top: 1px solid rgba(214,160,60,0.2);
+  border-right: 1px solid rgba(214,160,60,0.2);
+  box-shadow: none;
   transition: transform 0.4s ease;
 }
 .portrait img:hover { transform: scale(1.05); }
@@ -114,27 +117,22 @@ body {
 }
 
 /* ── BACKGROUND ELEMENTS ── */
-.bg-glow {
-  position: fixed;
-  right: 0; bottom: 0;
-  width: 500px; height: 500px;
-  background: radial-gradient(circle, rgba(34,211,238,0.15), transparent 70%);
-  filter: blur(80px);
-  pointer-events: none;
-}
-.grid-overlay {
-  position: fixed;
-  right: 0; bottom: 0;
-  width: 50%; height: 40%;
-  background-image:
-    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.2;
-  pointer-events: none;
-}
+.bg-glow    { display: none; }
+.grid-overlay { display: none; }
 
-/* ── ARROW ── */
+/* ── EDUCATION CARDS ── */
+a .edu-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0;
+  height: 1px;
+  background: #d6a03c;
+  transition: width 0.4s ease;
+}
+a:hover .edu-card::after { width: 100%; }
+a:hover .edu-card { transform: translateX(6px); }
+.edu-card { transition: transform 0.25s ease; }
 .arrow { animation: fadeDown 2s infinite; }
 @keyframes fadeDown {
   0%   { opacity: 0; transform: translateY(-10px); }
@@ -177,16 +175,27 @@ body {
   flex-shrink: 0;
   width: clamp(260px, 28vw, 380px);
   height: clamp(240px, 32vh, 320px);
-  border-radius: 20px;
-  border: 1px solid rgba(34, 211, 238, 0.3);
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
+  border-radius: 2px;
+  border: none;
+  border-left: 3px solid #d6a03c;
+  background: #161210;
   padding: 28px 24px;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition: transform 0.25s ease, border-color 0.25s ease;
+  position: relative;
 }
+.ach-card::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 0;
+  height: 1px;
+  background: #d6a03c;
+  transition: width 0.4s ease;
+}
+.ach-card:hover::after { width: 100%; }
 .ach-card:hover {
-  transform: scale(1.04);
-  box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
+  transform: translateX(6px);
+  box-shadow: none;
 }
 
 </style>
@@ -212,7 +221,7 @@ body {
       <p class="mb-4">Hello everyone! A very warm welcome to my digital space.</p>
 
       <p class="mb-4">
-        I'm <span class="text-cyan-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
+        I'm <span class="text-amber-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
         This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed,
         and the mindset that drives me forward.
       </p>
@@ -223,11 +232,11 @@ body {
       </p>
 
       <div class="space-y-4 text-sm md:text-base">
-        <p><span class="text-cyan-400 font-semibold">Education →</span> My academic journey and pursuit of knowledge.</p>
-        <p><span class="text-cyan-400 font-semibold">Achievements →</span> Competitive milestones that shaped my discipline and mindset.</p>
-        <p><span class="text-cyan-400 font-semibold">Interests →</span> What I'm passionate about beyond code.</p>
-        <p><span class="text-cyan-400 font-semibold">Projects →</span> The core of my work — solving problems through code.</p>
-        <p><span class="text-cyan-400 font-semibold">Certifications →</span> Skills and technical standards I've mastered.</p>
+        <p><span class="text-amber-400 font-semibold">Education →</span> My academic journey and pursuit of knowledge.</p>
+        <p><span class="text-amber-400 font-semibold">Achievements →</span> Competitive milestones that shaped my discipline and mindset.</p>
+        <p><span class="text-amber-400 font-semibold">Interests →</span> What I'm passionate about beyond code.</p>
+        <p><span class="text-amber-400 font-semibold">Projects →</span> The core of my work — solving problems through code.</p>
+        <p><span class="text-amber-400 font-semibold">Certifications →</span> Skills and technical standards I've mastered.</p>
       </div>
 
       <p class="mt-6">
@@ -261,22 +270,22 @@ body {
 
     <!-- SCHOOL -->
     <a href="edu.html" class="block">
-      <div class="p-6 rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md
-                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">School</h3>
-        <div class="h-40 bg-gray-700 rounded-lg overflow-hidden">
-          <img src="school.png" class="h-40 w-full object-cover border border-cyan-400" alt="School">
+      <div class="p-6 cursor-pointer transition duration-300"
+           style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; position:relative;">
+        <h3 class="text-amber-400 text-xl font-semibold mb-3" style="letter-spacing:0.08em;">School</h3>
+        <div class="h-40 overflow-hidden" style="border-radius:2px;">
+          <img src="school.png" class="h-40 w-full object-cover" alt="School">
         </div>
       </div>
     </a>
 
     <!-- COLLEGE -->
     <a href="edu.html" class="block">
-      <div class="p-6 rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md
-                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">College</h3>
-        <div class="h-40 bg-gray-700 rounded-lg overflow-hidden">
-          <img src="college.png" class="h-40 w-full object-cover border border-cyan-400" alt="College">
+      <div class="p-6 cursor-pointer transition duration-300"
+           style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; position:relative;">
+        <h3 class="text-amber-400 text-xl font-semibold mb-3" style="letter-spacing:0.08em;">College</h3>
+        <div class="h-40 overflow-hidden" style="border-radius:2px;">
+          <img src="college.png" class="h-40 w-full object-cover" alt="College">
         </div>
       </div>
     </a>
@@ -303,7 +312,7 @@ body {
 
       <!-- CARD 1 -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🏆 State Champion</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">🏆 State Champion</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Two-time Tamil Nadu State-level Table Tennis Champion. Competed at the highest level of state sport, bringing home gold twice.
         </p>
@@ -311,7 +320,7 @@ body {
 
       <!-- CARD 2 -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🔥 Clutch Player</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">🔥 Clutch Player</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Known for performing under extreme pressure. Wins matches when the stakes are highest — a mindset forged through years of competition.
         </p>
@@ -319,7 +328,7 @@ body {
 
       <!-- CARD 3 -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">⚡ Discipline</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">⚡ Discipline</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Built a warrior's mindset through consistent training, high-pressure competition, and the pursuit of excellence in sport and code.
         </p>
@@ -327,7 +336,7 @@ body {
 
       <!-- CARD 4 -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🚀 Builder</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">🚀 Builder</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Creator of KaiForge — a Flutter-based table tennis performance tracker sold as a first entrepreneurial milestone.
         </p>
@@ -335,7 +344,7 @@ body {
 
       <!-- CARD 5 (NEW) -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">♟️ Chess Strategist</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">♟️ Chess Strategist</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Bullet rating of 2065 on Chess.com. Favors the Grünfeld Defence and Nimzowitsch Opening — precision thinking applied beyond the board.
         </p>
@@ -343,7 +352,7 @@ body {
 
       <!-- CARD 6 (NEW) -->
       <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🛡️ Cybersecurity Path</h3>
+        <h3 class="text-amber-400 text-xl font-semibold mb-3">🛡️ Cybersecurity Path</h3>
         <p class="text-main opacity-80 text-sm leading-relaxed">
           Pursuing a B.E. in Computer Science with a Cybersecurity specialization — building toward becoming a Certified Ethical Hacker.
         </p>
