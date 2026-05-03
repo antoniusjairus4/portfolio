@@ -12,8 +12,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background-color: #100e0c;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23100e0c'/%3E%3Crect width='1' height='1' fill='%231a1714' opacity='0.6'/%3E%3C/svg%3E");
+  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
+  background-attachment: fixed;
   color: #f0ebe0;
   margin: 0;
   padding: 0;
@@ -126,8 +126,8 @@ body {
   width: 100%;
   pointer-events: none;
 }
-.glitch::before { color: #ff4500; animation: glitchTop 0.6s infinite; }
-.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s infinite; }
+.glitch::before { color: #ff4500; animation: glitchTop 0.6s 1; }
+.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s 1; }
 
 @keyframes glitchTop {
   0%   { clip-path: inset(0 0 80% 0); transform: translate(-2px,-2px); }

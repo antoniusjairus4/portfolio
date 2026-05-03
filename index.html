@@ -19,8 +19,7 @@ body {
 
 /* ── THEME ── */
 .dark-theme {
-  background-color: #100e0c;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23100e0c'/%3E%3Crect width='1' height='1' fill='%231a1714' opacity='0.6'/%3E%3C/svg%3E");
+  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
   color: #f0ebe0;
 }
 
@@ -47,8 +46,8 @@ body {
   width: 100%;
   pointer-events: none;
 }
-.glitch::before { color: #ff4500;  animation: glitchTop    0.6s infinite; }
-.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s infinite; }
+.glitch::before { color: #ff4500; animation: glitchTop    0.6s 1; }
+.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s 1; }
 
 @keyframes glitchTop {
   0%   { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px); }
@@ -289,10 +288,7 @@ a:hover .edu-card { transform: translateX(6px); }
   <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
 
     <!-- SCHOOL -->
-    <a href="edu.html" class="block">
-      <div class="p-6 cursor-pointer transition duration-300"
-           style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; position:relative;">
-        <h3 class="text-amber-400 text-xl font-semibold mb-3" style="letter-spacing:0.08em;">School</h3>
+    <a href="edu.html#school" class="block">
         <div class="h-40 overflow-hidden" style="border-radius:2px;">
           <img src="school.png" class="h-40 w-full object-cover" alt="School">
         </div>
@@ -300,10 +296,7 @@ a:hover .edu-card { transform: translateX(6px); }
     </a>
 
     <!-- COLLEGE -->
-    <a href="edu.html" class="block">
-      <div class="p-6 cursor-pointer transition duration-300"
-           style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; position:relative;">
-        <h3 class="text-amber-400 text-xl font-semibold mb-3" style="letter-spacing:0.08em;">College</h3>
+    <a href="edu.html#college" class="block">
         <div class="h-40 overflow-hidden" style="border-radius:2px;">
           <img src="college.png" class="h-40 w-full object-cover" alt="College">
         </div>
