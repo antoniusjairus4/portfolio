@@ -117,6 +117,12 @@ body {
   }
 }
 
+@media (max-width: 768px) {
+  .portrait {
+    display: none !important;
+  }
+}
+
 /* BACKGROUND */
 .bg-glow {
   position: fixed;
@@ -147,7 +153,7 @@ body {
 
 /* HORIZONTAL SCROLL SECTION */
 .horizontal-section {
-  height: 210vh;
+  height: 300vh;
   position: relative;
 }
 
@@ -168,8 +174,8 @@ body {
 }
 
 .ach-card {
-  min-width: 300px;
-  height: 300px;
+  min-width: 80vw;
+  height: 320px;
   border-radius: 20px;
   border: 1px solid rgba(34,211,238,0.3);
   background: rgba(255,255,255,0.05);
@@ -201,6 +207,38 @@ body {
   50% { opacity:1;}
   100% { opacity:0; transform: translateY(10px);}
 }
+
+/* 🔥 BETTER CARD SIZING (fix awkward desktop look) */
+.ach-card {
+  min-width: clamp(260px, 30vw, 420px);
+  height: clamp(260px, 35vh, 360px);
+  border-radius: 20px;
+  border: 1px solid rgba(34,211,238,0.3);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  transition: 0.3s;
+}
+
+/* 🔥 GLITCH ONLY ONCE */
+.glitch-active::before,
+.glitch-active::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+
+.glitch-active::before {
+  color: red;
+  animation: glitchTop 0.6s 2;
+}
+
+.glitch-active::after {
+  color: cyan;
+  animation: glitchBottom 0.6s 2;
+}
+
 </style>
 </head>
 
@@ -381,19 +419,17 @@ if (!sessionStorage.getItem("done")) {
   </div>
 
 </section>
+<!-- 🔥 ACHIEVEMENTS TITLE (OUTSIDE, NOT A CARD) -->
+<section class="horizontal-section mt-[-60px] px-10">
 
-<!-- ACHIEVEMENTS SECTION -->
-<section class="horizontal-section mt-[-60px]">
+  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-10 relative glitch-on-scroll"
+      data-text="ACHIEVEMENTS">
+    ACHIEVEMENTS
+  </h2>
 
   <div class="horizontal-wrapper">
 
     <div class="horizontal-track">
-
-      <!-- TITLE CARD -->
-      <div class="ach-card flex items-center justify-center text-3xl font-bold text-cyan-400 glitch"
-           data-text="ACHIEVEMENTS">
-        ACHIEVEMENTS
-      </div>
 
       <!-- CARD 1 -->
       <div class="ach-card">
@@ -464,11 +500,27 @@ window.addEventListener('scroll', () => {
   const section = document.querySelector('.horizontal-section');
   if (!section) return;
 
-  const rect = section.getBoundingClientRect();
-  const scrollProgress = -rect.top;
+    const rect = section.getBoundingClientRect();
+    const maxScroll = track.scrollWidth - window.innerWidth;
+    const scrollProgress = Math.min(maxScroll, Math.max(0, -rect.top));
 
-  track.style.transform = `translateX(-${scrollProgress}px)`;
+    track.style.transform = `translateX(-${scrollProgress}px)`;
 });
+
+// 🔥 GLITCH ON SCROLL (ONLY ONCE)
+const glitchElements = document.querySelectorAll('.glitch-on-scroll');
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('glitch-active');
+      observer.unobserve(entry.target); // run only once
+    }
+  });
+}, { threshold: 0.5 });
+
+glitchElements.forEach(el => observer.observe(el));
+
 </script>
 
 </html>
