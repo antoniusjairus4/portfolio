@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Antonius Jairus</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  transition: background 0.5s ease, color 0.5s ease;
+  overflow-x: hidden;
+}
+
+/* THEMES */
+.dark-theme {
+  background: linear-gradient(135deg, #0f172a, #020617, #000000);
+  color: #e2e8f0;
+}
+
+.light-theme {
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0, #cbd5f5);
+  color: #0f172a;
+}
+
+/* TEXT */
+.text-main {
+  color: #e2e8f0;
+}
+.light-theme .text-main {
+  color: #0f172a;
+}
+.text-glow {
+  text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+}
+
+/* NAME */
+.name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(60px, 10vw, 140px);
+  font-weight: 900;
+  line-height: 0.9;
+}
+.name span { display: block; }
+.name span:last-child { margin-left: 8%; }
+
+/* GLITCH */
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+}
+.glitch::before {
+  color: red;
+  animation: glitchTop 0.6s infinite;
+}
+.glitch::after {
+  color: cyan;
+  animation: glitchBottom 0.6s infinite;
+}
+
+@keyframes glitchTop {
+  0% { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px);}
+  50% { clip-path: inset(0 0 30% 0); transform: translate(3px,3px);}
+  100% { clip-path: inset(0 0 80% 0);}
+}
+@keyframes glitchBottom {
+  0% { clip-path: inset(80% 0 0 0); transform: translate(3px,3px);}
+  50% { clip-path: inset(40% 0 0 0); transform: translate(-3px,-3px);}
+  100% { clip-path: inset(80% 0 0 0);}
+}
+
+/* IMAGE */
+.portrait {
+  position: fixed;
+  right: 5%;
+  top: 80px;
+  z-index: 2;
+}
+
+.portrait img {
+  width: clamp(260px, 32vw, 520px); /* 🔥 BIGGER */
+  height: auto;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  border-radius: 16px;
+  border: 1px solid #22d3ee;
+  box-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
+  transition: transform 0.4s ease;
+}
+
+.portrait img:hover {
+  transform: scale(1.05);
+}
+
+/* PROTECT TEXT */
+.content {
+  max-width: 55%;
+}
+
+@media (max-width: 1024px) {
+  .content {
+    max-width: 65%;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    max-width: 100%;
+  }
+
+  .portrait {
+    right: 2%;
+    top: 100px;
+  }
+
+  .portrait img {
+    width: clamp(220px, 40vw, 320px); /* 🔥 slightly bigger mobile */
+  }
+}
+
+/* BACKGROUND */
+.bg-glow {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(34,211,238,0.15), transparent 70%);
+  filter: blur(80px);
+}
+
+.grid-overlay {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 50%;
+  height: 40%;
+  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+                    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.2;
+}
+
+/* ARROW */
+.arrow {
+  animation: fadeDown 2s infinite;
+}
+@keyframes fadeDown {
+  0% { opacity:0; transform: translateY(-10px);}
+  50% { opacity:1;}
+  100% { opacity:0; transform: translateY(10px);}
+}
+</style>
+</head>
+
+<body class="dark-theme">
+
+<div class="fixed top-5 right-5 text-2xl cursor-pointer z-50" onclick="toggleTheme()">🌙</div>
+
+<section class="h-screen flex flex-col justify-center px-10 relative">
+
+<div class="content">
+
+<div class="name text-main text-glow" id="name">
+  <span id="first"></span>
+  <span id="second"></span>
+</div>
+
+<p class="mt-6 text-lg opacity-70 tracking-widest text-main text-glow"
+   style="font-family: 'Playfair Display', serif;">
+   Ou paradosō, oudamōs tēmeron.
+</p>
+
+<div class="mt-10 max-w-xl text-sm md:text-base leading-relaxed text-main">
+
+  <p class="mb-4">
+    Hello everyone! A very warm welcome to my digital space.
+  </p>
+
+  <p class="mb-4">
+    I'm <span class="text-cyan-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
+    This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed, 
+    and the mindset that drives me forward.
+  </p>
+
+  <p class="mb-6">
+    Whether you're a developer, a collaborator, or just exploring, I'm glad you're here. 
+    Here's a quick roadmap of what you'll find as you scroll:
+  </p>
+
+  <div class="space-y-4 text-sm md:text-base">
+
+    <p>
+    <span class="text-cyan-400 font-semibold">Education →</span> 
+    My academic journey and pursuit of knowledge.
+    </p>
+
+    <p>
+      <span class="text-cyan-400 font-semibold">Achievements →</span> 
+      Competitive milestones that shaped my discipline and mindset.
+    </p>
+    
+
+    <p>
+      <span class="text-cyan-400 font-semibold">Intrests →</span> 
+      This belongs to all my intreats .
+    </p>
+    
+    <p>
+      <span class="text-cyan-400 font-semibold">Projects →</span> 
+      The core of my work — solving problems through code.
+    </p>
+
+    <p>
+      <span class="text-cyan-400 font-semibold">Certifications →</span> 
+      Skills and technical standards I've mastered.
+    </p>
+
+  </div>
+
+  <p class="mt-6">
+    Every project tells a story. I hope you enjoy exploring mine feel free to contact me i have given the contact details in the end
+  </p>
+
+</div>
+
+</div>
+</section>
+
+<div class="portrait">
+  <img src="podium.png">
+</div>
+
+<div class="bg-glow"></div>
+<div class="grid-overlay"></div>
+
+<div class="fixed bottom-10 right-10 text-xs opacity-40 tracking-widest text-main">
+  Scroll for more ⚡
+</div>
+
+<div class="absolute bottom-5 w-full text-center arrow text-xl text-main">↓</div>
+
+<script>
+const firstText = "Antonius";
+const secondText = "Jairus";
+
+let i = 0, j = 0;
+const firstEl = document.getElementById("first");
+const secondEl = document.getElementById("second");
+
+function typeFirst() {
+  if (i < firstText.length) {
+    firstEl.innerHTML += firstText.charAt(i);
+    firstEl.classList.add("glitch");
+    firstEl.setAttribute("data-text", firstEl.innerHTML);
+    i++;
+    setTimeout(typeFirst, 80);
+  } else setTimeout(typeSecond, 200);
+}
+
+function typeSecond() {
+  if (j < secondText.length) {
+    secondEl.innerHTML += secondText.charAt(j);
+    secondEl.classList.add("glitch");
+    secondEl.setAttribute("data-text", secondEl.innerHTML);
+    j++;
+    setTimeout(typeSecond, 80);
+  } else {
+    setTimeout(() => {
+      firstEl.classList.remove("glitch");
+      secondEl.classList.remove("glitch");
+    }, 700);
+  }
+}
+
+if (!sessionStorage.getItem("done")) {
+  typeFirst();
+  sessionStorage.setItem("done", "yes");
+} else {
+  firstEl.innerHTML = firstText;
+  secondEl.innerHTML = secondText;
+}
+
+function toggleTheme() {
+  document.body.classList.toggle("dark-theme");
+  document.body.classList.toggle("light-theme");
+}
+</script>
+
+<!-- EDUCATION SECTION -->
+<section class="min-h-screen px-10 flex flex-col justify-center">
+
+  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow glitch mb-12 relative"
+      data-text="EDUCATION">
+    EDUCATION
+  </h2>
+
+  <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
+
+    <!-- SCHOOL -->
+    <a href="edu.html" class="block">
+      <div class="p-6 rounded-2xl border border-cyan-400/30 
+                  bg-white/5 backdrop-blur-md 
+                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
+
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">
+          School
+        </h3>
+
+        <div class="h-40 bg-gray-700 rounded-lg flex items-center justify-center text-sm opacity-60">
+          Image Placeholder
+        </div>
+
+      </div>
+    </a>
+
+    <!-- COLLEGE -->
+    <a href="edu.html" class="block">
+      <div class="p-6 rounded-2xl border border-cyan-400/30 
+                  bg-white/5 backdrop-blur-md 
+                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
+
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">
+          College
+        </h3>
+
+        <div class="h-40 bg-gray-700 rounded-lg flex items-center justify-center text-sm opacity-60">
+          Image Placeholder
+        </div>
+
+      </div>
+    </a>
+
+  </div>
+
+</section>
+
+</body>
+</html>
