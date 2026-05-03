@@ -19,7 +19,8 @@ body {
 
 /* ── THEME ── */
 .dark-theme {
-  background: linear-gradient(135deg, #1a1410, #0d0b08, #111010);
+  background-color: #100e0c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23100e0c'/%3E%3Crect width='1' height='1' fill='%231a1714' opacity='0.6'/%3E%3C/svg%3E");
   color: #f0ebe0;
 }
 
@@ -116,7 +117,27 @@ body {
   .portrait { display: none !important; }
 }
 
-/* ── BACKGROUND ELEMENTS ── */
+/* ── SECTION HEADINGS ── */
+.section-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #d6a03c;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #d6a03c;
+  opacity: 0.3;
+  max-width: 200px;
+}
 .bg-glow    { display: none; }
 .grid-overlay { display: none; }
 
@@ -231,12 +252,12 @@ a:hover .edu-card { transform: translateX(6px); }
         Here's a quick roadmap of what you'll find as you scroll:
       </p>
 
-      <div class="space-y-4 text-sm md:text-base">
-        <p><span class="text-amber-400 font-semibold">Education →</span> My academic journey and pursuit of knowledge.</p>
-        <p><span class="text-amber-400 font-semibold">Achievements →</span> Competitive milestones that shaped my discipline and mindset.</p>
-        <p><span class="text-amber-400 font-semibold">Interests →</span> What I'm passionate about beyond code.</p>
-        <p><span class="text-amber-400 font-semibold">Projects →</span> The core of my work — solving problems through code.</p>
-        <p><span class="text-amber-400 font-semibold">Certifications →</span> Skills and technical standards I've mastered.</p>
+      <div class="space-y-3 text-sm md:text-base" style="border-left: 1px solid rgba(214,160,60,0.25); padding-left: 1rem;">
+        <p><span class="text-amber-400 font-semibold">Education</span> <span class="opacity-40 mx-1">—</span> My academic journey and pursuit of knowledge.</p>
+        <p><span class="text-amber-400 font-semibold">Achievements</span> <span class="opacity-40 mx-1">—</span> Competitive milestones that shaped my discipline and mindset.</p>
+        <p><span class="text-amber-400 font-semibold">Interests</span> <span class="opacity-40 mx-1">—</span> What I'm passionate about beyond code.</p>
+        <p><span class="text-amber-400 font-semibold">Projects</span> <span class="opacity-40 mx-1">—</span> The core of my work — solving problems through code.</p>
+        <p><span class="text-amber-400 font-semibold">Certifications</span> <span class="opacity-40 mx-1">—</span> Skills and technical standards I've mastered.</p>
       </div>
 
       <p class="mt-6">
@@ -261,8 +282,7 @@ a:hover .edu-card { transform: translateX(6px); }
 
 <!-- ═══════════════════════ EDUCATION ═══════════════════════ -->
 <section id="education-section" class="px-10 flex flex-col justify-center pt-32 pb-2">
-  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-6 relative glitch-on-scroll"
-      data-text="EDUCATION">
+  <h2 class="section-heading glitch-on-scroll" data-text="EDUCATION">
     EDUCATION
   </h2>
 
@@ -303,8 +323,7 @@ a:hover .edu-card { transform: translateX(6px); }
 
   <div class="achievements-sticky px-10">
 
-    <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-10 glitch-on-scroll"
-        data-text="ACHIEVEMENTS">
+    <h2 class="section-heading glitch-on-scroll" data-text="ACHIEVEMENTS">
       ACHIEVEMENTS
     </h2>
 
