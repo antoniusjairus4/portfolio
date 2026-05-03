@@ -6,63 +6,87 @@
 <title>Education | Antonius Jairus</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
 
 <style>
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
-  background: linear-gradient(135deg, #0f172a, #020617, #000000);
-  color: #e2e8f0;
+  background-color: #100e0c;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='4'%3E%3Crect width='4' height='4' fill='%23100e0c'/%3E%3Crect width='1' height='1' fill='%231a1714' opacity='0.6'/%3E%3C/svg%3E");
+  color: #f0ebe0;
   margin: 0;
-  padding: 40px;
+  padding: 0;
 }
 
-/* GLITCH */
-.glitch {
-  position: relative;
+/* ── BACK LINK ── */
+.back-link {
   font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: #d6a03c;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+.back-link:hover { opacity: 1; }
+
+/* ── PAGE HEADING ── */
+.page-heading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #f0ebe0;
+  letter-spacing: -0.02em;
 }
 
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
+/* ── SECTION HEADING ── */
+.section-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #d6a03c;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #d6a03c;
+  opacity: 0.3;
+  max-width: 300px;
 }
 
-.glitch::before {
-  color: red;
-  animation: glitchTop 0.6s infinite;
+/* ── INSTITUTION NAME ── */
+.institution-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(1rem, 2.2vw, 1.4rem);
+  color: #f0ebe0;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid #d6a03c;
 }
 
-.glitch::after {
-  color: cyan;
-  animation: glitchBottom 0.6s infinite;
-}
-
-@keyframes glitchTop {
-  0% { clip-path: inset(0 0 80% 0); transform: translate(-2px,-2px);}
-  50% { clip-path: inset(0 0 30% 0); transform: translate(2px,2px);}
-  100% { clip-path: inset(0 0 80% 0);}
-}
-
-@keyframes glitchBottom {
-  0% { clip-path: inset(80% 0 0 0); transform: translate(2px,2px);}
-  50% { clip-path: inset(40% 0 0 0); transform: translate(-2px,-2px);}
-  100% { clip-path: inset(80% 0 0 0);}
-}
-
-/* IMAGE FLOAT */
+/* ── FLOAT IMAGE ── */
 .float-img {
   float: left;
-  width: 280px;
-  margin: 0 20px 20px 0;
-  border-radius: 12px;
-  border: 1px solid #22d3ee;
+  width: clamp(200px, 30%, 300px);
+  margin: 0 28px 20px 0;
+  border-radius: 2px;
+  border-left: 3px solid #d6a03c;
+  border-bottom: 3px solid #d6a03c;
+  border-top: 1px solid rgba(214,160,60,0.2);
+  border-right: 1px solid rgba(214,160,60,0.2);
+  display: block;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
   .float-img {
     float: none;
@@ -70,82 +94,154 @@ body {
     margin: 0 0 20px 0;
   }
 }
+
+/* ── BODY TEXT ── */
+.body-text {
+  font-size: 0.95rem;
+  line-height: 1.85;
+  color: #c8bfb0;
+  margin-bottom: 1.5rem;
+}
+
+/* ── DIVIDER ── */
+.section-divider {
+  border: none;
+  border-top: 1px solid rgba(214,160,60,0.15);
+  margin: 4rem 0;
+}
+
+/* ── SCROLL OFFSET for anchor jump ── */
+#school, #college {
+  scroll-margin-top: 60px;
+}
+
+/* ── GLITCH on heading ── */
+.glitch { position: relative; }
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.glitch::before { color: #ff4500; animation: glitchTop 0.6s infinite; }
+.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s infinite; }
+
+@keyframes glitchTop {
+  0%   { clip-path: inset(0 0 80% 0); transform: translate(-2px,-2px); }
+  50%  { clip-path: inset(0 0 30% 0); transform: translate(2px,2px);   }
+  100% { clip-path: inset(0 0 80% 0); }
+}
+@keyframes glitchBottom {
+  0%   { clip-path: inset(80% 0 0 0); transform: translate(2px,2px);   }
+  50%  { clip-path: inset(40% 0 0 0); transform: translate(-2px,-2px); }
+  100% { clip-path: inset(80% 0 0 0); }
+}
 </style>
 </head>
 
 <body>
 
-<!-- TITLE -->
-<h1 class="text-5xl md:text-7xl font-bold glitch mb-16"
-    data-text="EDUCATION">
-  EDUCATION
-</h1>
+<div style="max-width: 860px; margin: 0 auto; padding: 48px 32px 80px;">
 
-<!-- SCHOOL -->
-<section class="mb-20">
+  <!-- BACK -->
+  <a href="index.html" class="back-link">← index</a>
 
-<h2 class="text-3xl text-cyan-400 font-semibold mb-6">
-  Campion Anglo Indian Higher Secondary School, Trichy
-</h2>
+  <!-- PAGE TITLE -->
+  <h1 class="page-heading glitch mt-6 mb-16" data-text="EDUCATION">
+    EDUCATION
+  </h1>
 
-<img src="images/school1.jpg" class="float-img">
+  <!-- ══════════ SCHOOL ══════════ -->
+  <section id="school">
 
-<p class="leading-relaxed mb-6">
-My academic journey began at Campion Anglo Indian Higher Secondary School in Trichy, an institution that played a defining role in shaping my discipline, mindset, and competitive spirit. The environment at Campion was not just about academics but about building character, leadership, and resilience. From early schooling years, I developed a strong foundation in subjects that would later support my interest in technology and analytical thinking.
+    <p class="section-heading">School</p>
 
-The structured academic system encouraged consistency, while the competitive atmosphere pushed me to always strive for improvement. One of the most impactful aspects of my time at Campion was the emphasis on leadership and responsibility. Being entrusted with roles during my school years helped me understand accountability and decision-making at a young age.
+    <p class="institution-name">
+      Campion Anglo Indian Higher Secondary School, Trichy
+    </p>
 
-Alongside academics, my passion for table tennis grew significantly during this period. Balancing studies and sports taught me time management, focus, and mental strength. The discipline I developed through sports directly influenced my academic performance, creating a synergy between physical and intellectual growth.
+    <div class="clearfix">
+      <img src="images/school1.jpg" class="float-img" alt="Campion School">
 
-The school also fostered communication skills, teamwork, and adaptability. Participating in events, competitions, and leadership activities helped me gain confidence and express my ideas effectively. These experiences laid the groundwork for my ability to perform under pressure and maintain composure in challenging situations.
+      <p class="body-text">
+        My academic journey began at Campion Anglo Indian Higher Secondary School in Trichy — an institution that played a defining role in shaping my discipline, mindset, and competitive spirit. The environment at Campion was not just about academics but about building character, leadership, and resilience.
+      </p>
 
-Overall, my time at Campion was not just about learning from textbooks but about developing a mindset of growth, resilience, and excellence. It built the core values that continue to guide me today in both my academic and personal pursuits.
-</p>
+      <p class="body-text">
+        From early schooling years, I developed a strong foundation in subjects that would later support my interest in technology and analytical thinking. The structured academic system encouraged consistency, while the competitive atmosphere pushed me to always strive for improvement.
+      </p>
 
-<img src="images/school2.jpg" class="float-img">
+      <p class="body-text">
+        One of the most impactful aspects of my time at Campion was the emphasis on leadership and responsibility. Being entrusted with roles during my school years helped me understand accountability and decision-making at a young age. I served as Assistant Leader (2023–24) and Leader (2024–25).
+      </p>
+    </div>
 
-<p class="leading-relaxed">
-Another significant aspect of my school life was the culture of discipline and structured growth. The teachers played a crucial role in mentoring and guiding students beyond academics. Their emphasis on clarity, consistency, and critical thinking helped me develop a strong intellectual base.
+    <div class="clearfix" style="margin-top: 1.5rem;">
+      <img src="images/school2.jpg" class="float-img" alt="Campion School">
 
-The exposure to different co-curricular activities also enhanced my adaptability and curiosity. Whether it was competitions, teamwork-based activities, or independent tasks, each experience contributed to shaping my personality.
+      <p class="body-text">
+        Alongside academics, my passion for table tennis grew significantly during this period. Balancing studies and sports taught me time management, focus, and mental strength. The discipline I developed through sports directly influenced my academic performance, creating a synergy between physical and intellectual growth.
+      </p>
 
-By the time I completed my schooling, I had not only gained academic knowledge but also developed a strong mindset centered around perseverance, self-belief, and continuous improvement. These qualities continue to influence my journey as I move forward into higher education and professional development.
-</p>
+      <p class="body-text">
+        The school also fostered communication skills, teamwork, and adaptability. Participating in events, competitions, and leadership activities helped me gain confidence and express my ideas effectively. These experiences laid the groundwork for my ability to perform under pressure and maintain composure in challenging situations.
+      </p>
 
-</section>
+      <p class="body-text">
+        By the time I completed my schooling, I had not only gained academic knowledge but also developed a strong mindset centered around perseverance, self-belief, and continuous improvement. These qualities continue to influence my journey as I move forward.
+      </p>
+    </div>
 
-<!-- COLLEGE -->
-<section>
+  </section>
 
-<h2 class="text-3xl text-cyan-400 font-semibold mb-6">
-  Sri Krishna College of Engineering and Technology
-</h2>
+  <hr class="section-divider">
 
-<img src="images/college1.jpg" class="float-img">
+  <!-- ══════════ COLLEGE ══════════ -->
+  <section id="college">
 
-<p class="leading-relaxed mb-6">
-My journey at Sri Krishna College of Engineering and Technology marks the beginning of my professional and technical growth. Pursuing a degree in Computer Science and Engineering with a specialization in Cybersecurity, I am focused on building a strong foundation in both theoretical knowledge and practical application.
+    <p class="section-heading">College</p>
 
-The college environment provides exposure to advanced concepts, modern technologies, and industry-relevant skills. It encourages innovation, problem-solving, and independent thinking. Being part of this institution has allowed me to explore different areas of technology while sharpening my analytical and logical reasoning abilities.
+    <p class="institution-name">
+      Sri Krishna College of Engineering and Technology
+    </p>
 
-One of the key aspects of my college experience is the opportunity to work on projects that bridge the gap between theory and real-world applications. Developing solutions, experimenting with new tools, and understanding system-level operations have enhanced my technical capabilities.
+    <div class="clearfix">
+      <img src="images/college1.jpg" class="float-img" alt="SKCET">
 
-In addition to academics, the college environment promotes collaboration and teamwork. Working with peers on projects and discussions helps in gaining diverse perspectives and improving problem-solving approaches. It also builds communication skills and the ability to work effectively in a team setting.
+      <p class="body-text">
+        My journey at Sri Krishna College of Engineering and Technology marks the beginning of my professional and technical growth. Pursuing a B.E. in Computer Science and Engineering with a specialization in Cybersecurity, I am focused on building a strong foundation in both theoretical knowledge and practical application.
+      </p>
 
-The exposure to cybersecurity as a specialization has opened up a new dimension of learning for me. Understanding digital threats, system vulnerabilities, and security mechanisms has become a crucial part of my academic journey.
-</p>
+      <p class="body-text">
+        The college environment provides exposure to advanced concepts, modern technologies, and industry-relevant skills. It encourages innovation, problem-solving, and independent thinking. Being part of this institution has allowed me to explore different areas of technology while sharpening my analytical and logical reasoning abilities.
+      </p>
 
-<img src="images/college2.jpg" class="float-img">
+      <p class="body-text">
+        One of the key aspects of my college experience is the opportunity to work on projects that bridge the gap between theory and real-world applications. Developing solutions, experimenting with new tools, and understanding system-level operations have enhanced my technical capabilities significantly.
+      </p>
+    </div>
 
-<p class="leading-relaxed">
-Beyond academics, my mindset of discipline and performance continues to play a major role in my college life. The ability to handle pressure, developed through sports, helps me stay focused during challenging situations.
+    <div class="clearfix" style="margin-top: 1.5rem;">
+      <img src="images/college2.jpg" class="float-img" alt="SKCET">
 
-I am actively working towards building projects, improving my technical skills, and preparing myself for real-world challenges. My goal is to become a skilled cybersecurity professional who can contribute meaningfully to the field.
+      <p class="body-text">
+        The exposure to cybersecurity as a specialization has opened up a new dimension of learning. Understanding digital threats, system vulnerabilities, and security mechanisms has become a crucial part of my academic journey — and the foundation of my goal to become a Certified Ethical Hacker.
+      </p>
 
-This phase of my education is not just about gaining knowledge but about transforming that knowledge into impactful action. It represents a transition from learning to building, from understanding to applying, and from ambition to execution.
-</p>
+      <p class="body-text">
+        Beyond academics, the discipline developed through years of sport continues to play a major role in my college life. The ability to handle pressure, stay focused during challenging situations, and push through difficulty translates directly into technical problem-solving.
+      </p>
 
-</section>
+      <p class="body-text">
+        This phase of my education represents a transition from learning to building, from understanding to applying, and from ambition to execution. I am actively working towards building impactful projects and preparing myself for real-world challenges in the cybersecurity space.
+      </p>
+    </div>
+
+  </section>
+
+</div>
 
 </body>
 </html>
