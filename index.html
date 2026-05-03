@@ -319,6 +319,8 @@ if (!sessionStorage.getItem("done")) {
   firstEl.innerHTML = firstText;
   secondEl.innerHTML = secondText;
 }
+
+
 </script>
 
 <!-- EDUCATION SECTION -->
@@ -371,5 +373,86 @@ if (!sessionStorage.getItem("done")) {
 
 </section>
 
+<!-- ACHIEVEMENTS SECTION -->
+<section class="horizontal-section">
+
+  <div class="horizontal-wrapper">
+
+    <div class="horizontal-track">
+
+      <!-- TITLE CARD -->
+      <div class="ach-card flex items-center justify-center text-3xl font-bold text-cyan-400 glitch"
+           data-text="ACHIEVEMENTS">
+        ACHIEVEMENTS
+      </div>
+
+      <!-- CARD 1 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl mb-3">🏆 State Champion</h3>
+        <p class="text-main opacity-80">
+          Two-time Tamil Nadu State-level Table Tennis Champion.
+        </p>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl mb-3">🔥 Clutch Player</h3>
+        <p class="text-main opacity-80">
+          Known for performing under extreme pressure situations.
+        </p>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl mb-3">⚡ Discipline</h3>
+        <p class="text-main opacity-80">
+          Built strong mindset through sports and competition.
+        </p>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl mb-3">🚀 Builder</h3>
+        <p class="text-main opacity-80">
+          Creator of KaiForge performance tracking system.
+        </p>
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
 </body>
+
+<script>
+// PORTRAIT SCROLL CONTROL
+const portrait = document.querySelector('.portrait');
+const trigger = document.querySelector('section:nth-of-type(2)'); // education
+
+window.addEventListener('scroll', () => {
+  const triggerTop = trigger.offsetTop;
+
+  if (window.scrollY > triggerTop - 200) {
+    portrait.classList.add('scroll');
+  } else {
+    portrait.classList.remove('scroll');
+  }
+});
+
+// HORIZONTAL SCROLL
+const track = document.querySelector('.horizontal-track');
+
+window.addEventListener('scroll', () => {
+  const section = document.querySelector('.horizontal-section');
+  if (!section) return;
+
+  const rect = section.getBoundingClientRect();
+  const scrollProgress = -rect.top;
+
+  track.style.transform = `translateX(-${scrollProgress}px)`;
+});
+</script>
+
 </html>
