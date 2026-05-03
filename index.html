@@ -22,17 +22,9 @@ body {
   color: #e2e8f0;
 }
 
-.light-theme {
-  background: linear-gradient(135deg, #f8fafc, #e2e8f0, #cbd5f5);
-  color: #0f172a;
-}
-
 /* TEXT */
 .text-main {
   color: #e2e8f0;
-}
-.light-theme .text-main {
-  color: #0f172a;
 }
 .text-glow {
   text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
@@ -162,8 +154,6 @@ body {
 
 <body class="dark-theme">
 
-<div class="fixed top-5 right-5 text-2xl cursor-pointer z-50" onclick="toggleTheme()">🌙</div>
-
 <section class="h-screen flex flex-col justify-center px-10 relative">
 
 <div class="content">
@@ -286,11 +276,6 @@ if (!sessionStorage.getItem("done")) {
 } else {
   firstEl.innerHTML = firstText;
   secondEl.innerHTML = secondText;
-}
-
-function toggleTheme() {
-  document.body.classList.toggle("dark-theme");
-  document.body.classList.toggle("light-theme");
 }
 </script>
 
