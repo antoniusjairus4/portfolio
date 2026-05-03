@@ -182,6 +182,16 @@ body {
   transform: scale(1.05);
 }
 
+.portrait {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.portrait.hide {
+  opacity: 0;
+  transform: translateY(-80px);
+  pointer-events: none;
+}
+
 /* ARROW */
 .arrow {
   animation: fadeDown 2s infinite;
@@ -324,8 +334,7 @@ if (!sessionStorage.getItem("done")) {
 </script>
 
 <!-- EDUCATION SECTION -->
-<section class="min-h-screen px-10 flex flex-col justify-center">
-
+<section class="min-h-[80vh] px-10 flex flex-col justify-center pt-10 pb-6">
   <h2 class="text-4xl md:text-6xl font-bold text-main text-glow glitch mb-12 relative"
       data-text="EDUCATION">
     EDUCATION
@@ -374,7 +383,7 @@ if (!sessionStorage.getItem("done")) {
 </section>
 
 <!-- ACHIEVEMENTS SECTION -->
-<section class="horizontal-section">
+<section class="horizontal-section mt-[-60px]">
 
   <div class="horizontal-wrapper">
 
