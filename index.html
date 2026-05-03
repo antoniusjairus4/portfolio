@@ -118,24 +118,25 @@ body {
 
 /* ── SECTION HEADINGS ── */
 .section-heading {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.1rem, 2vw, 1.4rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 700;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
   color: #d6a03c;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 20px;
   margin-bottom: 2rem;
+  position: relative;
 }
 .section-heading::after {
   content: '';
   flex: 1;
   height: 1px;
   background: #d6a03c;
-  opacity: 0.3;
-  max-width: 200px;
+  opacity: 0.25;
+  max-width: 260px;
 }
 .bg-glow    { display: none; }
 .grid-overlay { display: none; }
@@ -289,16 +290,24 @@ a:hover .edu-card { transform: translateX(6px); }
 
     <!-- SCHOOL -->
     <a href="edu.html#school" class="block">
-        <div class="h-40 overflow-hidden" style="border-radius:2px;">
-          <img src="school.png" class="h-40 w-full object-cover" alt="School">
+      <div style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; overflow:hidden; transition: transform 0.25s ease;">
+        <div style="padding: 16px 20px 12px;">
+          <h3 style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; letter-spacing:0.2em; color:#d6a03c; text-transform:uppercase; margin:0;">School</h3>
+        </div>
+        <div style="height:160px; overflow:hidden;">
+          <img src="school.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="School">
         </div>
       </div>
     </a>
 
     <!-- COLLEGE -->
     <a href="edu.html#college" class="block">
-        <div class="h-40 overflow-hidden" style="border-radius:2px;">
-          <img src="college.png" class="h-40 w-full object-cover" alt="College">
+      <div style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; overflow:hidden; transition: transform 0.25s ease;">
+        <div style="padding: 16px 20px 12px;">
+          <h3 style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; letter-spacing:0.2em; color:#d6a03c; text-transform:uppercase; margin:0;">College</h3>
+        </div>
+        <div style="height:160px; overflow:hidden;">
+          <img src="college.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="College">
         </div>
       </div>
     </a>
