@@ -6,78 +6,89 @@
 <title>Antonius Jairus</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
-
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
 
 <style>
+*, *::before, *::after { box-sizing: border-box; }
+
 body {
   margin: 0;
   transition: background 0.5s ease, color 0.5s ease;
   overflow-x: hidden;
 }
 
-/* THEMES */
+/* ── THEME ── */
 .dark-theme {
   background: linear-gradient(135deg, #0f172a, #020617, #000000);
   color: #e2e8f0;
 }
 
-/* TEXT */
-.text-main {
-  color: #e2e8f0;
-}
-.text-glow {
-  text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
-}
+.text-main  { color: #e2e8f0; }
+.text-glow  { text-shadow: 0 0 8px rgba(34, 211, 238, 0.4); }
 
-/* NAME */
+/* ── NAME ── */
 .name {
   font-family: 'Share Tech Mono', monospace;
   font-size: clamp(60px, 10vw, 140px);
   font-weight: 900;
   line-height: 0.9;
 }
-.name span { display: block; }
-.name span:last-child { margin-left: 8%; }
+.name span              { display: block; }
+.name span:last-child   { margin-left: 8%; }
 
-/* GLITCH */
+/* ── GLITCH (permanent, used on headings) ── */
+.glitch { position: relative; }
 .glitch::before,
 .glitch::after {
   content: attr(data-text);
   position: absolute;
   left: 0;
   width: 100%;
+  pointer-events: none;
 }
-.glitch::before {
-  color: red;
-  animation: glitchTop 0.6s infinite;
-}
-.glitch::after {
-  color: cyan;
-  animation: glitchBottom 0.6s infinite;
-}
+.glitch::before { color: red;  animation: glitchTop    0.6s infinite; }
+.glitch::after  { color: cyan; animation: glitchBottom 0.6s infinite; }
 
 @keyframes glitchTop {
-  0% { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px);}
-  50% { clip-path: inset(0 0 30% 0); transform: translate(3px,3px);}
-  100% { clip-path: inset(0 0 80% 0);}
+  0%   { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px); }
+  50%  { clip-path: inset(0 0 30% 0); transform: translate(3px, 3px);  }
+  100% { clip-path: inset(0 0 80% 0); }
 }
 @keyframes glitchBottom {
-  0% { clip-path: inset(80% 0 0 0); transform: translate(3px,3px);}
-  50% { clip-path: inset(40% 0 0 0); transform: translate(-3px,-3px);}
-  100% { clip-path: inset(80% 0 0 0);}
+  0%   { clip-path: inset(80% 0 0 0); transform: translate(3px, 3px);  }
+  50%  { clip-path: inset(40% 0 0 0); transform: translate(-3px,-3px); }
+  100% { clip-path: inset(80% 0 0 0); }
 }
 
-/* IMAGE */
+/* ── GLITCH ON SCROLL (fires once) ── */
+.glitch-on-scroll { position: relative; }
+.glitch-on-scroll.glitch-active::before,
+.glitch-on-scroll.glitch-active::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  width: 100%;
+  pointer-events: none;
+}
+.glitch-on-scroll.glitch-active::before {
+  color: red;
+  animation: glitchTop 0.6s 2;
+}
+.glitch-on-scroll.glitch-active::after {
+  color: cyan;
+  animation: glitchBottom 0.6s 2;
+}
+
+/* ── PORTRAIT ── */
 .portrait {
   position: fixed;
   right: 5%;
   top: 80px;
   z-index: 2;
+  transition: opacity 0.6s ease, transform 0.6s ease;
 }
-
 .portrait img {
-  width: clamp(260px, 32vw, 520px); /* 🔥 BIGGER */
+  width: clamp(260px, 32vw, 520px);
   height: auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
@@ -86,157 +97,96 @@ body {
   box-shadow: 0 0 50px rgba(34, 211, 238, 0.3);
   transition: transform 0.4s ease;
 }
-
-.portrait img:hover {
-  transform: scale(1.05);
-}
-
-/* PROTECT TEXT */
-.content {
-  max-width: 55%;
-}
-
-@media (max-width: 1024px) {
-  .content {
-    max-width: 65%;
-  }
-}
-
-@media (max-width: 768px) {
-  .content {
-    max-width: 100%;
-  }
-
-  .portrait {
-    right: 2%;
-    top: 100px;
-  }
-
-  .portrait img {
-    width: clamp(220px, 40vw, 320px); /* 🔥 slightly bigger mobile */
-  }
-}
-
-@media (max-width: 768px) {
-  .portrait {
-    display: none !important;
-  }
-}
-
-/* BACKGROUND */
-.bg-glow {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(34,211,238,0.15), transparent 70%);
-  filter: blur(80px);
-}
-
-.grid-overlay {
-  position: fixed;
-  right: 0;
-  bottom: 0;
-  width: 50%;
-  height: 40%;
-  background-image: linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
-                    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px);
-  background-size: 40px 40px;
-  opacity: 0.2;
-}
-
-/* PORTRAIT SCROLL CONTROL */
-.portrait.scroll {
-  position: absolute;
-}
-
-/* HORIZONTAL SCROLL SECTION */
-.horizontal-section {
-  height: 300vh;
-  position: relative;
-}
-
-.horizontal-wrapper {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-}
-
-.horizontal-track {
-  display: flex;
-  gap: 40px;
-  padding-left: 10vw;
-  transition: transform 0.1s linear;
-}
-
-.ach-card {
-  min-width: 80vw;
-  height: 320px;
-  border-radius: 20px;
-  border: 1px solid rgba(34,211,238,0.3);
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(10px);
-  padding: 20px;
-  transition: 0.3s;
-}
-
-.ach-card:hover {
-  transform: scale(1.05);
-}
-
-.portrait {
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-
+.portrait img:hover { transform: scale(1.05); }
 .portrait.hide {
   opacity: 0;
   transform: translateY(-80px);
   pointer-events: none;
 }
 
-/* ARROW */
-.arrow {
-  animation: fadeDown 2s infinite;
+/* ── CONTENT COLUMN ── */
+.content { max-width: 55%; }
+
+@media (max-width: 1024px) { .content { max-width: 65%; } }
+@media (max-width: 768px)  {
+  .content { max-width: 100%; }
+  .portrait { display: none !important; }
 }
+
+/* ── BACKGROUND ELEMENTS ── */
+.bg-glow {
+  position: fixed;
+  right: 0; bottom: 0;
+  width: 500px; height: 500px;
+  background: radial-gradient(circle, rgba(34,211,238,0.15), transparent 70%);
+  filter: blur(80px);
+  pointer-events: none;
+}
+.grid-overlay {
+  position: fixed;
+  right: 0; bottom: 0;
+  width: 50%; height: 40%;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+/* ── ARROW ── */
+.arrow { animation: fadeDown 2s infinite; }
 @keyframes fadeDown {
-  0% { opacity:0; transform: translateY(-10px);}
-  50% { opacity:1;}
-  100% { opacity:0; transform: translateY(10px);}
+  0%   { opacity: 0; transform: translateY(-10px); }
+  50%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(10px);  }
 }
 
-/* 🔥 BETTER CARD SIZING (fix awkward desktop look) */
+/* ════════════════════════════════════════
+   HORIZONTAL ACHIEVEMENTS SCROLL
+   ════════════════════════════════════════
+   The section is tall (scroll distance = card-track overflow).
+   A sticky wrapper sits inside it and does the pinning.
+   JS maps vertical scroll inside the section → horizontal translate.
+*/
+#achievements-section {
+  /* Height = viewport + extra scroll room for all cards */
+  /* We'll set this dynamically in JS once we know card widths */
+  position: relative;
+}
+
+.achievements-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.horizontal-track {
+  display: flex;
+  gap: 32px;
+  padding: 0 10vw;
+  /* no transition here — JS drives it, transition causes lag */
+  will-change: transform;
+}
+
 .ach-card {
-  min-width: clamp(260px, 30vw, 420px);
-  height: clamp(260px, 35vh, 360px);
+  flex-shrink: 0;
+  width: clamp(260px, 28vw, 380px);
+  height: clamp(240px, 32vh, 320px);
   border-radius: 20px;
-  border: 1px solid rgba(34,211,238,0.3);
-  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(34, 211, 238, 0.3);
+  background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
-  padding: 20px;
-  transition: 0.3s;
+  padding: 28px 24px;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
-
-/* 🔥 GLITCH ONLY ONCE */
-.glitch-active::before,
-.glitch-active::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-}
-
-.glitch-active::before {
-  color: red;
-  animation: glitchTop 0.6s 2;
-}
-
-.glitch-active::after {
-  color: cyan;
-  animation: glitchBottom 0.6s 2;
+.ach-card:hover {
+  transform: scale(1.04);
+  box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
 }
 
 </style>
@@ -244,112 +194,192 @@ body {
 
 <body class="dark-theme">
 
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
 <section class="h-screen flex flex-col justify-center px-10 relative">
+  <div class="content">
 
-<div class="content">
+    <div class="name text-main text-glow" id="name">
+      <span id="first"></span>
+      <span id="second"></span>
+    </div>
 
-<div class="name text-main text-glow" id="name">
-  <span id="first"></span>
-  <span id="second"></span>
-</div>
-
-<p class="mt-6 text-lg opacity-70 tracking-widest text-main text-glow"
-   style="font-family: 'Playfair Display', serif;">
-   Ou paradosō, oudamōs tēmeron.
-</p>
-
-<div class="mt-10 max-w-xl text-sm md:text-base leading-relaxed text-main">
-
-  <p class="mb-4">
-    Hello everyone! A very warm welcome to my digital space.
-  </p>
-
-  <p class="mb-4">
-    I'm <span class="text-cyan-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
-    This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed, 
-    and the mindset that drives me forward.
-  </p>
-
-  <p class="mb-6">
-    Whether you're a developer, a collaborator, or just exploring, I'm glad you're here. 
-    Here's a quick roadmap of what you'll find as you scroll:
-  </p>
-
-  <div class="space-y-4 text-sm md:text-base">
-
-    <p>
-    <span class="text-cyan-400 font-semibold">Education →</span> 
-    My academic journey and pursuit of knowledge.
+    <p class="mt-6 text-lg opacity-70 tracking-widest text-main text-glow"
+       style="font-family: 'Playfair Display', serif;">
+      Ou paradosō, oudamōs tēmeron.
     </p>
 
-    <p>
-      <span class="text-cyan-400 font-semibold">Achievements →</span> 
-      Competitive milestones that shaped my discipline and mindset.
-    </p>
-    
+    <div class="mt-10 max-w-xl text-sm md:text-base leading-relaxed text-main">
+      <p class="mb-4">Hello everyone! A very warm welcome to my digital space.</p>
 
-    <p>
-      <span class="text-cyan-400 font-semibold">Intrests →</span> 
-      This belongs to all my intreats .
-    </p>
-    
-    <p>
-      <span class="text-cyan-400 font-semibold">Projects →</span> 
-      The core of my work — solving problems through code.
-    </p>
+      <p class="mb-4">
+        I'm <span class="text-cyan-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
+        This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed,
+        and the mindset that drives me forward.
+      </p>
 
-    <p>
-      <span class="text-cyan-400 font-semibold">Certifications →</span> 
-      Skills and technical standards I've mastered.
-    </p>
+      <p class="mb-6">
+        Whether you're a developer, a collaborator, or just exploring, I'm glad you're here.
+        Here's a quick roadmap of what you'll find as you scroll:
+      </p>
+
+      <div class="space-y-4 text-sm md:text-base">
+        <p><span class="text-cyan-400 font-semibold">Education →</span> My academic journey and pursuit of knowledge.</p>
+        <p><span class="text-cyan-400 font-semibold">Achievements →</span> Competitive milestones that shaped my discipline and mindset.</p>
+        <p><span class="text-cyan-400 font-semibold">Interests →</span> What I'm passionate about beyond code.</p>
+        <p><span class="text-cyan-400 font-semibold">Projects →</span> The core of my work — solving problems through code.</p>
+        <p><span class="text-cyan-400 font-semibold">Certifications →</span> Skills and technical standards I've mastered.</p>
+      </div>
+
+      <p class="mt-6">
+        Every project tells a story. I hope you enjoy exploring mine — feel free to contact me, details are at the bottom.
+      </p>
+    </div>
 
   </div>
-
-  <p class="mt-6">
-    Every project tells a story. I hope you enjoy exploring mine feel free to contact me i have given the contact details in the end
-  </p>
-
-</div>
-
-</div>
 </section>
 
+<!-- Portrait (fixed, hides on scroll) -->
 <div class="portrait">
-  <img src="podium.png">
+  <img src="podium.png" alt="Antonius Jairus">
 </div>
 
 <div class="bg-glow"></div>
 <div class="grid-overlay"></div>
 
-<div class="fixed bottom-10 right-10 text-xs opacity-40 tracking-widest text-main">
-  Scroll for more ⚡
-</div>
-
+<div class="fixed bottom-10 right-10 text-xs opacity-40 tracking-widest text-main">Scroll for more ⚡</div>
 <div class="absolute bottom-5 w-full text-center arrow text-xl text-main">↓</div>
 
-<script>
-const firstText = "Antonius";
-const secondText = "Jairus";
 
+<!-- ═══════════════════════ EDUCATION ═══════════════════════ -->
+<section id="education-section" class="min-h-[80vh] px-10 flex flex-col justify-center pt-10 pb-6">
+  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-12 relative glitch-on-scroll"
+      data-text="EDUCATION">
+    EDUCATION
+  </h2>
+
+  <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
+
+    <!-- SCHOOL -->
+    <a href="edu.html" class="block">
+      <div class="p-6 rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md
+                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">School</h3>
+        <div class="h-40 bg-gray-700 rounded-lg overflow-hidden">
+          <img src="school.png" class="h-40 w-full object-cover border border-cyan-400" alt="School">
+        </div>
+      </div>
+    </a>
+
+    <!-- COLLEGE -->
+    <a href="edu.html" class="block">
+      <div class="p-6 rounded-2xl border border-cyan-400/30 bg-white/5 backdrop-blur-md
+                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">College</h3>
+        <div class="h-40 bg-gray-700 rounded-lg overflow-hidden">
+          <img src="college.png" class="h-40 w-full object-cover border border-cyan-400" alt="College">
+        </div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ ACHIEVEMENTS ═══════════════════════ -->
+<!-- 
+  FIX: The section's height is set by JS to equal 100vh + total horizontal scroll distance.
+  This gives the sticky inner container enough room to "scroll" horizontally.
+-->
+<section id="achievements-section">
+
+  <div class="achievements-sticky px-10">
+
+    <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-10 glitch-on-scroll"
+        data-text="ACHIEVEMENTS">
+      ACHIEVEMENTS
+    </h2>
+
+    <div class="horizontal-track" id="horizontal-track">
+
+      <!-- CARD 1 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🏆 State Champion</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Two-time Tamil Nadu State-level Table Tennis Champion. Competed at the highest level of state sport, bringing home gold twice.
+        </p>
+      </div>
+
+      <!-- CARD 2 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🔥 Clutch Player</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Known for performing under extreme pressure. Wins matches when the stakes are highest — a mindset forged through years of competition.
+        </p>
+      </div>
+
+      <!-- CARD 3 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">⚡ Discipline</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Built a warrior's mindset through consistent training, high-pressure competition, and the pursuit of excellence in sport and code.
+        </p>
+      </div>
+
+      <!-- CARD 4 -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🚀 Builder</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Creator of KaiForge — a Flutter-based table tennis performance tracker sold as a first entrepreneurial milestone.
+        </p>
+      </div>
+
+      <!-- CARD 5 (NEW) -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">♟️ Chess Strategist</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Bullet rating of 2065 on Chess.com. Favors the Grünfeld Defence and Nimzowitsch Opening — precision thinking applied beyond the board.
+        </p>
+      </div>
+
+      <!-- CARD 6 (NEW) -->
+      <div class="ach-card">
+        <h3 class="text-cyan-400 text-xl font-semibold mb-3">🛡️ Cybersecurity Path</h3>
+        <p class="text-main opacity-80 text-sm leading-relaxed">
+          Pursuing a B.E. in Computer Science with a Cybersecurity specialization — building toward becoming a Certified Ethical Hacker.
+        </p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<script>
+/* ── Typewriter with glitch ── */
+const firstText  = "Antonius";
+const secondText = "Jairus";
 let i = 0, j = 0;
-const firstEl = document.getElementById("first");
+const firstEl  = document.getElementById("first");
 const secondEl = document.getElementById("second");
 
 function typeFirst() {
   if (i < firstText.length) {
-    firstEl.innerHTML += firstText.charAt(i);
+    firstEl.textContent += firstText.charAt(i);
     firstEl.classList.add("glitch");
-    firstEl.setAttribute("data-text", firstEl.innerHTML);
+    firstEl.setAttribute("data-text", firstEl.textContent);
     i++;
     setTimeout(typeFirst, 80);
-  } else setTimeout(typeSecond, 200);
+  } else {
+    setTimeout(typeSecond, 200);
+  }
 }
 
 function typeSecond() {
   if (j < secondText.length) {
-    secondEl.innerHTML += secondText.charAt(j);
+    secondEl.textContent += secondText.charAt(j);
     secondEl.classList.add("glitch");
-    secondEl.setAttribute("data-text", secondEl.innerHTML);
+    secondEl.setAttribute("data-text", secondEl.textContent);
     j++;
     setTimeout(typeSecond, 80);
   } else {
@@ -360,167 +390,83 @@ function typeSecond() {
   }
 }
 
-if (!sessionStorage.getItem("done")) {
+// Always play on first real page load; sessionStorage keeps it from re-playing
+// on back-navigation within the same tab session.
+if (!sessionStorage.getItem("typed")) {
   typeFirst();
-  sessionStorage.setItem("done", "yes");
+  sessionStorage.setItem("typed", "yes");
 } else {
-  firstEl.innerHTML = firstText;
-  secondEl.innerHTML = secondText;
+  firstEl.textContent = firstText;
+  secondEl.textContent = secondText;
 }
 
 
-</script>
+/* ── Portrait: hide after education section passes ── */
+const portrait        = document.querySelector('.portrait');
+const educationSection = document.getElementById('education-section');
 
-<!-- EDUCATION SECTION -->
-<section class="min-h-[80vh] px-10 flex flex-col justify-center pt-10 pb-6">
-  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow glitch mb-12 relative"
-      data-text="EDUCATION">
-    EDUCATION
-  </h2>
-
-  <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
-
-    <!-- SCHOOL -->
-    <a href="edu.html" class="block">
-      <div class="p-6 rounded-2xl border border-cyan-400/30 
-                  bg-white/5 backdrop-blur-md 
-                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
-
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">
-          School
-        </h3>
-
-        <div class="h-40 bg-gray-700 rounded-lg flex items-center justify-center text-sm opacity-60">
-          <img src="school.png" 
-            class="h-40 w-full object-cover rounded-lg border border-cyan-400">
-        </div>
-
-      </div>
-    </a>
-
-    <!-- COLLEGE -->
-    <a href="edu.html" class="block">
-      <div class="p-6 rounded-2xl border border-cyan-400/30 
-                  bg-white/5 backdrop-blur-md 
-                  hover:scale-105 transition duration-300 shadow-lg cursor-pointer">
-
-        <h3 class="text-cyan-400 text-xl font-semibold mb-3">
-          College
-        </h3>
-
-        <div class="h-40 bg-gray-700 rounded-lg flex items-center justify-center text-sm opacity-60">
-          <img src="college.png" 
-            class="h-40 w-full object-cover rounded-lg border border-cyan-400">
-        </div>
-
-      </div>
-    </a>
-
-  </div>
-
-</section>
-<!-- 🔥 ACHIEVEMENTS TITLE (OUTSIDE, NOT A CARD) -->
-<section class="horizontal-section mt-[-60px] px-10">
-
-  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-10 relative glitch-on-scroll"
-      data-text="ACHIEVEMENTS">
-    ACHIEVEMENTS
-  </h2>
-
-  <div class="horizontal-wrapper">
-
-    <div class="horizontal-track">
-
-      <!-- CARD 1 -->
-      <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl mb-3">🏆 State Champion</h3>
-        <p class="text-main opacity-80">
-          Two-time Tamil Nadu State-level Table Tennis Champion.
-        </p>
-      </div>
-
-      <!-- CARD 2 -->
-      <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl mb-3">🔥 Clutch Player</h3>
-        <p class="text-main opacity-80">
-          Known for performing under extreme pressure situations.
-        </p>
-      </div>
-
-      <!-- CARD 3 -->
-      <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl mb-3">⚡ Discipline</h3>
-        <p class="text-main opacity-80">
-          Built strong mindset through sports and competition.
-        </p>
-      </div>
-
-      <!-- CARD 4 -->
-      <div class="ach-card">
-        <h3 class="text-cyan-400 text-xl mb-3">🚀 Builder</h3>
-        <p class="text-main opacity-80">
-          Creator of KaiForge performance tracking system.
-        </p>
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-
-</body>
-
-<script>
-// PORTRAIT SCROLL CONTROL
-const portrait = document.querySelector('.portrait');
-const trigger = document.querySelector('section:nth-of-type(2)'); // education
-
-window.addEventListener('scroll', () => {
-  const triggerTop = trigger.offsetTop;
-
-  if (window.scrollY > triggerTop - 200) {
-  portrait.classList.add('scroll');
-} else {
-  portrait.classList.remove('scroll');
+function handlePortrait() {
+  const triggerTop = educationSection.offsetTop;
+  if (window.scrollY > triggerTop + 300) {
+    portrait.classList.add('hide');
+  } else {
+    portrait.classList.remove('hide');
+  }
 }
+window.addEventListener('scroll', handlePortrait, { passive: true });
 
-// 🔥 VANISH AFTER MORE SCROLL
-if (window.scrollY > triggerTop + 300) {
-  portrait.classList.add('hide');
-} else {
-  portrait.classList.remove('hide');
-}
-});
 
-// HORIZONTAL SCROLL
-const track = document.querySelector('.horizontal-track');
-
-window.addEventListener('scroll', () => {
-  const section = document.querySelector('.horizontal-section');
-  if (!section) return;
-
-    const rect = section.getBoundingClientRect();
-    const maxScroll = track.scrollWidth - window.innerWidth;
-    const scrollProgress = Math.min(maxScroll, Math.max(0, -rect.top));
-
-    track.style.transform = `translateX(-${scrollProgress}px)`;
-});
-
-// 🔥 GLITCH ON SCROLL (ONLY ONCE)
-const glitchElements = document.querySelectorAll('.glitch-on-scroll');
-
-const observer = new IntersectionObserver((entries) => {
+/* ── Glitch-on-scroll (IntersectionObserver, fires once per element) ── */
+const glitchEls = document.querySelectorAll('.glitch-on-scroll');
+const glitchObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting) {
       entry.target.classList.add('glitch-active');
-      observer.unobserve(entry.target); // run only once
+      glitchObserver.unobserve(entry.target);
     }
   });
-}, { threshold: 0.5 });
+}, { threshold: 0.4 });
 
-glitchElements.forEach(el => observer.observe(el));
+glitchEls.forEach(el => glitchObserver.observe(el));
 
+
+/* ── Horizontal scroll for achievements ── 
+   HOW IT WORKS:
+   1. We measure total horizontal overflow of the card track.
+   2. We set the section's height = 100vh + that overflow, giving
+      enough vertical scroll room.
+   3. On scroll, we map how far into the section the user has scrolled
+      (relative to when the sticky element pins) → horizontal translate.
+*/
+const achSection = document.getElementById('achievements-section');
+const track      = document.getElementById('horizontal-track');
+
+function setupAchievements() {
+  const stickyHeight  = window.innerHeight;                   // 100vh
+  const trackWidth    = track.scrollWidth;                    // total card width
+  const visibleWidth  = window.innerWidth;
+  const scrollDistance = Math.max(0, trackWidth - visibleWidth + 160); // +padding
+
+  // Give the section enough height to scroll through all cards
+  achSection.style.height = (stickyHeight + scrollDistance) + 'px';
+
+  return scrollDistance;
+}
+
+let scrollDistance = setupAchievements();
+window.addEventListener('resize', () => { scrollDistance = setupAchievements(); }, { passive: true });
+
+function handleHorizontalScroll() {
+  const sectionTop    = achSection.offsetTop;
+  // How far the user has scrolled past the top of the sticky pin point
+  const scrolled      = window.scrollY - sectionTop;
+  const progress      = Math.min(scrollDistance, Math.max(0, scrolled));
+
+  track.style.transform = `translateX(-${progress}px)`;
+}
+
+window.addEventListener('scroll', handleHorizontalScroll, { passive: true });
 </script>
 
+</body>
 </html>
