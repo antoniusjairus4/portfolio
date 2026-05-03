@@ -83,12 +83,12 @@ body {
 .portrait {
   position: fixed;
   right: 5%;
-  top: 80px;
+  top: 40px;
   z-index: 2;
   transition: opacity 0.6s ease, transform 0.6s ease;
 }
 .portrait img {
-  width: clamp(260px, 32vw, 520px);
+  width: clamp(160px, 18vw, 280px);
   height: auto;
   aspect-ratio: 3 / 4;
   object-fit: cover;
@@ -195,7 +195,7 @@ body {
 <body class="dark-theme">
 
 <!-- ═══════════════════════ HERO ═══════════════════════ -->
-<section class="h-screen flex flex-col justify-center px-10 relative">
+<section class="min-h-[60vh] flex flex-col justify-center px-10 pt-16 pb-6 relative">
   <div class="content">
 
     <div class="name text-main text-glow" id="name">
@@ -203,12 +203,12 @@ body {
       <span id="second"></span>
     </div>
 
-    <p class="mt-6 text-lg opacity-70 tracking-widest text-main text-glow"
+    <p class="mt-3 text-lg opacity-70 tracking-widest text-main text-glow"
        style="font-family: 'Playfair Display', serif;">
       Ou paradosō, oudamōs tēmeron.
     </p>
 
-    <div class="mt-10 max-w-xl text-sm md:text-base leading-relaxed text-main">
+    <div class="mt-5 max-w-xl text-sm md:text-base leading-relaxed text-main">
       <p class="mb-4">Hello everyone! A very warm welcome to my digital space.</p>
 
       <p class="mb-4">
@@ -251,8 +251,8 @@ body {
 
 
 <!-- ═══════════════════════ EDUCATION ═══════════════════════ -->
-<section id="education-section" class="min-h-[80vh] px-10 flex flex-col justify-center pt-10 pb-6">
-  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-12 relative glitch-on-scroll"
+<section id="education-section" class="px-10 flex flex-col justify-center pt-6 pb-6">
+  <h2 class="text-4xl md:text-6xl font-bold text-main text-glow mb-6 relative glitch-on-scroll"
       data-text="EDUCATION">
     EDUCATION
   </h2>
