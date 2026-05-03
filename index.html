@@ -140,6 +140,48 @@ body {
   opacity: 0.2;
 }
 
+/* PORTRAIT SCROLL CONTROL */
+.portrait.scroll {
+  position: absolute;
+}
+
+/* HORIZONTAL SCROLL SECTION */
+.horizontal-section {
+  height: 200vh;
+  position: relative;
+}
+
+.horizontal-wrapper {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.horizontal-track {
+  display: flex;
+  gap: 40px;
+  padding-left: 10vw;
+  transition: transform 0.1s linear;
+}
+
+.ach-card {
+  min-width: 300px;
+  height: 300px;
+  border-radius: 20px;
+  border: 1px solid rgba(34,211,238,0.3);
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(10px);
+  padding: 20px;
+  transition: 0.3s;
+}
+
+.ach-card:hover {
+  transform: scale(1.05);
+}
+
 /* ARROW */
 .arrow {
   animation: fadeDown 2s infinite;
