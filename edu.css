@@ -1,0 +1,204 @@
+/* ── edu.css — styles for edu.html ── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body {
+  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
+  background-attachment: fixed;
+  color: #f0ebe0;
+  margin: 0;
+  padding: 0;
+  font-family: 'Playfair Display', serif;
+}
+
+/* ── WAVE CANVAS (fixed background, same as index) ── */
+#wave-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.45;
+}
+
+/* ── FLUID ETHER (per-section overlay) ── */
+.fluid-container {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.fluid-container canvas {
+  position: absolute;
+  inset: 0;
+  width: 100% !important;
+  height: 100% !important;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.85;
+}
+.fluid-container > *:not(canvas) {
+  position: relative;
+  z-index: 2;
+}
+
+/* Make sure all page content sits above the fixed wave bg */
+body > div,
+body > section,
+body > nav {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── BACK LINK ── */
+.back-link {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: #9b7fe8;
+  text-decoration: none;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+  display: inline-block;
+}
+.back-link:hover { opacity: 1; }
+
+/* ── PAGE HEADING ── */
+.page-heading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(2.5rem, 6vw, 5rem);
+  font-weight: 900;
+  line-height: 1;
+  color: #f0ebe0;
+  letter-spacing: -0.02em;
+  margin: 0 0 2rem;
+}
+
+/* ── SECTION HEADING (Education / College labels) ── */
+.section-heading {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 400;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: #9b7fe8;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #9b7fe8;
+  opacity: 0.25;
+  max-width: 300px;
+}
+
+/* ── INSTITUTION NAME ── */
+.institution-name {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  color: #f0ebe0;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid #9b7fe8;
+}
+
+/* ── CONTENT BLOCK (text + image side by side) ── */
+.content-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+  margin-bottom: 1.5rem;
+}
+.content-block.reverse { direction: rtl; }
+.content-block.reverse > * { direction: ltr; }
+
+/* ── BODY TEXT ── */
+.body-text {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: #b0a8a0;
+  margin-bottom: 1.2rem;
+}
+.body-text:last-child { margin-bottom: 0; }
+
+/* ── IMAGE PLACEHOLDER ── */
+.img-placeholder {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background: #13111a;
+  border-left: 2px solid #9b7fe8;
+  border-bottom: 2px solid #9b7fe8;
+  border-top: 1px solid rgba(155,127,232,0.15);
+  border-right: 1px solid rgba(155,127,232,0.15);
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: border-color 0.25s ease;
+}
+.img-placeholder:hover {
+  border-left-color: #c4a8ff;
+  border-bottom-color: #c4a8ff;
+}
+.img-placeholder::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(155,127,232,0.03) 0px,
+    rgba(155,127,232,0.03) 1px,
+    transparent 1px,
+    transparent 14px
+  );
+}
+.img-placeholder .img-icon {
+  font-size: 1.4rem;
+  opacity: 0.25;
+  z-index: 1;
+}
+.img-placeholder .img-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: #9b7fe8;
+  opacity: 0.4;
+  z-index: 1;
+}
+
+/* ── SECTION DIVIDER ── */
+.ruled-line {
+  border: none;
+  border-top: 1px solid rgba(155,127,232,0.15);
+  margin: 3rem 0;
+}
+
+/* ── ANCHOR SCROLL OFFSET ── */
+#school, #college { scroll-margin-top: 20px; padding-top: 20px; }
+
+/* ── FADE IN ── */
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.fade-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .content-block { grid-template-columns: 1fr; }
+  .content-block.reverse { direction: ltr; }
+}
