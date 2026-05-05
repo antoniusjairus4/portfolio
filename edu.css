@@ -1,53 +1,21 @@
-/* ── edu.css — styles for edu.html ── */
+/* ══════════════════════════════
+   edu.css — education page only
+   ══════════════════════════════ */
 
 *, *::before, *::after { box-sizing: border-box; }
+
+html {
+  background: #0f0a1a;
+}
 
 body {
   background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
   background-attachment: fixed;
+  min-height: 100vh;
   color: #f0ebe0;
   margin: 0;
   padding: 0;
   font-family: 'Playfair Display', serif;
-}
-
-/* ── WAVE CANVAS (fixed background, same as index) ── */
-#wave-canvas {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.45;
-}
-
-/* ── FLUID ETHER (per-section overlay) ── */
-.fluid-container {
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-.fluid-container canvas {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.85;
-}
-.fluid-container > *:not(canvas) {
-  position: relative;
-  z-index: 2;
-}
-
-/* Make sure all page content sits above the fixed wave bg */
-body > div,
-body > section,
-body > nav {
-  position: relative;
-  z-index: 1;
 }
 
 /* ── BACK LINK ── */
@@ -74,37 +42,75 @@ body > nav {
   margin: 0 0 2rem;
 }
 
-/* ── SECTION HEADING (Education / College labels) ── */
-.section-heading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #9b7fe8;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 1.5rem;
-}
-.section-heading::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #9b7fe8;
-  opacity: 0.25;
-  max-width: 300px;
+/* ══════════════════════════════════════
+   LIQUID ETHER FLUID CONTAINER
+   — dark bg required so the transparent
+     fluid colours are actually visible
+   ══════════════════════════════════════ */
+.fluid-container {
+  position: relative;
+  width: 100%;
+  height: 140px;
+  margin-bottom: 2rem;
+  border-radius: 8px;
+  border-left: 3px solid #9b7fe8;
+  background: #0d0b14;        /* dark base — fluid renders on top */
+  overflow: hidden;
 }
 
-/* ── INSTITUTION NAME ── */
-.institution-name {
+/* Text overlay on top of the fluid */
+.fluid-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 1.5rem;
+  z-index: 10;                /* above the THREE.js canvas */
+  pointer-events: none;
+}
+
+.fluid-label {
   font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  font-weight: 700;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
   color: #f0ebe0;
-  letter-spacing: 0.04em;
-  margin-bottom: 1.5rem;
-  padding-left: 1rem;
-  border-left: 3px solid #9b7fe8;
+  margin: 0 0 4px;
+  text-shadow: 0 0 20px rgba(155,127,232,0.6);
+}
+
+.fluid-inst {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(0.75rem, 1.5vw, 0.95rem);
+  color: #c4a8ff;
+  margin: 0;
+  opacity: 0.8;
+  letter-spacing: 0.03em;
+}
+
+/* THREE.js injects a canvas — style it */
+.fluid-container canvas {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1;
+  display: block;
+}
+
+/* ── SECTION DIVIDER ── */
+.ruled-line {
+  border: none;
+  border-top: 1px solid rgba(155,127,232,0.18);
+  margin: 3rem 0;
+}
+
+/* ── ANCHOR SCROLL OFFSET ── */
+#school, #college {
+  scroll-margin-top: 20px;
+  padding-top: 10px;
 }
 
 /* ── CONTENT BLOCK (text + image side by side) ── */
@@ -176,16 +182,6 @@ body > nav {
   z-index: 1;
 }
 
-/* ── SECTION DIVIDER ── */
-.ruled-line {
-  border: none;
-  border-top: 1px solid rgba(155,127,232,0.15);
-  margin: 3rem 0;
-}
-
-/* ── ANCHOR SCROLL OFFSET ── */
-#school, #college { scroll-margin-top: 20px; padding-top: 20px; }
-
 /* ── FADE IN ── */
 .fade-in {
   opacity: 0;
@@ -201,4 +197,5 @@ body > nav {
 @media (max-width: 768px) {
   .content-block { grid-template-columns: 1fr; }
   .content-block.reverse { direction: ltr; }
+  .fluid-container { height: 110px; }
 }

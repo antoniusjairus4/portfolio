@@ -7,13 +7,8 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="edu.css">
-<style>
-  #wave-canvas { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.45; }
-  body > div { position:relative; z-index:1; }
-</style>
 </head>
 <body>
-<canvas id="wave-canvas"></canvas>
 
 <div style="max-width:900px; margin:0 auto; padding:48px 32px 100px;">
 
@@ -24,11 +19,10 @@
   <!-- ═══════════ SCHOOL ═══════════ -->
   <section id="school">
 
-    <!-- Fluid header strip -->
-    <div id="school-fluid" class="fluid-container" style="height:120px; margin-bottom:1.5rem; border-radius:6px; border-left:3px solid #9b7fe8;">
-      <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 1.5rem; z-index:2;">
-        <p class="section-heading" style="margin:0 0 4px;">School</p>
-        <p class="institution-name" style="margin:0; border:none; padding:0; font-size:0.85rem; opacity:0.7;">Campion Anglo Indian Higher Secondary School, Trichy</p>
+    <div id="school-fluid" class="fluid-container">
+      <div class="fluid-text">
+        <p class="fluid-label">School</p>
+        <p class="fluid-inst">Campion Anglo Indian Higher Secondary School, Trichy</p>
       </div>
     </div>
 
@@ -78,11 +72,10 @@
   <!-- ═══════════ COLLEGE ═══════════ -->
   <section id="college">
 
-    <!-- Fluid header strip -->
-    <div id="college-fluid" class="fluid-container" style="height:120px; margin-bottom:1.5rem; border-radius:6px; border-left:3px solid #9b7fe8;">
-      <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 1.5rem; z-index:2;">
-        <p class="section-heading" style="margin:0 0 4px;">College</p>
-        <p class="institution-name" style="margin:0; border:none; padding:0; font-size:0.85rem; opacity:0.7;">Sri Krishna College of Engineering and Technology</p>
+    <div id="college-fluid" class="fluid-container">
+      <div class="fluid-text">
+        <p class="fluid-label">College</p>
+        <p class="fluid-inst">Sri Krishna College of Engineering and Technology</p>
       </div>
     </div>
 
@@ -129,18 +122,9 @@
 
 </div>
 
+<!-- Three.js + LiquidEther only — NO linewaves on this page -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="linewaves.js"></script>
 <script src="liquidether.js"></script>
 <script src="edu.js"></script>
-<script>
-  initLineWaves(document.getElementById('wave-canvas'), {
-    speed: 0.25, innerLineCount: 28, outerLineCount: 32,
-    warpIntensity: 0.8, rotation: -45, edgeFadeWidth: 0,
-    colorCycleSpeed: 0.8, brightness: 0.14,
-    color1: '#9b7fe8', color2: '#c4a8ff', color3: '#6d4fc2',
-    enableMouse: true, mouseInfluence: 1.5
-  });
-</script>
 </body>
 </html>
