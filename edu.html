@@ -4,260 +4,131 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Education | Antonius Jairus</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
-
+<link rel="stylesheet" href="edu.css">
 <style>
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
-  background-attachment: fixed;
-  color: #f0ebe0;
-  margin: 0;
-  padding: 0;
-}
-
-/* ── BACK LINK ── */
-.back-link {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: #d6a03c;
-  text-decoration: none;
-  opacity: 0.6;
-  transition: opacity 0.2s ease;
-}
-.back-link:hover { opacity: 1; }
-
-/* ── PAGE HEADING ── */
-.page-heading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 900;
-  line-height: 1;
-  color: #f0ebe0;
-  letter-spacing: -0.02em;
-}
-
-/* ── SECTION HEADING ── */
-.section-heading {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #d6a03c;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 2rem;
-}
-.section-heading::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #d6a03c;
-  opacity: 0.3;
-  max-width: 300px;
-}
-
-/* ── INSTITUTION NAME ── */
-.institution-name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(1rem, 2.2vw, 1.4rem);
-  color: #f0ebe0;
-  letter-spacing: 0.04em;
-  margin-bottom: 1.5rem;
-  padding-left: 1rem;
-  border-left: 3px solid #d6a03c;
-}
-
-/* ── FLOAT IMAGE ── */
-.float-img {
-  float: left;
-  width: clamp(200px, 30%, 300px);
-  margin: 0 28px 20px 0;
-  border-radius: 2px;
-  border-left: 3px solid #d6a03c;
-  border-bottom: 3px solid #d6a03c;
-  border-top: 1px solid rgba(214,160,60,0.2);
-  border-right: 1px solid rgba(214,160,60,0.2);
-  display: block;
-}
-
-@media (max-width: 768px) {
-  .float-img {
-    float: none;
-    width: 100%;
-    margin: 0 0 20px 0;
-  }
-}
-
-/* ── BODY TEXT ── */
-.body-text {
-  font-size: 0.95rem;
-  line-height: 1.85;
-  color: #c8bfb0;
-  margin-bottom: 1.5rem;
-}
-
-/* ── DIVIDER ── */
-.section-divider {
-  border: none;
-  border-top: 1px solid rgba(214,160,60,0.15);
-  margin: 4rem 0;
-}
-
-/* ── SCROLL OFFSET for anchor jump ── */
-#school, #college {
-  scroll-margin-top: 20px;
-  padding-top: 20px;
-}
-
-/* ── GLITCH on heading ── */
-.glitch { position: relative; }
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-}
-.glitch::before { color: #ff4500; animation: glitchTop 0.6s 1; }
-.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s 1; }
-
-@keyframes glitchTop {
-  0%   { clip-path: inset(0 0 80% 0); transform: translate(-2px,-2px); }
-  50%  { clip-path: inset(0 0 30% 0); transform: translate(2px,2px);   }
-  100% { clip-path: inset(0 0 80% 0); }
-}
-@keyframes glitchBottom {
-  0%   { clip-path: inset(80% 0 0 0); transform: translate(2px,2px);   }
-  50%  { clip-path: inset(40% 0 0 0); transform: translate(-2px,-2px); }
-  100% { clip-path: inset(80% 0 0 0); }
-}
+  #wave-canvas { position:fixed; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; opacity:0.45; }
+  body > * { position:relative; z-index:1; }
 </style>
 </head>
-
 <body>
+<canvas id="wave-canvas"></canvas>
 
-<div style="max-width: 860px; margin: 0 auto; padding: 48px 32px 80px;">
+<div style="max-width:900px; margin:0 auto; padding:48px 32px 100px;">
 
-  <!-- BACK -->
-  <a href="index.html" class="back-link">← index</a>
+  <a href="index.html" class="back-link">← back</a>
 
-  <!-- PAGE TITLE -->
-  <h1 class="page-heading glitch mt-6 mb-16" data-text="EDUCATION">
-    EDUCATION
-  </h1>
+  <h1 class="page-heading" style="margin-top:2rem;">Education</h1>
 
-  <!-- ══════════ SCHOOL ══════════ -->
+  <!-- ═══════════ SCHOOL ═══════════ -->
   <section id="school">
 
     <p class="section-heading">School</p>
+    <p class="institution-name">Campion Anglo Indian Higher Secondary School, Trichy</p>
 
-    <p class="institution-name">
-      Campion Anglo Indian Higher Secondary School, Trichy
-    </p>
-
-    <div class="clearfix">
-      <img src="images/school1.jpg" class="float-img" alt="Campion School">
-
-      <p class="body-text">
-        My academic journey began at Campion Anglo Indian Higher Secondary School in Trichy — an institution that played a defining role in shaping my discipline, mindset, and competitive spirit. The environment at Campion was not just about academics but about building character, leadership, and resilience.
-      </p>
-
-      <p class="body-text">
-        From early schooling years, I developed a strong foundation in subjects that would later support my interest in technology and analytical thinking. The structured academic system encouraged consistency, while the competitive atmosphere pushed me to always strive for improvement.
-      </p>
-
-      <p class="body-text">
-        One of the most impactful aspects of my time at Campion was the emphasis on leadership and responsibility. Being entrusted with roles during my school years helped me understand accountability and decision-making at a young age. I served as Assistant Leader (2023–24) and Leader (2024–25).
-      </p>
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block">
+        <div>
+          <p class="body-text">My academic journey began at Campion Anglo Indian Higher Secondary School in Trichy — an institution that played a defining role in shaping my discipline, mindset, and competitive spirit.</p>
+          <p class="body-text">The environment at Campion was not just about academics but about building character, leadership, and resilience. From early schooling years, I developed a strong foundation in subjects that would later support my interest in technology and analytical thinking.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 01</span>
+        </div>
+      </div>
     </div>
 
-    <div class="clearfix" style="margin-top: 1.5rem;">
-      <img src="images/school2.jpg" class="float-img" alt="Campion School">
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block reverse">
+        <div>
+          <p class="body-text">One of the most impactful aspects of my time at Campion was the emphasis on leadership and responsibility. I served as Assistant Leader (2023–24) and Leader (2024–25) — roles that taught me accountability and decision-making at a young age.</p>
+          <p class="body-text">Alongside academics, my passion for table tennis grew significantly during this period. Balancing studies and sports taught me time management, focus, and mental strength.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 02</span>
+        </div>
+      </div>
+    </div>
 
-      <p class="body-text">
-        Alongside academics, my passion for table tennis grew significantly during this period. Balancing studies and sports taught me time management, focus, and mental strength. The discipline I developed through sports directly influenced my academic performance, creating a synergy between physical and intellectual growth.
-      </p>
-
-      <p class="body-text">
-        The school also fostered communication skills, teamwork, and adaptability. Participating in events, competitions, and leadership activities helped me gain confidence and express my ideas effectively. These experiences laid the groundwork for my ability to perform under pressure and maintain composure in challenging situations.
-      </p>
-
-      <p class="body-text">
-        By the time I completed my schooling, I had not only gained academic knowledge but also developed a strong mindset centered around perseverance, self-belief, and continuous improvement. These qualities continue to influence my journey as I move forward.
-      </p>
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block">
+        <div>
+          <p class="body-text">The school fostered communication skills, teamwork, and adaptability. Participating in events, competitions, and leadership activities helped me gain confidence and express ideas effectively.</p>
+          <p class="body-text">By the time I completed schooling, I had developed a mindset centred around perseverance, self-belief, and continuous improvement — qualities that continue to guide me today.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 03</span>
+        </div>
+      </div>
     </div>
 
   </section>
 
-  <hr class="section-divider">
+  <hr class="ruled-line">
 
-  <!-- ══════════ COLLEGE ══════════ -->
+  <!-- ═══════════ COLLEGE ═══════════ -->
   <section id="college">
 
     <p class="section-heading">College</p>
+    <p class="institution-name">Sri Krishna College of Engineering and Technology</p>
 
-    <p class="institution-name">
-      Sri Krishna College of Engineering and Technology
-    </p>
-
-    <div class="clearfix">
-      <img src="images/college1.jpg" class="float-img" alt="SKCET">
-
-      <p class="body-text">
-        My journey at Sri Krishna College of Engineering and Technology marks the beginning of my professional and technical growth. Pursuing a B.E. in Computer Science and Engineering with a specialization in Cybersecurity, I am focused on building a strong foundation in both theoretical knowledge and practical application.
-      </p>
-
-      <p class="body-text">
-        The college environment provides exposure to advanced concepts, modern technologies, and industry-relevant skills. It encourages innovation, problem-solving, and independent thinking. Being part of this institution has allowed me to explore different areas of technology while sharpening my analytical and logical reasoning abilities.
-      </p>
-
-      <p class="body-text">
-        One of the key aspects of my college experience is the opportunity to work on projects that bridge the gap between theory and real-world applications. Developing solutions, experimenting with new tools, and understanding system-level operations have enhanced my technical capabilities significantly.
-      </p>
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block reverse">
+        <div>
+          <p class="body-text">My journey at Sri Krishna College of Engineering and Technology marks the beginning of my professional and technical growth. Pursuing a B.E. in Computer Science and Engineering with a specialization in Cybersecurity.</p>
+          <p class="body-text">The college environment provides exposure to advanced concepts, modern technologies, and industry-relevant skills. It encourages innovation, problem-solving, and independent thinking.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 01</span>
+        </div>
+      </div>
     </div>
 
-    <div class="clearfix" style="margin-top: 1.5rem;">
-      <img src="images/college2.jpg" class="float-img" alt="SKCET">
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block">
+        <div>
+          <p class="body-text">One of the key aspects of my college experience is the opportunity to work on projects that bridge theory and real-world application. Developing solutions and understanding system-level operations has enhanced my technical capabilities significantly.</p>
+          <p class="body-text">The exposure to cybersecurity as a specialization has opened up a new dimension of learning — understanding digital threats, vulnerabilities, and security mechanisms forms the foundation of my goal to become a Certified Ethical Hacker.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 02</span>
+        </div>
+      </div>
+    </div>
 
-      <p class="body-text">
-        The exposure to cybersecurity as a specialization has opened up a new dimension of learning. Understanding digital threats, system vulnerabilities, and security mechanisms has become a crucial part of my academic journey — and the foundation of my goal to become a Certified Ethical Hacker.
-      </p>
-
-      <p class="body-text">
-        Beyond academics, the discipline developed through years of sport continues to play a major role in my college life. The ability to handle pressure, stay focused during challenging situations, and push through difficulty translates directly into technical problem-solving.
-      </p>
-
-      <p class="body-text">
-        This phase of my education represents a transition from learning to building, from understanding to applying, and from ambition to execution. I am actively working towards building impactful projects and preparing myself for real-world challenges in the cybersecurity space.
-      </p>
+    <div class="fade-in" style="margin-bottom:2rem;">
+      <div class="content-block reverse">
+        <div>
+          <p class="body-text">Beyond academics, the discipline developed through years of sport continues to play a major role. The ability to handle pressure and stay focused under challenging situations translates directly into technical problem-solving.</p>
+          <p class="body-text">This phase represents a transition from learning to building, from understanding to applying, and from ambition to execution.</p>
+        </div>
+        <div class="img-placeholder">
+          <span class="img-icon">📷</span>
+          <span class="img-label">Image 03</span>
+        </div>
+      </div>
     </div>
 
   </section>
 
 </div>
 
+<script src="linewaves.js"></script>
+<script src="edu.js"></script>
 <script>
-// Force scroll to anchor on load — browser sometimes ignores it on fresh navigation
-window.addEventListener('load', () => {
-  const hash = window.location.hash;
-  if (hash) {
-    const target = document.querySelector(hash);
-    if (target) {
-      setTimeout(() => {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
-    }
-  }
-});
+  initLineWaves(document.getElementById('wave-canvas'), {
+    speed: 0.25, innerLineCount: 28, outerLineCount: 32,
+    warpIntensity: 0.8, rotation: -45, edgeFadeWidth: 0,
+    colorCycleSpeed: 0.8, brightness: 0.14,
+    color1: '#9b7fe8', color2: '#c4a8ff', color3: '#6d4fc2',
+    enableMouse: true, mouseInfluence: 1.5
+  });
 </script>
-
 </body>
 </html>

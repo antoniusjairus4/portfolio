@@ -1,256 +1,39 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Antonius Jairus</title>
-
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
-
+<link rel="stylesheet" href="index.css">
+<!-- Wave canvas sits fixed behind everything -->
 <style>
-*, *::before, *::after { box-sizing: border-box; }
-
-body {
-  margin: 0;
-  transition: background 0.5s ease, color 0.5s ease;
-  overflow-x: hidden;
-}
-
-/* ── THEME ── */
-.dark-theme {
-  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
-  color: #f0ebe0;
-}
-
-.text-main  { color: #f0ebe0; }
-.text-glow  { text-shadow: none; }
-
-/* ── NAME ── */
-.name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(60px, 10vw, 140px);
-  font-weight: 900;
-  line-height: 0.9;
-}
-.name span              { display: block; }
-.name span:last-child   { margin-left: 8%; }
-
-/* ── GLITCH (permanent, used on headings) ── */
-.glitch { position: relative; }
-.glitch::before,
-.glitch::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-}
-.glitch::before { color: #ff4500; animation: glitchTop    0.6s 1; }
-.glitch::after  { color: #d6a03c; animation: glitchBottom 0.6s 1; }
-
-@keyframes glitchTop {
-  0%   { clip-path: inset(0 0 80% 0); transform: translate(-3px,-3px); }
-  50%  { clip-path: inset(0 0 30% 0); transform: translate(3px, 3px);  }
-  100% { clip-path: inset(0 0 80% 0); }
-}
-@keyframes glitchBottom {
-  0%   { clip-path: inset(80% 0 0 0); transform: translate(3px, 3px);  }
-  50%  { clip-path: inset(40% 0 0 0); transform: translate(-3px,-3px); }
-  100% { clip-path: inset(80% 0 0 0); }
-}
-
-/* ── GLITCH ON SCROLL (fires once) ── */
-.glitch-on-scroll { position: relative; }
-.glitch-on-scroll.glitch-active::before,
-.glitch-on-scroll.glitch-active::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  width: 100%;
-  pointer-events: none;
-}
-.glitch-on-scroll.glitch-active::before {
-  color: #ff4500;
-  animation: glitchTop 0.6s 2;
-}
-.glitch-on-scroll.glitch-active::after {
-  color: #d6a03c;
-  animation: glitchBottom 0.6s 2;
-}
-
-/* ── PORTRAIT ── */
-.portrait {
-  position: fixed;
-  right: 5%;
-  top: 30px;
-  z-index: 2;
-  transition: opacity 0.6s ease, transform 0.6s ease;
-}
-.portrait img {
-  width: clamp(200px, 22vw, 340px);
-  height: auto;
-  aspect-ratio: 3 / 4;
-  object-fit: cover;
-  border-radius: 4px;
-  border-left: 3px solid #d6a03c;
-  border-bottom: 3px solid #d6a03c;
-  border-top: 1px solid rgba(214,160,60,0.2);
-  border-right: 1px solid rgba(214,160,60,0.2);
-  box-shadow: none;
-  transition: transform 0.4s ease;
-}
-.portrait img:hover { transform: scale(1.05); }
-.portrait.hide {
-  opacity: 0;
-  transform: translateY(-80px);
-  pointer-events: none;
-}
-
-/* ── CONTENT COLUMN ── */
-.content { max-width: 55%; }
-
-@media (max-width: 1024px) { .content { max-width: 65%; } }
-@media (max-width: 768px)  {
-  .content { max-width: 100%; }
-  .portrait { display: none !important; }
-}
-
-/* ── SECTION HEADINGS ── */
-.section-heading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 700;
-  letter-spacing: 0.25em;
-  text-transform: uppercase;
-  color: #d6a03c;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 2rem;
-  position: relative;
-}
-.section-heading::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #d6a03c;
-  opacity: 0.25;
-  max-width: 260px;
-}
-.bg-glow    { display: none; }
-.grid-overlay { display: none; }
-
-/* ── EDUCATION CARDS ── */
-a .edu-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 0;
-  height: 1px;
-  background: #d6a03c;
-  transition: width 0.4s ease;
-}
-a:hover .edu-card::after { width: 100%; }
-a:hover .edu-card { transform: translateX(6px); }
-.edu-card { transition: transform 0.25s ease; }
-.arrow { animation: fadeDown 2s infinite; }
-@keyframes fadeDown {
-  0%   { opacity: 0; transform: translateY(-10px); }
-  50%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(10px);  }
-}
-
-/* ════════════════════════════════════════
-   HORIZONTAL ACHIEVEMENTS SCROLL
-   ════════════════════════════════════════
-   The section is tall (scroll distance = card-track overflow).
-   A sticky wrapper sits inside it and does the pinning.
-   JS maps vertical scroll inside the section → horizontal translate.
-*/
-#achievements-section {
-  /* Height = viewport + extra scroll room for all cards */
-  /* We'll set this dynamically in JS once we know card widths */
-  position: relative;
-}
-
-.achievements-sticky {
-  position: sticky;
-  top: 0;
-  height: 100vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.horizontal-track {
-  display: flex;
-  gap: 32px;
-  padding: 0 10vw;
-  /* no transition here — JS drives it, transition causes lag */
-  will-change: transform;
-}
-
-.ach-card {
-  flex-shrink: 0;
-  width: clamp(260px, 28vw, 380px);
-  height: clamp(240px, 32vh, 320px);
-  border-radius: 8px;
-  border: none;
-  border-left: 3px solid #9b7fe8;
-  background: #13111a;
-  padding: 28px 24px;
-  transition: transform 0.25s ease;
-  position: relative;
-  text-decoration: none;
-  display: block;
-  cursor: pointer;
-}
-.ach-card::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0;
-  width: 0;
-  height: 1px;
-  background: #9b7fe8;
-  transition: width 0.4s ease;
-  border-radius: 0 0 8px 8px;
-}
-.ach-card:hover::after { width: 100%; }
-.ach-card:hover {
-  transform: translateX(6px);
-}
-.ach-card .card-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.7rem;
-  letter-spacing: 0.2em;
-  color: #9b7fe8;
-  text-transform: uppercase;
-  opacity: 0.6;
-  margin-bottom: 10px;
-  display: block;
-}
-.ach-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.15rem;
-  font-weight: 600;
-  color: #f0ebe0;
-  margin-bottom: 12px;
-  letter-spacing: 0.01em;
-}
-.ach-card p {
-  font-size: 0.85rem;
-  line-height: 1.75;
-  color: #a09890;
-}
-
+  #wave-canvas {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.55;
+  }
+  /* Don't use body > * z-index — conflicts with Tailwind fixed/absolute positions */
+  section, .portrait, .fixed, .absolute {
+    position: relative;
+    z-index: 2;
+  }
+  .portrait {
+    position: fixed !important;
+    z-index: 10 !important;
+  }
 </style>
 </head>
 
 <body class="dark-theme">
+<canvas id="wave-canvas"></canvas>
 
-<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<!-- ═══════════ HERO ═══════════ -->
 <section class="min-h-[60vh] flex flex-col justify-center px-10 pt-16 pb-6 relative">
   <div class="content">
 
@@ -259,31 +42,30 @@ a:hover .edu-card { transform: translateX(6px); }
       <span id="second"></span>
     </div>
 
-    <p class="mt-3 text-lg opacity-70 tracking-widest text-main text-glow"
-       style="font-family: 'Playfair Display', serif;">
+    <p class="mt-3 text-lg opacity-70 tracking-widest text-main" style="font-family:'Playfair Display',serif;">
       Ou paradosō, oudamōs tēmeron.
     </p>
 
     <div class="mt-5 max-w-xl text-sm md:text-base leading-relaxed text-main">
+
       <p class="mb-4">Hello everyone! A very warm welcome to my digital space.</p>
 
       <p class="mb-4">
-        I'm <span class="text-amber-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
+        I'm <span class="text-violet-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
         This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed,
         and the mindset that drives me forward.
       </p>
 
-      <p class="mb-6">
+      <p class="mb-4">
         Whether you're a developer, a collaborator, or just exploring, I'm glad you're here.
         Here's a quick roadmap of what you'll find as you scroll:
       </p>
 
-      <div class="space-y-3 text-sm md:text-base" style="border-left: 1px solid rgba(214,160,60,0.25); padding-left: 1rem;">
-        <p><span class="text-amber-400 font-semibold">Education</span> <span class="opacity-40 mx-1">—</span> My academic journey and pursuit of knowledge.</p>
-        <p><span class="text-amber-400 font-semibold">Achievements</span> <span class="opacity-40 mx-1">—</span> Competitive milestones that shaped my discipline and mindset.</p>
-        <p><span class="text-amber-400 font-semibold">Interests</span> <span class="opacity-40 mx-1">—</span> What I'm passionate about beyond code.</p>
-        <p><span class="text-amber-400 font-semibold">Projects</span> <span class="opacity-40 mx-1">—</span> The core of my work — solving problems through code.</p>
-        <p><span class="text-amber-400 font-semibold">Certifications</span> <span class="opacity-40 mx-1">—</span> Skills and technical standards I've mastered.</p>
+      <div class="space-y-3 text-sm md:text-base" style="border-left:1px solid rgba(155,127,232,0.25); padding-left:1rem;">
+        <p><span class="text-violet-400 font-semibold">Education</span> <span class="opacity-40 mx-1">—</span> My academic journey and pursuit of knowledge.</p>
+        <p><span class="text-violet-400 font-semibold">Pursuits</span> <span class="opacity-40 mx-1">—</span> Sport, art, strategy — the pursuits that shaped my character.</p>
+        <p><span class="text-violet-400 font-semibold">Projects</span> <span class="opacity-40 mx-1">—</span> The core of my work — solving problems through code.</p>
+        <p><span class="text-violet-400 font-semibold">Certifications</span> <span class="opacity-40 mx-1">—</span> Skills and technical standards I've mastered.</p>
       </div>
 
       <p class="mt-6">
@@ -294,7 +76,7 @@ a:hover .edu-card { transform: translateX(6px); }
   </div>
 </section>
 
-<!-- Portrait (fixed, hides on scroll) -->
+<!-- Portrait -->
 <div class="portrait">
   <img src="podium.png" alt="Antonius Jairus">
 </div>
@@ -306,32 +88,25 @@ a:hover .edu-card { transform: translateX(6px); }
 <div class="absolute bottom-5 w-full text-center arrow text-xl text-main">↓</div>
 
 
-<!-- ═══════════════════════ EDUCATION ═══════════════════════ -->
+<!-- ═══════════ EDUCATION ═══════════ -->
 <section id="education-section" class="px-10 flex flex-col justify-center pt-32 pb-2">
-  <h2 class="section-heading glitch-on-scroll" data-text="EDUCATION">
-    EDUCATION
-  </h2>
+
+  <h2 class="section-heading glitch-on-scroll" data-text="EDUCATION">EDUCATION</h2>
 
   <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
 
-    <!-- SCHOOL -->
     <a href="edu.html#school" class="block">
-      <div style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; overflow:hidden; transition: transform 0.25s ease;">
-        <div style="padding: 16px 20px 12px;">
-          <h3 style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; letter-spacing:0.2em; color:#d6a03c; text-transform:uppercase; margin:0;">School</h3>
-        </div>
+      <div class="edu-card">
+        <span class="edu-card-label">School</span>
         <div style="height:160px; overflow:hidden;">
           <img src="school.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="School">
         </div>
       </div>
     </a>
 
-    <!-- COLLEGE -->
     <a href="edu.html#college" class="block">
-      <div style="background:#161210; border-left:3px solid #d6a03c; border-radius:2px; overflow:hidden; transition: transform 0.25s ease;">
-        <div style="padding: 16px 20px 12px;">
-          <h3 style="font-family:'Share Tech Mono',monospace; font-size:0.85rem; letter-spacing:0.2em; color:#d6a03c; text-transform:uppercase; margin:0;">College</h3>
-        </div>
+      <div class="edu-card">
+        <span class="edu-card-label">College</span>
         <div style="height:160px; overflow:hidden;">
           <img src="college.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="College">
         </div>
@@ -342,57 +117,44 @@ a:hover .edu-card { transform: translateX(6px); }
 </section>
 
 
-<!-- ═══════════════════════ ACHIEVEMENTS ═══════════════════════ -->
-<!-- 
-  FIX: The section's height is set by JS to equal 100vh + total horizontal scroll distance.
-  This gives the sticky inner container enough room to "scroll" horizontally.
--->
-<section id="achievements-section" style="margin-top: -120px;">
-
+<!-- ═══════════ PURSUITS ═══════════ -->
+<section id="achievements-section" style="margin-top:-120px;">
   <div class="achievements-sticky px-10">
 
-    <h2 class="section-heading glitch-on-scroll" data-text="PURSUITS">
-      PURSUITS
-    </h2>
+    <h2 class="section-heading glitch-on-scroll" data-text="PURSUITS">PURSUITS</h2>
 
     <div class="horizontal-track" id="horizontal-track">
 
-      <!-- TABLE TENNIS -->
       <a href="tt.html" class="ach-card">
         <span class="card-label">Sport</span>
         <h3>Table Tennis</h3>
         <p>The sport that shaped my focus, reflexes, and competitive mindset from childhood. Two-time Tamil Nadu State Champion.</p>
       </a>
 
-      <!-- KARATE -->
       <a href="kar.html" class="ach-card">
         <span class="card-label">Martial Art</span>
         <h3>Karate</h3>
         <p>Trained before table tennis. Built my foundation in discipline, self-defence, and controlled aggression.</p>
       </a>
 
-      <!-- MUSIC -->
       <a href="music.html" class="ach-card">
         <span class="card-label">Art</span>
         <h3>Music — Keyboard</h3>
         <p>The one pursuit that quiets everything else. Playing keyboard is how I reset and maintain clarity of thought.</p>
       </a>
 
-      <!-- PUBLIC SPEAKING -->
       <a href="speak.html" class="ach-card">
         <span class="card-label">Communication</span>
         <h3>Public Speaking & Events</h3>
         <p>Coordinated events and held the stage at Campion. Strong English and the ability to command a room.</p>
       </a>
 
-      <!-- CHESS -->
       <a href="chess.html" class="ach-card">
         <span class="card-label">Strategy</span>
         <h3>Chess</h3>
         <p>Bullet 2065 · Blitz 1854 · Rapid 1760. Grünfeld Defence. The most mentally demanding thing I do — and I keep coming back.</p>
       </a>
 
-      <!-- OTHERS -->
       <a href="others.html" class="ach-card">
         <span class="card-label">Miscellaneous</span>
         <h3>Others</h3>
@@ -404,119 +166,24 @@ a:hover .edu-card { transform: translateX(6px); }
 </section>
 
 
-<!-- ═══════════════════════ SCRIPTS ═══════════════════════ -->
+<script src="index.js"></script>
+<script src="linewaves.js"></script>
 <script>
-/* ── Typewriter with glitch ── */
-const firstText  = "Antonius";
-const secondText = "Jairus";
-let i = 0, j = 0;
-const firstEl  = document.getElementById("first");
-const secondEl = document.getElementById("second");
-
-function typeFirst() {
-  if (i < firstText.length) {
-    firstEl.textContent += firstText.charAt(i);
-    firstEl.classList.add("glitch");
-    firstEl.setAttribute("data-text", firstEl.textContent);
-    i++;
-    setTimeout(typeFirst, 80);
-  } else {
-    setTimeout(typeSecond, 200);
-  }
-}
-
-function typeSecond() {
-  if (j < secondText.length) {
-    secondEl.textContent += secondText.charAt(j);
-    secondEl.classList.add("glitch");
-    secondEl.setAttribute("data-text", secondEl.textContent);
-    j++;
-    setTimeout(typeSecond, 80);
-  } else {
-    setTimeout(() => {
-      firstEl.classList.remove("glitch");
-      secondEl.classList.remove("glitch");
-    }, 700);
-  }
-}
-
-// Always play on first real page load; sessionStorage keeps it from re-playing
-// on back-navigation within the same tab session.
-if (!sessionStorage.getItem("typed")) {
-  typeFirst();
-  sessionStorage.setItem("typed", "yes");
-} else {
-  firstEl.textContent = firstText;
-  secondEl.textContent = secondText;
-}
-
-
-/* ── Portrait: hide after education section passes ── */
-const portrait        = document.querySelector('.portrait');
-const educationSection = document.getElementById('education-section');
-
-function handlePortrait() {
-  const triggerTop = educationSection.offsetTop;
-  if (window.scrollY > triggerTop + 300) {
-    portrait.classList.add('hide');
-  } else {
-    portrait.classList.remove('hide');
-  }
-}
-window.addEventListener('scroll', handlePortrait, { passive: true });
-
-
-/* ── Glitch-on-scroll (IntersectionObserver, fires once per element) ── */
-const glitchEls = document.querySelectorAll('.glitch-on-scroll');
-const glitchObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('glitch-active');
-      glitchObserver.unobserve(entry.target);
-    }
+  initLineWaves(document.getElementById('wave-canvas'), {
+    speed:           0.3,
+    innerLineCount:  32,
+    outerLineCount:  36,
+    warpIntensity:   1.0,
+    rotation:        -45,
+    edgeFadeWidth:   0.0,
+    colorCycleSpeed: 1.0,
+    brightness:      0.35,
+    color1:          '#9b7fe8',
+    color2:          '#c4a8ff',
+    color3:          '#6d4fc2',
+    enableMouse:     true,
+    mouseInfluence:  2.0
   });
-}, { threshold: 0.4 });
-
-glitchEls.forEach(el => glitchObserver.observe(el));
-
-
-/* ── Horizontal scroll for achievements ── 
-   HOW IT WORKS:
-   1. We measure total horizontal overflow of the card track.
-   2. We set the section's height = 100vh + that overflow, giving
-      enough vertical scroll room.
-   3. On scroll, we map how far into the section the user has scrolled
-      (relative to when the sticky element pins) → horizontal translate.
-*/
-const achSection = document.getElementById('achievements-section');
-const track      = document.getElementById('horizontal-track');
-
-function setupAchievements() {
-  const stickyHeight  = window.innerHeight;                   // 100vh
-  const trackWidth    = track.scrollWidth;                    // total card width
-  const visibleWidth  = window.innerWidth;
-  const scrollDistance = Math.max(0, trackWidth - visibleWidth + 160); // +padding
-
-  // Give the section enough height to scroll through all cards
-  achSection.style.height = (stickyHeight + scrollDistance) + 'px';
-
-  return scrollDistance;
-}
-
-let scrollDistance = setupAchievements();
-window.addEventListener('resize', () => { scrollDistance = setupAchievements(); }, { passive: true });
-
-function handleHorizontalScroll() {
-  const sectionTop    = achSection.offsetTop;
-  // How far the user has scrolled past the top of the sticky pin point
-  const scrolled      = window.scrollY - sectionTop;
-  const progress      = Math.min(scrollDistance, Math.max(0, scrolled));
-
-  track.style.transform = `translateX(-${progress}px)`;
-}
-
-window.addEventListener('scroll', handleHorizontalScroll, { passive: true });
 </script>
-
 </body>
 </html>
