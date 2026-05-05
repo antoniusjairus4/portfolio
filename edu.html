@@ -17,12 +17,13 @@
   <h1 class="page-heading" style="margin-top:2rem;">Education</h1>
 
   <!-- ═══════════ SCHOOL ═══════════ -->
-  <section id="school">
+  <section id="school" class="liquid-section" data-liquid-id="school-liquid">
 
-    <div id="school-fluid" class="fluid-container">
-      <div class="fluid-text">
-        <p class="fluid-label">School</p>
-        <p class="fluid-inst">Campion Anglo Indian Higher Secondary School, Trichy</p>
+    <!-- Fluid header strip -->
+    <div class="fluid-container" style="height:120px; margin-bottom:1.5rem; border-radius:6px; border-left:3px solid #9b7fe8;">
+      <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 1.5rem; z-index:2;">
+        <p class="section-heading" style="margin:0 0 4px;">School</p>
+        <p class="institution-name" style="margin:0; border:none; padding:0; font-size:0.85rem; opacity:0.7;">Campion Anglo Indian Higher Secondary School, Trichy</p>
       </div>
     </div>
 
@@ -70,12 +71,13 @@
   <hr class="ruled-line">
 
   <!-- ═══════════ COLLEGE ═══════════ -->
-  <section id="college">
+  <section id="college" class="liquid-section" data-liquid-id="college-liquid">
 
-    <div id="college-fluid" class="fluid-container">
-      <div class="fluid-text">
-        <p class="fluid-label">College</p>
-        <p class="fluid-inst">Sri Krishna College of Engineering and Technology</p>
+    <!-- Fluid header strip -->
+    <div class="fluid-container" style="height:120px; margin-bottom:1.5rem; border-radius:6px; border-left:3px solid #9b7fe8;">
+      <div style="position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; padding:0 1.5rem; z-index:2;">
+        <p class="section-heading" style="margin:0 0 4px;">College</p>
+        <p class="institution-name" style="margin:0; border:none; padding:0; font-size:0.85rem; opacity:0.7;">Sri Krishna College of Engineering and Technology</p>
       </div>
     </div>
 
@@ -122,9 +124,11 @@
 
 </div>
 
-<!-- Three.js + LiquidEther only — NO linewaves on this page -->
+<!-- Load Three.js first -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<!-- Then your library -->
 <script src="liquidether.js"></script>
+<!-- Then your page-specific logic -->
 <script src="edu.js"></script>
 </body>
 </html>
