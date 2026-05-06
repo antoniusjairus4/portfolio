@@ -39,7 +39,6 @@ html {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  /* The canvas is injected inside here by liquidether.js */
 }
 
 /* All page content sits above the fluid bg */
