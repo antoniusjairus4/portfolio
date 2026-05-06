@@ -1,92 +1,122 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: #0a0a0f;
-  color: #f0ebe0;
-  margin: 0;
-  padding: 0;
-  font-family: 'Playfair Display', serif;
+    background: #0a0a0f; /* Fallback */
+    /* CHANGE: Changed default body text to a bright white/off-white */
+    color: #ffffff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Playfair Display', serif;
+    overflow-x: hidden;
 }
 
+/* ── LIGHT PILLAR BACKGROUND ENGINE ── */
+#pillar-bg-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.8; /* Adjusted for better content contrast */
+}
+
+#pillar-bg-container canvas {
+    mix-blend-mode: screen; /* Matches config for high vibrancy */
+}
+
+/* ── MAIN CONTENT LAYER ── */
 .main-container {
-  max-width: 900px;
-  margin: 0 auto;
-  padding: 48px 32px 100px;
-  position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 32px 100px;
+    position: relative;
+    z-index: 1; /* Content sits above the background pillars */
 }
 
-/* ── MAGIC BENTO REINFORCED ── */
+/* ── REINFORCED MAGIC BENTO CARDS ── */
 .magic-bento-card {
-  --glow-x: 50%;
-  --glow-y: 50%;
-  --glow-intensity: 0;
-  position: relative;
-  overflow: hidden;
-  background: #120F17;
-  border: 1px solid #2F293A;
-  border-radius: 12px;
-  transition: box-shadow 0.3s ease, border-color 0.3s ease;
-  transform-style: preserve-3d;
+    --glow-x: 50%;
+    --glow-y: 50%;
+    --glow-intensity: 0;
+    position: relative;
+    overflow: hidden;
+    background: rgba(18, 15, 23, 0.85); /* Dark background inside the card for contrast */
+    backdrop-filter: blur(10px); /* For glassmorphism effect */
+    border: 1px solid rgba(47, 41, 58, 0.9);
+    border-radius: 12px;
+    transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.2s ease-out;
+    transform-style: preserve-3d;
 }
 
+/* Specific styling for the education header strips */
 .header-strip.magic-bento-card {
-  border-left: 3px solid #9b7fe8 !important;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
+    border-left: 3px solid #9b7fe8 !important; /* Signature purple accent is maintained */
+    padding: 1.5rem;
+    margin-bottom: 2.5rem;
 }
 
-.img-placeholder {
-  width: 100%;
-  aspect-ratio: 4/3;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Enhanced Border Glow */
+/* Reinforcing border glow intensity */
 .magic-bento-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  padding: 2px;
-  background: radial-gradient(
-    500px circle at var(--glow-x) var(--glow-y),
-    rgba(132, 0, 255, calc(var(--glow-intensity) * 1.0)) 0%, /* Increased intensity weight */
-    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.4)) 40%,
-    transparent 80%
-  );
-  border-radius: inherit;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
+    content: '';
+    position: absolute;
+    inset: 0;
+    padding: 2.5px; /* Border thickness */
+    background: radial-gradient(
+        500px circle at var(--glow-x) var(--glow-y),
+        rgba(132, 0, 255, calc(var(--glow-intensity) * 1.3)) 0%, /* Max intensity weight */
+        rgba(132, 0, 255, calc(var(--glow-intensity) * 0.6)) 40%,
+        transparent 80%
+    );
+    border-radius: inherit;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+    z-index: 2; /* Keeps glow above background pillars */
 }
 
+/* Spotlight that follows mouse movement */
 .global-spotlight {
-  position: fixed;
-  width: 700px;
-  height: 700px;
-  background: radial-gradient(circle, rgba(132, 0, 255, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 999;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: screen;
-  opacity: 0;
+    position: fixed;
+    width: 700px;
+    height: 700px;
+    background: radial-gradient(circle, rgba(132, 0, 255, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999; /* Highest layer for visible cursor effect */
+    transform: translate(-50%, -50%);
+    mix-blend-mode: screen;
+    opacity: 0;
 }
 
-/* ── LAYOUT ── */
+/* ── LAYOUT & TYPOGRAPHY FIXES ── */
 .education-section { margin-bottom: 4rem; }
-.content-block { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 3rem; align-items: start; }
+.content-block { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 3.5rem; align-items: start; }
 .content-block.reverse { direction: rtl; }
 .content-block.reverse > * { direction: ltr; }
 
-.section-heading { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; font-size: 1.2rem; letter-spacing: 0.25em; text-transform: uppercase; margin: 0; }
-.institution-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; opacity: 0.7; }
-.body-text { font-size: 0.95rem; line-height: 1.8; color: #b0a8a0; margin-bottom: 1rem; }
-.page-heading { font-family: 'Share Tech Mono', monospace; font-size: 3.5rem; margin-bottom: 2rem; }
-.back-link { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; text-decoration: none; opacity: 0.6; }
-.ruled-line { border: none; border-top: 1px solid rgba(155, 127, 232, 0.15); margin: 4rem 0; }
+/* Image placeholder box */
+.img-placeholder { width: 100%; aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; isolation: isolate; }
+.img-placeholder::before { content: ''; position: absolute; inset: 0; background: rgba(0, 0, 0, 0.15); z-index: -1; } /* Subtler grid */
 
+/* Typography */
+.page-heading { font-family: 'Share Tech Mono', monospace; font-size: clamp(2.5rem, 6vw, 4rem); color: #ffffff; margin-bottom: 2rem; }
+.section-heading { font-family: 'Share Tech Mono', monospace; color: #ffffff; font-size: 1.2rem; letter-spacing: 0.25em; text-transform: uppercase; margin: 0; }
+
+/* CHANGE: institution-subtitle was #f0ebe0, now full bright #ffffff for high contrast */
+.institution-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; color: #ffffff; opacity: 1; }
+
+/* CHANGE: body-text was dark #b0a8a0, now bright #ffffff for high contrast */
+.body-text { font-size: 0.95rem; line-height: 1.9; color: #ffffff; margin-bottom: 1.2rem; }
+.body-text:last-child { margin-bottom: 0; }
+
+.back-link { font-family: 'Share Tech Mono', monospace; color: #ffffff; text-decoration: none; opacity: 0.7; transition: opacity 0.2s; }
+.back-link:hover { opacity: 1; }
+.img-icon { font-size: 1.4rem; color: #ffffff; opacity: 0.5; }
+.img-label { font-family: 'Share Tech Mono', monospace; font-size: 0.6rem; color: #ffffff; opacity: 0.6; }
+.ruled-line { border: none; border-top: 1px solid rgba(255, 255, 255, 0.15); margin: 4rem 0; }
+
+/* Responsive grid */
 @media (max-width: 768px) { .content-block { grid-template-columns: 1fr; } }
