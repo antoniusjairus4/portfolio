@@ -6,7 +6,6 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Playfair Display', serif;
-  overflow-x: hidden;
 }
 
 .main-container {
@@ -14,10 +13,9 @@ body {
   margin: 0 auto;
   padding: 48px 32px 100px;
   position: relative;
-  z-index: 1;
 }
 
-/* ── MAGIC BENTO CORE ── */
+/* ── MAGIC BENTO REINFORCED ── */
 .magic-bento-card {
   --glow-x: 50%;
   --glow-y: 50%;
@@ -27,24 +25,36 @@ body {
   background: #120F17;
   border: 1px solid #2F293A;
   border-radius: 12px;
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.header-strip.magic-bento-card {
+  border-left: 3px solid #9b7fe8 !important;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.img-placeholder {
+  width: 100%;
   aspect-ratio: 4/3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  transition: box-shadow 0.3s ease;
 }
 
-/* Border Glow Effect */
+/* Enhanced Border Glow */
 .magic-bento-card::after {
   content: '';
   position: absolute;
   inset: 0;
   padding: 2px;
   background: radial-gradient(
-    300px circle at var(--glow-x) var(--glow-y),
-    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.8)) 0%,
-    transparent 70%
+    500px circle at var(--glow-x) var(--glow-y),
+    rgba(132, 0, 255, calc(var(--glow-intensity) * 1.0)) 0%, /* Increased intensity weight */
+    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.4)) 40%,
+    transparent 80%
   );
   border-radius: inherit;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
@@ -53,12 +63,11 @@ body {
   pointer-events: none;
 }
 
-/* Global Spotlight Element */
 .global-spotlight {
   position: fixed;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(132, 0, 255, 0.08) 0%, transparent 70%);
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(132, 0, 255, 0.1) 0%, transparent 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 999;
@@ -67,44 +76,17 @@ body {
   opacity: 0;
 }
 
-/* ── LAYOUT FIXES ── */
-.education-section {
-  position: relative;
-  margin-bottom: 4rem;
-  isolation: isolate;
-}
-
-.header-strip {
-  border-left: 3px solid #9b7fe8;
-  padding: 1rem 1.5rem;
-  background: rgba(155, 127, 232, 0.05);
-  border-radius: 6px;
-  margin-bottom: 2rem;
-}
-
-.content-block {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  margin-bottom: 3rem;
-  align-items: start;
-}
-
+/* ── LAYOUT ── */
+.education-section { margin-bottom: 4rem; }
+.content-block { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-bottom: 3rem; align-items: start; }
 .content-block.reverse { direction: rtl; }
 .content-block.reverse > * { direction: ltr; }
 
-.body-text {
-  font-size: 0.95rem;
-  line-height: 1.8;
-  color: #b0a8a0;
-  margin-bottom: 1rem;
-}
-
-.page-heading { font-family: 'Share Tech Mono', monospace; font-size: 3.5rem; color: #f0ebe0; margin-bottom: 2rem; }
-.section-heading { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; font-size: 1.2rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0; }
-.institution-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; opacity: 0.7; margin: 5px 0 0; }
-.back-link { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; text-decoration: none; font-size: 0.8rem; opacity: 0.6; }
-
+.section-heading { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; font-size: 1.2rem; letter-spacing: 0.25em; text-transform: uppercase; margin: 0; }
+.institution-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; opacity: 0.7; }
+.body-text { font-size: 0.95rem; line-height: 1.8; color: #b0a8a0; margin-bottom: 1rem; }
+.page-heading { font-family: 'Share Tech Mono', monospace; font-size: 3.5rem; margin-bottom: 2rem; }
+.back-link { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; text-decoration: none; opacity: 0.6; }
 .ruled-line { border: none; border-top: 1px solid rgba(155, 127, 232, 0.15); margin: 4rem 0; }
 
 @media (max-width: 768px) { .content-block { grid-template-columns: 1fr; } }

@@ -1,76 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 1. Create Global Spotlight
     const spotlight = document.createElement('div');
     spotlight.className = 'global-spotlight';
     document.body.appendChild(spotlight);
 
-    const cards = document.querySelectorAll('.magic-bento-card');
+    const bentoElements = document.querySelectorAll('.magic-bento-card');
 
-    // 2. Global Mouse Tracking
     document.addEventListener('mousemove', (e) => {
-        // Move spotlight
         gsap.to(spotlight, {
             left: e.clientX,
             top: e.clientY,
-            duration: 0.15,
-            ease: 'power2.out'
+            duration: 0.1,
+            ease: 'none'
         });
 
-        cards.forEach(card => {
-            const rect = card.getBoundingClientRect();
+        bentoElements.forEach(el => {
+            const rect = el.getBoundingClientRect();
             
-            // Calculate Glow Position
+            // Map mouse to local card coordinates
             const x = ((e.clientX - rect.left) / rect.width) * 100;
             const y = ((e.clientY - rect.top) / rect.height) * 100;
-            card.style.setProperty('--glow-x', `${x}%`);
-            card.style.setProperty('--glow-y', `${y}%`);
+            el.style.setProperty('--glow-x', `${x}%`);
+            el.style.setProperty('--glow-y', `${y}%`);
 
-            // Intensity based on distance to card center
+            // Proximity intensity calculation
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
             const dist = Math.hypot(e.clientX - centerX, e.clientY - centerY);
             
-            const intensity = Math.max(0, 1 - dist / 500);
-            card.style.setProperty('--glow-intensity', intensity);
+            // Increased detection sensitivity (450px)
+            const intensity = Math.max(0, 1 - dist / 450);
+            el.style.setProperty('--glow-intensity', intensity);
             
             if (intensity > 0) {
-                gsap.to(spotlight, { opacity: intensity * 0.7, duration: 0.2 });
+                gsap.to(spotlight, { opacity: intensity * 0.8, duration: 0.1 });
             }
         });
     });
 
-    // 3. Card-Specific Tilt Effect
-    cards.forEach(card => {
+    // Reset spotlight when leaving viewport
+    document.addEventListener('mouseleave', () => {
+        gsap.to(spotlight, { opacity: 0, duration: 0.3 });
+    });
+
+    // Add Tilt for all bento cards (Headers and Images)
+    bentoElements.forEach(card => {
         card.addEventListener('mousemove', (e) => {
             const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-
-            const rotateX = ((y - centerY) / centerY) * -10;
-            const rotateY = ((x - centerX) / centerX) * 10;
+            const rotateX = ((e.clientY - (rect.top + rect.height/2)) / (rect.height/2)) * -6;
+            const rotateY = ((e.clientX - (rect.left + rect.width/2)) / (rect.width/2)) * 6;
 
             gsap.to(card, {
                 rotateX,
                 rotateY,
-                duration: 0.1,
-                ease: 'power2.out',
-                transformPerspective: 1000
+                duration: 0.2,
+                transformPerspective: 1000,
+                ease: 'power1.out'
             });
         });
 
         card.addEventListener('mouseleave', () => {
-            gsap.to(card, {
-                rotateX: 0,
-                rotateY: 0,
-                duration: 0.5,
-                ease: 'power2.out'
-            });
+            gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.6, ease: 'elastic.out(1, 0.3)' });
         });
     });
 
-    // 4. Fade-in Observer
+    // Fade-in Observer
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
@@ -82,8 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.fade-in').forEach(el => {
         el.style.opacity = '0';
-        el.style.transform = 'translateY(20px)';
-        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';
         observer.observe(el);
     });
 });
