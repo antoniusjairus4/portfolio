@@ -1,221 +1,110 @@
-/* ── edu.css — styles for edu.html ── */
-
 *, *::before, *::after { box-sizing: border-box; }
 
 body {
-  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
-  background-attachment: fixed;
+  background: #0a0a0f;
   color: #f0ebe0;
   margin: 0;
   padding: 0;
   font-family: 'Playfair Display', serif;
+  overflow-x: hidden;
 }
 
-/* ── FLUID ETHER (per-section overlay) ── */
-.fluid-container {
-  position: relative;
-  overflow: hidden;
-  z-index: 2;
-  background: linear-gradient(120deg, rgba(18, 14, 32, 0.92), rgba(27, 18, 44, 0.88));
-}
-.fluid-container canvas {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.85;
-}
-.fluid-container > *:not(canvas) {
-  position: relative;
-  z-index: 3;
-}
-
-.liquid-section {
-  position: relative;
-  z-index: 1;
-  background: rgba(10, 5, 25, 0.4);
-  overflow: hidden;
-  padding: 1rem 1rem 0.25rem;
-  border-radius: 10px;
-  isolation: isolate;
-  margin-bottom: 2rem;
-}
-
-.liquid-section canvas {
-  position: absolute;
-  inset: 0;
-  width: 100% !important;
-  height: 100% !important;
-  z-index: 0;
-  opacity: 0.9;
-  mix-blend-mode: screen;
-  pointer-events: none;
-}
-
-.liquid-section > * {
+.main-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 48px 32px 100px;
   position: relative;
   z-index: 1;
 }
 
-/* Keep page content above background */
-body > div,
-body > section,
-body > nav {
+/* ── MAGIC BENTO CORE ── */
+.magic-bento-card {
+  --glow-x: 50%;
+  --glow-y: 50%;
+  --glow-intensity: 0;
   position: relative;
-  z-index: 1;
-}
-
-/* ── BACK LINK ── */
-.back-link {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.75rem;
-  letter-spacing: 0.2em;
-  color: #9b7fe8;
-  text-decoration: none;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-  display: inline-block;
-}
-.back-link:hover { opacity: 1; }
-
-/* ── PAGE HEADING ── */
-.page-heading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(2.5rem, 6vw, 5rem);
-  font-weight: 900;
-  line-height: 1;
-  color: #f0ebe0;
-  letter-spacing: -0.02em;
-  margin: 0 0 2rem;
-}
-
-/* ── SECTION HEADING (Education / College labels) ── */
-.section-heading {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(1rem, 2vw, 1.3rem);
-  font-weight: 400;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: #9b7fe8;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 1.5rem;
-}
-.section-heading::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: #9b7fe8;
-  opacity: 0.25;
-  max-width: 300px;
-}
-
-/* ── INSTITUTION NAME ── */
-.institution-name {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: clamp(0.9rem, 2vw, 1.2rem);
-  color: #f0ebe0;
-  letter-spacing: 0.04em;
-  margin-bottom: 1.5rem;
-  padding-left: 1rem;
-  border-left: 3px solid #9b7fe8;
-}
-
-/* ── CONTENT BLOCK (text + image side by side) ── */
-.content-block {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.5rem;
-  align-items: start;
-  margin-bottom: 1.5rem;
-}
-.content-block.reverse { direction: rtl; }
-.content-block.reverse > * { direction: ltr; }
-
-/* ── BODY TEXT ── */
-.body-text {
-  font-size: 0.95rem;
-  line-height: 1.9;
-  color: #b0a8a0;
-  margin-bottom: 1.2rem;
-}
-.body-text:last-child { margin-bottom: 0; }
-
-/* ── IMAGE PLACEHOLDER ── */
-.img-placeholder {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  background: #13111a;
-  border-left: 2px solid #9b7fe8;
-  border-bottom: 2px solid #9b7fe8;
-  border-top: 1px solid rgba(155,127,232,0.15);
-  border-right: 1px solid rgba(155,127,232,0.15);
-  border-radius: 6px;
   overflow: hidden;
+  background: #120F17;
+  border: 1px solid #2F293A;
+  border-radius: 12px;
+  aspect-ratio: 4/3;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transition: border-color 0.25s ease;
+  transition: box-shadow 0.3s ease;
 }
-.img-placeholder:hover {
-  border-left-color: #c4a8ff;
-  border-bottom-color: #c4a8ff;
-}
-.img-placeholder::after {
+
+/* Border Glow Effect */
+.magic-bento-card::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(
-    45deg,
-    rgba(155,127,232,0.03) 0px,
-    rgba(155,127,232,0.03) 1px,
-    transparent 1px,
-    transparent 14px
+  padding: 2px;
+  background: radial-gradient(
+    300px circle at var(--glow-x) var(--glow-y),
+    rgba(132, 0, 255, calc(var(--glow-intensity) * 0.8)) 0%,
+    transparent 70%
   );
-}
-.img-placeholder .img-icon {
-  font-size: 1.4rem;
-  opacity: 0.25;
-  z-index: 1;
-}
-.img-placeholder .img-label {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.6rem;
-  letter-spacing: 0.2em;
-  color: #9b7fe8;
-  opacity: 0.4;
-  z-index: 1;
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
-/* ── SECTION DIVIDER ── */
-.ruled-line {
-  border: none;
-  border-top: 1px solid rgba(155,127,232,0.15);
-  margin: 3rem 0;
-}
-
-/* ── ANCHOR SCROLL OFFSET ── */
-#school, #college { scroll-margin-top: 20px; padding-top: 20px; }
-
-/* ── FADE IN ── */
-.fade-in {
+/* Global Spotlight Element */
+.global-spotlight {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(132, 0, 255, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: screen;
   opacity: 0;
-  transform: translateY(20px);
-  transition: opacity 0.55s ease, transform 0.55s ease;
-}
-.fade-in.visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
-/* ── RESPONSIVE ── */
-@media (max-width: 768px) {
-  .content-block { grid-template-columns: 1fr; }
-  .content-block.reverse { direction: ltr; }
+/* ── LAYOUT FIXES ── */
+.education-section {
+  position: relative;
+  margin-bottom: 4rem;
+  isolation: isolate;
 }
+
+.header-strip {
+  border-left: 3px solid #9b7fe8;
+  padding: 1rem 1.5rem;
+  background: rgba(155, 127, 232, 0.05);
+  border-radius: 6px;
+  margin-bottom: 2rem;
+}
+
+.content-block {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.5rem;
+  margin-bottom: 3rem;
+  align-items: start;
+}
+
+.content-block.reverse { direction: rtl; }
+.content-block.reverse > * { direction: ltr; }
+
+.body-text {
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: #b0a8a0;
+  margin-bottom: 1rem;
+}
+
+.page-heading { font-family: 'Share Tech Mono', monospace; font-size: 3.5rem; color: #f0ebe0; margin-bottom: 2rem; }
+.section-heading { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; font-size: 1.2rem; letter-spacing: 0.2em; text-transform: uppercase; margin: 0; }
+.institution-subtitle { font-family: 'Share Tech Mono', monospace; font-size: 0.85rem; opacity: 0.7; margin: 5px 0 0; }
+.back-link { font-family: 'Share Tech Mono', monospace; color: #9b7fe8; text-decoration: none; font-size: 0.8rem; opacity: 0.6; }
+
+.ruled-line { border: none; border-top: 1px solid rgba(155, 127, 232, 0.15); margin: 4rem 0; }
+
+@media (max-width: 768px) { .content-block { grid-template-columns: 1fr; } }
