@@ -1,7 +1,8 @@
 /* ── pursuit.js — shared interactions for all pursuit pages ── */
 
-// Fade-in sections as they enter the viewport
 document.addEventListener('DOMContentLoaded', () => {
+  
+  /* ── Fade-in on scroll ── */
   const fadeEls = document.querySelectorAll('.fade-in');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -13,10 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { threshold: 0.12 });
   fadeEls.forEach(el => observer.observe(el));
 
-  // Init wave canvas if present
+  /* ── Wave canvas background (optional, only if canvas exists) ── */
   const canvas = document.getElementById('wave-canvas');
-  if (canvas && window.initLineWaves) {
-    initLineWaves(canvas, {
+  if (canvas && typeof window.initLineWaves === 'function') {
+    window.initLineWaves(canvas, {
       speed:           0.25,
       innerLineCount:  28,
       outerLineCount:  32,

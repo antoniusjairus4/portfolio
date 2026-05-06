@@ -108,13 +108,23 @@ body {
 .content-block.reverse { direction: rtl; }
 .content-block.reverse > * { direction: ltr; }
 
-.content-block .text-col p {
+/* ── TEXT COLUMN (used in pursuit pages) ── */
+.text-col p {
   font-size: 0.95rem;
   line-height: 1.9;
   color: #b0a8a0;
   margin-bottom: 1.2rem;
 }
-.content-block .text-col p:last-child { margin-bottom: 0; }
+.text-col p:last-child { margin-bottom: 0; }
+
+/* ── BODY TEXT (used in education page) ── */
+.body-text {
+  font-size: 0.95rem;
+  line-height: 1.9;
+  color: #b0a8a0;
+  margin-bottom: 1.2rem;
+}
+.body-text:last-child { margin-bottom: 0; }
 
 /* ── IMAGE PLACEHOLDER ── */
 .img-placeholder {
@@ -205,5 +215,8 @@ body > * { position: relative; z-index: 1; }
   .content-block.reverse { direction: ltr; }
   .gallery-grid {
     grid-template-columns: 1fr;
+  }
+  .stat-row {
+    gap: 1rem;
   }
 }

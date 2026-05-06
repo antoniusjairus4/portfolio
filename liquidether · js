@@ -1,18 +1,30 @@
-/* liquidether.js — Corrected Vanilla JS Port */
+/* liquidether.js — Fluid Ether Background Effect */
+
 (function (global) {
+  'use strict';
+
+  if (typeof THREE === 'undefined') {
+    console.warn('Three.js required for LiquidEther');
+    return;
+  }
+
+  // Create palette texture from color stops
   function makePaletteTexture(stops) {
-    let arr = (Array.isArray(stops) && stops.length > 0)
+    const arr = (Array.isArray(stops) && stops.length > 0) 
       ? (stops.length === 1 ? [stops[0], stops[0]] : stops)
       : ['#ffffff', '#ffffff'];
-    const w = arr.length;
+    
+    const w = Math.max(arr.length, 2);
     const data = new Uint8Array(w * 4);
+    
     for (let i = 0; i < w; i++) {
-      const c = new THREE.Color(arr[i]);
-      data[i * 4 + 0] = Math.round(c.r * 255);
-      data[i * 4 + 1] = Math.round(c.g * 255);
-      data[i * 4 + 2] = Math.round(c.b * 255);
+      const color = new THREE.Color(arr[Math.min(i, arr.length - 1)]);
+      data[i * 4 + 0] = Math.round(color.r * 255);
+      data[i * 4 + 1] = Math.round(color.g * 255);
+      data[i * 4 + 2] = Math.round(color.b * 255);
       data[i * 4 + 3] = 255;
     }
+    
     const tex = new THREE.DataTexture(data, w, 1, THREE.RGBAFormat);
     tex.magFilter = THREE.LinearFilter;
     tex.minFilter = THREE.LinearFilter;
@@ -21,108 +33,304 @@
     return tex;
   }
 
-  // Shader Sources
-  const face_vert = `attribute vec3 position; varying vec2 uv; void main(){ uv = 0.5 + position.xy * 0.5; gl_Position = vec4(position, 1.0); }`;
-  
-  const advection_frag = `
+  // Simplex noise for organic fluid movement
+  function makeNoiseTexture(size) {
+    const data = new Uint8Array(size * size * 4);
+    for (let i = 0; i < size * size; i++) {
+      const v = Math.random() * 255;
+      data[i * 4 + 0] = v;
+      data[i * 4 + 1] = v;
+      data[i * 4 + 2] = v;
+      data[i * 4 + 3] = 255;
+    }
+    const tex = new THREE.DataTexture(data, size, size, THREE.RGBAFormat);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.needsUpdate = true;
+    return tex;
+  }
+
+  // ============ SHADERS ============
+
+  const vertexShader = `
+    attribute vec3 position;
+    varying vec2 vUv;
+    void main() {
+      vUv = 0.5 + position.xy * 0.5;
+      gl_Position = vec4(position, 1.0);
+    }
+  `;
+
+  // Fluid simulation fragment shader
+  const fluidFragmentShader = `
     precision highp float;
+    
     uniform sampler2D velocity;
+    uniform sampler2D noiseTexture;
+    uniform vec2 resolution;
+    uniform float time;
+    uniform vec2 mouse;
+    uniform float mouseForce;
+    uniform float cursorSize;
     uniform float dt;
-    uniform vec2 fboSize;
-    varying vec2 uv;
-    void main(){
-      vec2 ratio = max(fboSize.x, fboSize.y) / fboSize;
+    
+    varying vec2 vUv;
+    
+    vec2 rotate(vec2 v, float a) {
+      float s = sin(a);
+      float c = cos(a);
+      return vec2(v.x * c - v.y * s, v.x * s + v.y * c);
+    }
+    
+    void main() {
+      vec2 uv = vUv;
+      vec2 texel = 1.0 / resolution;
+      
+      // Sample current velocity field
       vec2 vel = texture2D(velocity, uv).xy;
-      vec2 uv2 = uv - vel * dt * ratio;
-      gl_FragColor = vec4(texture2D(velocity, uv2).xy, 0.0, 1.0);
-    }`;
+      
+      // Add mouse force
+      vec2 mousePos = mouse;
+      float mouseDist = length(uv - mousePos);
+      float mouseInfluence = mouseForce * exp(-mouseDist * mouseDist / (cursorSize * 0.0001));
+      
+      // Advection - follow the flow
+      vec2 advectedUv = uv - vel * 0.016 * 2.0;
+      vec2 advectedVel = texture2D(velocity, advectedUv).xy;
+      
+      // Add curl noise for organic movement
+      float noiseScale = 3.0;
+      vec2 noiseUv = uv * noiseScale + time * 0.1;
+      vec2 noise;
+      noise.x = texture2D(noiseTexture, noiseUv + vec2(0.01, 0.0)).x - 
+                texture2D(noiseTexture, noiseUv - vec2(0.01, 0.0)).x;
+      noise.y = texture2D(noiseTexture, noiseUv + vec2(0.0, 0.01)).x - 
+                texture2D(noiseTexture, noiseUv - vec2(0.0, 0.01)).x;
+      noise *= 0.5;
+      
+      // Combine
+      vec2 newVel = advectedVel * 0.98; // damping
+      newVel += noise * 0.002;
+      newVel += (mousePos - uv) * mouseInfluence * 0.001;
+      
+      // Normalize and store
+      gl_FragColor = vec4(newVel, 0.0, 1.0);
+    }
+  `;
 
-  const externalForce_frag = `
+  // Color output fragment shader
+  const colorFragmentShader = `
     precision highp float;
-    uniform vec2 force;
-    uniform vec2 center;
-    uniform float scale;
-    varying vec2 uv;
-    void main(){
-      float d = distance(uv, center * 0.5 + 0.5);
-      float f = exp(-d * d / (scale * 0.0001));
-      gl_FragColor = vec4(force * f, 0.0, 1.0);
-    }`;
-
-  const color_frag = `
-    precision highp float;
+    
     uniform sampler2D velocity;
     uniform sampler2D palette;
-    varying vec2 uv;
-    void main(){
+    uniform sampler2D noiseTexture;
+    uniform float time;
+    uniform vec2 mouse;
+    uniform float mouseForce;
+    uniform float cursorSize;
+    
+    varying vec2 vUv;
+    
+    void main() {
+      vec2 uv = vUv;
       vec2 vel = texture2D(velocity, uv).xy;
-      float len = clamp(length(vel) * 0.5, 0.0, 1.0);
-      vec3 color = texture2D(palette, vec2(len, 0.5)).rgb;
-      gl_FragColor = vec4(color, len);
-    }`;
+      float velLen = length(vel);
+      
+      // Create flowing pattern
+      float pattern = sin(uv.x * 10.0 + time * 0.5 + vel.x * 50.0) * 
+                      cos(uv.y * 8.0 - time * 0.3 + vel.y * 50.0);
+      pattern = pattern * 0.5 + 0.5;
+      
+      // Sample palette based on velocity magnitude
+      float palettePos = clamp(velLen * 10.0, 0.0, 1.0);
+      vec3 color = texture2D(palette, vec2(palettePos, 0.5)).rgb;
+      
+      // Add glow near mouse
+      float mouseDist = length(uv - mouse);
+      float mouseGlow = mouseForce * exp(-mouseDist * mouseDist / (cursorSize * 0.0001));
+      color += color * mouseGlow * 2.0;
+      
+      // Output with alpha based on intensity
+      float alpha = clamp(palettePos * 0.7 + mouseGlow * 0.3, 0.0, 0.8);
+      gl_FragColor = vec4(color, alpha);
+    }
+  `;
+
+  // ============ INIT FUNCTION ============
 
   function initLiquidEther(container, opts) {
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(window.devicePixelRatio);
+    opts = opts || {};
+    
+    const options = {
+      colors: opts.colors || ['#5227FF', '#9b7fe8', '#c4a8ff'],
+      mouseForce: opts.mouseForce || 18,
+      cursorSize: opts.cursorSize || 120,
+      resolution: opts.resolution || 0.5,
+      dt: opts.dt || 0.014,
+      ...opts
+    };
+
+    // Setup renderer
+    const renderer = new THREE.WebGLRenderer({ 
+      antialias: true, 
+      alpha: true,
+      premultipliedAlpha: false 
+    });
+    
+    const pixelRatio = Math.min(window.devicePixelRatio, 2);
+    renderer.setPixelRatio(pixelRatio);
+    
+    const containerWidth = container.clientWidth || 300;
+    const containerHeight = container.clientHeight || 300;
+    renderer.setSize(containerWidth, containerHeight);
+    
     const canvas = renderer.domElement;
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.pointerEvents = 'none';
+    canvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;';
+    container.style.position = 'relative';
     container.appendChild(canvas);
 
-    const mouse = { curr: new THREE.Vector2(), old: new THREE.Vector2(), diff: new THREE.Vector2() };
-    
-    container.addEventListener('mousemove', (e) => {
-      const r = container.getBoundingClientRect();
-      mouse.curr.set((e.clientX - r.left) / r.width * 2 - 1, -((e.clientY - r.top) / r.height * 2 - 1));
-    });
-
-    const w = container.clientWidth * opts.resolution;
-    const h = container.clientHeight * opts.resolution;
-    renderer.setSize(container.clientWidth, container.clientHeight);
-
-    // FBOs
-    const type = /(iPad|iPhone|iPod)/i.test(navigator.userAgent) ? THREE.HalfFloatType : THREE.FloatType;
-    const fbo0 = new THREE.WebGLRenderTarget(w, h, { type });
-    const fbo1 = new THREE.WebGLRenderTarget(w, h, { type });
-
-    // Passes
+    // Full-screen quad setup
     const scene = new THREE.Scene();
     const camera = new THREE.Camera();
-    const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
-    scene.add(mesh);
+    const geometry = new THREE.PlaneGeometry(2, 2);
 
-    const forceMat = new THREE.RawShaderMaterial({
-      vertexShader: face_vert, fragmentShader: externalForce_frag,
-      uniforms: { force: { value: mouse.diff }, center: { value: mouse.curr }, scale: { value: opts.cursorSize } },
+    // Create FBOs for ping-pong
+    const size = Math.floor(512 * options.resolution);
+    const type = (/(iPad|iPhone|iPod)/i.test(navigator.userAgent)) 
+      ? THREE.HalfFloatType 
+      : THREE.FloatType;
+    
+    const fboOptions = {
+      type: type,
+      minFilter: THREE.LinearFilter,
+      magFilter: THREE.LinearFilter,
+      format: THREE.RGBAFormat,
+      stencilBuffer: false,
+      depthBuffer: false
+    };
+    
+    let fbo0 = new THREE.WebGLRenderTarget(size, size, fboOptions);
+    let fbo1 = new THREE.WebGLRenderTarget(size, size, fboOptions);
+
+    // Materials
+    const noiseTexture = makeNoiseTexture(256);
+    
+    const velocityMaterial = new THREE.RawShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fluidFragmentShader,
+      uniforms: {
+        velocity: { value: null },
+        noiseTexture: { value: noiseTexture },
+        resolution: { value: new THREE.Vector2(size, size) },
+        time: { value: 0 },
+        mouse: { value: new THREE.Vector2(0.5, 0.5) },
+        mouseForce: { value: options.mouseForce },
+        cursorSize: { value: options.cursorSize },
+        dt: { value: options.dt }
+      }
+    });
+
+    const displayMaterial = new THREE.RawShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: colorFragmentShader,
+      uniforms: {
+        velocity: { value: fbo0.texture },
+        palette: { value: makePaletteTexture(options.colors) },
+        noiseTexture: { value: noiseTexture },
+        time: { value: 0 },
+        mouse: { value: new THREE.Vector2(0.5, 0.5) },
+        mouseForce: { value: options.mouseForce },
+        cursorSize: { value: options.cursorSize }
+      },
+      transparent: true,
       blending: THREE.AdditiveBlending
     });
 
-    const colorMat = new THREE.RawShaderMaterial({
-      vertexShader: face_vert, fragmentShader: color_frag,
-      uniforms: { velocity: { value: null }, palette: { value: makePaletteTexture(opts.colors) } },
-      transparent: true
+    // Mouse tracking
+    const mouse = new THREE.Vector2(0.5, 0.5);
+    const targetMouse = new THREE.Vector2(0.5, 0.5);
+    
+    container.addEventListener('mousemove', (e) => {
+      const rect = container.getBoundingClientRect();
+      targetMouse.x = (e.clientX - rect.left) / rect.width;
+      targetMouse.y = 1.0 - (e.clientY - rect.top) / rect.height;
+    });
+    
+    container.addEventListener('mouseleave', () => {
+      targetMouse.set(0.5, 0.5);
     });
 
-    function render() {
-      mouse.diff.subVectors(mouse.curr, mouse.old).multiplyScalar(opts.mouseForce);
-      mouse.old.copy(mouse.curr);
+    // Animation state
+    let currentMaterial = velocityMaterial;
+    let mesh = new THREE.Mesh(geometry, currentMaterial);
+    scene.add(mesh);
 
-      // Force Pass
-      mesh.material = forceMat;
+    const clock = new THREE.Clock();
+    let animationId;
+
+    function render() {
+      animationId = requestAnimationFrame(render);
+      
+      const elapsedTime = clock.getElapsedTime();
+      const delta = clock.getDelta();
+
+      // Smooth mouse
+      mouse.x += (targetMouse.x - mouse.x) * 0.05;
+      mouse.y += (targetMouse.y - mouse.y) * 0.05;
+
+      // Update uniforms
+      velocityMaterial.uniforms.time.value = elapsedTime;
+      velocityMaterial.uniforms.mouse.value = mouse;
+      
+      displayMaterial.uniforms.time.value = elapsedTime;
+      displayMaterial.uniforms.mouse.value = mouse;
+
+      // Render velocity to fbo0
+      mesh.material = velocityMaterial;
+      velocityMaterial.uniforms.velocity.value = fbo1.texture;
       renderer.setRenderTarget(fbo0);
       renderer.render(scene, camera);
 
-      // Advection/Output Pass
-      mesh.material = colorMat;
-      colorMat.uniforms.velocity.value = fbo0.texture;
+      // Swap FBOs
+      [fbo0, fbo1] = [fbo1, fbo0];
+
+      // Render display to screen
+      mesh.material = displayMaterial;
+      displayMaterial.uniforms.velocity.value = fbo0.texture;
       renderer.setRenderTarget(null);
       renderer.render(scene, camera);
-
-      requestAnimationFrame(render);
     }
+
     render();
+
+    // Handle resize
+    function handleResize() {
+      const w = container.clientWidth || 300;
+      const h = container.clientHeight || 300;
+      renderer.setSize(w, h);
+    }
+    
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup
+    function destroy() {
+      cancelAnimationFrame(animationId);
+      window.removeEventListener('resize', handleResize);
+      fbo0.dispose();
+      fbo1.dispose();
+      renderer.dispose();
+      geometry.dispose();
+      velocityMaterial.dispose();
+      displayMaterial.dispose();
+      if (canvas.parentNode) {
+        canvas.parentNode.removeChild(canvas);
+      }
+    }
+
+    return { destroy, renderer, canvas };
   }
+
   global.initLiquidEther = initLiquidEther;
+
 })(window);

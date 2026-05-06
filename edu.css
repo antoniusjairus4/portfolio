@@ -33,24 +33,13 @@ body {
 }
 
 .liquid-section {
-  position: relative; /* Essential */
+  position: relative;
   z-index: 1;
   background: rgba(10, 5, 25, 0.4);
-  overflow: hidden; /* Keeps the fluid inside the borders */
-}
-
-.liquid-section canvas {
-  z-index: -1; /* Puts the fluid behind your text */
-  mix-blend-mode: screen; /* Makes colors pop against dark backgrounds */
-}
-
-.liquid-section {
-  position: relative;
+  overflow: hidden;
   padding: 1rem 1rem 0.25rem;
   border-radius: 10px;
-  overflow: hidden;
   isolation: isolate;
-  background: rgba(10, 5, 25, 0.4);
   margin-bottom: 2rem;
 }
 
@@ -60,7 +49,7 @@ body {
   width: 100% !important;
   height: 100% !important;
   z-index: 0;
-  opacity: 1;
+  opacity: 0.9;
   mix-blend-mode: screen;
   pointer-events: none;
 }
@@ -229,9 +218,4 @@ body > nav {
 @media (max-width: 768px) {
   .content-block { grid-template-columns: 1fr; }
   .content-block.reverse { direction: ltr; }
-}
-
-.liquid-section canvas {
-  opacity: 0.9;
-  mix-blend-mode: screen;
 }

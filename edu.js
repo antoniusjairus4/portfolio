@@ -26,31 +26,60 @@ document.addEventListener('DOMContentLoaded', () => {
   fadeEls.forEach(el => fadeObserver.observe(el));
 
   /* ── LiquidEther on school + college sections ── */
-  if (window.initLiquidEther) {
+  function initFluidSections() {
+    if (typeof window.initLiquidEther !== 'function') {
+      // Retry if library hasn't loaded yet
+      setTimeout(initFluidSections, 100);
+      return;
+    }
+
     const schoolSection = document.querySelector('#school.liquid-section');
     if (schoolSection) {
-      initLiquidEther(schoolSection, {
+      window.initLiquidEther(schoolSection, {
         colors: ['#5227FF', '#9b7fe8', '#c4a8ff'],
-        mouseForce: 18, cursorSize: 120,
-        isViscous: true, viscous: 30,
-        iterationsViscous: 32, iterationsPoisson: 32,
-        resolution: 0.5, dt: 0.014, BFECC: true, isBounce: false,
-        autoDemo: true, autoSpeed: 0.4, autoIntensity: 1.9,
-        takeoverDuration: 0.25, autoResumeDelay: 3000, autoRampDuration: 0.6
+        mouseForce: 18,
+        cursorSize: 120,
+        isViscous: true,
+        viscous: 30,
+        iterationsViscous: 32,
+        iterationsPoisson: 32,
+        resolution: 0.5,
+        dt: 0.014,
+        BFECC: true,
+        isBounce: false,
+        autoDemo: true,
+        autoSpeed: 0.4,
+        autoIntensity: 1.9,
+        takeoverDuration: 0.25,
+        autoResumeDelay: 3000,
+        autoRampDuration: 0.6
       });
     }
 
     const collegeSection = document.querySelector('#college.liquid-section');
     if (collegeSection) {
-      initLiquidEther(collegeSection, {
+      window.initLiquidEther(collegeSection, {
         colors: ['#3d1fa8', '#FF9FFC', '#B497CF'],
-        mouseForce: 18, cursorSize: 120,
-        isViscous: true, viscous: 30,
-        iterationsViscous: 32, iterationsPoisson: 32,
-        resolution: 0.5, dt: 0.014, BFECC: true, isBounce: false,
-        autoDemo: true, autoSpeed: 0.35, autoIntensity: 1.8,
-        takeoverDuration: 0.25, autoResumeDelay: 3000, autoRampDuration: 0.6
+        mouseForce: 18,
+        cursorSize: 120,
+        isViscous: true,
+        viscous: 30,
+        iterationsViscous: 32,
+        iterationsPoisson: 32,
+        resolution: 0.5,
+        dt: 0.014,
+        BFECC: true,
+        isBounce: false,
+        autoDemo: true,
+        autoSpeed: 0.35,
+        autoIntensity: 1.8,
+        takeoverDuration: 0.25,
+        autoResumeDelay: 3000,
+        autoRampDuration: 0.6
       });
     }
   }
+
+  // Start checking for LiquidEther availability
+  initFluidSections();
 });
