@@ -195,3 +195,15 @@ function render(time) {
 
 render();
 
+/* ── PROJECT STRIPS: scroll-triggered entrance, fires once ── */
+const projStrips = document.querySelectorAll('.proj-strip');
+const projObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      projObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.85 });
+
+projStrips.forEach(s => projObserver.observe(s));
