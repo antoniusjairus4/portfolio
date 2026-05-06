@@ -8,9 +8,7 @@
  *   const ether = initLiquidEther(containerElement, options);
  *   // ether.dispose() to clean up
  */
-
 import * as THREE from 'https://unpkg.com/three@0.128.0/build/three.module.js';
-
 /* ─────────────────────────────────────────────
    GLSL SHADERS
 ───────────────────────────────────────────── */

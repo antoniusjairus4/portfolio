@@ -98,4 +98,100 @@ function handleHorizontalScroll() {
   track.style.transform = `translateX(-${progress}px)`;
 }
 
-window.addEventListener('scroll', handleHorizontalScroll, { passive: true });
+window.addEventListener('scroll', handleHorizontalScroll, { passive: true });const canvas = document.getElementById("darkveil-bg");
+const gl = canvas.getContext("webgl");
+
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
+}
+window.addEventListener("resize", resize);
+resize();
+
+const vertexSrc = `
+attribute vec2 position;
+void main(){
+  gl_Position = vec4(position,0.0,1.0);
+}
+`;
+
+const fragmentSrc = `
+precision mediump float;
+
+uniform vec2 uResolution;
+uniform float uTime;
+
+float rand(vec2 p){
+  return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main(){
+  vec2 uv = gl_FragCoord.xy / uResolution.xy;
+  uv = uv * 2.0 - 1.0;
+
+  float t = uTime * 0.5;
+
+  // Warp effect
+  uv += 0.2 * vec2(
+    sin(uv.y * 6.0 + t),
+    cos(uv.x * 6.0 + t)
+  );
+
+  float color = sin(uv.x * 3.0 + t) + cos(uv.y * 3.0 - t);
+
+  // Dark purple theme
+  vec3 col = vec3(
+    0.1 + 0.3 * color,
+    0.0,
+    0.3 + 0.6 * color
+  );
+
+  // Noise
+  col += (rand(uv + t) - 0.5) * 0.05;
+
+  gl_FragColor = vec4(col, 1.0);
+}
+`;
+
+function createShader(type, source) {
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+  return shader;
+}
+
+const program = gl.createProgram();
+gl.attachShader(program, createShader(gl.VERTEX_SHADER, vertexSrc));
+gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fragmentSrc));
+gl.linkProgram(program);
+gl.useProgram(program);
+
+const vertices = new Float32Array([
+  -1, -1,
+   1, -1,
+  -1,  1,
+   1,  1
+]);
+
+const buffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+
+const position = gl.getAttribLocation(program, "position");
+gl.enableVertexAttribArray(position);
+gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+
+const uTime = gl.getUniformLocation(program, "uTime");
+const uResolution = gl.getUniformLocation(program, "uResolution");
+
+function render(time) {
+  gl.uniform1f(uTime, time * 0.001);
+  gl.uniform2f(uResolution, canvas.width, canvas.height);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  requestAnimationFrame(render);
+}
+
+render();
+
