@@ -11,17 +11,49 @@ body {
 }
 
 html {
-  background: #0f0a1a;
+  /* Deepened from #0f0a1a → true near-black with a faint violet tint */
+  background: #04020d;
 }
 
 .dark-theme {
-  background: linear-gradient(135deg, #0f0a1a 0%, #1a1a1a 35%, #130d20 65%, #0a0a0f 100%);
+  background: linear-gradient(
+    160deg,
+    #04020d 0%,
+    #080414 25%,
+    #0b0618 55%,
+    #060310 80%,
+    #020108 100%
+  );
   color: #f0ebe0;
   min-height: 100vh;
 }
 
 .text-main { color: #f0ebe0; }
 .text-glow  { text-shadow: none; }
+
+/* ── LiquidEther background container ── */
+#liquid-ether-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  /* The canvas is injected inside here by liquidether.js */
+}
+
+/* All page content sits above the fluid bg */
+section,
+.portrait,
+.fixed,
+.absolute {
+  position: relative;
+  z-index: 2;
+}
+.portrait {
+  position: fixed !important;
+  z-index: 10 !important;
+}
 
 /* NAME */
 .name {
@@ -138,7 +170,10 @@ html {
 
 /* EDUCATION CARDS */
 .edu-card {
-  background: #13111a;
+  /* Slightly more transparent to let fluid bleed through */
+  background: rgba(13, 10, 22, 0.82);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   border-left: 3px solid #9b7fe8;
   border-radius: 4px;
   overflow: hidden;
@@ -182,7 +217,10 @@ html {
   height: clamp(240px, 32vh, 320px);
   border-radius: 8px;
   border-left: 3px solid #9b7fe8;
-  background: #13111a;
+  /* Glassmorphism so fluid shows subtly behind */
+  background: rgba(13, 10, 22, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   padding: 28px 24px;
   transition: transform 0.25s ease;
   position: relative;

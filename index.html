@@ -7,31 +7,12 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="index.css">
-<!-- Wave canvas sits fixed behind everything -->
-<style>
-  #wave-canvas {
-    position: fixed;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-    opacity: 0.55;
-  }
-  /* Don't use body > * z-index — conflicts with Tailwind fixed/absolute positions */
-  section, .portrait, .fixed, .absolute {
-    position: relative;
-    z-index: 2;
-  }
-  .portrait {
-    position: fixed !important;
-    z-index: 10 !important;
-  }
-</style>
 </head>
 
 <body class="dark-theme">
-<canvas id="wave-canvas"></canvas>
+
+<!-- LiquidEther fills the full viewport, fixed behind everything -->
+<div id="liquid-ether-bg"></div>
 
 <!-- ═══════════ HERO ═══════════ -->
 <section class="min-h-[60vh] flex flex-col justify-center px-10 pt-16 pb-6 relative">
@@ -167,22 +148,39 @@
 
 
 <script src="index.js"></script>
-<script src="linewaves.js"></script>
-<script>
-  initLineWaves(document.getElementById('wave-canvas'), {
-    speed:           0.3,
-    innerLineCount:  32,
-    outerLineCount:  36,
-    warpIntensity:   1.0,
-    rotation:        -45,
-    edgeFadeWidth:   0.0,
-    colorCycleSpeed: 1.0,
-    brightness:      0.35,
-    color1:          '#9b7fe8',
-    color2:          '#c4a8ff',
-    color3:          '#6d4fc2',
-    enableMouse:     true,
-    mouseInfluence:  2.0
+
+<!-- LiquidEther initialisation — ES module so it can import Three.js -->
+<script type="module">
+  import { initLiquidEther } from './liquidether.js';
+
+  const bg = document.getElementById('liquid-ether-bg');
+
+  initLiquidEther(bg, {
+    // Deep violet-to-amethyst-to-midnight palette — matches the portfolio accent colour
+    colors: [
+      '#050210',   // near-black deep void
+      '#1a0533',   // midnight violet
+      '#3d1270',   // deep amethyst
+      '#7b3fbe',   // mid-violet
+      '#9b7fe8',   // accent violet (matches CSS --violet-400)
+      '#c4a8ff',   // soft lavender peak
+    ],
+    mouseForce:       30,
+    cursorSize:       130,
+    isViscous:        false,
+    viscous:          28,
+    iterationsPoisson: 32,
+    dt:               0.014,
+    BFECC:            true,
+    resolution:       0.5,
+    isBounce:         false,
+    autoDemo:         true,
+    autoSpeed:        0.3,
+    autoIntensity:    2.8,
+    takeoverDuration: 0.3,
+    autoResumeDelay:  1500,
+    autoRampDuration: 1.0,
+    opacity:          0.68,
   });
 </script>
 </body>
