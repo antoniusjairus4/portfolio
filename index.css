@@ -353,3 +353,75 @@ section,
   .proj-strip { border-right: none; border-bottom: 1px solid rgba(155,127,232,0.12); }
   .proj-strip:last-child { border-bottom: none; }
 }
+
+/* ── PURSUITS MASK BLUR ── */
+.achievements-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  /* The Mask: Fades out at the left and right edges (15% fade) */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 15%,
+    black 85%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 15%,
+    black 85%,
+    transparent
+  );
+}
+
+/* Ensure the cards don't jitter during the scroll transition */
+.horizontal-track {
+  display: flex;
+  gap: 32px;
+  padding: 0 15vw; /* Increased padding to start cards within the blur zone */
+  will-change: transform;
+}
+
+/* Mobile tweak for the mask */
+@media (max-width: 768px) {
+  /* ── DEEP BLUR PURSUITS MASK ── */
+.achievements-sticky {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  /* Increased the transparent zones to 25% for a heavier blur effect */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 25%, 
+    black 75%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 25%,
+    black 75%,
+    transparent 100%
+  );
+}
+
+.horizontal-track {
+  display: flex;
+  gap: 40px; /* Increased gap for better visual separation during blur */
+  padding: 0 20vw; /* Start cards deeper in the center to avoid a sudden "pop" */
+  will-change: transform;
+}
+}
