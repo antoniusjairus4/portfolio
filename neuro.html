@@ -10,10 +10,21 @@
         .project-section {
             height: auto !important; 
             min-height: 100vh;
-            padding: 100px 20px; /* Space for fixed headers if any */
+            padding: 100px 20px;
             flex-direction: column;
             display: flex;
             align-items: center;
+
+            background:
+                radial-gradient(circle at top left,
+                    rgba(255, 79, 216, 0.12),
+                    transparent 30%),
+
+                radial-gradient(circle at bottom right,
+                    rgba(155, 92, 255, 0.15),
+                    transparent 35%),
+
+                linear-gradient(180deg, #070707 0%, #020202 100%);
         }
 
         /* 2. Container for the long-form content */
@@ -35,18 +46,30 @@
         }
 
         .detail-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+
+            border: 1px solid rgba(255, 79, 216, 0.18);
+
             padding: 30px;
+
             border-radius: 20px;
+
             backdrop-filter: blur(15px);
             -webkit-backdrop-filter: blur(15px);
+
+            box-shadow:
+                0 0 25px rgba(255, 79, 216, 0.08),
+                0 0 50px rgba(155, 92, 255, 0.05);
         }
 
         .detail-card h3 {
-            color: #ff6b35;
+            color: #ffffff;
             margin-top: 0;
             font-size: 1.4rem;
+        }
+
+        .detail-card p {
+            color: #d7d7d7;
         }
 
         /* 4. Responsive Image Gallery */
@@ -61,22 +84,48 @@
         .app-screenshot-placeholder {
             width: 100%;
             aspect-ratio: 16/9;
-            background: rgba(255, 107, 53, 0.05);
-            border: 1px dashed rgba(255, 107, 53, 0.4);
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 79, 216, 0.08),
+                    rgba(155, 92, 255, 0.08),
+                    rgba(255, 46, 99, 0.08)
+                );
+
+            border: 1px dashed rgba(255, 79, 216, 0.35);
+
             border-radius: 12px;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #ff6b35;
+
+            color: #ffffff;
+
             font-size: 0.9rem;
+
             text-align: center;
+
             padding: 10px;
+
             transition: all 0.3s ease;
         }
 
         .app-screenshot-placeholder:hover {
-            background: rgba(255, 107, 53, 0.15);
-            border-color: #ff6b35;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(255, 79, 216, 0.15),
+                    rgba(155, 92, 255, 0.15),
+                    rgba(255, 46, 99, 0.15)
+                );
+
+            border-color: #ff4fd8;
+
+            box-shadow:
+                0 0 25px rgba(255, 79, 216, 0.14),
+                0 0 45px rgba(155, 92, 255, 0.08);
         }
 
         /* 5. Mobile Adjustments */
@@ -84,15 +133,18 @@
             .project-title {
                 font-size: 2.2rem !important;
             }
+
             .project-card {
                 padding: 1.5rem !important;
                 margin: 0 10px;
             }
+
             .detail-card {
                 padding: 20px;
             }
+
             .info-grid {
-                grid-template-columns: 1fr; /* Force stack on very small screens */
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -113,11 +165,16 @@
         <div class="project-card">
             <div class="project-content">
                 <span class="project-tag">Featured Project</span>
-                <h2 class="project-title">KaiForge</h2>
+
+                <h2 class="project-title">
+                    KaiForge
+                </h2>
+
                 <p class="project-description">
                     The ultimate analytical companion for table tennis professionals. 
                     KaiForge transforms raw match footage into a strategic roadmap.
                 </p>
+
                 <div class="project-tech">
                     <span>C++</span>
                     <span>Real-time Analytics</span>
@@ -128,33 +185,77 @@
         </div>
 
         <div class="details-container">
+
             <div class="info-grid">
+
                 <div class="detail-card">
                     <h3>Project Philosophy</h3>
-                    <p>KaiForge bridges the gap between intuition and raw data. We process high-speed ball trajectories to offer a "forge" where technique is refined through evidence.</p>
+
+                    <p>
+                        KaiForge bridges the gap between intuition and raw data.
+                        We process high-speed ball trajectories to offer a "forge"
+                        where technique is refined through evidence.
+                    </p>
                 </div>
+
                 <div class="detail-card">
                     <h3>Core Functionality</h3>
-                    <p>Utilizing frame-by-frame analysis, the system tracks the ball at speeds exceeding 100km/h, providing heatmaps and momentum tracking.</p>
+
+                    <p>
+                        Utilizing frame-by-frame analysis, the system tracks the ball
+                        at speeds exceeding 100km/h, providing heatmaps and momentum tracking.
+                    </p>
                 </div>
+
             </div>
 
             <div class="detail-card" style="margin-bottom: 40px;">
                 <h3>Deep Tech Stack</h3>
-                <p><strong>C++ Backend:</strong> Handles the core mathematical engine with zero-latency overhead for high-frequency video processing.</p>
-                <p><strong>Supabase:</strong> Manages the central nervous system, syncing player profiles and historical trends via PostgreSQL.</p>
+
+                <p>
+                    <strong style="color:#ff4fd8;">C++ Backend:</strong>
+                    Handles the core mathematical engine with zero-latency overhead
+                    for high-frequency video processing.
+                </p>
+
+                <p>
+                    <strong style="color:#9b5cff;">Supabase:</strong>
+                    Manages the central nervous system, syncing player profiles
+                    and historical trends via PostgreSQL.
+                </p>
             </div>
 
-            <h2 style="text-align: center; color: #ab35ff; margin-bottom: 20px;">Application Preview</h2>
+            <h2 style="
+                text-align: center;
+                color: #ff4fd8;
+                margin-bottom: 20px;
+                text-shadow: 0 0 15px rgba(255,79,216,0.3);
+            ">
+                Application Preview
+            </h2>
+
             <div class="image-gallery">
-                <div class="app-screenshot-placeholder">Main Dashboard View</div>
-                <div class="app-screenshot-placeholder">Heatmap Analysis</div>
-                <div class="app-screenshot-placeholder">Real-time Ball Tracking</div>
-                <div class="app-screenshot-placeholder">Player Performance Stats</div>
+                <div class="app-screenshot-placeholder">
+                    Main Dashboard View
+                </div>
+
+                <div class="app-screenshot-placeholder">
+                    Heatmap Analysis
+                </div>
+
+                <div class="app-screenshot-placeholder">
+                    Real-time Ball Tracking
+                </div>
+
+                <div class="app-screenshot-placeholder">
+                    Player Performance Stats
+                </div>
             </div>
+
         </div>
     </section>
 
     <script type="module" src="proj.js"></script>
+
 </body>
 </html>
