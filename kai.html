@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaiForge - Project Showcase</title>
+    <link rel="stylesheet" href="proj.css">
+</head>
+<body>
+
+    <!-- Include OGL library via CDN -->
+    <script type="importmap">
+      {
+        "imports": {
+          "ogl": "https://cdn.jsdelivr.net/npm/ogl@1.0.11/+esm"
+        }
+      }
+    </script>
+
+    <section class="project-section" id="kaiforge-section">
+        <!-- The Shader Background -->
+        <div id="plasma-canvas-container"></div>
+
+        <!-- Project Overlay -->
+        <div class="project-card">
+            <div class="project-content">
+                <span class="project-tag">Featured Project</span>
+                <h2 class="project-title">KaiForge</h2>
+                <p class="project-description">
+                    An elite-level performance analytics suite designed for competitive table tennis. 
+                    KaiForge leverages advanced data tracking to provide athletes with actionable insights 
+                    into match dynamics and technical execution.
+                </p>
+                <div class="project-tech">
+                    <span>C++</span>
+                    <span>Real-time Analytics</span>
+                    <span>Supabase</span>
+                </div>
+                <a href="#" class="project-link">View Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="proj.js"></script>
+</body>
+</html>
