@@ -41,6 +41,22 @@ body {
   letter-spacing: 0;
 }
 
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(115deg, transparent 0%, rgba(125, 211, 252, 0.055) 26%, transparent 42%),
+    linear-gradient(245deg, transparent 10%, rgba(251, 146, 60, 0.04) 38%, transparent 56%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.018) 0 1px, transparent 1px 120px);
+  opacity: 0.56;
+  mix-blend-mode: screen;
+  animation: veilSweep 22s linear infinite;
+  mask-image: linear-gradient(to bottom, transparent 0%, black 16%, black 82%, transparent 100%);
+}
+
 body::selection {
   background: rgba(125, 211, 252, 0.28);
   color: white;
@@ -72,13 +88,56 @@ img {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(circle at 16% 8%, rgba(125, 211, 252, 0.16), transparent 28%),
-    radial-gradient(circle at 78% 18%, rgba(251, 146, 60, 0.12), transparent 30%),
-    radial-gradient(circle at 50% 52%, rgba(167, 139, 250, 0.1), transparent 36%),
+    linear-gradient(100deg, transparent 8%, rgba(125, 211, 252, 0.12) 30%, transparent 52%),
+    linear-gradient(18deg, transparent 18%, rgba(167, 139, 250, 0.1) 44%, transparent 72%),
+    linear-gradient(152deg, transparent 24%, rgba(251, 146, 60, 0.075) 64%, transparent 86%),
     linear-gradient(90deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px),
     linear-gradient(180deg, rgba(255, 255, 255, 0.032) 1px, transparent 1px);
-  background-size: auto, auto, auto, 96px 96px, 96px 96px;
+  background-size: 140% 140%, 120% 120%, 160% 160%, 96px 96px, 96px 96px;
+  background-position: 0% 0%, 100% 20%, 50% 100%, 0 0, 0 0;
   mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+  animation: atmosphereDrift 32s ease-in-out infinite alternate;
+}
+
+.motion-veil {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0.68;
+  filter: blur(18px);
+  mask-image: linear-gradient(to bottom, black 0%, black 68%, transparent 100%);
+}
+
+.motion-veil span {
+  position: absolute;
+  left: -18%;
+  width: 136%;
+  height: 16vh;
+  transform: rotate(-8deg);
+  background: linear-gradient(90deg, transparent 0%, rgba(125, 211, 252, 0.08) 32%, rgba(246, 241, 232, 0.035) 50%, rgba(251, 146, 60, 0.055) 68%, transparent 100%);
+  animation: ribbonFloat 18s ease-in-out infinite alternate;
+}
+
+.motion-veil span:nth-child(1) {
+  top: 18%;
+}
+
+.motion-veil span:nth-child(2) {
+  top: 46%;
+  height: 12vh;
+  opacity: 0.62;
+  animation-duration: 24s;
+  animation-delay: -8s;
+}
+
+.motion-veil span:nth-child(3) {
+  top: 72%;
+  height: 10vh;
+  opacity: 0.42;
+  animation-duration: 28s;
+  animation-delay: -13s;
 }
 
 .section-shell {
@@ -154,6 +213,28 @@ section {
   align-items: center;
   gap: 64px;
   padding: 112px 0 72px;
+}
+
+.hero-section,
+.work-section,
+.education-section,
+.signal-section,
+.contact-section {
+  position: relative;
+}
+
+.work-section::before,
+.education-section::before,
+.signal-section::before {
+  content: "";
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  width: min(920px, 86vw);
+  height: 1px;
+  translate: -50% 0;
+  background: linear-gradient(90deg, transparent, rgba(125, 211, 252, 0.24), rgba(251, 146, 60, 0.12), transparent);
+  opacity: 0.8;
 }
 
 .eyebrow,
@@ -352,6 +433,26 @@ section {
   gap: 18px;
 }
 
+.profile-points {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 8px;
+}
+
+.profile-points span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  color: rgba(246, 241, 232, 0.76);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
 .intro-copy p,
 .section-note,
 .project-card p,
@@ -425,9 +526,48 @@ section {
   padding: 28px;
 }
 
+.project-card::after,
+.pursuit-card::after {
+  content: "";
+  position: absolute;
+  inset: auto 18px 18px 18px;
+  height: 1px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent, var(--cyan)) 54%, transparent), transparent);
+  opacity: 0.6;
+  transform: scaleX(0.32);
+  transform-origin: left;
+  transition: transform 300ms var(--ease), opacity 300ms ease;
+}
+
+.project-card:hover::after,
+.pursuit-card:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 .project-card-large {
   min-height: 600px;
   padding: 40px;
+}
+
+.project-meta {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.project-meta span {
+  min-height: 72px;
+  display: flex;
+  align-items: flex-end;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(246, 241, 232, 0.72);
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.25;
 }
 
 .card-index {
@@ -517,6 +657,15 @@ section {
   padding: 28px;
 }
 
+.image-card small {
+  display: block;
+  margin-top: 14px;
+  color: rgba(246, 241, 232, 0.72);
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
 .pursuits-section {
   position: relative;
 }
@@ -601,6 +750,14 @@ section {
   padding-bottom: 96px;
 }
 
+.contact-note {
+  max-width: 620px;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
 .contact-actions {
   justify-self: end;
   margin-top: 0;
@@ -624,6 +781,33 @@ section {
     scroll-behavior: auto !important;
     transition-duration: 1ms !important;
     animation-duration: 1ms !important;
+  }
+}
+
+@keyframes atmosphereDrift {
+  0% {
+    background-position: 0% 0%, 100% 20%, 50% 100%, 0 0, 0 0;
+  }
+  100% {
+    background-position: 42% 18%, 58% 44%, 28% 76%, 24px 18px, -18px 24px;
+  }
+}
+
+@keyframes ribbonFloat {
+  0% {
+    transform: translate3d(-4%, -10px, 0) rotate(-8deg) scaleX(0.96);
+  }
+  100% {
+    transform: translate3d(5%, 18px, 0) rotate(-5deg) scaleX(1.04);
+  }
+}
+
+@keyframes veilSweep {
+  0% {
+    background-position: -22vw 0, 18vw 0, 0 0;
+  }
+  100% {
+    background-position: 24vw 0, -16vw 0, 120px 0;
   }
 }
 
@@ -721,6 +905,14 @@ section {
     padding: 28px;
   }
 
+  .project-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .project-meta span {
+    min-height: 48px;
+  }
+
   .project-card {
     min-height: 236px;
   }
@@ -750,6 +942,11 @@ section {
 
   .signal-panel {
     padding: 28px;
+  }
+
+  .motion-veil {
+    opacity: 0.46;
+    filter: blur(22px);
   }
 }
 

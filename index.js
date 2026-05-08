@@ -41,6 +41,9 @@ function initBackground() {
       float t = uTime * 0.12;
       float field = noise(p * 2.4 + vec2(t, -t));
       field += 0.5 * noise(p * 4.8 - vec2(t * 1.8, t * 0.7));
+      float current = sin((p.x * 1.8 - p.y * 0.85) + uTime * 0.26);
+      current += 0.55 * sin((p.x * -1.2 + p.y * 1.6) - uTime * 0.18);
+      current = smoothstep(0.66, 1.34, current + field * 0.34);
 
       vec2 pointer = (uPointer / uResolution.xy) * 2.0 - 1.0;
       pointer.x *= uResolution.x / uResolution.y;
@@ -55,6 +58,7 @@ function initBackground() {
       color += cyan * smoothstep(0.52, 1.25, field) * 0.17;
       color += ember * smoothstep(0.72, 1.36, field + p.x * 0.18) * 0.12;
       color += violet * smoothstep(0.56, 1.18, field - p.y * 0.16) * 0.16;
+      color += mix(cyan, ember, uv.x) * current * 0.055;
       color += cyan * cursor * 0.13;
 
       float vignette = smoothstep(1.32, 0.22, length(p));
