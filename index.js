@@ -1,220 +1,219 @@
-/* ── index.js — interactions for index.html ── */
+const canvas = document.getElementById("darkveil-bg");
+const gl = canvas && canvas.getContext("webgl", { antialias: false, alpha: true });
 
-/* ── TYPEWRITER with one-shot glitch ── */
-const firstText  = 'Antonius';
-const secondText = 'Jairus';
-let i = 0, j = 0;
-const firstEl  = document.getElementById('first');
-const secondEl = document.getElementById('second');
+function initBackground() {
+  if (!canvas || !gl) return;
 
-function typeFirst() {
-  if (i < firstText.length) {
-    firstEl.textContent += firstText.charAt(i);
-    firstEl.classList.add('glitch');
-    firstEl.setAttribute('data-text', firstEl.textContent);
-    i++;
-    setTimeout(typeFirst, 80);
-  } else {
-    setTimeout(typeSecond, 200);
-  }
-}
-
-function typeSecond() {
-  if (j < secondText.length) {
-    secondEl.textContent += secondText.charAt(j);
-    secondEl.classList.add('glitch');
-    secondEl.setAttribute('data-text', secondEl.textContent);
-    j++;
-    setTimeout(typeSecond, 80);
-  } else {
-    setTimeout(() => {
-      firstEl.classList.remove('glitch');
-      secondEl.classList.remove('glitch');
-    }, 700);
-  }
-}
-
-// Play once per tab session
-if (!sessionStorage.getItem('typed')) {
-  typeFirst();
-  sessionStorage.setItem('typed', 'yes');
-} else {
-  firstEl.textContent = firstText;
-  secondEl.textContent = secondText;
-}
-
-
-/* ── PORTRAIT: hide when user scrolls past education ── */
-const portrait         = document.querySelector('.portrait');
-const educationSection = document.getElementById('education-section');
-
-function handlePortrait() {
-  const triggerTop = educationSection.offsetTop;
-  if (window.scrollY > triggerTop + 300) {
-    portrait.classList.add('hide');
-  } else {
-    portrait.classList.remove('hide');
-  }
-}
-window.addEventListener('scroll', handlePortrait, { passive: true });
-
-
-/* ── GLITCH ON SCROLL (IntersectionObserver, fires once per element) ── */
-const glitchEls = document.querySelectorAll('.glitch-on-scroll');
-const glitchObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('glitch-active');
-      glitchObserver.unobserve(entry.target);
+  const vertexSrc = `
+    attribute vec2 position;
+    void main() {
+      gl_Position = vec4(position, 0.0, 1.0);
     }
-  });
-}, { threshold: 0.4 });
+  `;
 
-glitchEls.forEach(el => glitchObserver.observe(el));
+  const fragmentSrc = `
+    precision mediump float;
 
+    uniform vec2 uResolution;
+    uniform float uTime;
+    uniform vec2 uPointer;
 
-/* ── HORIZONTAL SCROLL FOR PURSUITS ──
-   Section height = 100vh + card overflow.
-   Vertical scroll inside section → horizontal translateX on track.
-*/
-const achSection = document.getElementById('achievements-section');
-const track      = document.getElementById('horizontal-track');
+    float hash(vec2 p) {
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+    }
 
-function setupAchievements() {
-  const trackWidth     = track.scrollWidth;
-  const visibleWidth   = window.innerWidth;
-  const scrollDistance = Math.max(0, trackWidth - visibleWidth + 160);
-  achSection.style.height = (window.innerHeight + scrollDistance) + 'px';
-  return scrollDistance;
-}
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+        mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+        u.y
+      );
+    }
 
-let scrollDistance = setupAchievements();
-window.addEventListener('resize', () => { scrollDistance = setupAchievements(); }, { passive: true });
+    void main() {
+      vec2 uv = gl_FragCoord.xy / uResolution.xy;
+      vec2 p = uv * 2.0 - 1.0;
+      p.x *= uResolution.x / uResolution.y;
 
-function handleHorizontalScroll() {
-  const sectionTop = achSection.offsetTop;
-  const scrolled   = window.scrollY - sectionTop;
-  const progress   = Math.min(scrollDistance, Math.max(0, scrolled));
-  track.style.transform = `translateX(-${progress}px)`;
-}
+      float t = uTime * 0.12;
+      float field = noise(p * 2.4 + vec2(t, -t));
+      field += 0.5 * noise(p * 4.8 - vec2(t * 1.8, t * 0.7));
 
-window.addEventListener('scroll', handleHorizontalScroll, { passive: true });const canvas = document.getElementById("darkveil-bg");
-const gl = canvas.getContext("webgl");
+      vec2 pointer = (uPointer / uResolution.xy) * 2.0 - 1.0;
+      pointer.x *= uResolution.x / uResolution.y;
+      float cursor = smoothstep(0.42, 0.0, distance(p, pointer));
 
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
-}
-window.addEventListener("resize", resize);
-resize();
+      vec3 ink = vec3(0.015, 0.018, 0.026);
+      vec3 cyan = vec3(0.35, 0.78, 0.98);
+      vec3 ember = vec3(1.0, 0.46, 0.18);
+      vec3 violet = vec3(0.48, 0.32, 0.95);
 
-const vertexSrc = `
-attribute vec2 position;
-void main(){
-  gl_Position = vec4(position,0.0,1.0);
-}
-`;
+      vec3 color = ink;
+      color += cyan * smoothstep(0.52, 1.25, field) * 0.17;
+      color += ember * smoothstep(0.72, 1.36, field + p.x * 0.18) * 0.12;
+      color += violet * smoothstep(0.56, 1.18, field - p.y * 0.16) * 0.16;
+      color += cyan * cursor * 0.13;
 
-const fragmentSrc = `
-precision mediump float;
+      float vignette = smoothstep(1.32, 0.22, length(p));
+      color *= vignette;
+      color += (hash(gl_FragCoord.xy + uTime) - 0.5) * 0.018;
 
-uniform vec2 uResolution;
-uniform float uTime;
+      gl_FragColor = vec4(color, 1.0);
+    }
+  `;
 
-float rand(vec2 p){
-  return fract(sin(dot(p, vec2(12.9898,78.233))) * 43758.5453);
-}
+  function createShader(type, source) {
+    const shader = gl.createShader(type);
+    gl.shaderSource(shader, source);
+    gl.compileShader(shader);
 
-void main(){
-  vec2 uv = gl_FragCoord.xy / uResolution.xy;
-  uv = uv * 2.0 - 1.0;
+    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+      gl.deleteShader(shader);
+      return null;
+    }
 
-  float t = uTime * 0.5;
+    return shader;
+  }
 
-  // Warp effect
-  uv += 0.2 * vec2(
-    sin(uv.y * 6.0 + t),
-    cos(uv.x * 6.0 + t)
-  );
+  const vertexShader = createShader(gl.VERTEX_SHADER, vertexSrc);
+  const fragmentShader = createShader(gl.FRAGMENT_SHADER, fragmentSrc);
+  if (!vertexShader || !fragmentShader) return;
 
-  float color = sin(uv.x * 3.0 + t) + cos(uv.y * 3.0 - t);
+  const program = gl.createProgram();
+  gl.attachShader(program, vertexShader);
+  gl.attachShader(program, fragmentShader);
+  gl.linkProgram(program);
 
-  // Dark purple theme
-  vec3 col = vec3(
-    0.1 + 0.3 * color,
-    0.0,
-    0.3 + 0.6 * color
-  );
+  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) return;
 
-  // Noise
-  col += (rand(uv + t) - 0.5) * 0.05;
+  gl.useProgram(program);
 
-  gl_FragColor = vec4(col, 1.0);
-}
-`;
+  const vertices = new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]);
+  const buffer = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-function createShader(type, source) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  return shader;
-}
+  const position = gl.getAttribLocation(program, "position");
+  gl.enableVertexAttribArray(position);
+  gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
 
-const program = gl.createProgram();
-gl.attachShader(program, createShader(gl.VERTEX_SHADER, vertexSrc));
-gl.attachShader(program, createShader(gl.FRAGMENT_SHADER, fragmentSrc));
-gl.linkProgram(program);
-gl.useProgram(program);
+  const uTime = gl.getUniformLocation(program, "uTime");
+  const uResolution = gl.getUniformLocation(program, "uResolution");
+  const uPointer = gl.getUniformLocation(program, "uPointer");
+  const pointer = { x: window.innerWidth * 0.68, y: window.innerHeight * 0.38 };
 
-const vertices = new Float32Array([
-  -1, -1,
-   1, -1,
-  -1,  1,
-   1,  1
-]);
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.8);
+    canvas.width = Math.floor(window.innerWidth * dpr);
+    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.style.width = `${window.innerWidth}px`;
+    canvas.style.height = `${window.innerHeight}px`;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
 
-const buffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
+  function render(time) {
+    gl.uniform1f(uTime, time * 0.001);
+    gl.uniform2f(uResolution, canvas.width, canvas.height);
+    gl.uniform2f(uPointer, pointer.x * (canvas.width / window.innerWidth), canvas.height - pointer.y * (canvas.height / window.innerHeight));
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(render);
+  }
 
-const position = gl.getAttribLocation(program, "position");
-gl.enableVertexAttribArray(position);
-gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
+  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    pointer.x += (event.clientX - pointer.x) * 0.22;
+    pointer.y += (event.clientY - pointer.y) * 0.22;
+  }, { passive: true });
 
-const uTime = gl.getUniformLocation(program, "uTime");
-const uResolution = gl.getUniformLocation(program, "uResolution");
-
-function render(time) {
-  gl.uniform1f(uTime, time * 0.001);
-  gl.uniform2f(uResolution, canvas.width, canvas.height);
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  resize();
   requestAnimationFrame(render);
 }
 
-render();
+function initReveal() {
+  const revealEls = document.querySelectorAll("[data-reveal]");
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add("is-visible");
+      observer.unobserve(entry.target);
+    });
+  }, { threshold: 0.16, rootMargin: "0px 0px -8% 0px" });
 
-/* ── PROJECT STRIPS: scroll-triggered entrance, fires once ── */
-const projStrips = document.querySelectorAll('.proj-strip');
-const projObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      projObserver.unobserve(entry.target);
+  revealEls.forEach((el) => observer.observe(el));
+}
+
+function initProjectSpotlight() {
+  document.querySelectorAll(".project-card, .image-card, .pursuit-card").forEach((card) => {
+    card.addEventListener("pointermove", (event) => {
+      const rect = card.getBoundingClientRect();
+      card.style.setProperty("--mouse-x", `${event.clientX - rect.left}px`);
+      card.style.setProperty("--mouse-y", `${event.clientY - rect.top}px`);
+    }, { passive: true });
+  });
+}
+
+function initPursuitScroll() {
+  const section = document.querySelector(".pursuits-section");
+  const track = document.getElementById("pursuit-track");
+  const sticky = document.querySelector(".pursuits-sticky");
+  const desktop = window.matchMedia("(min-width: 761px)");
+
+  if (!section || !track || !sticky) return;
+
+  let distance = 0;
+
+  function setup() {
+    if (!desktop.matches) {
+      section.style.height = "auto";
+      track.style.transform = "translate3d(0, 0, 0)";
+      distance = 0;
+      return;
     }
-  });
-}, { threshold: 0.85 });
 
-projStrips.forEach(s => projObserver.observe(s));
+    const shellWidth = sticky.getBoundingClientRect().width;
+    distance = Math.max(0, track.scrollWidth - shellWidth);
+    section.style.height = `${window.innerHeight + distance + 144}px`;
+  }
 
-document.querySelectorAll('.proj-strip').forEach(card => {
-  card.addEventListener('mousemove', e => {
-    const rect = card.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+  function update() {
+    if (!desktop.matches || distance === 0) return;
+    const rect = section.getBoundingClientRect();
+    const progress = Math.min(distance, Math.max(0, -rect.top));
+    track.style.transform = `translate3d(${-progress}px, 0, 0)`;
+  }
 
-    card.style.setProperty('--mouse-x', `${x}px`);
-    card.style.setProperty('--mouse-y', `${y}px`);
-  });
-});
+  setup();
+  update();
+  window.addEventListener("resize", () => {
+    setup();
+    update();
+  }, { passive: true });
+  window.addEventListener("scroll", update, { passive: true });
+}
+
+function initActiveNav() {
+  const links = [...document.querySelectorAll(".nav-links a")];
+  const sections = links
+    .map((link) => document.querySelector(link.getAttribute("href")))
+    .filter(Boolean);
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (!entry.isIntersecting) return;
+      links.forEach((link) => {
+        link.classList.toggle("is-active", link.getAttribute("href") === `#${entry.target.id}`);
+      });
+    });
+  }, { threshold: 0.28, rootMargin: "-24% 0px -58% 0px" });
+
+  sections.forEach((section) => observer.observe(section));
+}
+
+initBackground();
+initReveal();
+initProjectSpotlight();
+initPursuitScroll();
+initActiveNav();

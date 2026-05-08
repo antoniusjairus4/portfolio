@@ -1,251 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Antonius Jairus</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Playfair+Display&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="index.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio of Antonius Jairus R: developer, builder, athlete, and systems thinker.">
+  <title>Antonius Jairus R | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
 </head>
 
-<body class="dark-theme">
+<body>
+  <canvas id="darkveil-bg" aria-hidden="true"></canvas>
+  <div class="site-atmosphere" aria-hidden="true"></div>
 
-<!-- LiquidEther fills the full viewport, fixed behind everything -->
-<canvas id="darkveil-bg"></canvas>
+  <header class="site-header">
+    <a class="brand-mark" href="#top" aria-label="Antonius Jairus home">
+      <span>AJ</span>
+    </a>
 
-<!-- ═══════════ HERO ═══════════ -->
-<section class="min-h-[60vh] flex flex-col justify-center px-10 pt-16 pb-6 relative">
-  <div class="content">
+    <nav class="nav-links" aria-label="Primary navigation">
+      <a href="#work">Work</a>
+      <a href="#education">Education</a>
+      <a href="#pursuits">Pursuits</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </header>
 
-    <div class="name text-main text-glow" id="name">
-      <span id="first"></span>
-      <span id="second"></span>
-    </div>
+  <main id="top">
+    <section class="hero-section section-shell">
+      <div class="hero-copy" data-reveal>
+        <p class="eyebrow">Developer portfolio</p>
+        <h1>
+          <span id="first-name">Antonius</span>
+          <span id="last-name">Jairus R</span>
+        </h1>
+        <p class="hero-lede">
+          I build clean digital products with a competitive edge: AI systems, product prototypes,
+          and interactive web experiences shaped by discipline, sport, and strategy.
+        </p>
 
-    <p class="mt-3 text-lg opacity-70 tracking-widest text-main" style="font-family:'Playfair Display',serif;">
-      Ou paradosō, oudamōs tēmeron.
-    </p>
-
-    <div class="mt-5 max-w-xl text-sm md:text-base leading-relaxed text-main">
-
-      <p class="mb-4">Hello everyone! A very warm welcome to my digital space.</p>
-
-      <p class="mb-4">
-        I'm <span class="text-violet-400 font-semibold">Antonius Jairus R</span>, and I'm thrilled to share my journey with you.
-        This isn't just a portfolio — it's a reflection of the projects and the discipline that I've developed,
-        and the mindset that drives me forward.
-      </p>
-
-      <p class="mb-4">
-        Whether you're a developer, a collaborator, or just exploring, I'm glad you're here.
-        Here's a quick roadmap of what you'll find as you scroll:
-      </p>
-
-      <div class="space-y-3 text-sm md:text-base" style="border-left:1px solid rgba(155,127,232,0.25); padding-left:1rem;">
-        <p><span class="text-violet-400 font-semibold">Education</span> <span class="opacity-40 mx-1">—</span> My academic journey and pursuit of knowledge.</p>
-        <p><span class="text-violet-400 font-semibold">Pursuits</span> <span class="opacity-40 mx-1">—</span> Sport, art, strategy — the pursuits that shaped my character.</p>
-        <p><span class="text-violet-400 font-semibold">Projects</span> <span class="opacity-40 mx-1">—</span> The core of my work — solving problems through code.</p>
-        <p><span class="text-violet-400 font-semibold">Certifications</span> <span class="opacity-40 mx-1">—</span> Skills and technical standards I've mastered.</p>
-      </div>
-
-      <p class="mt-6">
-        Every project tells a story. I hope you enjoy exploring mine — feel free to contact me, details are at the bottom.
-      </p>
-    </div>
-
-  </div>
-</section>
-
-<!-- Portrait -->
-<div class="portrait">
-  <img src="podium.png" alt="Antonius Jairus">
-</div>
-
-<div class="bg-glow"></div>
-<div class="grid-overlay"></div>
-
-<div class="fixed bottom-10 right-10 text-xs opacity-40 tracking-widest text-main">Scroll for more ⚡</div>
-<div class="absolute bottom-5 w-full text-center arrow text-xl text-main">↓</div>
-
-
-<!-- ═══════════ EDUCATION ═══════════ -->
-<section id="education-section" class="px-10 flex flex-col justify-center pt-32 pb-2">
-
-  <h2 class="section-heading glitch-on-scroll" data-text="EDUCATION">EDUCATION</h2>
-
-  <div class="grid md:grid-cols-2 gap-10 max-w-4xl">
-
-    <a href="edu.html#school" class="block">
-      <div class="edu-card">
-        <span class="edu-card-label">School</span>
-        <div style="height:160px; overflow:hidden;">
-          <img src="school.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="School">
+        <div class="hero-actions" aria-label="Primary actions">
+          <a class="button button-primary" href="#work">View work</a>
+          <a class="button button-secondary" href="#contact">Get in touch</a>
         </div>
       </div>
-    </a>
 
-    <a href="edu.html#college" class="block">
-      <div class="edu-card">
-        <span class="edu-card-label">College</span>
-        <div style="height:160px; overflow:hidden;">
-          <img src="college.png" style="width:100%; height:160px; object-fit:cover; display:block;" alt="College">
+      <aside class="hero-panel" data-reveal>
+        <div class="portrait-frame">
+          <img src="podium.png" alt="Antonius Jairus standing at a podium">
+        </div>
+        <div class="hero-metrics" aria-label="Portfolio highlights">
+          <div>
+            <strong>04</strong>
+            <span>featured builds</span>
+          </div>
+          <div>
+            <strong>TN</strong>
+            <span>state champion</span>
+          </div>
+          <div>
+            <strong>AI</strong>
+            <span>product focus</span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section-shell intro-section" data-reveal>
+      <div class="section-kicker">Profile</div>
+      <div class="intro-grid">
+        <h2>Systems thinking with athlete-level execution.</h2>
+        <div class="intro-copy">
+          <p>
+            This portfolio is the map of how I think: technical projects at the center,
+            education as the foundation, and pursuits that sharpen focus under pressure.
+          </p>
+          <p>
+            I care about interfaces that feel composed, code that stays understandable,
+            and products that make a sharp first impression without losing usability.
+          </p>
         </div>
       </div>
-    </a>
+    </section>
 
-  </div>
-</section>
-
-
-<!-- ═══════════ PURSUITS ═══════════ -->
-<section id="achievements-section" style="margin-top:-120px;">
-  <div class="achievements-sticky px-10">
-
-    <h2 class="section-heading glitch-on-scroll" data-text="PURSUITS">PURSUITS</h2>
-
-    <div class="horizontal-track" id="horizontal-track">
-
-      <a href="tt.html" class="ach-card">
-        <span class="card-label">Sport</span>
-        <h3>Table Tennis</h3>
-        <p>The sport that shaped my focus, reflexes, and competitive mindset from childhood. Two-time Tamil Nadu State Champion.</p>
-      </a>
-
-      <a href="kar.html" class="ach-card">
-        <span class="card-label">Martial Art</span>
-        <h3>Karate</h3>
-        <p>Trained before table tennis. Built my foundation in discipline, self-defence, and controlled aggression.</p>
-      </a>
-
-      <a href="music.html" class="ach-card">
-        <span class="card-label">Art</span>
-        <h3>Music — Keyboard</h3>
-        <p>The one pursuit that quiets everything else. Playing keyboard is how I reset and maintain clarity of thought.</p>
-      </a>
-
-      <a href="speak.html" class="ach-card">
-        <span class="card-label">Communication</span>
-        <h3>Public Speaking & Events</h3>
-        <p>Coordinated events and held the stage at Campion. Strong English and the ability to command a room.</p>
-      </a>
-
-      <a href="chess.html" class="ach-card">
-        <span class="card-label">Strategy</span>
-        <h3>Chess</h3>
-        <p>Bullet 2065 · Blitz 1854 · Rapid 1760. Grünfeld Defence. The most mentally demanding thing I do — and I keep coming back.</p>
-      </a>
-
-      <a href="others.html" class="ach-card">
-        <span class="card-label">Miscellaneous</span>
-        <h3>Others</h3>
-        <p>Everything else that doesn't fit a label — curiosities, side experiments, and things still taking shape.</p>
-      </a>
-
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════ PROJECTS ═══════════ -->
-<section id="projects-section" class="px-10 pt-0 pb-24" style="margin-top:-60px;">
-  
-  <h2 class="section-heading glitch-on-scroll" data-text="PROJECTS">PROJECTS</h2>
-
-  <div class="projects-list">
-
-    <!-- Card 1: from LEFT -->
-    <a href="neuro.html" class="proj-strip from-left">
-      <div class="proj-strip-inner">
-        <span class="proj-strip-label">AI · Healthcare</span>
-        <span class="proj-strip-title">NeuroScan AI</span>
-        <span class="proj-strip-desc">Multimodal Alzheimer's detection fusing MRI, PET & blood biomarkers.</span>
+    <section class="section-shell work-section" id="work">
+      <div class="section-heading" data-reveal>
+        <div>
+          <p class="eyebrow">Selected work</p>
+          <h2>Projects with intent, not filler.</h2>
+        </div>
+        <a class="text-link" href="#contact">Available for collaboration</a>
       </div>
-      <div class="proj-strip-tags">
-        <span class="proj-card-tag">Python</span>
-        <span class="proj-card-tag">Flask</span>
-      </div>
-      <span class="proj-strip-arrow">→</span>
-    </a>
 
-    <!-- Card 2: from BOTTOM -->
-    <a href="kai.html" class="proj-strip from-bottom">
-      <div class="proj-strip-inner">
-        <span class="proj-strip-label">App · Sport</span>
-        <span class="proj-strip-title">KaiForge</span>
-        <span class="proj-strip-desc">Flutter table tennis tracker with AI-powered drill suggestions.</span>
-      </div>
-      <div class="proj-strip-tags">
-        <span class="proj-card-tag">Flutter</span>
-        <span class="proj-card-tag">Dart</span>
-      </div>
-      <span class="proj-strip-arrow">→</span>
-    </a>
+      <div class="project-feature" data-reveal>
+        <a class="project-card project-card-large" href="neuro.html" style="--accent: #7dd3fc;">
+          <span class="card-index">01</span>
+          <div>
+            <p class="project-label">AI Healthcare</p>
+            <h3>NeuroScan AI</h3>
+            <p>
+              Multimodal Alzheimer's detection concept combining MRI, PET, and blood biomarker signals
+              into a more explainable diagnostic workflow.
+            </p>
+          </div>
+          <div class="tag-row">
+            <span>Python</span>
+            <span>Flask</span>
+            <span>ML</span>
+          </div>
+        </a>
 
-    <!-- Card 3: from BOTTOM -->
-    <a href="thrift.html" class="proj-strip from-bottom">
-      <div class="proj-strip-inner">
-        <span class="proj-strip-label">Web · Marketplace</span>
-        <span class="proj-strip-title">Campus Thrift</span>
-        <span class="proj-strip-desc">Student marketplace with college email validation & Supabase backend.</span>
+        <div class="project-stack">
+          <a class="project-card" href="kai.html" style="--accent: #f97316;">
+            <span class="card-index">02</span>
+            <p class="project-label">Sport Analytics</p>
+            <h3>KaiForge</h3>
+            <p>Table tennis intelligence app with structured tracking and drill suggestions.</p>
+            <div class="tag-row">
+              <span>Flutter</span>
+              <span>Dart</span>
+            </div>
+          </a>
+
+          <a class="project-card" href="thrift.html" style="--accent: #34d399;">
+            <span class="card-index">03</span>
+            <p class="project-label">Marketplace</p>
+            <h3>Campus Thrift</h3>
+            <p>College marketplace experience with student validation and Supabase-backed flow.</p>
+            <div class="tag-row">
+              <span>Supabase</span>
+              <span>JavaScript</span>
+            </div>
+          </a>
+
+          <a class="project-card" href="valante.html" style="--accent: #f43f5e;">
+            <span class="card-index">04</span>
+            <p class="project-label">Security Tool</p>
+            <h3>Valante</h3>
+            <p>Security-focused utility built around access control and integrity-first handling.</p>
+            <div class="tag-row">
+              <span>Python</span>
+              <span>Security</span>
+            </div>
+          </a>
+        </div>
       </div>
-      <div class="proj-strip-tags">
-        <span class="proj-card-tag">Supabase</span>
-        <span class="proj-card-tag">JS</span>
+    </section>
+
+    <section class="section-shell education-section" id="education">
+      <div class="section-heading" data-reveal>
+        <div>
+          <p class="eyebrow">Education</p>
+          <h2>Foundation and trajectory.</h2>
+        </div>
       </div>
-      <span class="proj-strip-arrow">→</span>
-    </a>
 
-    <!-- Card 4: from RIGHT -->
-    <a href="valante.html" class="proj-strip from-right">
-      <div class="proj-strip-inner">
-        <span class="proj-strip-label">Security · Tool</span>
-        <span class="proj-strip-title">Valante</span>
-        <span class="proj-strip-desc">Cybersecurity tool built for controlled access and data integrity.</span>
+      <div class="education-grid">
+        <a class="image-card" href="edu.html#school" data-reveal>
+          <img src="school.png" alt="School campus">
+          <div>
+            <p class="project-label">School</p>
+            <h3>Campion</h3>
+            <span>Academic base, stage confidence, and early discipline.</span>
+          </div>
+        </a>
+
+        <a class="image-card" href="edu.html#college" data-reveal>
+          <img src="college.png" alt="College campus">
+          <div>
+            <p class="project-label">College</p>
+            <h3>Engineering Path</h3>
+            <span>Technical growth, product building, and applied systems work.</span>
+          </div>
+        </a>
       </div>
-      <div class="proj-strip-tags">
-        <span class="proj-card-tag">Cybersecurity</span>
-        <span class="proj-card-tag">Python</span>
+    </section>
+
+    <section class="pursuits-section" id="pursuits">
+      <div class="pursuits-sticky section-shell">
+        <div class="section-heading compact" data-reveal>
+          <div>
+            <p class="eyebrow">Pursuits</p>
+            <h2>Pressure, rhythm, strategy.</h2>
+          </div>
+          <p class="section-note">The non-code systems that shaped the developer.</p>
+        </div>
+
+        <div class="pursuit-track" id="pursuit-track">
+          <a class="pursuit-card" href="tt.html">
+            <span>Sport</span>
+            <h3>Table Tennis</h3>
+            <p>Focus, reflexes, and competitive clarity from a two-time Tamil Nadu State Champion.</p>
+          </a>
+          <a class="pursuit-card" href="kar.html">
+            <span>Martial Art</span>
+            <h3>Karate</h3>
+            <p>Control, discipline, self-defence, and the habit of staying calm under force.</p>
+          </a>
+          <a class="pursuit-card" href="music.html">
+            <span>Art</span>
+            <h3>Keyboard</h3>
+            <p>The reset switch: rhythm, patience, and a quieter kind of precision.</p>
+          </a>
+          <a class="pursuit-card" href="speak.html">
+            <span>Communication</span>
+            <h3>Speaking</h3>
+            <p>Event coordination, stage presence, and the ability to own a room with clarity.</p>
+          </a>
+          <a class="pursuit-card" href="chess.html">
+            <span>Strategy</span>
+            <h3>Chess</h3>
+            <p>Bullet 2065, Blitz 1854, Rapid 1760, and a constant appetite for sharper decisions.</p>
+          </a>
+          <a class="pursuit-card" href="others.html">
+            <span>Archive</span>
+            <h3>Others</h3>
+            <p>Side quests, curiosities, and the experiments still becoming something real.</p>
+          </a>
+        </div>
       </div>
-      <span class="proj-strip-arrow">→</span>
-    </a>
+    </section>
 
-  </div>
-</section>
-<script src="index.js"></script>
+    <section class="section-shell signal-section" data-reveal>
+      <div class="signal-panel">
+        <p class="eyebrow">Operating style</p>
+        <h2>Fast enough to ship. Careful enough to make it feel designed.</h2>
+        <div class="signal-grid">
+          <div>
+            <span>01</span>
+            <strong>Product judgment</strong>
+            <p>Clear hierarchy, useful constraints, and interfaces that feel intentional.</p>
+          </div>
+          <div>
+            <span>02</span>
+            <strong>Technical fluency</strong>
+            <p>Comfort across frontend, backend concepts, AI workflows, and data-backed products.</p>
+          </div>
+          <div>
+            <span>03</span>
+            <strong>Competitive mindset</strong>
+            <p>Built from sport: repetition, composure, feedback loops, and consistent output.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-<!-- LiquidEther initialisation — ES module so it can import Three.js -->
-<script type="module">
-  import { initLiquidEther } from './liquidether.js';
+    <section class="section-shell contact-section" id="contact" data-reveal>
+      <div>
+        <p class="eyebrow">Contact</p>
+        <h2>Let's build something with taste and teeth.</h2>
+      </div>
+      <div class="contact-actions">
+        <a class="button button-primary" href="mailto:">Email me</a>
+        <a class="button button-secondary" href="#top">Back to top</a>
+      </div>
+    </section>
+  </main>
 
-  const bg = document.getElementById('liquid-ether-bg');
-
-  initLiquidEther(bg, {
-    // Deep violet-to-amethyst-to-midnight palette — matches the portfolio accent colour
-    colors: [
-      '#050210',   // near-black deep void
-      '#1a0533',   // midnight violet
-      '#3d1270',   // deep amethyst
-      '#7b3fbe',   // mid-violet
-      '#9b7fe8',   // accent violet (matches CSS --violet-400)
-      '#c4a8ff',   // soft lavender peak
-    ],
-    mouseForce:       30,
-    cursorSize:       130,
-    isViscous:        false,
-    viscous:          28,
-    iterationsPoisson: 32,
-    dt:               0.014,
-    BFECC:            true,
-    resolution:       0.5,
-    isBounce:         false,
-    autoDemo:         true,
-    autoSpeed:        0.3,
-    autoIntensity:    2.8,
-    takeoverDuration: 0.3,
-    autoResumeDelay:  1500,
-    autoRampDuration: 1.0,
-    opacity:          0.68,
-  });
-</script>
+  <script src="index.js"></script>
 </body>
 </html>
