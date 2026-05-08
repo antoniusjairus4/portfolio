@@ -729,26 +729,23 @@ section {
     min-height: 360px;
   }
 
-  .pursuits-section {
-    height: auto !important;
-  }
-
   .pursuits-sticky {
-    position: relative;
-    min-height: auto;
+    position: sticky;
+    min-height: 100svh;
     padding: 72px 0;
-    overflow: visible;
+    overflow: hidden;
   }
 
   .pursuit-track {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr;
+    width: max-content;
+    display: flex;
+    gap: 12px;
   }
 
   .pursuit-card {
-    width: 100%;
-    min-height: 236px;
+    width: min(312px, 78vw);
+    min-height: 252px;
+    padding: 24px;
   }
 
   .signal-panel {

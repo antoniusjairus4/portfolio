@@ -159,27 +159,20 @@ function initPursuitScroll() {
   const section = document.querySelector(".pursuits-section");
   const track = document.getElementById("pursuit-track");
   const sticky = document.querySelector(".pursuits-sticky");
-  const desktop = window.matchMedia("(min-width: 761px)");
 
   if (!section || !track || !sticky) return;
 
   let distance = 0;
 
   function setup() {
-    if (!desktop.matches) {
-      section.style.height = "auto";
-      track.style.transform = "translate3d(0, 0, 0)";
-      distance = 0;
-      return;
-    }
-
     const shellWidth = sticky.getBoundingClientRect().width;
     distance = Math.max(0, track.scrollWidth - shellWidth);
-    section.style.height = `${window.innerHeight + distance + 144}px`;
+    const scrollBuffer = window.innerWidth < 761 ? 96 : 144;
+    section.style.height = `${window.innerHeight + distance + scrollBuffer}px`;
   }
 
   function update() {
-    if (!desktop.matches || distance === 0) return;
+    if (distance === 0) return;
     const rect = section.getBoundingClientRect();
     const progress = Math.min(distance, Math.max(0, -rect.top));
     track.style.transform = `translate3d(${-progress}px, 0, 0)`;
