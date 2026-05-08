@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaiForge - Project Showcase</title>
+    <link rel="stylesheet" href="proj.css">
+    <style>
+        /* 1. Resetting the section to handle scrolling properly on mobile */
+        .project-section {
+            height: auto !important; 
+            min-height: 100vh;
+            padding: 100px 20px; /* Space for fixed headers if any */
+            flex-direction: column;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 2. Container for the long-form content */
+        .details-container {
+            z-index: 2;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 40px;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* 3. Responsive Grid for Information */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .detail-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        .detail-card h3 {
+            color: #ff6b35;
+            margin-top: 0;
+            font-size: 1.4rem;
+        }
+
+        /* 4. Responsive Image Gallery */
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            margin-top: 40px;
+        }
+
+        .app-screenshot-placeholder {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: rgba(255, 107, 53, 0.05);
+            border: 1px dashed rgba(255, 107, 53, 0.4);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff6b35;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .app-screenshot-placeholder:hover {
+            background: rgba(255, 107, 53, 0.15);
+            border-color: #ff6b35;
+        }
+
+        /* 5. Mobile Adjustments */
+        @media (max-width: 600px) {
+            .project-title {
+                font-size: 2.2rem !important;
+            }
+            .project-card {
+                padding: 1.5rem !important;
+                margin: 0 10px;
+            }
+            .detail-card {
+                padding: 20px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr; /* Force stack on very small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "ogl": "https://cdn.jsdelivr.net/npm/ogl@1.0.11/+esm"
+        }
+      }
+    </script>
+
+    <section class="project-section" id="kaiforge-section">
+        <div id="plasma-canvas-container"></div>
+
+        <div class="project-card">
+            <div class="project-content">
+                <span class="project-tag">Featured Project</span>
+                <h2 class="project-title">KaiForge</h2>
+                <p class="project-description">
+                    The ultimate analytical companion for table tennis professionals. 
+                    KaiForge transforms raw match footage into a strategic roadmap.
+                </p>
+                <div class="project-tech">
+                    <span>C++</span>
+                    <span>Real-time Analytics</span>
+                    <span>Supabase</span>
+                    <span>Computer Vision</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-container">
+            <div class="info-grid">
+                <div class="detail-card">
+                    <h3>Project Philosophy</h3>
+                    <p>KaiForge bridges the gap between intuition and raw data. We process high-speed ball trajectories to offer a "forge" where technique is refined through evidence.</p>
+                </div>
+                <div class="detail-card">
+                    <h3>Core Functionality</h3>
+                    <p>Utilizing frame-by-frame analysis, the system tracks the ball at speeds exceeding 100km/h, providing heatmaps and momentum tracking.</p>
+                </div>
+            </div>
+
+            <div class="detail-card" style="margin-bottom: 40px;">
+                <h3>Deep Tech Stack</h3>
+                <p><strong>C++ Backend:</strong> Handles the core mathematical engine with zero-latency overhead for high-frequency video processing.</p>
+                <p><strong>Supabase:</strong> Manages the central nervous system, syncing player profiles and historical trends via PostgreSQL.</p>
+            </div>
+
+            <h2 style="text-align: center; color: #ff6b35; margin-bottom: 20px;">Application Preview</h2>
+            <div class="image-gallery">
+                <div class="app-screenshot-placeholder">Main Dashboard View</div>
+                <div class="app-screenshot-placeholder">Heatmap Analysis</div>
+                <div class="app-screenshot-placeholder">Real-time Ball Tracking</div>
+                <div class="app-screenshot-placeholder">Player Performance Stats</div>
+            </div>
+        </div>
+    </section>
+
+    <script type="module" src="proj.js"></script>
+</body>
+</html>
