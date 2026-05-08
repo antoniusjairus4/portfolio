@@ -94,15 +94,16 @@ function initPlasma() {
 
     // Handle responsiveness
     function resize() {
-        const width = container.offsetWidth;
-        const height = container.offsetHeight;
+        const width = window.innerWidth;
+        const height = window.innerHeight;
         renderer.setSize(width, height);
         program.uniforms.iResolution.value = [gl.drawingBufferWidth, gl.drawingBufferHeight];
     }
     
     window.addEventListener('resize', resize);
     resize();
-
+    window.addEventListener('orientationchange', resize);
+    
     // Animation loop
     function update(t) {
         requestAnimationFrame(update);
