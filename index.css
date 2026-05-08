@@ -216,14 +216,15 @@ section,
 /* ═══════════ PROJECTS SECTION ═══════════ */
 #projects-section { position: relative; z-index: 2; }
 
+
+/* AFTER */
 .projects-list {
   display: flex;
   flex-direction: row;
-  gap: 0;
+  gap: 14px;
   width: 100%;
-  border-top: 1px solid rgba(155, 127, 232, 0.15);
-  border-bottom: 1px solid rgba(155, 127, 232, 0.15);
 }
+
 
 .proj-strip {
   flex: 1;
@@ -233,17 +234,15 @@ section,
   gap: 16px;
   padding: 28px 24px;
   text-decoration: none;
-  border-right: 1px solid rgba(155, 127, 232, 0.25);
-  border-top: 1px solid rgba(155, 127, 232, 0.15);
-  border-bottom: 1px solid rgba(155, 127, 232, 0.15);
+  border: 1px solid rgba(155, 127, 232, 0.18);
+  border-radius: 6px;
   background: rgba(20, 10, 40, 0.55);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   position: relative;
-  transition: background 0.25s ease, padding-top 0.25s ease;
+  transition: background 0.25s ease;
   overflow: hidden;
 }
-.proj-strip:last-child { border-right: none; }
 
 /* accent bar on top on hover */
 .proj-strip::before {
@@ -278,12 +277,14 @@ section,
   color: #f0ebe0;
   line-height: 1.2;
 }
+
+/* AFTER */
 .proj-strip-desc {
-  font-family: 'Share Tech Mono', monospace;
-  font-size: 0.72rem;
-  color: rgba(240, 235, 224, 0.45);
-  line-height: 1.6;
-  margin-top: 4px;
+  font-family: 'Playfair Display', serif;
+  font-size: 0.78rem;
+  color: rgba(240, 235, 224, 0.5);
+  line-height: 1.65;
+  margin-top: 6px;
 }
 
 .proj-strip-tags {
@@ -349,9 +350,8 @@ section,
 .projects-list .proj-strip:nth-child(4) { transition-delay: 0s; }
 
 @media (max-width: 900px) {
-  .projects-list { flex-direction: column; }
-  .proj-strip { border-right: none; border-bottom: 1px solid rgba(155,127,232,0.12); }
-  .proj-strip:last-child { border-bottom: none; }
+  .projects-list { flex-direction: column; gap: 12px; }
+  .proj-strip { /* inherits border-radius from above — nothing extra needed */ }
 }
 
 /* ── PURSUITS MASK BLUR ── */
