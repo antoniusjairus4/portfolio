@@ -386,3 +386,40 @@ body {
         padding: 18px;
     }
 }
+
+/* Cinematic Dark Veil Layers */
+.veil-vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 10; /* Sits behind the nav but over the background */
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 20%,
+    rgba(5, 6, 8, 0.4) 60%,
+    rgba(5, 6, 8, 0.9) 100%
+  );
+}
+
+.veil-grain {
+  position: fixed;
+  inset: 0;
+  z-index: 11;
+  pointer-events: none;
+  opacity: 0.04; /* Very subtle! */
+  background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+  /* Alternatively, you can use a CSS noise generator */
+  mix-blend-mode: overlay;
+}
+
+/* Enhancing the "Veil" feeling on your section transitions */
+section::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 150px;
+  background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
+  pointer-events: none;
+}
