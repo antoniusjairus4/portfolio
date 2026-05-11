@@ -284,42 +284,16 @@ body {
     margin: 60px auto 0;
 }
 
-.app-screenshot-placeholder {
+.app-screenshot-placeholder img {
     width: 100%;
 
-    aspect-ratio: 16 / 10;
+    height: 100%;
 
-    min-height: 260px;
+    object-fit: cover;
 
-    background:
-        linear-gradient(
-            145deg,
-            rgba(140, 210, 255, 0.08),
-            rgba(60, 120, 255, 0.05),
-            rgba(220, 245, 255, 0.04)
-        );
+    border-radius: inherit;
 
-    border: 1px solid rgba(160, 220, 255, 0.16);
-
-    border-radius: 26px;
-
-    display: flex;
-
-    align-items: center;
-    justify-content: center;
-
-    color: #eef7ff;
-
-    font-size: 1.1rem;
-
-    text-align: center;
-
-    padding: 20px;
-
-    backdrop-filter: blur(18px);
-    -webkit-backdrop-filter: blur(18px);
-
-    transition: 0.35s ease;
+    display: block;
 }
 
 .app-screenshot-placeholder:hover {
