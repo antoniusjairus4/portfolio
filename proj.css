@@ -278,8 +278,8 @@ body {
 .app-screenshot-placeholder {
     width: 100%;
     aspect-ratio: 16/9;
-    background: rgba(15, 15, 20, 0.85);           /* Darker, subtle base */
-    border: 1px solid rgba(255, 255, 255, 0.08); /* Very subtle light border */
+    background: rgba(15, 15, 20, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     overflow: hidden;
     display: flex;
@@ -296,12 +296,21 @@ body {
     object-fit: contain;
     object-position: center;
     display: block;
-    background: #0a0a0a;   /* Fallback dark color if image fails */
+    background: #0a0a0a;
 }
 
 .app-screenshot-placeholder:hover {
-    border-color: rgba(140, 160, 255, 0.2);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+    background: rgba(20, 20, 28, 0.95);
+    border-color: rgba(100, 150, 255, 0.3);
+    transform: translateY(-8px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7),
+                0 0 30px rgba(80, 140, 255, 0.15);
+}
+
+@media (max-width: 480px) {
+    .app-screenshot-placeholder {
+        aspect-ratio: 4 / 3;
+    }
 }
 
 /* MOBILE FIXES */
@@ -415,4 +424,27 @@ section::after {
   height: 150px;
   background: linear-gradient(to top, var(--bg) 0%, transparent 100%);
   pointer-events: none;
+}
+
+.image-gallery {
+    display: grid;
+    gap: 28px;
+    width: 100%;
+    max-width: 1400px;
+    margin: 60px auto 0;
+    justify-content: center;
+}
+
+/* Desktop & Tablet - 2 columns */
+@media (min-width: 768px) {
+    .image-gallery {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile - 1 column */
+@media (max-width: 767px) {
+    .image-gallery {
+        grid-template-columns: 1fr;
+    }
 }
