@@ -371,11 +371,11 @@ body {
 
     .image-gallery {
     grid-template-columns: 1fr;
-}
+    }
 
-.app-screenshot-placeholder {
-    min-height: 220px;
-}
+    .app-screenshot-placeholder {
+        min-height: 220px;
+    }
 }
 
 /* VERY SMALL DEVICES */
