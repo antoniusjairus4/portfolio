@@ -87,11 +87,15 @@ void main() {
     // Intensity mapping for custom color overlay
     float intensity = (o.r + o.g + o.b) / 3.0;
 
-    vec3 finalColor = mix(
-        o.rgb * 0.15,
-        intensity * uCustomColor,
-        1.15
-    );
+    vec3 icyGlow = vec3(
+    0.75, 0.9, 1.0
+);
+
+vec3 finalColor = mix(
+    o.rgb * 0.08,
+    intensity * icyGlow,
+    1.35
+);
 
     // Alpha management based on light intensity
     fragColor = vec4(
@@ -147,7 +151,7 @@ function initPlasma() {
             },
 
             uOpacity: {
-                value: 0.85
+                value: 0.55
             },
 
             uMouse: {
