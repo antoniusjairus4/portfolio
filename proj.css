@@ -269,52 +269,57 @@ body {
 .image-gallery {
     display: grid;
 
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    grid-template-columns:
+        repeat(
+            auto-fit,
+            minmax(420px, 1fr)
+        );
 
-    gap: 24px;
+    gap: 28px;
 
     width: 100%;
 
-    max-width: 900px;
+    max-width: 1400px;
 
-    margin: 40px auto 0;
+    margin: 60px auto 0;
 }
 
-/* SCREENSHOT CARDS */
 .app-screenshot-placeholder {
     width: 100%;
 
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 16 / 10;
+
+    min-height: 260px;
 
     background:
         linear-gradient(
-            135deg,
-            rgba(10, 73, 145, 0.08),
-            rgba(8, 56, 199, 0.08),
-            rgba(10, 78, 167, 0.08)
+            145deg,
+            rgba(140, 210, 255, 0.08),
+            rgba(60, 120, 255, 0.05),
+            rgba(220, 245, 255, 0.04)
         );
 
-    border: 1px solid rgba(19, 47, 159, 0.2);
+    border: 1px solid rgba(160, 220, 255, 0.16);
 
-    border-radius: 20px;
+    border-radius: 26px;
 
     display: flex;
 
     align-items: center;
     justify-content: center;
 
-    color: #ffffff;
+    color: #eef7ff;
 
-    font-size: 1rem;
+    font-size: 1.1rem;
 
     text-align: center;
 
-    padding: 15px;
+    padding: 20px;
 
-    transition:
-        transform 0.35s ease,
-        border-color 0.35s ease,
-        box-shadow 0.35s ease;
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+
+    transition: 0.35s ease;
 }
 
 .app-screenshot-placeholder:hover {
@@ -365,7 +370,11 @@ body {
     }
 
     .image-gallery {
-        grid-template-columns: 1fr;
+    grid-template-columns: 1fr;
+    }
+
+    .app-screenshot-placeholder {
+        min-height: 220px;
     }
 }
 
