@@ -1,153 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KaiForge - Project Showcase</title>
     <link rel="stylesheet" href="proj.css">
-    <style>
-        /* 1. Resetting the section to handle scrolling properly on mobile */
-        .project-section {
-            height: auto !important; 
-            min-height: 100vh;
-            padding: 100px 20px;
-            flex-direction: column;
-            display: flex;
-            align-items: center;
+<style>
+    /* Only keep the most important overrides here */
+    .project-section {
+        height: auto !important; 
+        min-height: 100vh;
+        padding: 100px 20px;
+        flex-direction: column;
+        display: flex;
+        align-items: center;
+    }
 
-            background:
-                radial-gradient(circle at top left,
-                    rgba(255, 79, 216, 0.12),
-                    transparent 30%),
-
-                radial-gradient(circle at bottom right,
-                    rgba(155, 92, 255, 0.15),
-                    transparent 35%),
-
-                linear-gradient(180deg, #070707 0%, #020202 100%);
-        }
-
-        /* 2. Container for the long-form content */
-        .details-container {
-            z-index: 2;
-            width: 100%;
-            max-width: 900px;
-            margin-top: 40px;
-            color: white;
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        /* 3. Responsive Grid for Information */
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+    /* Mobile Adjustments */
+    @media (max-width: 600px) {
+        .project-title {
+            font-size: 2.2rem !important;
         }
 
         .detail-card {
-            background: rgba(255, 255, 255, 0.04);
-
-            border: 1px solid rgba(255, 79, 216, 0.18);
-
-            padding: 30px;
-
-            border-radius: 20px;
-
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-
-            box-shadow:
-                0 0 25px rgba(255, 79, 216, 0.08),
-                0 0 50px rgba(155, 92, 255, 0.05);
+            padding: 20px;
         }
 
-        .detail-card h3 {
-            color: #ffffff;
-            margin-top: 0;
-            font-size: 1.4rem;
+        .info-grid {
+            grid-template-columns: 1fr;
         }
-
-        .detail-card p {
-            color: #d7d7d7;
-        }
-
-        /* 4. Responsive Image Gallery */
-        .image-gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            width: 100%;
-            margin-top: 40px;
-        }
-
-        .app-screenshot-placeholder {
-            width: 100%;
-            aspect-ratio: 16/9;
-
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255, 79, 216, 0.08),
-                    rgba(155, 92, 255, 0.08),
-                    rgba(255, 46, 99, 0.08)
-                );
-
-            border: 1px dashed rgba(255, 79, 216, 0.35);
-
-            border-radius: 12px;
-
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            color: #ffffff;
-
-            font-size: 0.9rem;
-
-            text-align: center;
-
-            padding: 10px;
-
-            transition: all 0.3s ease;
-        }
-
-        .app-screenshot-placeholder:hover {
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(255, 79, 216, 0.15),
-                    rgba(155, 92, 255, 0.15),
-                    rgba(255, 46, 99, 0.15)
-                );
-
-            border-color: #ff4fd8;
-
-            box-shadow:
-                0 0 25px rgba(255, 79, 216, 0.14),
-                0 0 45px rgba(155, 92, 255, 0.08);
-        }
-
-        /* 5. Mobile Adjustments */
-        @media (max-width: 600px) {
-            .project-title {
-                font-size: 2.2rem !important;
-            }
-
-            .project-card {
-                padding: 1.5rem !important;
-                margin: 0 10px;
-            }
-
-            .detail-card {
-                padding: 20px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 
@@ -164,22 +50,21 @@
 
         <div class="project-card">
             <div class="project-content">
-                <span class="project-tag">Featured Project</span>
+                <span class="project-tag">Project Name</span>
 
                 <h2 class="project-title">
                     KaiForge
                 </h2>
 
                 <p class="project-description">
-                    The ultimate analytical companion for table tennis professionals. 
-                    KaiForge transforms raw match footage into a strategic roadmap.
+                    KaiForge helps table tennis players understand their game better by turning practice sessions, match performances, and tournament records into meaningful insights for their improvement.
                 </p>
 
                 <div class="project-tech">
-                    <span>C++</span>
-                    <span>Real-time Analytics</span>
+                    <span>Typescript</span>
+                    <span>Tailwind and JS</span>
                     <span>Supabase</span>
-                    <span>Computer Vision</span>
+                    <span>React</span>
                 </div>
             </div>
         </div>
@@ -189,12 +74,10 @@
             <div class="info-grid">
 
                 <div class="detail-card">
-                    <h3>Project Philosophy</h3>
+                    <h3>The Idea</h3>
 
                     <p>
-                        KaiForge bridges the gap between intuition and raw data.
-                        We process high-speed ball trajectories to offer a "forge"
-                        where technique is refined through evidence.
+                        KaiForge bridges the gap between intuition and raw performance data. Players can enter their practice, match, and tournament records, which are then tran-sformed into detailed graphs and visual insights that help analyze progress at its core.
                     </p>
                 </div>
 
@@ -202,53 +85,70 @@
                     <h3>Core Functionality</h3>
 
                     <p>
-                        Utilizing frame-by-frame analysis, the system tracks the ball
-                        at speeds exceeding 100km/h, providing heatmaps and momentum tracking.
+                        KaiForge is more than just a tracking app — it's a long-term performance companion for table tennis players. With secure login and personalized data storage, players can monitor their growth over time through detailed analysis of practice sessions, matches, and tournaments. From league-cum-knockout tournament structures to everyday practice matches, KaiForge transforms every session into meaningful visual insights that help players improve with clarity and precision.
                     </p>
                 </div>
 
             </div>
 
             <div class="detail-card" style="margin-bottom: 40px;">
-                <h3>Deep Tech Stack</h3>
+                <h3>The Complete Tech Stack</h3>
 
                 <p>
-                    <strong style="color:#ff4fd8;">C++ Backend:</strong>
-                    Handles the core mathematical engine with zero-latency overhead
-                    for high-frequency video processing.
+                    <strong style="color:#dff6ff;">React + Vite:</strong>
+                    Used to build a fast, responsive, and modern user interface with lightning-fast development and optimized performance.
                 </p>
 
                 <p>
-                    <strong style="color:#9b5cff;">Supabase:</strong>
-                    Manages the central nervous system, syncing player profiles
-                    and historical trends via PostgreSQL.
+                    <strong style="color:#9fdcff;">TypeScript:</strong>
+                    Adds scalability and type safety, making the application more reliable, maintainable, and production-ready.
+                </p>
+
+                <p>
+                    <strong style="color:#7ec8ff;">Tailwind CSS:</strong>
+                    Powers the futuristic glassmorphism-inspired UI with responsive and utility-first styling.
+                </p>
+
+                <p>
+                    <strong style="color:#6faeff;">Supabase:</strong>
+                    Handles secure authentication, cloud synchronization, and real-time database management for player records and analytics.
+                </p>
+
+                <p>
+                    <strong style="color:#4e7ac4;">PostgreSQL:</strong>
+                    Stores practice sessions, match history, tournament records, and long-term player performance data efficiently.
+                </p>
+
+                <p>
+                    <strong style="color:#b8e7ff;">Analytics Engine:</strong>
+                    Transforms raw practice and tournament data into meaningful graphs, charts, and visual performance insights.
                 </p>
             </div>
 
             <h2 style="
                 text-align: center;
-                color: #ff4fd8;
+                color: #cdd2dd;
                 margin-bottom: 20px;
-                text-shadow: 0 0 15px rgba(255,79,216,0.3);
+                text-shadow: 0 0 15px rgba(213, 216, 216, 0.3);
             ">
                 Application Preview
             </h2>
 
             <div class="image-gallery">
                 <div class="app-screenshot-placeholder">
-                    Main Dashboard View
+                    <img src="../images/match_analysis.png" alt="Match Analysis">
                 </div>
 
                 <div class="app-screenshot-placeholder">
-                    Heatmap Analysis
+                    <img src="../images/practice_analysis.png" alt="Practice Analysis">
                 </div>
 
                 <div class="app-screenshot-placeholder">
-                    Real-time Ball Tracking
+                    <img src="../images/dashboard.png" alt="Dashboard">
                 </div>
 
                 <div class="app-screenshot-placeholder">
-                    Player Performance Stats
+                    <img src="../images/tmt_leauge.png" alt="Tournament League">
                 </div>
             </div>
 
