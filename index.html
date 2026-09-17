@@ -1,163 +1,600 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <style>
-        /* Essential styles to make the effect fullscreen */
-        body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-            font-family: 'Inter', sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Antonius Jairus — Portfolio of Full-Stack Developer, CSE Cybersecurity Student (SKCET), National Gold Medalist Athlete, and Web Application Builder.">
+  <title>Antonius Jairus | Personal Portfolio & Engineer Showcase</title>
 
-        #lights-container {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-        .overlay {
-            position: relative;
-            z-index: 2;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: white;
-            text-align: center;
-            background: radial-gradient(circle, rgba(0,0,0,0) 0%, rgba(0,0,0,0.8) 100%);
-            pointer-events: none;
-        }
-
-        .redirect-box {
-            /* background: rgba(255, 255, 255, 0.05); */
-            /* backdrop-filter: blur(10px); */
-            /* padding: 2rem;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1); */
-            pointer-events: auto;
-        }
-
-        a { color: #03b3c3; text-decoration: none; font-weight: bold; }
-    </style>
+  <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
 
-    <div id="lights-container"></div>
+  <!-- Top Scroll Progress Indicator -->
+  <div id="scroll-progress"></div>
 
-    <div class="overlay">
-        <div class="redirect-box">
-            <h1>Are you readyyyyy</h1>
-            <p>Redirecting to <a href="landing/index.html">landing page</a>...</p>
+  <!-- Desktop Header Navigation Bar -->
+  <header class="site-header">
+    <a class="brand-mark" href="#top" aria-label="Antonius Jairus Home">
+      <div class="brand-logo-icon">AJ</div>
+      <span class="brand-title">Antonius Jairus</span>
+      <span class="brand-badge">PORTFOLIO</span>
+    </a>
+
+    <nav class="nav-links" aria-label="Primary Navigation">
+      <a href="#about">About</a>
+      <a href="#education">Education</a>
+      <a href="#projects">Projects</a>
+      <a href="#pursuits">Pursuits</a>
+      <a href="#freelance">Freelancing</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <a class="nav-cta" href="#contact">Get in Touch</a>
+  </header>
+
+  <!-- Mobile Bottom Sticky Navigation Bar -->
+  <nav class="mobile-bottom-nav" aria-label="Mobile Navigation">
+    <a class="mobile-nav-item" href="#top">
+      <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+      <span>Home</span>
+    </a>
+    <a class="mobile-nav-item" href="#education">
+      <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+      <span>Edu</span>
+    </a>
+    <a class="mobile-nav-item" href="#projects">
+      <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+      <span>Projects</span>
+    </a>
+    <a class="mobile-nav-item" href="#pursuits">
+      <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+      <span>Pursuits</span>
+    </a>
+    <a class="mobile-nav-item" href="#contact">
+      <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+      <span>Contact</span>
+    </a>
+  </nav>
+
+  <main id="top">
+
+    <!-- HERO SECTION -->
+    <section class="hero-section section-shell" id="about">
+      <div class="hero-left" data-reveal>
+        <div class="hero-badge">
+          <span>⚙️ B.E. CSE CYBERSECURITY · FULL-STACK DEVELOPER</span>
         </div>
-    </div>
 
-    <!-- We use Three.js as the engine for the Hyperspeed effect -->
-    <script type="importmap">
-        {
-            "imports": {
-                "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-            }
-        }
-    </script>
+        <h1 class="hero-title">
+          Antonius Jairus<br>
+          <span class="hero-title-highlight">Developer & Competitor</span>
+        </h1>
 
-    <script type="module">
-        import * as THREE from 'three';
+        <p class="hero-subtitle">
+          2nd year B.E. Computer Science (Cybersecurity) student at Sri Krishna College of Engineering & Technology. Building real-time full-stack web applications, AI copilots, and high-frequency telemetry engines. Driven by competitive focus as a National Gold Medalist in Table Tennis and Black Belt in Karate.
+        </p>
 
-        // Automatic redirect after 3 seconds to show off the effect
-        setTimeout(() => {
-            window.location.href = "landing/index.html";
-        }, 3500);
+        <div class="hero-actions">
+          <a class="btn-primary" href="#projects">
+            <span>Explore My Projects</span>
+            <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+          <a class="btn-secondary" href="#education">
+            <span>Education & Background</span>
+          </a>
+        </div>
 
-        /**
-         * Hyperspeed Effect Logic
-         * Manually coded implementation of your ReactBits configuration
-         */
-        const options = {
-            onSpeedUp: () => { console.log("Accelerating..."); },
-            onSlowDown: () => { },
-            distortion: 'turbulentDistortion',
-            length: 400,
-            roadWidth: 10,
-            islandWidth: 2,
-            lanesPerRoad: 3,
-            fov: 90,
-            colors: {
-                roadColor: 0x080808,
-                islandColor: 0x0a0a0a,
-                background: 0x000000,
-                shoulderLines: 0x131318,
-                brokenLines: 0x131318,
-                leftCars: [0xd856bf, 0x6750a2, 0xc247ac],
-                rightCars: [0x03b3c3, 0x0e5ea5, 0x324555],
-                sticks: 0x03b3c3
-            }
-        };
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-val">8.835</div>
+            <div class="metric-lbl">SKCET CGPA (9.50 Sem 2)</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">450ms</div>
+            <div class="metric-lbl">WebSocket Telemetry</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">1985</div>
+            <div class="metric-lbl">Peak Rapid Chess Rating</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">Gold</div>
+            <div class="metric-lbl">National TT Medalist</div>
+          </div>
+        </div>
+      </div>
 
-        // Initialize Three.js Scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(options.fov, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-        document.getElementById('lights-container').appendChild(renderer.domElement);
+      <div class="hero-right" data-reveal>
+        <div class="hero-profile-card">
+          <div class="profile-card-header">
+            <img class="profile-avatar" src="images/podium.png" alt="Antonius Jairus">
+            <div class="profile-title-box">
+              <h3>Antonius Jairus R</h3>
+              <p>Full-Stack MERN & Security Student</p>
+            </div>
+          </div>
 
-        // Simple representation of the moving lights (The "Manual" core)
-        const geometry = new THREE.BoxGeometry(0.1, 0.1, 2);
-        const lights = [];
+          <p class="profile-bio-text">
+            Passionate about building composed interfaces, clean software architecture, and competing in hackathons and sports. I don't just know full-stack as a certificate — I build and ship live deliverable projects.
+          </p>
 
-        function createLight(color, x, z) {
-            const material = new THREE.MeshBasicMaterial({ color: color });
-            const mesh = new THREE.Mesh(geometry, material);
-            mesh.position.set(x, -1, z);
-            scene.add(mesh);
-            return mesh;
-        }
+          <div class="profile-highlights-list">
+            <div class="highlight-item">
+              <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>SKCET Class Topper (Sem 2 GPA 9.50) & Student Council</span>
+            </div>
+            <div class="highlight-item">
+              <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Built Palindrome AI & KaiForge Analytics Platforms</span>
+            </div>
+            <div class="highlight-item">
+              <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>National Bug Bounty Competitor (36h Bangalore Hackathon)</span>
+            </div>
+            <div class="highlight-item">
+              <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              <span>Former School Pupil Leader (Campion Anglo-Indian School)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-        // Generate initial light trails based on your colors
-        for(let i = 0; i < 100; i++) {
-            const isLeft = Math.random() > 0.5;
-            const colorSet = isLeft ? options.colors.leftCars : options.colors.rightCars;
-            const color = colorSet[Math.floor(Math.random() * colorSet.length)];
-            const x = isLeft ? -Math.random() * 5 - 2 : Math.random() * 5 + 2;
-            const z = -Math.random() * options.length;
-            lights.push({ mesh: createLight(color, x, z), speed: Math.random() * 2 + 1 });
-        }
+    <!-- EDUCATION SECTION -->
+    <section class="education-section" id="education">
+      <div class="section-shell">
+        <div class="section-heading-wrap" data-reveal>
+          <span class="section-kicker">ACADEMIC FOUNDATION</span>
+          <h2 class="section-title">Education & Leadership Roles.</h2>
+          <p class="section-subtitle">School built my confidence and leadership base. College is where I dive deep into technical systems, cybersecurity, and product engineering.</p>
+        </div>
 
-        camera.position.z = 5;
-        camera.position.y = 1;
+        <div class="education-cards-grid" data-reveal>
+          
+          <!-- COLLEGE -->
+          <div class="edu-card">
+            <div>
+              <div class="edu-header-row">
+                <div class="edu-icon-box">
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
+                </div>
+                <div class="edu-title-box">
+                  <h3>Sri Krishna College of Engineering & Technology (SKCET)</h3>
+                  <p>B.E. Computer Science and Engineering (Cybersecurity) · Coimbatore, TN</p>
+                </div>
+              </div>
 
-        function animate() {
-            requestAnimationFrame(animate);
+              <div class="edu-metrics-badges">
+                <span class="edu-badge">CGPA: 8.835</span>
+                <span class="edu-badge">Semester 2 GPA: 9.50 (Class Topper)</span>
+                <span class="edu-badge">Student Council</span>
+                <span class="edu-badge">Expected 2029</span>
+              </div>
+
+              <p class="edu-desc-text">
+                Focusing on core computer science foundations, cybersecurity analysis, data structures & algorithms in C++, and full-stack MERN product development. Active member of the College Student Council and participant in IEEE technical activities.
+              </p>
+            </div>
+          </div>
+
+          <!-- SCHOOL -->
+          <div class="edu-card">
+            <div>
+              <div class="edu-header-row">
+                <div class="edu-icon-box">
+                  <svg width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5m3 0h1M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <div class="edu-title-box">
+                  <h3>Campion Anglo-Indian Higher Secondary School</h3>
+                  <p>Higher Secondary Certificate (HSC) · Tiruchirappalli, TN</p>
+                </div>
+              </div>
+
+              <div class="edu-metrics-badges">
+                <span class="edu-badge">HSC Score: 82%</span>
+                <span class="edu-badge">School Pupil Leader (2024-25)</span>
+                <span class="edu-badge">Assistant Leader (2023-24)</span>
+                <span class="edu-badge">Graduated 2025</span>
+              </div>
+
+              <p class="edu-desc-text">
+                Defined my character, stage confidence, and public speaking abilities. Elected School Pupil Leader, coordinating student initiatives, school events, and faculty relations. Represented school in Table Tennis, Karate, NCC, Culturals, and Debates.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- FLAGSHIP PROJECTS SECTION -->
+    <section class="projects-section section-shell" id="projects">
+      <div class="section-heading-wrap" data-reveal>
+        <span class="section-kicker">FEATURED ENGINEERING BUILDS</span>
+        <h2 class="section-title">Live Production Projects.</h2>
+        <p class="section-subtitle">Real-world applications engineered with MERN stack, real-time WebSockets, and AI copilots.</p>
+      </div>
+
+      <div class="projects-grid" data-reveal>
+
+        <!-- PALINDROME -->
+        <div class="project-card">
+          <div>
+            <div class="project-badge-row">
+              <span class="project-live-tag">
+                <span class="project-live-dot"></span>
+                LIVE PLATFORM
+              </span>
+              <span style="font-family: 'Share Tech Mono', monospace; color: var(--text-faint); font-weight: 700;">01</span>
+            </div>
+
+            <h3>Palindrome</h3>
+            <p>
+              Real-time high-frequency financial intelligence engine & AI copilot. Architected with 450ms Socket.io telemetry data streaming to render net-worth fluctuations across Equities, Crypto, and Metals. Features "Maliketh", a local GPU-accelerated AI copilot (Ollama/Gemma2) for subscription anomaly detection, coupled with JWT + AES-256 field encryption auth and custom DNS mail infrastructure.
+            </p>
+
+            <div class="project-tech-tags">
+              <span class="tech-tag-item">React 18</span>
+              <span class="tech-tag-item">Socket.io</span>
+              <span class="tech-tag-item">Node.js</span>
+              <span class="tech-tag-item">Express</span>
+              <span class="tech-tag-item">MongoDB Atlas</span>
+              <span class="tech-tag-item">Ollama (Gemma2)</span>
+              <span class="tech-tag-item">Resend API</span>
+              <span class="tech-tag-item">Firebase Functions</span>
+            </div>
+          </div>
+
+          <div class="project-actions-flex">
+            <a class="btn-primary" href="https://palindrome.antoniusjairus.in" target="_blank" rel="noopener">
+              <span>Visit Platform ↗</span>
+            </a>
+            <button class="btn-secondary" onclick="openProjectModal('palindrome')">
+              <span>View Screenshots</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- KAIFORGE -->
+        <div class="project-card">
+          <div>
+            <div class="project-badge-row">
+              <span class="project-live-tag">
+                <span class="project-live-dot"></span>
+                LIVE PLATFORM
+              </span>
+              <span style="font-family: 'Share Tech Mono', monospace; color: var(--text-faint); font-weight: 700;">02</span>
+            </div>
+
+            <h3>KaiForge</h3>
+            <p>
+              Full-stack athletic performance analytics platform built for table tennis players and athletes to log practice sessions, match performances, and tournament records into actionable visual performance dashboards. Transforms everyday training metrics into long-term performance trend graphs.
+            </p>
+
+            <div class="project-tech-tags">
+              <span class="tech-tag-item">TypeScript</span>
+              <span class="tech-tag-item">React + Vite</span>
+              <span class="tech-tag-item">Tailwind CSS</span>
+              <span class="tech-tag-item">Supabase PostgreSQL</span>
+              <span class="tech-tag-item">MERN Architecture</span>
+            </div>
+          </div>
+
+          <div class="project-actions-flex">
+            <a class="btn-primary" href="https://kaiforge.antoniusjairus.in" target="_blank" rel="noopener">
+              <span>Visit Platform ↗</span>
+            </a>
+            <button class="btn-secondary" onclick="openProjectModal('kaiforge')">
+              <span>View Screenshots</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PURSUITS & ACHIEVEMENTS SECTION -->
+    <section class="pursuits-section" id="pursuits">
+      <div class="section-shell">
+        <div class="section-heading-wrap" data-reveal>
+          <span class="section-kicker">DISCIPLINE & ACHIEVEMENTS</span>
+          <h2 class="section-title">Sports, Strategy & Leadership.</h2>
+          <p class="section-subtitle">Non-code systems that shaped my focus, composure, and tactical execution under pressure.</p>
+        </div>
+
+        <div class="pursuits-grid" data-reveal>
+          
+          <!-- TABLE TENNIS -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">SPORT</span>
+              <h3>Table Tennis</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>National</strong>
+                  <span>Gold Medalist</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>Rank 1</strong>
+                  <span>Trichy U17/U19</span>
+                </div>
+              </div>
+              <p>
+                Achieved national rank and won RDS Gold Medal in 10th & Silver in 12th. Qualified for SGFI Super League and won Open State championships in Madurai and Yercaud. Currently representing SKCET and ranked top 6 in Coimbatore Men's category.
+              </p>
+            </div>
+          </div>
+
+          <!-- KARATE -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">MARTIAL ART</span>
+              <h3>Karate</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>Black Belt</strong>
+                  <span>Certified</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>4x National</strong>
+                  <span>Champion</span>
+                </div>
+              </div>
+              <p>
+                Earned Black Belt under Sensei Eashwer Kumar. Secured National Gold and Silver in Kata, and 4 consecutive State Gold medals in Kata alongside Bronze in Kumite at JJ Indoor Stadium, Chennai.
+              </p>
+            </div>
+          </div>
+
+          <!-- CHESS -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">STRATEGY</span>
+              <h3>Competitive Chess</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>1985</strong>
+                  <span>Peak Rapid</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>2143</strong>
+                  <span>Peak Bullet</span>
+                </div>
+              </div>
+              <p>
+                Pure calculation, pattern recognition, and psychological endurance. Plays Grünfeld Defence as Black and Nimzowitsch Opening as White. Organized department-level chess tournaments at SKCET.
+              </p>
+            </div>
+          </div>
+
+          <!-- PUBLIC SPEAKING -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">COMMUNICATION</span>
+              <h3>Public Speaking</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>10+</strong>
+                  <span>Public Speeches</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>3rd Place</strong>
+                  <span>Book Fest Winner</span>
+                </div>
+              </div>
+              <p>
+                Articulate communication and stage presence. Award winner at District-level Book Festival speaking competition at Odisia, Coimbatore. Hosted campus seminars including "Cybersecurity Overview" at SKCET.
+              </p>
+            </div>
+          </div>
+
+          <!-- CYBERSECURITY & BUG BOUNTY -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">CYBERSECURITY</span>
+              <h3>Bug Bounty Competitor</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>36h</strong>
+                  <span>National Hackathon</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>Bangalore</strong>
+                  <span>Selected Finalist</span>
+                </div>
+              </div>
+              <p>
+                Selected for and competed in a rigorous 36-hour National Level Bug Bounty competition in Bangalore, hunting for real-world system vulnerabilities and exploit vectors.
+              </p>
+            </div>
+          </div>
+
+          <!-- KEYBOARD & MUSIC -->
+          <div class="pursuit-card">
+            <div>
+              <span class="pursuit-category-tag">ART</span>
+              <h3>Keyboard & Music</h3>
+              <div class="pursuit-stats-row">
+                <div class="pursuit-stat-box">
+                  <strong>Rhythm</strong>
+                  <span>Patience</span>
+                </div>
+                <div class="pursuit-stat-box">
+                  <strong>Precision</strong>
+                  <span>Focus</span>
+                </div>
+              </div>
+              <p>
+                Rhythm, patience, and a quieter kind of precision that balances technical engineering with artistic harmony.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- TECHNICAL STACK SECTION -->
+    <section class="stack-section section-shell" id="stack">
+      <div class="section-heading-wrap" data-reveal>
+        <span class="section-kicker">TECHNICAL FLUENCY</span>
+        <h2 class="section-title">Languages, Stacks & Tools.</h2>
+        <p class="section-subtitle">Comfort across frontend, backend concepts, AI workflows, and data-backed products.</p>
+      </div>
+
+      <div class="stack-grid" data-reveal>
+        <div class="stack-card">
+          <h3>PROGRAMMING LANGUAGES & STACKS</h3>
+          <div class="skill-badges-flex">
+            <span class="skill-pill">⚡ C++ (Data Structures & Algorithms Focus)</span>
+            <span class="skill-pill">🌐 MERN Stack (React, Node.js, Express.js, MongoDB)</span>
+            <span class="skill-pill">📘 TypeScript</span>
+            <span class="skill-pill">🟨 JavaScript (ES6+)</span>
+            <span class="skill-pill">🎨 HTML5 & Modern CSS3</span>
+            <span class="skill-pill">💨 Tailwind CSS</span>
+          </div>
+        </div>
+
+        <div class="stack-card">
+          <h3>TOOLS & PLATFORMS</h3>
+          <div class="skill-badges-flex">
+            <span class="skill-pill">🛠️ Git & GitHub</span>
+            <span class="skill-pill">💻 VS Code & Linux/Unix CLI</span>
+            <span class="skill-pill">🔥 Firebase Cloud Functions</span>
+            <span class="skill-pill">⚡ Vite</span>
+            <span class="skill-pill">🔌 Socket.io (WebSockets)</span>
+            <span class="skill-pill">🤖 Ollama (Gemma2 / Llama3)</span>
+            <span class="skill-pill">🛢️ Supabase & PostgreSQL</span>
+            <span class="skill-pill">📜 GSAP Animation</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBTLE FREELANCE OFFERINGS NOTE SECTION -->
+    <section class="freelance-note-section section-shell" id="freelance">
+      <div class="freelance-card-wrap" data-reveal>
+        <div class="freelance-text-side">
+          <span class="section-kicker">SERVICES & FREELANCING</span>
+          <h3>Looking for a Web Application or Website?</h3>
+          <p>
+            Alongside my academic studies and projects, I also take on select freelance web development projects for startups, creators, and business owners who need clean, modern, and scalable digital solutions.
+          </p>
+        </div>
+
+        <div class="freelance-pricing-preview">
+          <div class="freelance-price-item">
+            <label>Websites</label>
+            <strong>₹4,999+</strong>
+            <span style="font-size: 0.76rem; color: var(--text-faint);">Portfolios, Landing Pages</span>
+          </div>
+          <div class="freelance-price-item">
+            <label>Web Apps</label>
+            <strong>₹8,999+</strong>
+            <span style="font-size: 0.76rem; color: var(--text-faint);">SaaS, Dashboards, APIs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section class="contact-section" id="contact">
+      <div class="section-shell">
+        <div class="contact-grid" data-reveal>
+          <div>
+            <span class="section-kicker">GET IN TOUCH</span>
+            <h2 class="section-title" style="text-align: left; margin-top: 10px;">Let's Build Something Together.</h2>
+            <p class="section-subtitle" style="text-align: left;">
+              Open to technical project collaborations, hackathons, open-source work, and freelance web application engineering.
+            </p>
+
+            <div class="contact-details-list">
+              <a class="contact-item" href="tel:+919443385650">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+                <span>+91 9443385650</span>
+              </a>
+
+              <a class="contact-item" href="mailto:antoniusjairusofficial@gmail.com">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span>antoniusjairusofficial@gmail.com</span>
+              </a>
+
+              <a class="contact-item" href="https://wa.me/919443385650?text=Hi%20Antonius,%20I%20saw%20your%20portfolio" target="_blank" rel="noopener">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                <span>WhatsApp Message ↗</span>
+              </a>
+
+              <a class="contact-item" href="https://github.com/antoniusjairus4" target="_blank" rel="noopener">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+                <span>github.com/antoniusjairus4 ↗</span>
+              </a>
+
+              <a class="contact-item" href="https://linkedin.com/in/antoniusjairus4" target="_blank" rel="noopener">
+                <svg fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/></svg>
+                <span>linkedin.com/in/antoniusjairus4 ↗</span>
+              </a>
+            </div>
+          </div>
+
+          <div class="contact-form-card">
+            <h3 style="margin: 0 0 16px; font-size: 1.25rem; font-weight: 800;">Send a Message</h3>
             
-            lights.forEach(light => {
-                light.mesh.position.z += light.speed;
-                if (light.mesh.position.z > 5) {
-                    light.mesh.position.z = -options.length;
-                }
-            });
+            <form action="mailto:antoniusjairusofficial@gmail.com" method="post" enctype="text/plain">
+              <div class="form-group">
+                <label for="contact-name">Your Name</label>
+                <input class="form-control" type="text" id="contact-name" name="name" placeholder="John Doe" required>
+              </div>
 
-            renderer.render(scene, camera);
-        }
+              <div class="form-group">
+                <label for="contact-email">Your Email / Phone</label>
+                <input class="form-control" type="text" id="contact-email" name="email" placeholder="john@example.com" required>
+              </div>
 
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
+              <div class="form-group">
+                <label for="service-select">Topic / Inquiry Type</label>
+                <select class="form-control" id="service-select" name="service">
+                  <option value="General Project / Collaboration">General Collaboration / Project</option>
+                  <option value="Website Package (₹4,999+)">Freelance Website — ₹4,999+</option>
+                  <option value="Web Application Package (₹8,999+)">Freelance Web Application — ₹8,999+</option>
+                </select>
+              </div>
 
-        animate();
-    </script>
+              <div class="form-group">
+                <label for="contact-message">Message</label>
+                <textarea class="form-control" id="contact-message" name="message" rows="4" placeholder="Hi Antonius, I'd like to talk about..." required></textarea>
+              </div>
+
+              <button class="btn-primary" type="submit" style="width: 100%;">
+                <span>Send Message</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- INTERACTIVE SCREENSHOT GALLERY MODAL -->
+  <div class="modal-overlay" id="gallery-modal" aria-hidden="true">
+    <div class="modal-dialog-box" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <h3 id="modal-title">Project Case Study</h3>
+        <button class="modal-close-btn" id="modal-close" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-gallery-grid" id="modal-gallery-grid">
+          <!-- Populated dynamically via src/main.ts -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
 </body>
 </html>
