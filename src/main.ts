@@ -2,18 +2,29 @@ import { ProjectData, ProjectGalleryItem } from './types';
 
 // Project Case Study Data Store
 const projectGalleries: Record<string, ProjectData> = {
+  neuroshield: {
+    id: "neuroshield",
+    title: "NeuroShield AI — Multimodal Deep Learning for Early Alzheimer's Risk Prediction",
+    category: "AI Research & Neuroimaging",
+    description: "Novel multimodal deep learning system predicting MCI-to-AD conversion timelines using ADNI dataset. Fuses 3D structural MRI, PET neuroimaging, and plasma blood biomarkers with 3D CNN + ViT encoders and Cross-Modal Attention Fusion.",
+    techStack: ["PyTorch", "3D CNN", "Vision Transformers", "FT-Transformer", "ADNI Dataset", "ANTs & HD-BET", "Survival Analysis"],
+    images: [
+      { src: "images/neuro_landing.png", caption: "NeuroShield AI Platform & Diagnosis Interface" },
+      { src: "images/ne_samp_analysis.png", caption: "Sample Analysis Output & Biomarker Radar" },
+      { src: "images/neuro_overview.png", caption: "Multimodal Fusion Architecture Diagram" },
+      { src: "images/neuro_code.png", caption: "ADNI PyTorch EfficientNet Scanning Pipeline" }
+    ]
+  },
   palindrome: {
     id: "palindrome",
     title: "Palindrome — Financial Intelligence Engine & AI Copilot",
     category: "Financial Telemetry & AI",
-    description: "High-frequency real-time financial telemetry engine streaming net-worth fluctuations with 450ms Socket.io WebSocket cycles. Features 'Maliketh', a GPU-accelerated local LLM copilot (Ollama/Gemma2) for subscription anomaly detection, coupled with enterprise JWT auth, AES-256 transaction encryption, and production DNS custom domain mail dispatch.",
-    techStack: ["React 18", "Vite", "Node.js", "Express", "MongoDB Atlas", "Socket.io", "Ollama (Gemma2)", "Resend API", "Firebase Functions", "Tailwind CSS"],
+    description: "High-frequency real-time financial telemetry engine streaming net-worth fluctuations with 450ms Socket.io WebSocket cycles. Features 'Maliketh', a GPU-accelerated local LLM copilot (Ollama/Gemma2) for subscription anomaly detection.",
+    techStack: ["React 18", "Vite", "Node.js", "Express", "MongoDB Atlas", "Socket.io", "Ollama (Gemma2)", "Resend API", "Firebase Functions"],
     liveUrl: "https://palindrome.antoniusjairus.in",
     images: [
-      { src: "images/neuro_landing.png", caption: "Live Platform Dashboard & Net Worth Analytics" },
-      { src: "images/ne_samp_analysis.png", caption: "Real-Time Telemetry & Asset Breakdown" },
-      { src: "images/dashboard.png", caption: "Maliketh AI Copilot & Subscription Analytics" },
-      { src: "images/neuro_code.png", caption: "Enterprise Architecture & WebSocket Engine" }
+      { src: "images/dashboard.png", caption: "Live Financial Telemetry Dashboard" },
+      { src: "images/neuro_code.png", caption: "WebSocket & Cryptographic Security Engine" }
     ]
   },
   kaiforge: {
