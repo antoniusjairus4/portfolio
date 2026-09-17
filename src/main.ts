@@ -17,14 +17,17 @@ const projectGalleries: Record<string, ProjectData> = {
   },
   palindrome: {
     id: "palindrome",
-    title: "Palindrome — Financial Intelligence Engine & AI Copilot",
-    category: "Financial Telemetry & AI",
-    description: "High-frequency real-time financial telemetry engine streaming net-worth fluctuations with 450ms Socket.io WebSocket cycles. Features 'Maliketh', a GPU-accelerated local LLM copilot (Ollama/Gemma2) for subscription anomaly detection.",
-    techStack: ["React 18", "Vite", "Node.js", "Express", "MongoDB Atlas", "Socket.io", "Ollama (Gemma2)", "Resend API", "Firebase Functions"],
+    title: "Palindrome — Sovereign Financial Intelligence Core & Autonomous Wealth Engine",
+    category: "Financial Telemetry & AI (Featured @ EUREKA! 2026)",
+    description: "Architected sub-500ms real-time net worth telemetry engine with Socket.io streaming (450ms updates). Features a two-stage local VLM vision pipeline (FastAPI + Ollama/Gemma 2) with defensive visual triage, client-side Tesseract.js OCR, Maliketh AI Copilot with BullMQ action queues, and HMAC-SHA256 household ledger verification.",
+    techStack: ["React 18", "Vite", "Node.js", "Express", "Python / FastAPI", "WebSockets", "Ollama (Gemma 2 VLM)", "MongoDB Atlas", "Redis & BullMQ", "GSAP & Lenis"],
     liveUrl: "https://palindrome.antoniusjairus.in",
     images: [
-      { src: "images/dashboard.png", caption: "Live Financial Telemetry Dashboard" },
-      { src: "images/neuro_code.png", caption: "WebSocket & Cryptographic Security Engine" }
+      { src: "images/palindrome_landing.png", caption: "Sovereign Financial Intelligence Core Landing Page" },
+      { src: "images/palindrome_dashboard.png", caption: "Financial Intelligence Core Real-Time Dashboard (₹29,49,619.47)" },
+      { src: "images/palindrome_maliketh.png", caption: "Maliketh AI Copilot Natural Language Action Drawer" },
+      { src: "images/palindrome_house.png", caption: "Cryptographically Shared Household Ledger (HMAC-SHA256)" },
+      { src: "images/palindrome_pricing.png", caption: "Tiered Pricing & 45-Day Free Access Plan Matrix" }
     ]
   },
   kaiforge: {
