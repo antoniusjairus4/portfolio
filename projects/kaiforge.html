@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KaiForge | Antonius Jairus Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="scroll-progress"></div>
+
+  <header class="subpage-header">
+    <div class="section-shell">
+      <a href="../index.html#projects" class="back-link-btn">
+        <span>← Back to Portfolio</span>
+      </a>
+      <span class="section-kicker">PROJECT CASE STUDY</span>
+      <h1 class="subpage-title">KaiForge</h1>
+      <p class="subpage-tagline">Full-Stack Athletic Performance Analytics Platform dedicated to Table Tennis players and competitive athletes.</p>
+    </div>
+  </header>
+
+  <main class="subpage-body section-shell">
+    <div class="content-block-grid" data-reveal>
+      <div class="detail-text-col">
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 12px;">The Core Idea</h2>
+        <p>
+          KaiForge bridges the gap between raw intuition and actionable performance data. Table tennis players and athletes can log their everyday practice sessions, match performances, and tournament records, transforming raw training entries into intuitive visual trends and daily progress reports.
+        </p>
+        <p>
+          Built completely open-sourced and free, KaiForge provides a long-term performance companion that monitors athletic growth over time with clarity and precision.
+        </p>
+        
+        <div style="margin-top: 20px;">
+          <a class="btn-primary" href="https://kaiforge.antoniusjairus.in" target="_blank" rel="noopener">
+            <span>Visit Live Platform (kaiforge.antoniusjairus.in) ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="detail-img-box">
+        <img src="../images/match_analysis.png" alt="KaiForge Match Analysis">
+      </div>
+    </div>
+
+    <div class="content-block-grid reverse" data-reveal>
+      <div class="detail-img-box">
+        <img src="../images/dashboard.png" alt="KaiForge Dashboard">
+      </div>
+
+      <div class="detail-text-col">
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 12px;">Architecture & Key Features</h2>
+        <p>
+          KaiForge supports tournament management (league-cum-knockout structures), match tracking, and practice session performance analytics. With secure authentication and cloud data persistence, players can view their growth over time.
+        </p>
+        
+        <div class="skill-badges-flex" style="margin-top: 14px;">
+          <span class="skill-pill">📘 TypeScript</span>
+          <span class="skill-pill">⚛️ React + Vite</span>
+          <span class="skill-pill">💨 Tailwind CSS</span>
+          <span class="skill-pill">⚡ Supabase</span>
+          <span class="skill-pill">🛢️ PostgreSQL</span>
+          <span class="skill-pill">📊 Data Analytics Engine</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;" data-reveal>
+      <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 20px; text-align: center;">Application Preview</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div class="detail-img-box"><img src="../images/practice_analysis.png" alt="Practice Analysis"></div>
+        <div class="detail-img-box"><img src="../images/tmt_leauge.png" alt="Tournament League Engine"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/src/subpage.ts"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Palindrome / Neuroshield | Antonius Jairus Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <div id="scroll-progress"></div>
+
+  <header class="subpage-header">
+    <div class="section-shell">
+      <a href="../index.html#projects" class="back-link-btn">
+        <span>← Back to Portfolio</span>
+      </a>
+      <span class="section-kicker">FLAGSHIP SYSTEM BUILD</span>
+      <h1 class="subpage-title">Palindrome</h1>
+      <p class="subpage-tagline">Real-Time High-Frequency Financial Intelligence Engine & AI Copilot Platform.</p>
+    </div>
+  </header>
+
+  <main class="subpage-body section-shell">
+    <div class="content-block-grid" data-reveal>
+      <div class="detail-text-col">
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 12px;">High-Frequency Telemetry & AI</h2>
+        <p>
+          Palindrome is a full-stack platform built with sub-second WebSocket telemetry streaming (450ms refresh cycle) rendering real-time net-worth fluctuations and live asset portfolio valuations across Equities, Cryptocurrencies, and Precious Metals.
+        </p>
+        <p>
+          Integrated with "Maliketh", a local GPU-accelerated AI copilot utilizing Ollama (Gemma2/Llama3) and MongoDB aggregation pipelines to detect spending anomalies and compute micro-purchase savings recommendations.
+        </p>
+        
+        <div style="margin-top: 20px;">
+          <a class="btn-primary" href="https://palindrome.antoniusjairus.in" target="_blank" rel="noopener">
+            <span>Visit Live Platform (palindrome.antoniusjairus.in) ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="detail-img-box">
+        <img src="../images/neuro_landing.png" alt="Palindrome Landing">
+      </div>
+    </div>
+
+    <div class="content-block-grid reverse" data-reveal>
+      <div class="detail-img-box">
+        <img src="../images/ne_samp_analysis.png" alt="Sample Analysis">
+      </div>
+
+      <div class="detail-text-col">
+        <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 12px;">Enterprise Architecture & Security</h2>
+        <p>
+          Built with JWT authentication, cryptographic email verification tokens, AES-256 field-level transaction encryption, and custom DNS zone records (DKIM, SPF, DMARC) with Resend API integration for high-deliverability transactional emails. Deployed with serverless 2nd-gen Firebase Cloud Functions.
+        </p>
+        
+        <div class="skill-badges-flex" style="margin-top: 14px;">
+          <span class="skill-pill">⚛️ React 18 + Vite</span>
+          <span class="skill-pill">🔌 Socket.io</span>
+          <span class="skill-pill">🟢 Node.js & Express</span>
+          <span class="skill-pill">🍃 MongoDB Atlas</span>
+          <span class="skill-pill">🤖 Ollama (Gemma2)</span>
+          <span class="skill-pill">🔥 Firebase Functions</span>
+          <span class="skill-pill">🔒 AES-256 Encryption</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;" data-reveal>
+      <h2 style="font-size: 1.6rem; font-weight: 800; margin-bottom: 20px; text-align: center;">System Preview</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div class="detail-img-box"><img src="../images/dashboard.png" alt="Dashboard"></div>
+        <div class="detail-img-box"><img src="../images/neuro_code.png" alt="Architecture Code"></div>
+      </div>
+    </div>
+  </main>
+
+  <script type="module" src="/src/subpage.ts"></script>
+</body>
+</html>
