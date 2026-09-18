@@ -921,6 +921,16 @@ section {
   transition: all 200ms var(--ease);
 }
 
+.skill-pill img,
+.tech-tag-item img {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .skill-pill:hover {
   transform: translateY(-1px);
   border-color: rgba(37, 99, 235, 0.35);
