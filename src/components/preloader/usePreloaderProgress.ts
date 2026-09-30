@@ -1,38 +1,39 @@
 import { useEffect, useState } from 'react';
 
 export interface PreloaderOptions {
-  minDurationMs?: number; // Default 3000ms
-  maxDurationMs?: number; // Default 4800ms
+  minDurationMs?: number; // Default 6000ms
+  maxDurationMs?: number; // Default 8000ms
   onComplete?: () => void;
 }
 
 export function computeSmoothedProgress(
   elapsedMs: number,
   assetLoaded: boolean,
-  minDurationMs = 3000,
-  maxDurationMs = 4800
+  minDurationMs = 6000,
+  maxDurationMs = 8000
 ): number {
   if (elapsedMs <= 0) return 0;
 
   // Hard maximum constraint
   if (elapsedMs >= maxDurationMs) return 100;
 
-  // Base progress based on elapsed time vs max duration
-  const timeProgress = (elapsedMs / maxDurationMs) * 100;
+  const targetDuration = assetLoaded ? minDurationMs : maxDurationMs;
+  const rawRatio = Math.min(1, elapsedMs / targetDuration);
+
+  // Smooth decelerating curve (quick early, slowing near 90, confident finish to 100)
+  const easedRatio = 1 - Math.pow(1 - rawRatio, 2.2);
 
   if (assetLoaded) {
-    // If assets are ready, scale progress so it reaches 100% at minDurationMs
-    const assetProgress = Math.min(100, (elapsedMs / minDurationMs) * 100);
-    return Math.max(timeProgress, assetProgress);
+    return Math.min(100, Math.floor(easedRatio * 100));
   }
 
   // Cap at 95% if assets are still loading before maxDurationMs
-  return Math.min(95, timeProgress);
+  return Math.min(95, Math.floor(easedRatio * 100));
 }
 
 export function usePreloaderProgress({
-  minDurationMs = 3000,
-  maxDurationMs = 4800,
+  minDurationMs = 6000,
+  maxDurationMs = 8000,
   onComplete,
 }: PreloaderOptions = {}) {
   const [progress, setProgress] = useState<number>(0);
@@ -65,7 +66,7 @@ export function usePreloaderProgress({
         maxDurationMs
       );
 
-      setProgress(Math.floor(currentProgress));
+      setProgress(currentProgress);
 
       if (currentProgress >= 100) {
         setIsDone(true);

@@ -3,6 +3,8 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useEffect, useRef, useState } from 'react';
+import { heroContent } from '@/content/heroContent';
+import { SCROLL_STORY } from '@/motion/tokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -10,7 +12,11 @@ export const PhotoCoverSplit: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftHalfRef = useRef<HTMLDivElement>(null);
   const rightHalfRef = useRef<HTMLDivElement>(null);
-  const placeholderRef = useRef<HTMLDivElement>(null);
+  const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
+  const rolesRef = useRef<(HTMLLIElement | null)[]>([]);
+  const scrollCueRef = useRef<HTMLDivElement>(null);
+
   const [isReducedMotion, setIsReducedMotion] = useState(false);
 
   useEffect(() => {
@@ -26,56 +32,112 @@ export const PhotoCoverSplit: React.FC = () => {
     if (!containerRef.current || isReducedMotion) return;
 
     const ctx = gsap.context(() => {
-      // Set initial 3D transforms for GPU hardware acceleration
-      gsap.set([leftHalfRef.current, rightHalfRef.current], {
+      // Force 3D hardware acceleration
+      gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
         force3D: true,
       });
+
+      // Initial text states before Beat A
+      gsap.set(lettersRef.current, { yPercent: 120, opacity: 0 });
+      gsap.set(rolesRef.current, { yPercent: 60, opacity: 0 });
 
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
-          end: '+=100%',
+          end: `+=${SCROLL_STORY.totalDistanceVh}%`,
           pin: true,
           scrub: 0.5,
           anticipatePin: 1,
           invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            if (self.progress > 0.02 && scrollCueRef.current) {
+              gsap.to(scrollCueRef.current, { opacity: 0, duration: 0.3 });
+            }
+          },
         },
       });
 
-      // Split reveal animation: Left half slides left (-100%), Right half slides right (+100%)
+      // --- BEAT A: The Reveal (0% -> 35%) ---
+      // Halves slide to 50% partial opening
       tl.to(
         leftHalfRef.current,
-        {
-          xPercent: -100,
-          ease: 'power2.inOut',
-        },
+        { xPercent: -50, ease: 'power2.inOut', duration: 0.35 },
         0
       )
         .to(
           rightHalfRef.current,
-          {
-            xPercent: 100,
-            ease: 'power2.inOut',
-          },
+          { xPercent: 50, ease: 'power2.inOut', duration: 0.35 },
           0
         )
-        .fromTo(
-          placeholderRef.current,
+        // Staggered name letters rise & fade in
+        .to(
+          lettersRef.current,
           {
-            scale: 0.94,
-            opacity: 0.8,
-          },
-          {
-            scale: 1,
+            yPercent: 0,
             opacity: 1,
-            ease: 'power2.out',
+            stagger: 0.04,
+            ease: 'power3.out',
+            duration: 0.25,
           },
-          0
+          0.05
+        )
+        // Staggered 3 role lines fade & rise in
+        .to(
+          rolesRef.current,
+          {
+            yPercent: 0,
+            opacity: 1,
+            stagger: 0.06,
+            ease: 'power2.out',
+            duration: 0.2,
+          },
+          0.15
+        );
+
+      // --- BEAT B: The Read (35% -> 55%) ---
+      // Stable rest position for reading; no major motion changes
+      tl.to(
+        [leftHalfRef.current, rightHalfRef.current],
+        { duration: 0.2 },
+        0.35
+      );
+
+      // --- BEAT C: The Exit (55% -> 100%) ---
+      // Halves slide completely off-screen (-100% / +100%)
+      tl.to(
+        leftHalfRef.current,
+        { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
+        0.55
+      )
+        .to(
+          rightHalfRef.current,
+          { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
+          0.55
+        )
+        // Text scales up from 1x to 3.5x and letter-spacing opens
+        .to(
+          contentWrapperRef.current,
+          {
+            scale: 3.5,
+            letterSpacing: '0.08em',
+            ease: 'power2.in',
+            duration: 0.45,
+          },
+          0.55
+        )
+        // Text fades out as scale passes ~3x (75% -> 100%)
+        .to(
+          contentWrapperRef.current,
+          {
+            opacity: 0,
+            ease: 'power2.in',
+            duration: 0.25,
+          },
+          0.75
         );
     }, containerRef);
 
-    // Refresh ScrollTrigger after layout calculation
     const timer = setTimeout(() => {
       ScrollTrigger.refresh();
     }, 200);
@@ -86,13 +148,33 @@ export const PhotoCoverSplit: React.FC = () => {
     };
   }, [isReducedMotion]);
 
-  // Keyboard navigation to trigger split reveal
+  // Keyboard Navigation: Enter/Space/ArrowDown advance by beats, ArrowUp goes back
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    const vh = window.innerHeight;
+    const currentScroll = window.scrollY;
+
     if (['Enter', ' ', 'ArrowDown'].includes(e.key)) {
       e.preventDefault();
-      window.scrollTo({ top: window.innerHeight * 1.5, behavior: 'smooth' });
+      if (currentScroll < vh * 1.0) {
+        window.scrollTo({ top: vh * 1.22, behavior: 'smooth' }); // Beat A -> B (35%)
+      } else if (currentScroll < vh * 2.0) {
+        window.scrollTo({ top: vh * 3.5, behavior: 'smooth' }); // Beat B -> C (100%)
+      } else {
+        window.scrollTo({ top: vh * 4.5, behavior: 'smooth' }); // To Placeholder
+      }
+    } else if (e.key === 'ArrowUp') {
+      if (currentScroll > 0) {
+        e.preventDefault();
+        if (currentScroll > vh * 2.0) {
+          window.scrollTo({ top: vh * 1.22, behavior: 'smooth' });
+        } else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      }
     }
   };
+
+  const nameLetters = heroContent.name.split('');
 
   return (
     <section
@@ -100,18 +182,54 @@ export const PhotoCoverSplit: React.FC = () => {
       tabIndex={0}
       onKeyDown={handleKeyDown}
       className="relative w-full h-[100svh] overflow-hidden bg-[#0C0907] outline-none select-none"
-      aria-label="Full-screen photo cover. Use arrow down, space, or scroll to open portfolio."
+      aria-label="Full-screen photo cover. Use arrow keys or scroll to reveal portfolio story."
     >
-      {/* Page 1 Placeholder (Beneath Split) */}
+      {/* Centre Content Layer (Beneath Photo Halves) */}
       <div
-        ref={placeholderRef}
-        className="absolute inset-0 w-full h-full bg-[#0C0907] flex items-center justify-center z-0"
+        className="absolute inset-0 w-full h-full bg-[#0C0907] flex flex-col items-center justify-center z-0 p-4 text-center"
         style={{
           background:
-            'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.15) 0%, rgba(12, 9, 7, 1) 70%)',
+            'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.15) 0%, rgba(12, 9, 7, 1) 75%)',
         }}
       >
-        {/* Text-free placeholder as specified for Phase 1 */}
+        {/* Scalable Text Wrapper */}
+        <div
+          ref={contentWrapperRef}
+          className="flex flex-col items-center justify-center will-change-transform"
+        >
+          {/* Accessible H1 with letter spans for stagger animation */}
+          <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center overflow-hidden">
+            <span className="sr-only">{heroContent.name}</span>
+            <span aria-hidden="true" className="flex">
+              {nameLetters.map((char, index) => (
+                <span
+                  key={`${char}-${index}`}
+                  ref={(el) => {
+                    lettersRef.current[index] = el;
+                  }}
+                  className="inline-block will-change-transform"
+                >
+                  {char}
+                </span>
+              ))}
+            </span>
+          </h1>
+
+          {/* Semantic 3-Role List */}
+          <ul className="list-none p-0 m-0 mt-4 sm:mt-6 flex flex-col items-center gap-1 sm:gap-2">
+            {heroContent.roles.map((role, index) => (
+              <li
+                key={role}
+                ref={(el) => {
+                  rolesRef.current[index] = el;
+                }}
+                className="font-hero-role tracking-wide will-change-transform"
+              >
+                {role}
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Left Image Half */}
@@ -166,7 +284,10 @@ export const PhotoCoverSplit: React.FC = () => {
       </div>
 
       {/* Minimal Scroll Cue */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none">
+      <div
+        ref={scrollCueRef}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center pointer-events-none transition-opacity duration-300"
+      >
         <div className="w-[1px] h-10 bg-gradient-to-b from-[#E0A93B] to-transparent animate-pulse" />
       </div>
     </section>

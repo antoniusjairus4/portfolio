@@ -15,3 +15,20 @@ export const COLOR_TOKENS = {
   gold: '#E0A93B',
   ember: '#E8481F',
 } as const;
+
+// Phase 2: Pinned Scroll Story Beats & Distances
+export const SCROLL_STORY = {
+  totalDistanceVh: 350,
+  beats: {
+    revealEnd: 0.35, // 0% to 35%: Photo split + text reveal
+    readEnd: 0.55,   // 35% to 55%: Rest & read stable text
+    exitEnd: 1.00,   // 55% to 100%: Halves off-screen + text scale up/fade
+  },
+} as const;
+
+// Phase 2: Longer Preloader Timing (6.0s - 8.0s)
+export const PRELOADER_TIMINGS = {
+  minDurationMs: 6000,
+  maxDurationMs: 8000,
+  targetMs: 6500,
+} as const;
