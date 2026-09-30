@@ -1,1 +1,17 @@
+# dependencies
 node_modules
+.pnpm-store
+
+# next.js build output
+.next
+out
+
+# testing
+test-results
+coverage
+
+# env files
+.env*.local
+
+# vercel & firebase
+.firebase

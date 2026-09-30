@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///home/jairus/Antonius%20Jairus/Projects/Portfolio/node_modules/.pnpm/next@16.3.7_@babel+core@7.29.7_supports-color@8.1.1__@playwright+test@1.63.0_@types+nod_cbefbe8824f99cce227469bc1d9ca8ba/node_modules/next/src/client/components/builtin/unauthorized.tsx"],"sourcesContent":["import { HTTPAccessErrorFallback } from '../http-access-fallback/error-fallback'\n\nexport default function Unauthorized() {\n  return (\n    <HTTPAccessErrorFallback\n      status={401}\n      message=\"You're not authorized to access this page.\"\n    />\n  )\n}\n"],"names":["Unauthorized","HTTPAccessErrorFallback","status","message"],"mappings":";;;+BAEA,WAAA;;;eAAwBA;;;;+BAFgB;AAEzB,SAASA;IACtB,OAAA,WAAA,GACE,CAAA,GAAA,YAAA,GAAA,EAACC,eAAAA,uBAAuB,EAAA;QACtBC,QAAQ;QACRC,SAAQ;;AAGd","ignoreList":[0]}}]
-}
