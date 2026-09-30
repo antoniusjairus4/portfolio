@@ -1,0 +1,52 @@
+{
+  "metadata": {
+    "format": "png",
+    "mediaType": "image/png",
+    "width": 1536,
+    "height": 1024,
+    "space": "srgb",
+    "channels": 3,
+    "depth": "uchar",
+    "density": 72,
+    "isProgressive": false,
+    "isPalette": false,
+    "bitsPerSample": 8,
+    "hasProfile": false,
+    "hasAlpha": false,
+    "autoOrient": {
+      "width": 1536,
+      "height": 1024
+    }
+  },
+  "report": {
+    "1280": {
+      "avif": {
+        "filename": "cover-1280.avif",
+        "sizeKb": "74.43"
+      },
+      "webp": {
+        "filename": "cover-1280.webp",
+        "sizeKb": "50.30"
+      },
+      "jpeg": {
+        "filename": "cover-1280.jpeg",
+        "sizeKb": "99.22"
+      }
+    },
+    "1536": {
+      "avif": {
+        "filename": "cover-1536.avif",
+        "sizeKb": "100.80"
+      },
+      "webp": {
+        "filename": "cover-1536.webp",
+        "sizeKb": "65.66"
+      },
+      "jpeg": {
+        "filename": "cover-1536.jpeg",
+        "sizeKb": "134.81"
+      }
+    }
+  },
+  "lqipBase64": "data:image/jpeg;base64,/9j/2wBDABQODxIPDRQSEBIXFRQYHjIhHhwcHj0sLiQySUBMS0dARkVQWnNiUFVtVkVGZIhlbXd7gYKBTmCNl4x9lnN+gXz/2wBDARUXFx4aHjshITt8U0ZTfHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHx8fHz/wAARCAALABADASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAQIF/8QAGBAAAwEBAAAAAAAAAAAAAAAAAAEDAiH/xAAVAQEBAAAAAAAAAAAAAAAAAAADBP/EABgRAAIDAAAAAAAAAAAAAAAAAAASARFB/9oADAMBAAIRAxEAPwDAjhNE3ykMXwLvgelCQtn/2Q=="
+}
