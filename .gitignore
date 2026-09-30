@@ -6,6 +6,10 @@ node_modules
 .next
 out
 
+# Raw / Source Heavy Media Assets (Optimized variants are stored in public/images)
+assets-src/
+images_offl/
+
 # Testing & Coverage
 test-results
 coverage
