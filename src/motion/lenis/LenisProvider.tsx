@@ -3,8 +3,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
-import type React from 'react';
-import { createContext, useContext, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useEffect, useRef } from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,12 +11,14 @@ interface LenisContextType {
   lenis: Lenis | null;
   stop: () => void;
   start: () => void;
+  refresh: () => void;
 }
 
 const LenisContext = createContext<LenisContextType>({
   lenis: null,
   stop: () => {},
   start: () => {},
+  refresh: () => {},
 });
 
 export const useLenis = () => useContext(LenisContext);
@@ -36,7 +37,7 @@ export const LenisProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     const lenis = new Lenis({
       duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - 2 ** (-10 * t)),
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
       touchMultiplier: 2,
     });
@@ -59,10 +60,16 @@ export const LenisProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const stop = () => lenisRef.current?.stop();
-  const start = () => lenisRef.current?.start();
+  const start = () => {
+    lenisRef.current?.start();
+    setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 100);
+  };
+  const refresh = () => ScrollTrigger.refresh();
 
   return (
-    <LenisContext.Provider value={{ lenis: lenisRef.current, stop, start }}>
+    <LenisContext.Provider value={{ lenis: lenisRef.current, stop, start, refresh }}>
       {children}
     </LenisContext.Provider>
   );

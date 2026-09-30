@@ -1,6 +1,6 @@
 # Phase 1: Preloader, Photo Cover & Split Reveal Specifications
 
-> **Status**: Phase 1 Complete (Loader Page, Cover & Split Reveal Implemented)
+> **Status**: Phase 1 Complete (Loader Page, Cover & Split Reveal Implemented & Debugged)
 
 ---
 
@@ -9,70 +9,53 @@
 ```
 Time (s)     Visual & State Transition
 0.0s ───────► Preloader container mounts over full viewport (#0C0907).
-              Ember ball (#E8481F) begins 60fps settling bounce loop on gold table line (#E0A93B).
+              Large Ember ball (clamp(96px, 12vw, 220px)) with gold glow begins 4-bounce settling loop on gold table line.
               Counter climbs monotonically from 00 to 100 in Bricolage Grotesque (clamp: 6rem-36vw).
-2.4s ───────► Minimum duration threshold reached. If asset loading complete, counter reaches 100.
-3.8s ───────► Hard maximum duration cap. Counter reaches 100 regardless of network speed.
-              Ball makes final bounce & serves vertically off-screen top.
-3.8s–4.4s ──► Preloader panel wipes upward (translateY(-100%)) following the ball.
-              Full-screen photo cover revealed with scale (1.08 -> 1.0) and blur -> sharp transition.
+3.0s ───────► Minimum duration threshold reached. If asset loading complete, counter reaches 100.
+4.8s ───────► Hard maximum duration cap. Counter reaches 100 regardless of network speed.
+              Ball makes final bounce & serves vertically off-screen top (-140vh).
+4.8s–5.5s ──► Preloader panel wipes upward (translateY(-100%)) following the ball.
+              Full-screen photo cover revealed.
               Lenis smooth scroll unlocked (lenis.start()).
-4.4s+ ──────► Visitor scrolls down. GSAP ScrollTrigger pins cover and scrubs dual-image split reveal:
-              Left half moves -100% X, Right half moves +100% X.
+5.5s+ ──────► Visitor scrolls down. GSAP ScrollTrigger pins cover and scrubs dual-image split reveal:
+              Left half moves -100% X (translate3d), Right half moves +100% X (translate3d).
               Page 1 text-free placeholder scales from 0.94 -> 1.0 beneath the opening halves.
 ```
 
 ---
 
-## 2. Focal-Point Mathematics & Aspect Ratio Seam Alignment
+## 2. Root Cause Investigation & Resolution of Split Reveal
+
+### Confirmed Root Causes:
+1. **Document Height Collapse (`scrollHeight == innerHeight`)**:
+   - *Evidence*: `document.scrollingElement.scrollHeight` equalled `720px` (exactly 1 viewport height).
+   - *Cause*: `globals.css` set `html, body { height: 100%; }` and `PhotoCoverSplit` set `h-[100svh] overflow-hidden`. When GSAP inserted `.pin-spacer` (height: 1440px), the outer document height failed to expand due to fixed height declarations. The browser was unable to scroll at all, leaving `window.scrollY` pinned at `0px`.
+   - *Fix*: Removed `height: 100%` from `html` and `body` in `src/styles/globals.css`, replacing it with `min-height: 100%`.
+
+2. **Unrefreshed ScrollTrigger Bounds on Preloader Dismissal**:
+   - *Evidence*: `ScrollTrigger` created initial triggers while `Preloader` was fixed over the viewport and Lenis was stopped.
+   - *Fix*: Added `ScrollTrigger.refresh()` callback on image `onLoad` and upon preloader dismissal in `LenisProvider.tsx`.
+
+---
+
+## 3. Large Ember Ball & Settling Bounce Specifications
+
+- **Ball Diameter**: `clamp(96px, 12vw, 220px)`.
+- **Color & Glow**: `--color-ember` (`#E8481F`) with soft gold outer glow (`shadow-[0_0_50px_rgba(224,169,59,0.45)]`).
+- **Layering**: Layered at `z-30`, in front of the giant counter (`z-10`), guaranteeing high visibility.
+- **Settling Bounces**: 4 distinct bounces with squash & stretch transform physics (`scale(1.25, 0.75)` on impact, `scale(0.9, 1.15)` at peak):
+  - Bounce 1: ~55–65% viewport height
+  - Bounce 2: ~38% viewport height
+  - Bounce 3: ~20% viewport height
+  - Bounce 4: ~8% viewport height
+  - Final Serve: Serves upward to `-140vh`.
+
+---
+
+## 4. Focal-Point Mathematics & Aspect Ratio Seam Alignment
 
 - **Source Image**: `images_offl/Image_0.png` (1536 x 1024 px, 3:2 Aspect Ratio).
-- **Focal Point (Kiss Point)**: $X_{\text{focal}} = 0.485$ (48.5% from left edge of original photo).
-- **Target Split Seam**: $X_{\text{seam}} = 0.500$ (50.0% center of viewport).
-
-### Mathematical Calculation Across Viewport Aspect Ratios
-
-For any viewport with aspect ratio $A_{\text{viewport}} = \frac{W_{\text{viewport}}}{H_{\text{viewport}}}$:
-
-1. **Landscape Viewports ($A_{\text{viewport}} \ge 1.5$, e.g. 16:9 = 1.777)**:
-   The image spans 100% of the viewport width. To shift the focal point from 48.5% to the 50.0% seam:
-   $$\text{object-position} = 50\% + (50\% - 48.5\%) = 51.5\%$$
-   Applied via CSS: `landscape:object-[51.5%_50%]`.
-
-2. **Portrait Viewports ($A_{\text{viewport}} < 1.5$, e.g. 9:16 = 0.5625 for mobile phones)**:
-   The image is cropped horizontally by `object-fit: cover`. The visible width fraction is:
-   $$\text{Fraction}_{\text{visible}} = \frac{A_{\text{viewport}}}{1.5} = \frac{0.5625}{1.5} = 0.375$$
-   The cropped offset $P_x$ required to center the focal point $0.485$ in the middle ($0.50$) of the visible window satisfies:
-   $$P_x \cdot (1 - 0.375) + 0.50 \cdot 0.375 = 0.485 \implies P_x \cdot 0.625 + 0.1875 = 0.485$$
-   $$P_x = \frac{0.485 - 0.1875}{0.625} = \frac{0.2975}{0.625} = 0.476 \implies 47.6\%$$
-   Applied via CSS: `portrait:object-[47.6%_50%]`.
-
-This guarantees that the split seam passes exactly through the focal point across all screen sizes and mobile aspect ratios without manual image cropping.
-
----
-
-## 3. Image Variant Optimization Manifest
-
-Original raw image saved to `assets-src/Image_0.png` (1536 x 1024 px). Native max width is 1536 px (no upscaling beyond native resolution).
-
-| Width (px) | Format | File Name | File Size (KB) | Reduction vs Raw PNG |
-| :--- | :--- | :--- | :--- | :--- |
-| **1280** | AVIF | `cover-1280.avif` | **74.43 KB** | **-96.2%** |
-| **1280** | WebP | `cover-1280.webp` | **50.30 KB** | **-97.5%** |
-| **1280** | JPEG | `cover-1280.jpeg` | **99.22 KB** | **-95.0%** |
-| **1536** *(Native Max)* | AVIF | `cover-1536.avif` | **100.80 KB** | **-94.9%** |
-| **1536** *(Native Max)* | WebP | `cover-1536.webp` | **65.66 KB** | **-96.7%** |
-| **1536** *(Native Max)* | JPEG | `cover-1536.jpeg` | **134.81 KB** | **-93.2%** |
-| **LQIP Blur** | JPEG Base64 | Inline Data URI | **0.41 KB** | **Instant Placeholder** |
-
----
-
-## 4. Technical Architecture & Dual-Half Split Implementation
-
-To eliminate any potential sub-pixel hairline gaps during animation on high-DPI (Retina/Mobile) screens:
-- **Single Source Image**: The same image asset is rendered in two full-size overlays.
-- **Left Half**: `clip-path: inset(0 50% 0 0)` — displays exactly the left 50% of the viewport.
-- **Right Half**: `clip-path: inset(0 0 0 50%)` — displays exactly the right 50% of the viewport.
-- **Accessibility & ARIA**:
-  - Main image exposes `alt="Jairus Portfolio Photo Cover"`.
-  - Duplicate right image is marked `aria-hidden="true"` to prevent duplicate screen reader announcements.
+- **Focal Point**: $X_{\text{focal}} = 0.485$ (48.5% from left edge of original photo).
+- **Split Seam**: $X_{\text{seam}} = 0.500$ (50.0% center of viewport).
+- **Landscape Viewports ($\ge 1.5$)**: `object-position: 51.5% 50%`.
+- **9:16 Portrait Phones**: `object-position: 47.6% 50%`.

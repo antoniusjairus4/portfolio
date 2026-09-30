@@ -31,8 +31,8 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
   }, [onComplete]);
 
   const { progress, isDone } = usePreloaderProgress({
-    minDurationMs: 2400,
-    maxDurationMs: 3800,
+    minDurationMs: 3000,
+    maxDurationMs: 4800,
   });
 
   const handleFinish = useCallback(() => {
@@ -53,7 +53,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     setIsServing(true);
     setTimeout(() => {
       setIsDismissed(true);
-    }, 600);
+    }, 700);
   }, [isReducedMotion, onComplete]);
 
   useEffect(() => {
@@ -78,7 +78,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Site preloader"
-      className={`fixed inset-0 z-50 flex flex-col justify-between p-8 bg-[#0C0907] select-none pointer-events-auto transition-transform duration-600 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+      className={`fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-10 bg-[#0C0907] select-none pointer-events-auto transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
         isServing ? '-translate-y-full' : 'translate-y-0'
       }`}
       style={{ willChange: 'transform' }}
@@ -89,7 +89,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
       </div>
 
       {/* Top bar with minimal skip button */}
-      <div className="flex justify-end w-full">
+      <div className="flex justify-end w-full z-40">
         <button
           type="button"
           onClick={handleSkip}
@@ -99,38 +99,89 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         </button>
       </div>
 
-      {/* Main Counter Display */}
-      <div className="flex flex-col items-center justify-center flex-1 my-auto">
-        <span className="font-display-enormous text-[#F2E9D8] tracking-tighter tabular-nums">
+      {/* Main Counter Display (Behind Ball) */}
+      <div className="flex flex-col items-center justify-center flex-1 my-auto z-10">
+        <span className="font-display-enormous text-[#F2E9D8] tracking-tighter tabular-nums opacity-90">
           {formattedCounter}
         </span>
       </div>
 
-      {/* Table Tennis Ball & Gold Line Animation Area */}
-      <div className="relative w-full h-32 overflow-hidden flex items-end justify-center pb-8">
-        {/* Table line */}
-        <div className="absolute bottom-8 left-0 right-0 h-[1px] bg-[#E0A93B]/40" />
+      {/* Table Tennis Ball & Settling Bounce Arena (In Front of Counter) */}
+      <div className="relative w-full h-[65vh] max-h-[600px] overflow-hidden flex items-end justify-center pb-12 z-30 pointer-events-none">
+        {/* Table Line */}
+        <div className="absolute bottom-12 left-0 right-0 h-[2px] bg-[#E0A93B]/40 shadow-[0_0_12px_rgba(224,169,59,0.3)]" />
 
-        {/* Ember Ball */}
+        {/* Dynamic Contact Shadow */}
         {!isReducedMotion && (
           <div
-            className={`w-6 h-6 rounded-full bg-[#E8481F] shadow-[0_0_20px_rgba(232,72,31,0.6)] transition-all duration-500 ${
-              isServing ? 'animate-ball-serve' : 'animate-ball-bounce'
+            className={`absolute bottom-[42px] w-[clamp(60px,8vw,140px)] h-3 rounded-[50%] bg-[#E0A93B]/30 blur-sm transition-all ${
+              isServing ? 'animate-shadow-serve' : 'animate-shadow-bounce'
+            }`}
+          />
+        )}
+
+        {/* Large Ember Ball (clamp 96px to 220px) with Gold Glow */}
+        {!isReducedMotion && (
+          <div
+            className={`w-[clamp(96px,12vw,220px)] h-[clamp(96px,12vw,220px)] rounded-full bg-[#E8481F] shadow-[0_0_50px_rgba(224,169,59,0.45),0_0_20px_rgba(232,72,31,0.8)] border border-[#E0A93B]/30 ${
+              isServing ? 'animate-ball-serve' : 'animate-ball-bounce-settle'
             }`}
           />
         )}
       </div>
 
-      {/* Keyframe animation inline styles */}
+      {/* Keyframe animation inline styles for 60fps settling bounce with squash & stretch */}
       <style jsx>{`
-        @keyframes ballBounce {
-          0%, 100% {
-            transform: translateY(0);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+        @keyframes ballBounceSettle {
+          /* Bounce 1: Highest (approx 60% of viewport) */
+          0% {
+            transform: translateY(-55vh) scale(0.9, 1.15);
+            animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3);
           }
-          50% {
-            transform: translateY(-60px);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          14% {
+            transform: translateY(0) scale(1.25, 0.75);
+            animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1);
+          }
+          /* Peak 2: ~38% viewport */
+          28% {
+            transform: translateY(-38vh) scale(0.92, 1.1);
+            animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3);
+          }
+          40% {
+            transform: translateY(0) scale(1.2, 0.8);
+            animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1);
+          }
+          /* Peak 3: ~20% viewport */
+          52% {
+            transform: translateY(-20vh) scale(0.95, 1.05);
+            animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3);
+          }
+          62% {
+            transform: translateY(0) scale(1.15, 0.85);
+            animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1);
+          }
+          /* Peak 4: ~8% viewport */
+          72% {
+            transform: translateY(-8vh) scale(0.98, 1.02);
+            animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3);
+          }
+          80% {
+            transform: translateY(0) scale(1.08, 0.92);
+            animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1);
+          }
+          100% {
+            transform: translateY(0) scale(1, 1);
+          }
+        }
+
+        @keyframes shadowBounce {
+          0%, 28%, 52%, 72% {
+            transform: scale(0.3);
+            opacity: 0.2;
+          }
+          14%, 40%, 62%, 80%, 100% {
+            transform: scale(1);
+            opacity: 0.8;
           }
         }
 
@@ -138,18 +189,42 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
           0% {
             transform: translateY(0) scale(1);
           }
+          15% {
+            transform: translateY(20px) scale(1.3, 0.7);
+          }
           100% {
-            transform: translateY(-120vh) scale(0.6);
-            opacity: 0.8;
+            transform: translateY(-140vh) scale(0.75, 1.25);
+            opacity: 0.9;
           }
         }
 
-        .animate-ball-bounce {
-          animation: ballBounce 0.6s infinite;
+        @keyframes shadowServe {
+          0% {
+            transform: scale(1);
+            opacity: 0.8;
+          }
+          100% {
+            transform: scale(0.1);
+            opacity: 0;
+          }
+        }
+
+        .animate-ball-bounce-settle {
+          animation: ballBounceSettle 3.0s infinite;
+          transform-origin: bottom center;
+        }
+
+        .animate-shadow-bounce {
+          animation: shadowBounce 3.0s infinite;
         }
 
         .animate-ball-serve {
-          animation: ballServe 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          animation: ballServe 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          transform-origin: bottom center;
+        }
+
+        .animate-shadow-serve {
+          animation: shadowServe 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
       `}</style>
     </div>

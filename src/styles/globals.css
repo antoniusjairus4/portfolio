@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-base: #0c0907;
-  --color-surface: #17110c;
-  --color-ivory: #f2e9d8;
-  --color-muted: #a89880;
-  --color-gold: #e0a93b;
-  --color-ember: #e8481f;
-  --color-blue: #4f6bff;
-  --color-paper: #f1e8d8;
+  --color-base: #0C0907;
+  --color-surface: #17110C;
+  --color-ivory: #F2E9D8;
+  --color-muted: #A89880;
+  --color-gold: #E0A93B;
+  --color-ember: #E8481F;
+  --color-blue: #4F6BFF;
+  --color-paper: #F1E8D8;
 
-  --font-display: "Bricolage Grotesque Variable", sans-serif;
-  --font-utility: "JetBrains Mono Variable", monospace;
+  --font-display: 'Bricolage Grotesque Variable', sans-serif;
+  --font-utility: 'JetBrains Mono Variable', monospace;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
@@ -22,12 +22,12 @@
 }
 
 :root {
-  --color-base: #0c0907;
-  --color-surface: #17110c;
-  --color-ivory: #f2e9d8;
-  --color-muted: #a89880;
-  --color-gold: #e0a93b;
-  --color-ember: #e8481f;
+  --color-base: #0C0907;
+  --color-surface: #17110C;
+  --color-ivory: #F2E9D8;
+  --color-muted: #A89880;
+  --color-gold: #E0A93B;
+  --color-ember: #E8481F;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
@@ -37,21 +37,27 @@
   font-family: var(--font-display);
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
+html {
+  min-height: 100%;
   width: 100%;
-  height: 100%;
-  background-color: #0c0907;
+  background-color: #0C0907;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+body {
+  min-height: 100%;
+  width: 100%;
+  background-color: #0C0907;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
 /* Enormous Display Typography for Loader Numerals */
 .font-display-enormous {
-  font-family: "Bricolage Grotesque Variable", sans-serif;
+  font-family: 'Bricolage Grotesque Variable', sans-serif;
   font-size: clamp(6rem, 25vw, 36vw);
   font-weight: 800;
   line-height: 0.85;

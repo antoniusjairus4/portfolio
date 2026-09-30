@@ -1,16 +1,16 @@
 import { useEffect, useState } from 'react';
 
 export interface PreloaderOptions {
-  minDurationMs?: number; // Default 2400ms
-  maxDurationMs?: number; // Default 3800ms
+  minDurationMs?: number; // Default 3000ms
+  maxDurationMs?: number; // Default 4800ms
   onComplete?: () => void;
 }
 
 export function computeSmoothedProgress(
   elapsedMs: number,
   assetLoaded: boolean,
-  minDurationMs = 2400,
-  maxDurationMs = 3800,
+  minDurationMs = 3000,
+  maxDurationMs = 4800
 ): number {
   if (elapsedMs <= 0) return 0;
 
@@ -31,8 +31,8 @@ export function computeSmoothedProgress(
 }
 
 export function usePreloaderProgress({
-  minDurationMs = 2400,
-  maxDurationMs = 3800,
+  minDurationMs = 3000,
+  maxDurationMs = 4800,
   onComplete,
 }: PreloaderOptions = {}) {
   const [progress, setProgress] = useState<number>(0);
@@ -62,7 +62,7 @@ export function usePreloaderProgress({
         elapsed,
         assetLoaded,
         minDurationMs,
-        maxDurationMs,
+        maxDurationMs
       );
 
       setProgress(Math.floor(currentProgress));

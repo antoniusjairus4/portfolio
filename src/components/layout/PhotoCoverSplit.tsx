@@ -26,18 +26,24 @@ export const PhotoCoverSplit: React.FC = () => {
     if (!containerRef.current || isReducedMotion) return;
 
     const ctx = gsap.context(() => {
+      // Set initial 3D transforms for GPU hardware acceleration
+      gsap.set([leftHalfRef.current, rightHalfRef.current], {
+        force3D: true,
+      });
+
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: containerRef.current,
           start: 'top top',
           end: '+=100%',
           pin: true,
-          scrub: 0.8,
+          scrub: 0.5,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
         },
       });
 
-      // Split reveal animation: Left half moves left, right half moves right
+      // Split reveal animation: Left half slides left (-100%), Right half slides right (+100%)
       tl.to(
         leftHalfRef.current,
         {
@@ -69,14 +75,22 @@ export const PhotoCoverSplit: React.FC = () => {
         );
     }, containerRef);
 
-    return () => ctx.revert();
+    // Refresh ScrollTrigger after layout calculation
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 200);
+
+    return () => {
+      clearTimeout(timer);
+      ctx.revert();
+    };
   }, [isReducedMotion]);
 
   // Keyboard navigation to trigger split reveal
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (['Enter', ' ', 'ArrowDown'].includes(e.key)) {
       e.preventDefault();
-      window.scrollTo({ top: window.innerHeight, behavior: 'smooth' });
+      window.scrollTo({ top: window.innerHeight * 1.5, behavior: 'smooth' });
     }
   };
 
@@ -94,7 +108,7 @@ export const PhotoCoverSplit: React.FC = () => {
         className="absolute inset-0 w-full h-full bg-[#0C0907] flex items-center justify-center z-0"
         style={{
           background:
-            'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 1) 70%)',
+            'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.15) 0%, rgba(12, 9, 7, 1) 70%)',
         }}
       >
         {/* Text-free placeholder as specified for Phase 1 */}
@@ -121,6 +135,7 @@ export const PhotoCoverSplit: React.FC = () => {
             className="w-full h-full object-cover portrait:object-[47.6%_50%] landscape:object-[51.5%_50%]"
             loading="eager"
             fetchPriority="high"
+            onLoad={() => ScrollTrigger.refresh()}
           />
         </picture>
       </div>
