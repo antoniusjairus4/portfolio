@@ -40,7 +40,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
         const container = document.querySelector('section[aria-label*="Full-screen photo cover"]');
         const left = container?.children[1] as HTMLElement;
         const right = container?.children[2] as HTMLElement;
-        const textWrapper = container?.querySelector('div > div') as HTMLElement;
+        const textWrapper = container?.querySelector('.will-change-transform') as HTMLElement;
 
         return {
           leftTransform: left ? window.getComputedStyle(left).transform : 'NONE',

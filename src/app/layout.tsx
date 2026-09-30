@@ -1,9 +1,8 @@
 import type { Metadata } from 'next';
 import type React from 'react';
-import '@fontsource-variable/bricolage-grotesque';
-import '@fontsource-variable/jetbrains-mono';
 import '@/styles/globals.css';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
+
 
 export const metadata: Metadata = {
   title: 'Jairus — Portfolio',

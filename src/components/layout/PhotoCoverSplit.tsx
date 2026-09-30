@@ -31,112 +31,123 @@ export const PhotoCoverSplit: React.FC = () => {
   useEffect(() => {
     if (!containerRef.current || isReducedMotion) return;
 
-    const ctx = gsap.context(() => {
-      // Force 3D hardware acceleration
-      gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
-        force3D: true,
-      });
+    let ctx: gsap.Context | null = null;
 
-      // Initial text states before Beat A
-      gsap.set(lettersRef.current, { yPercent: 120, opacity: 0 });
-      gsap.set(rolesRef.current, { yPercent: 60, opacity: 0 });
+    const initAnimation = () => {
+      ctx = gsap.context(() => {
+        // Force 3D hardware acceleration
+        gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
+          force3D: true,
+        });
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: `+=${SCROLL_STORY.totalDistanceVh}%`,
-          pin: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            if (self.progress > 0.02 && scrollCueRef.current) {
-              gsap.to(scrollCueRef.current, { opacity: 0, duration: 0.3 });
-            }
+        // Initial text states before Beat A
+        gsap.set(lettersRef.current, { yPercent: 120, opacity: 0 });
+        gsap.set(rolesRef.current, { yPercent: 60, opacity: 0 });
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: containerRef.current,
+            start: 'top top',
+            end: `+=${SCROLL_STORY.totalDistanceVh}%`,
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
+              if (self.progress > 0.02 && scrollCueRef.current) {
+                gsap.to(scrollCueRef.current, { opacity: 0, duration: 0.3 });
+              }
+            },
           },
-        },
-      });
+        });
 
-      // --- BEAT A: The Reveal (0% -> 35%) ---
-      // Halves slide to 50% partial opening
-      tl.to(
-        leftHalfRef.current,
-        { xPercent: -50, ease: 'power2.inOut', duration: 0.35 },
-        0
-      )
-        .to(
-          rightHalfRef.current,
-          { xPercent: 50, ease: 'power2.inOut', duration: 0.35 },
+        // --- BEAT A: The Reveal (0% -> 35%) ---
+        // Halves slide to 50% partial opening
+        tl.to(
+          leftHalfRef.current,
+          { xPercent: -50, ease: 'power2.inOut', duration: 0.35 },
           0
         )
-        // Staggered name letters rise & fade in
-        .to(
-          lettersRef.current,
-          {
-            yPercent: 0,
-            opacity: 1,
-            stagger: 0.04,
-            ease: 'power3.out',
-            duration: 0.25,
-          },
-          0.05
-        )
-        // Staggered 3 role lines fade & rise in
-        .to(
-          rolesRef.current,
-          {
-            yPercent: 0,
-            opacity: 1,
-            stagger: 0.06,
-            ease: 'power2.out',
-            duration: 0.2,
-          },
-          0.15
+          .to(
+            rightHalfRef.current,
+            { xPercent: 50, ease: 'power2.inOut', duration: 0.35 },
+            0
+          )
+          // Staggered name letters rise & fade in
+          .to(
+            lettersRef.current,
+            {
+              yPercent: 0,
+              opacity: 1,
+              stagger: 0.04,
+              ease: 'power3.out',
+              duration: 0.25,
+            },
+            0.05
+          )
+          // Staggered 3 role lines fade & rise in
+          .to(
+            rolesRef.current,
+            {
+              yPercent: 0,
+              opacity: 1,
+              stagger: 0.06,
+              ease: 'power2.out',
+              duration: 0.2,
+            },
+            0.15
+          );
+
+        // --- BEAT B: The Read (35% -> 55%) ---
+        // Stable rest position for reading; no major motion changes
+        tl.to(
+          [leftHalfRef.current, rightHalfRef.current],
+          { duration: 0.2 },
+          0.35
         );
 
-      // --- BEAT B: The Read (35% -> 55%) ---
-      // Stable rest position for reading; no major motion changes
-      tl.to(
-        [leftHalfRef.current, rightHalfRef.current],
-        { duration: 0.2 },
-        0.35
-      );
+        // --- BEAT C: The Exit (55% -> 100%) ---
+        // Halves slide completely off-screen (-100% / +100%)
+        tl.to(
+          leftHalfRef.current,
+          { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
+          0.55
+        )
+          .to(
+            rightHalfRef.current,
+            { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
+            0.55
+          )
+          // Text scales up from 1x to 3.5x and letter-spacing opens
+          .to(
+            contentWrapperRef.current,
+            {
+              scale: 3.5,
+              letterSpacing: '0.08em',
+              ease: 'power2.in',
+              duration: 0.45,
+            },
+            0.55
+          )
+          // Text fades out as scale passes ~3x (75% -> 100%)
+          .to(
+            contentWrapperRef.current,
+            {
+              opacity: 0,
+              ease: 'power2.in',
+              duration: 0.25,
+            },
+            0.75
+          );
+      }, containerRef);
+    };
 
-      // --- BEAT C: The Exit (55% -> 100%) ---
-      // Halves slide completely off-screen (-100% / +100%)
-      tl.to(
-        leftHalfRef.current,
-        { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
-        0.55
-      )
-        .to(
-          rightHalfRef.current,
-          { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
-          0.55
-        )
-        // Text scales up from 1x to 3.5x and letter-spacing opens
-        .to(
-          contentWrapperRef.current,
-          {
-            scale: 3.5,
-            letterSpacing: '0.08em',
-            ease: 'power2.in',
-            duration: 0.45,
-          },
-          0.55
-        )
-        // Text fades out as scale passes ~3x (75% -> 100%)
-        .to(
-          contentWrapperRef.current,
-          {
-            opacity: 0,
-            ease: 'power2.in',
-            duration: 0.25,
-          },
-          0.75
-        );
-    }, containerRef);
+    // Ensure fonts are fully loaded before measuring SplitText letters
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(initAnimation);
+    } else {
+      initAnimation();
+    }
 
     const timer = setTimeout(() => {
       ScrollTrigger.refresh();
@@ -144,9 +155,18 @@ export const PhotoCoverSplit: React.FC = () => {
 
     return () => {
       clearTimeout(timer);
-      ctx.revert();
+      if (ctx) (ctx as gsap.Context).revert();
     };
   }, [isReducedMotion]);
+
+  // Pre-decode revealed background image after page load
+  useEffect(() => {
+    const img = new Image();
+    img.src = '/images/hero/after_split-1672.webp';
+    if ('decode' in img) {
+      img.decode().catch(() => {});
+    }
+  }, []);
 
   // Keyboard Navigation: Enter/Space/ArrowDown advance by beats, ArrowUp goes back
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -185,50 +205,74 @@ export const PhotoCoverSplit: React.FC = () => {
       aria-label="Full-screen photo cover. Use arrow keys or scroll to reveal portfolio story."
     >
       {/* Centre Content Layer (Beneath Photo Halves) */}
-      <div
-        className="absolute inset-0 w-full h-full bg-[#0C0907] flex flex-col items-center justify-center z-0 p-4 text-center"
-        style={{
-          background:
-            'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.15) 0%, rgba(12, 9, 7, 1) 75%)',
-        }}
-      >
-        {/* Scalable Text Wrapper */}
-        <div
-          ref={contentWrapperRef}
-          className="flex flex-col items-center justify-center will-change-transform"
-        >
-          {/* Accessible H1 with letter spans for stagger animation */}
-          <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center overflow-hidden">
-            <span className="sr-only">{heroContent.name}</span>
-            <span aria-hidden="true" className="flex">
-              {nameLetters.map((char, index) => (
-                <span
-                  key={`${char}-${index}`}
-                  ref={(el) => {
-                    lettersRef.current[index] = el;
-                  }}
-                  className="inline-block will-change-transform"
-                >
-                  {char}
-                </span>
-              ))}
-            </span>
-          </h1>
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+        {/* Revealed Background Image (Static, lower priority load) */}
+        <picture className="absolute inset-0 w-full h-full">
+          <source
+            srcSet="/images/hero/after_split-1672.avif 1672w, /images/hero/after_split-1280.avif 1280w"
+            type="image/avif"
+          />
+          <source
+            srcSet="/images/hero/after_split-1672.webp 1672w, /images/hero/after_split-1280.webp 1280w"
+            type="image/webp"
+          />
+          <img
+            src="/images/hero/after_split-1672.jpg"
+            alt=""
+            className="w-full h-full object-cover object-center"
+            loading="lazy"
+          />
+        </picture>
 
-          {/* Semantic 3-Role List */}
-          <ul className="list-none p-0 m-0 mt-4 sm:mt-6 flex flex-col items-center gap-1 sm:gap-2">
-            {heroContent.roles.map((role, index) => (
-              <li
-                key={role}
-                ref={(el) => {
-                  rolesRef.current[index] = el;
-                }}
-                className="font-hero-role tracking-wide will-change-transform"
-              >
-                {role}
-              </li>
-            ))}
-          </ul>
+        {/* Static Darkening Scrim & Radial Glow for High WCAG Contrast */}
+        <div
+          className="absolute inset-0 w-full h-full pointer-events-none"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.65) 0%, rgba(12, 9, 7, 0.88) 100%)',
+          }}
+        />
+
+        {/* Text Layer Centred on both axes */}
+        <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center z-10">
+          {/* Scalable Text Wrapper */}
+          <div
+            ref={contentWrapperRef}
+            className="flex flex-col items-center justify-center will-change-transform"
+          >
+            {/* Accessible H1 with letter spans for stagger animation */}
+            <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center overflow-hidden">
+              <span className="sr-only">{heroContent.name}</span>
+              <span aria-hidden="true" className="flex">
+                {nameLetters.map((char, index) => (
+                  <span
+                    key={`${char}-${index}`}
+                    ref={(el) => {
+                      lettersRef.current[index] = el;
+                    }}
+                    className="inline-block will-change-transform"
+                  >
+                    {char}
+                  </span>
+                ))}
+              </span>
+            </h1>
+
+            {/* Semantic 3-Role List */}
+            <ul className="list-none p-0 m-0 mt-3 sm:mt-5 flex flex-col items-center gap-1 sm:gap-2">
+              {heroContent.roles.map((role, index) => (
+                <li
+                  key={role}
+                  ref={(el) => {
+                    rolesRef.current[index] = el;
+                  }}
+                  className="font-hero-role tracking-wide will-change-transform"
+                >
+                  {role}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
 

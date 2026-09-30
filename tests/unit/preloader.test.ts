@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
+import { heroContent } from '../../src/content/heroContent';
 import { computeSmoothedProgress } from '../../src/components/preloader/usePreloaderProgress';
 import { PRELOADER_TIMINGS, SCROLL_STORY } from '../../src/motion/tokens';
+
 
 describe('Preloader Progress Timing & Beat Boundary Logic', () => {
   it('starts at 0% when elapsed time is 0', () => {
@@ -57,4 +59,10 @@ describe('Preloader Progress Timing & Beat Boundary Logic', () => {
     expect(SCROLL_STORY.beats.exitEnd).toBe(1.00);
     expect(SCROLL_STORY.totalDistanceVh).toBe(350);
   });
+
+  it('contains the updated role copy: Student, Freelancer, Entrepreneur', () => {
+    expect(heroContent.roles).toEqual(['Student', 'Freelancer', 'Entrepreneur']);
+  });
 });
+
+

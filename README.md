@@ -18,23 +18,31 @@ Status: Phase 2: story reveal page (preloader 6.0s–8.0s, centre content, 3-bea
 
 ## Design Tokens (Tailwind CSS v4 `@theme`)
 
-### Palette
+### Palette & Text Tokens
 - `--color-base`: `#0C0907` (warm black)
 - `--color-surface`: `#17110C`
 - `--color-ivory`: `#F2E9D8` (primary text)
 - `--color-muted`: `#A89880`
 - `--color-gold`: `#E0A93B` (primary accent)
 - `--color-ember`: `#E8481F` (hot accent / ball)
+- `--color-hero-name`: `#FFF4E0` (warm white hero name)
+- `--color-hero-role`: `rgba(255, 244, 224, 0.65)` (softer warm white hero roles)
 
 ### Typography
-- **Display**: Bricolage Grotesque (variable, self-hosted via Fontsource)
-- **Serif**: Instrument Serif (400 Italic, self-hosted via Fontsource)
+- **Display**: Clash Display (variable WOFF2 self-hosted in `public/fonts/ClashDisplay-Variable.woff2`)
+- **Secondary**: Satoshi (variable WOFF2 self-hosted in `public/fonts/Satoshi-Variable.woff2`)
 - **Utility**: JetBrains Mono (variable, self-hosted via Fontsource)
-- **Enormous Numeral Class**: `.font-display-enormous` (`clamp(6rem, 25vw, 36vw)`)
-- **Hero Name**: `.font-hero-name` (`clamp(4.5rem, 18vw, 24rem)`)
-- **Hero Roles**: `.font-hero-role` (`clamp(1.8rem, 5vw, 6rem)`)
+- **Enormous Numeral Class**: `.font-display-enormous` (`clamp(6rem, 25vw, 36vw)`, weight 700, tabular-nums)
+- **Hero Name**: `.font-hero-name` (`clamp(3.8rem, 16.5vw, 22rem)`, weight 700)
+- **Hero Roles**: `.font-hero-role` (`clamp(1.4rem, 4.2vw, 4.8rem)`, weight 500, upright sentence case)
 
-### Motion Tokens & Beats
+### Revealed Background Image
+- **Original Source**: `assets-src/After_split.png` (1672x941 px, 1.45 MB PNG)
+- **Optimized Assets**: `public/images/hero/after_split-1672.avif` (73.5 KB), `after_split-1672.webp` (52.6 KB), `after_split-1672.jpg` (116.1 KB) + blur placeholder.
+
+### Motion Tokens & Beats (Unchanged)
+> [!NOTE]
+> All animation timing, durations, easing, scroll distances, and beat boundaries remain strictly unchanged.
 - `SCROLL_STORY.totalDistanceVh`: `350` (3.5 viewport heights of scroll)
 - `SCROLL_STORY.beats`: `revealEnd: 0.35`, `readEnd: 0.55`, `exitEnd: 1.00`
 - `PRELOADER_TIMINGS`: `minDurationMs: 6000`, `maxDurationMs: 8000`, `targetMs: 6500`
@@ -51,14 +59,13 @@ Status: Phase 2: story reveal page (preloader 6.0s–8.0s, centre content, 3-bea
 | `@react-three/fiber` | `9.8.1` | Dependency | R3F React Canvas |
 | `gsap` / `@gsap/react` | `3.15.0` / `2.1.2` | Dependency | GSAP Animation |
 | `lenis` | `1.3.26` | Dependency | Smooth Scroll |
-| `@fontsource-variable/bricolage-grotesque` | `5.3.0` | DevDependency | Display Font |
-| `@fontsource/instrument-serif` | `5.3.0` | DevDependency | Italic Serif Font |
 | `@fontsource-variable/jetbrains-mono` | `5.3.0` | DevDependency | Utility Font |
 | `sharp` | `0.35.5` | DevDependency | Image Processing Engine |
 | `typescript` | `7.0.2` | DevDependency | Type System |
 | `@biomejs/biome` | `2.5.14` | DevDependency | Linter / Formatter |
 | `vitest` | `5.0.2` | DevDependency | Unit Testing |
 | `@playwright/test` | `1.63.0` | DevDependency | E2E Testing |
+
 
 ---
 

@@ -5,5 +5,6 @@ export interface HeroContent {
 
 export const heroContent: HeroContent = {
   name: 'JAIRUS',
-  roles: ['Student', 'Freelancer', 'Founder'],
+  roles: ['Student', 'Freelancer', 'Entrepreneur'],
 };
+
