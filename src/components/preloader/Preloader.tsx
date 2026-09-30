@@ -67,7 +67,9 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     handleFinish();
   };
 
-  if (isDismissed || skipped) return null;
+  if (isDismissed || skipped) {
+    return <div className="hidden pointer-events-none" aria-hidden="true" />;
+  }
 
   const formattedCounter = String(progress).padStart(2, '0');
 

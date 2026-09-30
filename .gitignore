@@ -1,17 +1,35 @@
-# dependencies
+# Dependencies
 node_modules
 .pnpm-store
 
-# next.js build output
+# Next.js build outputs
 .next
 out
 
-# testing
+# Testing & Coverage
 test-results
 coverage
+playwright-report
 
-# env files
-.env*.local
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
 
-# vercel & firebase
+# Environment files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDEs & System files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Firebase & Cloud
 .firebase
+.runtimeconfig.json
