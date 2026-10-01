@@ -54,14 +54,11 @@ describe('Preloader Progress Timing & Beat Boundary Logic', () => {
   });
 
   it('exports valid scroll story beat boundary constants', () => {
-    expect(SCROLL_STORY.beats.revealEnd).toBe(0.20);
-    expect(SCROLL_STORY.beats.readEnd).toBe(0.32);
-    expect(SCROLL_STORY.beats.exitEnd).toBe(0.57);
-    expect(SCROLL_STORY.beats.holdEnd).toBe(0.61);
-    expect(SCROLL_STORY.beats.tearEnd).toBe(1.00);
-    expect(SCROLL_STORY.totalDistanceVh).toBe(570);
+    expect(SCROLL_STORY.beats.revealEnd).toBe(0.35);
+    expect(SCROLL_STORY.beats.readEnd).toBe(0.55);
+    expect(SCROLL_STORY.beats.exitEnd).toBe(1.00);
+    expect(SCROLL_STORY.totalDistanceVh).toBe(350);
   });
-
 
   it('contains the updated role copy: Student, Freelancer, Entrepreneur', () => {
     expect(heroContent.roles).toEqual(['Student', 'Freelancer', 'Entrepreneur']);

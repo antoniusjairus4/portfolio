@@ -50,12 +50,11 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
       });
 
       if (p === 0) {
-        expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(stepInfo.leftTransform);
-        expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(stepInfo.rightTransform);
+        expect(stepInfo.leftTransform).toBe('matrix(1, 0, 0, 1, 0, 0)');
+        expect(stepInfo.rightTransform).toBe('matrix(1, 0, 0, 1, 0, 0)');
       } else if (p === 0.45) {
         // Beat B: Read (Text fully visible, halves partially open)
         expect(stepInfo.leftTransform).not.toBe('matrix(1, 0, 0, 1, 0, 0)');
-        expect(stepInfo.leftTransform).not.toBe('none');
         expect(stepInfo.textOpacity).toBeGreaterThan(0.8);
       } else if (p === 1.0) {
         // Exit complete: Photo halves off-screen, text steady
@@ -87,7 +86,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     expect(scrollY).toBeGreaterThan(0);
   });
 
-  test('regression: cover is visible immediately after preloader finishes without scrolling', async ({ page }) => {
+  test('regression: cover is visible immediately after preloader finishes without scrolling', async ({ page, context }) => {
     // First Visit Path
     await page.goto('http://localhost:3000');
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
@@ -97,7 +96,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     const scrollYBefore = await page.evaluate(() => window.scrollY);
     expect(scrollYBefore).toBe(0);
 
-    // Assert photo halves have opacity 1 and transform matrix(1, 0, 0, 1, 0, 0) or none
+    // Assert photo halves have opacity 1 and transform matrix(1, 0, 0, 1, 0, 0)
     const coverInfoFirst = await page.evaluate(() => {
       const container = document.querySelector('section[aria-label*="Full-screen photo cover"]');
       const left = container?.children[1] as HTMLElement;
@@ -113,9 +112,9 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
 
     expect(coverInfoFirst.containerY).toBe(0);
     expect(coverInfoFirst.leftOpacity).toBe('1');
-    expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(coverInfoFirst.leftTransform);
-    expect(coverInfoFirst.leftOpacity).toBe('1');
-    expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(coverInfoFirst.rightTransform);
+    expect(coverInfoFirst.leftTransform).toBe('matrix(1, 0, 0, 1, 0, 0)');
+    expect(coverInfoFirst.rightOpacity).toBe('1');
+    expect(coverInfoFirst.rightTransform).toBe('matrix(1, 0, 0, 1, 0, 0)');
 
     // Repeat Visit Path (sessionStorage skip)
     await page.reload();
@@ -133,36 +132,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
 
     expect(coverInfoRepeat.containerY).toBe(0);
     expect(coverInfoRepeat.leftOpacity).toBe('1');
-    expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(coverInfoRepeat.leftTransform);
-  });
-
-  test('Phase 3 tear transition renders canvas with data-strips attribute and handles tear completion', async ({ page }) => {
-    await page.goto('http://localhost:3000');
-
-    // Wait for preloader finish or skip
-    const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
-    await expect(preloader).toBeHidden({ timeout: 8800 });
-
-    // Scroll to start of tear (progress ~0.65 of scroll story)
-    const storyHeight = 5.7 * 720;
-    await page.evaluate((pos) => window.scrollTo(0, pos), storyHeight * 0.65);
-    await page.waitForTimeout(1000);
-
-    // Canvas element with data-strips attribute should be rendered
-    const canvas = page.locator('canvas[data-strips]');
-    await expect(canvas).toBeVisible({ timeout: 8000 });
-    const stripCountStr = await canvas.getAttribute('data-strips');
-    expect(stripCountStr).not.toBeNull();
-    const stripCount = parseInt(stripCountStr || '0', 10);
-    expect([4, 5, 7]).toContain(stripCount);
-
-    // Scroll to 100% completion of tear
-    await page.evaluate((pos) => window.scrollTo(0, pos), storyHeight);
-    await page.waitForTimeout(500);
-
-    // Next page (#page-1-placeholder) should be visible
-    const nextPage = page.locator('#page-1-placeholder');
-    await expect(nextPage).toBeVisible();
+    expect(coverInfoRepeat.leftTransform).toBe('matrix(1, 0, 0, 1, 0, 0)');
   });
 });
 
