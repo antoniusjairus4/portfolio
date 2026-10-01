@@ -10,7 +10,20 @@ export default function Home() {
   return (
     <main className="relative w-full bg-[#0C0907]">
       {/* Preloader (Phase 1/2) */}
-      <Preloader onComplete={() => start()} />
+      <Preloader
+        onComplete={() => {
+          start();
+          // Frame after preloader exits: refresh ScrollTrigger and verify pin position
+          requestAnimationFrame(() => {
+            if (typeof window !== 'undefined' && 'ScrollTrigger' in window) {
+              const ST = (window as unknown as { ScrollTrigger: { refresh: () => void; update: () => void } }).ScrollTrigger;
+              ST.refresh();
+              ST.update();
+            }
+          });
+        }}
+      />
+
 
       {/* Page 0 Cover & Pinned Scroll Story Reveal */}
       <PhotoCoverSplit />

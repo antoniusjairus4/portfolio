@@ -8,6 +8,11 @@ import { SCROLL_STORY } from '@/motion/tokens';
 
 gsap.registerPlugin(ScrollTrigger);
 
+if (typeof window !== 'undefined') {
+  (window as unknown as { ScrollTrigger: typeof ScrollTrigger }).ScrollTrigger = ScrollTrigger;
+}
+
+
 export const PhotoCoverSplit: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftHalfRef = useRef<HTMLDivElement>(null);
@@ -32,9 +37,12 @@ export const PhotoCoverSplit: React.FC = () => {
     if (!containerRef.current || isReducedMotion) return;
 
     let ctx: gsap.Context | null = null;
+    let cancelled = false;
 
     const initAnimation = () => {
+      if (cancelled) return;
       ctx = gsap.context(() => {
+
         // Force 3D hardware acceleration
         gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
           force3D: true,
@@ -154,10 +162,12 @@ export const PhotoCoverSplit: React.FC = () => {
     }, 200);
 
     return () => {
+      cancelled = true;
       clearTimeout(timer);
       if (ctx) (ctx as gsap.Context).revert();
     };
   }, [isReducedMotion]);
+
 
   // Pre-decode revealed background image after page load
   useEffect(() => {
