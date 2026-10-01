@@ -16,15 +16,29 @@ export const COLOR_TOKENS = {
   ember: '#E8481F',
 } as const;
 
-// Phase 2: Pinned Scroll Story Beats & Distances
+// Phase 3: Pinned Scroll Story Beats & Distances (Split Reveal + 3D Strip Tear)
+export const NAME_EXIT_SCALE_END = 1.3;
+export const TEAR_SCROLL_DISTANCE_VH = 220; // 2.2 viewport heights
+
 export const SCROLL_STORY = {
-  totalDistanceVh: 350,
+  totalDistanceVh: 570, // 350 + 220 vh total scroll story
+  nameExitScaleEnd: NAME_EXIT_SCALE_END,
+  tearScrollDistanceVh: TEAR_SCROLL_DISTANCE_VH,
   beats: {
-    revealEnd: 0.35, // 0% to 35%: Photo split + text reveal
-    readEnd: 0.55,   // 35% to 55%: Rest & read stable text
-    exitEnd: 1.00,   // 55% to 100%: Halves off-screen + text scale up/fade
+    revealEnd: 0.20, // 0% -> 20%: Photo split + text reveal (Beat A)
+    readEnd: 0.32,   // 20% -> 32%: Rest & read stable text (Beat B)
+    exitEnd: 0.57,   // 32% -> 57%: Photo halves slide off-screen, text scale 1.0 -> 1.3 (Beat C)
+    holdEnd: 0.61,   // 57% -> 61%: Clean hold (5% of story)
+    tearEnd: 1.00,   // 61% -> 100%: 3D vertical strip tear transition (Beat D)
+  },
+  strips: {
+    desktop: 7, // >= 1024px
+    tablet: 5,  // 640px - 1023px
+    mobile: 4,  // < 640px
+    staggerOverlap: 0.45,
   },
 } as const;
+
 
 // Phase 2: Longer Preloader Timing (6.0s - 8.0s)
 export const PRELOADER_TIMINGS = {

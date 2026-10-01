@@ -4,7 +4,7 @@
 Personal portfolio of Jairus: cybersecurity student, two-time Tamil Nadu state table tennis champion, and young founder. Built to a competition standard, aiming for Awwards Site of the Day and the Developer award.
 
 ## Status
-Status: Phase 2: story reveal page (preloader 6.0s–8.0s, centre content, 3-beat pinned scroll story reveal & page 1 placeholder implemented).
+Status: Phase 3: physical 3D tear transition implemented (Awwards-standard vertical strip tear, 60 fps WebGL cylinder bend, noise paper edges, responsive strip counts, seamless DOM handoff & fallbacks).
 
 ---
 
@@ -125,8 +125,8 @@ Portfolio/
 - **Phase 0.5**: Product Brief & Architectural Specifications (Completed)
 - **Phase 1**: Loader Page, Photo Cover & Split Reveal (Completed)
 - **Phase 2**: Centre Content & 3-Beat Pinned Scroll Story Reveal (Completed)
-- **Phase 3**: Hero & 3D Ball Experience (Planned)
-- **Phase 4**: Work & Content Sections (Planned)
+- **Phase 3**: Physical 3D Vertical Strip Tear Transition (Completed)
+- **Phase 4**: Ventures / Work Page (Planned)
 - **Phase 5**: Contact & Firebase Backend (Planned)
 - **Phase 6**: Performance, Accessibility & Security Hardening (Planned)
 - **Phase 7**: Launch & Awwards Submission (Planned)

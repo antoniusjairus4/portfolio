@@ -2,16 +2,21 @@
 
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import dynamic from 'next/dynamic';
 import React, { useEffect, useRef, useState } from 'react';
 import { heroContent } from '@/content/heroContent';
-import { SCROLL_STORY } from '@/motion/tokens';
+import { NAME_EXIT_SCALE_END, SCROLL_STORY } from '@/motion/tokens';
+
+const StripTearCanvas = dynamic(
+  () => import('./tear/StripTearCanvas').then((m) => m.StripTearCanvas),
+  { ssr: false }
+);
 
 gsap.registerPlugin(ScrollTrigger);
 
 if (typeof window !== 'undefined') {
   (window as unknown as { ScrollTrigger: typeof ScrollTrigger }).ScrollTrigger = ScrollTrigger;
 }
-
 
 export const PhotoCoverSplit: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -23,6 +28,9 @@ export const PhotoCoverSplit: React.FC = () => {
   const scrollCueRef = useRef<HTMLDivElement>(null);
 
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [tearProgress, setTearProgress] = useState(0);
+  const [isTearActive, setIsTearActive] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
     try {
@@ -31,10 +39,18 @@ export const PhotoCoverSplit: React.FC = () => {
     } catch {
       // Fallback
     }
+
+    const updateDims = () => {
+      setDimensions({ width: window.innerWidth, height: window.innerHeight });
+    };
+    updateDims();
+
+    window.addEventListener('resize', updateDims);
+    return () => window.removeEventListener('resize', updateDims);
   }, []);
 
   useEffect(() => {
-    if (!containerRef.current || isReducedMotion) return;
+    if (!containerRef.current) return;
 
     let ctx: gsap.Context | null = null;
     let cancelled = false;
@@ -42,11 +58,30 @@ export const PhotoCoverSplit: React.FC = () => {
     const initAnimation = () => {
       if (cancelled) return;
       ctx = gsap.context(() => {
-
         // Force 3D hardware acceleration
         gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
           force3D: true,
         });
+
+        // Reduced motion path: simple crossfade without letter stagger or 3D tear
+        if (isReducedMotion) {
+          gsap.set(lettersRef.current, { yPercent: 0, opacity: 1 });
+          gsap.set(rolesRef.current, { yPercent: 0, opacity: 1 });
+
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top top',
+              end: `+=${SCROLL_STORY.totalDistanceVh}%`,
+              pin: true,
+              scrub: 0.5,
+            },
+          })
+            .to([leftHalfRef.current, rightHalfRef.current], { xPercent: -100, duration: 0.5 }, 0)
+            .to(contentWrapperRef.current, { opacity: 0, duration: 0.5 }, 0.5);
+
+          return;
+        }
 
         // Initial text states before Beat A
         gsap.set(lettersRef.current, { yPercent: 120, opacity: 0 });
@@ -62,75 +97,94 @@ export const PhotoCoverSplit: React.FC = () => {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
+              // Fade out scroll cue before Beat D begins
               if (self.progress > 0.02 && scrollCueRef.current) {
                 gsap.to(scrollCueRef.current, { opacity: 0, duration: 0.3 });
+              }
+
+              // Beat D Tear Progress (0.61 -> 1.00)
+              const holdEnd = SCROLL_STORY.beats.holdEnd;
+              if (self.progress >= holdEnd) {
+                setIsTearActive(true);
+                const p = (self.progress - holdEnd) / (1.0 - holdEnd);
+                setTearProgress(Math.min(Math.max(p, 0), 1));
+              } else {
+                setIsTearActive(false);
+                setTearProgress(0);
               }
             },
           },
         });
 
-        // --- BEAT A: The Reveal (0% -> 35%) ---
-        // Halves slide to 50% partial opening
+        // --- BEAT A: The Reveal (0% -> 20%) ---
         tl.to(
           leftHalfRef.current,
-          { xPercent: -50, ease: 'power2.inOut', duration: 0.35 },
+          { xPercent: -50, ease: 'power2.inOut', duration: 0.20 },
           0
         )
           .to(
             rightHalfRef.current,
-            { xPercent: 50, ease: 'power2.inOut', duration: 0.35 },
+            { xPercent: 50, ease: 'power2.inOut', duration: 0.20 },
             0
           )
-          // Staggered name letters rise & fade in
           .to(
             lettersRef.current,
             {
               yPercent: 0,
               opacity: 1,
-              stagger: 0.04,
+              stagger: 0.03,
               ease: 'power3.out',
-              duration: 0.25,
+              duration: 0.15,
             },
-            0.05
+            0.03
           )
-          // Staggered 3 role lines fade & rise in
           .to(
             rolesRef.current,
             {
               yPercent: 0,
               opacity: 1,
-              stagger: 0.06,
+              stagger: 0.04,
               ease: 'power2.out',
-              duration: 0.2,
+              duration: 0.12,
             },
-            0.15
+            0.08
           );
 
-        // --- BEAT B: The Read (35% -> 55%) ---
-        // Stable rest position for reading; no major motion changes
+        // --- BEAT B: The Read (20% -> 32%) ---
         tl.to(
           [leftHalfRef.current, rightHalfRef.current],
-          { duration: 0.2 },
-          0.35
+          { duration: 0.12 },
+          0.20
         );
 
-        // --- BEAT C: The Exit (55% -> 100%) ---
+        // --- BEAT C: The Exit (32% -> 57%) ---
         // Halves slide completely off-screen (-100% / +100%)
-        // Text remains steady at resting scale (1.0x) without zooming bigger
+        // Text scales up slightly to NAME_EXIT_SCALE_END (1.3x) without fading out
         tl.to(
           leftHalfRef.current,
-          { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
-          0.55
-        ).to(
-          rightHalfRef.current,
-          { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
-          0.55
-        );
+          { xPercent: -100, ease: 'power2.inOut', duration: 0.25 },
+          0.32
+        )
+          .to(
+            rightHalfRef.current,
+            { xPercent: 100, ease: 'power2.inOut', duration: 0.25 },
+            0.32
+          )
+          .to(
+            contentWrapperRef.current,
+            {
+              scale: NAME_EXIT_SCALE_END,
+              ease: 'power1.out',
+              duration: 0.25,
+            },
+            0.32
+          );
 
+        // --- CLEAN HOLD (57% -> 61%) ---
+        tl.to(contentWrapperRef.current, { duration: 0.04 }, 0.57);
       }, containerRef);
     };
 
-    // Ensure fonts are fully loaded before measuring SplitText letters
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(initAnimation);
     } else {
@@ -148,7 +202,6 @@ export const PhotoCoverSplit: React.FC = () => {
     };
   }, [isReducedMotion]);
 
-
   // Pre-decode revealed background image after page load
   useEffect(() => {
     const img = new Image();
@@ -158,25 +211,28 @@ export const PhotoCoverSplit: React.FC = () => {
     }
   }, []);
 
-  // Keyboard Navigation: Enter/Space/ArrowDown advance by beats, ArrowUp goes back
+  // Keyboard Navigation: Enter/Space/ArrowDown step beat-by-beat (A -> B -> C -> D -> Next Page)
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const vh = window.innerHeight;
     const currentScroll = window.scrollY;
+    const totalDist = vh * (SCROLL_STORY.totalDistanceVh / 100);
 
     if (['Enter', ' ', 'ArrowDown'].includes(e.key)) {
       e.preventDefault();
-      if (currentScroll < vh * 1.0) {
-        window.scrollTo({ top: vh * 1.22, behavior: 'smooth' }); // Beat A -> B (35%)
-      } else if (currentScroll < vh * 2.0) {
-        window.scrollTo({ top: vh * 3.5, behavior: 'smooth' }); // Beat B -> C (100%)
+      if (currentScroll < totalDist * 0.2) {
+        window.scrollTo({ top: totalDist * 0.26, behavior: 'smooth' }); // Beat A -> B
+      } else if (currentScroll < totalDist * 0.5) {
+        window.scrollTo({ top: totalDist * 0.58, behavior: 'smooth' }); // Beat B -> C/Hold
+      } else if (currentScroll < totalDist * 0.95) {
+        window.scrollTo({ top: totalDist, behavior: 'smooth' }); // Beat C -> D (Tear complete)
       } else {
-        window.scrollTo({ top: vh * 4.5, behavior: 'smooth' }); // To Placeholder
+        window.scrollTo({ top: totalDist + vh, behavior: 'smooth' }); // To Placeholder
       }
     } else if (e.key === 'ArrowUp') {
       if (currentScroll > 0) {
         e.preventDefault();
-        if (currentScroll > vh * 2.0) {
-          window.scrollTo({ top: vh * 1.22, behavior: 'smooth' });
+        if (currentScroll > totalDist * 0.6) {
+          window.scrollTo({ top: totalDist * 0.26, behavior: 'smooth' });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -194,8 +250,21 @@ export const PhotoCoverSplit: React.FC = () => {
       className="relative w-full h-[100svh] overflow-hidden bg-[#0C0907] outline-none select-none"
       aria-label="Full-screen photo cover. Use arrow keys or scroll to reveal portfolio story."
     >
-      {/* Centre Content Layer (Beneath Photo Halves) */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+      {/* 3D Vertical Strip Tear WebGL Canvas Layer (Active during Beat D) */}
+      {!isReducedMotion && dimensions.width > 0 && (
+        <StripTearCanvas
+          scrollProgress={tearProgress}
+          width={dimensions.width}
+          height={dimensions.height}
+        />
+      )}
+
+      {/* Centre Content Layer (Beneath Photo Halves, hidden visually during Beat D handoff) */}
+      <div
+        className={`absolute inset-0 w-full h-full z-0 overflow-hidden transition-opacity duration-150 ${
+          isTearActive ? 'opacity-0' : 'opacity-100'
+        }`}
+      >
         {/* Revealed Background Image (Static, lower priority load) */}
         <picture className="absolute inset-0 w-full h-full">
           <source
@@ -234,7 +303,6 @@ export const PhotoCoverSplit: React.FC = () => {
             <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center py-2">
               <span className="sr-only">{heroContent.name}</span>
               <span aria-hidden="true" className="flex">
-
                 {nameLetters.map((char, index) => (
                   <span
                     key={`${char}-${index}`}
@@ -328,3 +396,4 @@ export const PhotoCoverSplit: React.FC = () => {
     </section>
   );
 };
+
