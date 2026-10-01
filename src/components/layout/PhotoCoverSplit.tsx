@@ -231,9 +231,10 @@ export const PhotoCoverSplit: React.FC = () => {
             className="flex flex-col items-center justify-center will-change-transform"
           >
             {/* Accessible H1 with letter spans for stagger animation */}
-            <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center overflow-hidden">
+            <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center py-2">
               <span className="sr-only">{heroContent.name}</span>
               <span aria-hidden="true" className="flex">
+
                 {nameLetters.map((char, index) => (
                   <span
                     key={`${char}-${index}`}

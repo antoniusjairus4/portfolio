@@ -96,10 +96,13 @@ body {
   font-family: 'Cinzel Decorative', 'Cinzel Variable', 'Cinzel', serif;
   font-size: clamp(3.2rem, 15vw, 20rem);
   font-weight: 700;
-  line-height: 0.85;
+  line-height: 1.05;
   letter-spacing: 0.02em;
   color: var(--color-hero-name);
+  padding-top: 0.1em;
+  padding-bottom: 0.1em;
 }
+
 
 
 .font-hero-role {
