@@ -93,13 +93,14 @@ body {
 
 /* Centre Content Typography */
 .font-hero-name {
-  font-family: 'Clash Display', system-ui, sans-serif;
-  font-size: clamp(3.8rem, 16.5vw, 22rem);
+  font-family: 'Cinzel Decorative', 'Cinzel Variable', 'Cinzel', serif;
+  font-size: clamp(3.2rem, 15vw, 20rem);
   font-weight: 700;
-  line-height: 0.82;
-  letter-spacing: -0.03em;
+  line-height: 0.85;
+  letter-spacing: 0.02em;
   color: var(--color-hero-name);
 }
+
 
 .font-hero-role {
   font-family: 'Satoshi', system-ui, sans-serif;

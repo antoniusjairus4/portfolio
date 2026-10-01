@@ -1,7 +1,10 @@
 import type { Metadata } from 'next';
 import type React from 'react';
+import '@fontsource/cinzel-decorative/700.css';
+import '@fontsource-variable/cinzel';
 import '@/styles/globals.css';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
+
 
 
 export const metadata: Metadata = {
