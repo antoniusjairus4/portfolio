@@ -57,8 +57,8 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
         expect(stepInfo.leftTransform).not.toBe('matrix(1, 0, 0, 1, 0, 0)');
         expect(stepInfo.textOpacity).toBeGreaterThan(0.8);
       } else if (p === 1.0) {
-        // Exit complete: Text faded out
-        expect(stepInfo.textOpacity).toBeLessThan(0.2);
+        // Exit complete: Photo halves off-screen, text steady
+        expect(stepInfo.textOpacity).toBeGreaterThan(0.8);
       }
     }
   });

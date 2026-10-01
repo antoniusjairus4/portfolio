@@ -116,37 +116,17 @@ export const PhotoCoverSplit: React.FC = () => {
 
         // --- BEAT C: The Exit (55% -> 100%) ---
         // Halves slide completely off-screen (-100% / +100%)
+        // Text remains steady at resting scale (1.0x) without zooming bigger
         tl.to(
           leftHalfRef.current,
           { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
           0.55
-        )
-          .to(
-            rightHalfRef.current,
-            { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
-            0.55
-          )
-          // Text scales up from 1x to 3.5x and letter-spacing opens
-          .to(
-            contentWrapperRef.current,
-            {
-              scale: 3.5,
-              letterSpacing: '0.08em',
-              ease: 'power2.in',
-              duration: 0.45,
-            },
-            0.55
-          )
-          // Text fades out as scale passes ~3x (75% -> 100%)
-          .to(
-            contentWrapperRef.current,
-            {
-              opacity: 0,
-              ease: 'power2.in',
-              duration: 0.25,
-            },
-            0.75
-          );
+        ).to(
+          rightHalfRef.current,
+          { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
+          0.55
+        );
+
       }, containerRef);
     };
 
