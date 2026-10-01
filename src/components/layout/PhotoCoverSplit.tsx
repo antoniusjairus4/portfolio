@@ -5,6 +5,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useEffect, useRef, useState } from 'react';
 import { heroContent } from '@/content/heroContent';
 import { SCROLL_STORY } from '@/motion/tokens';
+import { BakeResult, LetterBox } from './collapse/bakePhysics';
+import { createPhysicsCollapseController, PhysicsCollapseController } from './collapse/usePhysicsCollapse';
+import { PhysicsDebugOverlay } from './collapse/PhysicsDebugOverlay';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -12,29 +15,110 @@ if (typeof window !== 'undefined') {
   (window as unknown as { ScrollTrigger: typeof ScrollTrigger }).ScrollTrigger = ScrollTrigger;
 }
 
-
 export const PhotoCoverSplit: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const leftHalfRef = useRef<HTMLDivElement>(null);
   const rightHalfRef = useRef<HTMLDivElement>(null);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
+  const pageBgRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const rolesRef = useRef<(HTMLLIElement | null)[]>([]);
+  const roleLettersRef = useRef<Map<string, HTMLSpanElement | null>>(new Map());
   const scrollCueRef = useRef<HTMLDivElement>(null);
 
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const [collapseProgress, setCollapseProgress] = useState(0);
+  const [bakedFrameIndex, setBakedFrameIndex] = useState(0);
+  const [debugConfig, setDebugConfig] = useState<{ enabled: boolean }>({ enabled: false });
+
+  const controllerRef = useRef<PhysicsCollapseController | null>(null);
+  const letterMapRef = useRef<Map<string, HTMLElement>>(new Map());
+  const [bakeState, setBakeState] = useState<{ result: BakeResult | null; timeMs: number; isBaking: boolean }>({
+    result: null,
+    timeMs: 0,
+    isBaking: false,
+  });
 
   useEffect(() => {
     try {
       const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
       setIsReducedMotion(mediaQuery.matches);
+
+      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('physDebug') === '1') {
+          setDebugConfig({ enabled: true });
+        }
+      }
     } catch {
       // Fallback
     }
   }, []);
 
+  const nameLetters = heroContent.name.split('');
+
+  // Measure letter boxes & bake physics simulation
+  const performBake = () => {
+    if (isReducedMotion || !containerRef.current) return;
+
+    if (!controllerRef.current) {
+      controllerRef.current = createPhysicsCollapseController();
+    }
+
+    const boxes: LetterBox[] = [];
+    const elementsMap = new Map<string, HTMLElement>();
+
+    // 1. Name Letters
+    nameLetters.forEach((char, index) => {
+      const id = `name-${index}`;
+      const el = lettersRef.current[index];
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        boxes.push({
+          id,
+          char,
+          x: rect.left,
+          y: rect.top,
+          width: rect.width,
+          height: rect.height,
+          isName: true,
+        });
+        elementsMap.set(id, el);
+      }
+    });
+
+    // 2. Role Letters
+    heroContent.roles.forEach((role, rIdx) => {
+      role.split('').forEach((char, cIdx) => {
+        const id = `role-${rIdx}-${cIdx}`;
+        const el = roleLettersRef.current.get(id);
+        if (el && char !== ' ') {
+          const rect = el.getBoundingClientRect();
+          boxes.push({
+            id,
+            char,
+            x: rect.left,
+            y: rect.top,
+            width: rect.width,
+            height: rect.height,
+            isName: false,
+          });
+          elementsMap.set(id, el);
+        }
+      });
+    });
+
+    letterMapRef.current = elementsMap;
+
+    const result = controllerRef.current.bake(window.innerWidth, window.innerHeight, boxes);
+    setBakeState({
+      result,
+      timeMs: controllerRef.current.bakeTimeMs,
+      isBaking: false,
+    });
+  };
+
   useEffect(() => {
-    if (!containerRef.current || isReducedMotion) return;
+    if (!containerRef.current) return;
 
     let ctx: gsap.Context | null = null;
     let cancelled = false;
@@ -42,15 +126,34 @@ export const PhotoCoverSplit: React.FC = () => {
     const initAnimation = () => {
       if (cancelled) return;
       ctx = gsap.context(() => {
-
         // Force 3D hardware acceleration
         gsap.set([leftHalfRef.current, rightHalfRef.current, contentWrapperRef.current], {
           force3D: true,
         });
 
+        // Reduced motion path
+        if (isReducedMotion) {
+          gsap.set(lettersRef.current, { yPercent: 0, opacity: 1 });
+
+          gsap.timeline({
+            scrollTrigger: {
+              trigger: containerRef.current,
+              start: 'top top',
+              end: `+=${SCROLL_STORY.totalDistanceVh}%`,
+              pin: true,
+              scrub: 0.5,
+            },
+          })
+            .to([leftHalfRef.current, rightHalfRef.current], { xPercent: -100, duration: 0.6 }, 0)
+            .to(pageBgRef.current, { opacity: 0, duration: 0.4 }, 0.6);
+
+          return;
+        }
+
         // Initial text states before Beat A
         gsap.set(lettersRef.current, { yPercent: 120, opacity: 0 });
-        gsap.set(rolesRef.current, { yPercent: 60, opacity: 0 });
+        const allRoleLetterEls = Array.from(roleLettersRef.current.values()).filter(Boolean);
+        gsap.set(allRoleLetterEls, { yPercent: 60, opacity: 0 });
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -62,80 +165,119 @@ export const PhotoCoverSplit: React.FC = () => {
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
+              // Fade out scroll cue before Beat D begins
               if (self.progress > 0.02 && scrollCueRef.current) {
                 gsap.to(scrollCueRef.current, { opacity: 0, duration: 0.3 });
+              }
+
+              // Beat D Physics Collapse Progress (holdEnd -> 1.00)
+              const holdEnd = SCROLL_STORY.beats.holdEnd;
+              if (self.progress >= holdEnd) {
+                const p = (self.progress - holdEnd) / (1.0 - holdEnd);
+                const clampedP = Math.min(Math.max(p, 0), 1);
+                setCollapseProgress(clampedP);
+
+                // Background image cross-fade during collapse
+                if (pageBgRef.current) {
+                  pageBgRef.current.style.opacity = String(1.0 - clampedP);
+                }
+
+                // Apply baked physics transforms
+                if (controllerRef.current && controllerRef.current.bakeResult) {
+                  controllerRef.current.applyFrame(clampedP, letterMapRef.current);
+                  const totalF = controllerRef.current.bakeResult.totalFrames;
+                  setBakedFrameIndex(Math.floor(clampedP * (totalF - 1)));
+                }
+              } else {
+                setCollapseProgress(0);
+                setBakedFrameIndex(0);
+
+                if (pageBgRef.current) {
+                  pageBgRef.current.style.opacity = '1';
+                }
+
+                if (controllerRef.current) {
+                  controllerRef.current.resetTransforms(letterMapRef.current);
+                }
               }
             },
           },
         });
 
-        // --- BEAT A: The Reveal (0% -> 35%) ---
-        // Halves slide to 50% partial opening
+        // --- BEAT A: The Reveal (0% -> 22%) ---
         tl.to(
           leftHalfRef.current,
-          { xPercent: -50, ease: 'power2.inOut', duration: 0.35 },
+          { xPercent: -50, ease: 'power2.inOut', duration: 0.22 },
           0
         )
           .to(
             rightHalfRef.current,
-            { xPercent: 50, ease: 'power2.inOut', duration: 0.35 },
+            { xPercent: 50, ease: 'power2.inOut', duration: 0.22 },
             0
           )
-          // Staggered name letters rise & fade in
           .to(
             lettersRef.current,
             {
               yPercent: 0,
               opacity: 1,
-              stagger: 0.04,
+              stagger: 0.03,
               ease: 'power3.out',
-              duration: 0.25,
+              duration: 0.15,
             },
-            0.05
+            0.03
           )
-          // Staggered 3 role lines fade & rise in
           .to(
-            rolesRef.current,
+            allRoleLetterEls,
             {
               yPercent: 0,
               opacity: 1,
-              stagger: 0.06,
+              stagger: 0.015,
               ease: 'power2.out',
-              duration: 0.2,
+              duration: 0.12,
             },
-            0.15
+            0.08
           );
 
-        // --- BEAT B: The Read (35% -> 55%) ---
-        // Stable rest position for reading; no major motion changes
+        // --- BEAT B: The Read (22% -> 35%) ---
         tl.to(
           [leftHalfRef.current, rightHalfRef.current],
-          { duration: 0.2 },
+          { duration: 0.13 },
+          0.22
+        );
+
+        // --- BEAT C: The Exit (35% -> 60%) ---
+        tl.to(
+          leftHalfRef.current,
+          { xPercent: -100, ease: 'power2.inOut', duration: 0.25 },
+          0.35
+        ).to(
+          rightHalfRef.current,
+          { xPercent: 100, ease: 'power2.inOut', duration: 0.25 },
           0.35
         );
 
-        // --- BEAT C: The Exit (55% -> 100%) ---
-        // Halves slide completely off-screen (-100% / +100%)
-        // Text remains steady at resting scale (1.0x) without zooming bigger
-        tl.to(
-          leftHalfRef.current,
-          { xPercent: -100, ease: 'power2.inOut', duration: 0.45 },
-          0.55
-        ).to(
-          rightHalfRef.current,
-          { xPercent: 100, ease: 'power2.inOut', duration: 0.45 },
-          0.55
-        );
+        // --- CLEAN HOLD (60% -> 64%) ---
+        tl.to(contentWrapperRef.current, { duration: 0.04 }, 0.60);
 
       }, containerRef);
     };
 
-    // Ensure fonts are fully loaded before measuring SplitText letters
     if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(initAnimation);
+      document.fonts.ready.then(() => {
+        initAnimation();
+        performBake();
+      });
     } else {
       initAnimation();
+      performBake();
     }
+
+    const handleResize = () => {
+      performBake();
+      ScrollTrigger.refresh();
+    };
+
+    window.addEventListener('resize', handleResize);
 
     const timer = setTimeout(() => {
       ScrollTrigger.refresh();
@@ -144,10 +286,10 @@ export const PhotoCoverSplit: React.FC = () => {
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      window.removeEventListener('resize', handleResize);
       if (ctx) (ctx as gsap.Context).revert();
     };
   }, [isReducedMotion]);
-
 
   // Pre-decode revealed background image after page load
   useEffect(() => {
@@ -158,33 +300,34 @@ export const PhotoCoverSplit: React.FC = () => {
     }
   }, []);
 
-  // Keyboard Navigation: Enter/Space/ArrowDown advance by beats, ArrowUp goes back
+  // Keyboard Navigation: Enter/Space/ArrowDown advance beat-by-beat, ArrowUp reverses
   const handleKeyDown = (e: React.KeyboardEvent) => {
     const vh = window.innerHeight;
     const currentScroll = window.scrollY;
+    const totalDist = vh * (SCROLL_STORY.totalDistanceVh / 100);
 
     if (['Enter', ' ', 'ArrowDown'].includes(e.key)) {
       e.preventDefault();
-      if (currentScroll < vh * 1.0) {
-        window.scrollTo({ top: vh * 1.22, behavior: 'smooth' }); // Beat A -> B (35%)
-      } else if (currentScroll < vh * 2.0) {
-        window.scrollTo({ top: vh * 3.5, behavior: 'smooth' }); // Beat B -> C (100%)
+      if (currentScroll < totalDist * 0.22) {
+        window.scrollTo({ top: totalDist * 0.28, behavior: 'smooth' }); // Beat A -> B
+      } else if (currentScroll < totalDist * 0.50) {
+        window.scrollTo({ top: totalDist * 0.62, behavior: 'smooth' }); // Beat B -> C/Hold
+      } else if (currentScroll < totalDist * 0.95) {
+        window.scrollTo({ top: totalDist, behavior: 'smooth' }); // Beat C -> D (Collapse complete)
       } else {
-        window.scrollTo({ top: vh * 4.5, behavior: 'smooth' }); // To Placeholder
+        window.scrollTo({ top: totalDist + vh, behavior: 'smooth' }); // To Placeholder
       }
     } else if (e.key === 'ArrowUp') {
       if (currentScroll > 0) {
         e.preventDefault();
-        if (currentScroll > vh * 2.0) {
-          window.scrollTo({ top: vh * 1.22, behavior: 'smooth' });
+        if (currentScroll > totalDist * 0.6) {
+          window.scrollTo({ top: totalDist * 0.28, behavior: 'smooth' });
         } else {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
       }
     }
   };
-
-  const nameLetters = heroContent.name.split('');
 
   return (
     <section
@@ -194,9 +337,23 @@ export const PhotoCoverSplit: React.FC = () => {
       className="relative w-full h-[100svh] overflow-hidden bg-[#0C0907] outline-none select-none"
       aria-label="Full-screen photo cover. Use arrow keys or scroll to reveal portfolio story."
     >
+      {/* Dev-only Debug Overlay */}
+      {debugConfig.enabled && (
+        <PhysicsDebugOverlay
+          scrollProgress={collapseProgress}
+          bakedFrameIndex={bakedFrameIndex}
+          bakeResult={bakeState.result}
+          bakeTimeMs={bakeState.timeMs}
+          isBaking={bakeState.isBaking}
+        />
+      )}
+
       {/* Centre Content Layer (Beneath Photo Halves) */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-        {/* Revealed Background Image (Static, lower priority load) */}
+      <div
+        ref={pageBgRef}
+        className="absolute inset-0 w-full h-full z-0 overflow-hidden transition-opacity duration-75"
+      >
+        {/* Revealed Background Image */}
         <picture className="absolute inset-0 w-full h-full">
           <source
             srcSet="/images/hero/after_split-1672.avif 1672w, /images/hero/after_split-1280.avif 1280w"
@@ -214,7 +371,7 @@ export const PhotoCoverSplit: React.FC = () => {
           />
         </picture>
 
-        {/* Static Darkening Scrim & Radial Glow for High WCAG Contrast */}
+        {/* Static Darkening Scrim */}
         <div
           className="absolute inset-0 w-full h-full pointer-events-none"
           style={{
@@ -222,48 +379,53 @@ export const PhotoCoverSplit: React.FC = () => {
               'radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.65) 0%, rgba(12, 9, 7, 0.88) 100%)',
           }}
         />
+      </div>
 
-        {/* Text Layer Centred on both axes */}
-        <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center z-10">
-          {/* Scalable Text Wrapper */}
-          <div
-            ref={contentWrapperRef}
-            className="flex flex-col items-center justify-center will-change-transform"
-          >
-            {/* Accessible H1 with letter spans for stagger animation */}
-            <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center py-2">
-              <span className="sr-only">{heroContent.name}</span>
-              <span aria-hidden="true" className="flex">
-
-                {nameLetters.map((char, index) => (
-                  <span
-                    key={`${char}-${index}`}
-                    ref={(el) => {
-                      lettersRef.current[index] = el;
-                    }}
-                    className="inline-block will-change-transform"
-                  >
-                    {char}
-                  </span>
-                ))}
-              </span>
-            </h1>
-
-            {/* Semantic 3-Role List */}
-            <ul className="list-none p-0 m-0 mt-3 sm:mt-5 flex flex-col items-center gap-1 sm:gap-2">
-              {heroContent.roles.map((role, index) => (
-                <li
-                  key={role}
+      {/* Text Layer Centred on both axes */}
+      <div className="absolute inset-0 w-full h-full flex flex-col items-center justify-center p-4 text-center z-10 pointer-events-none">
+        {/* Scalable Text Wrapper */}
+        <div
+          ref={contentWrapperRef}
+          className="flex flex-col items-center justify-center will-change-transform"
+        >
+          {/* Accessible H1 with letter spans */}
+          <h1 className="font-hero-name tracking-tighter m-0 p-0 flex justify-center py-2">
+            <span className="sr-only">{heroContent.name}</span>
+            <span aria-hidden="true" className="flex">
+              {nameLetters.map((char, index) => (
+                <span
+                  key={`${char}-${index}`}
                   ref={(el) => {
-                    rolesRef.current[index] = el;
+                    lettersRef.current[index] = el;
                   }}
-                  className="font-hero-role tracking-wide will-change-transform"
+                  className="inline-block will-change-transform"
                 >
-                  {role}
-                </li>
+                  {char}
+                </span>
               ))}
-            </ul>
-          </div>
+            </span>
+          </h1>
+
+          {/* Semantic 3-Role List */}
+          <ul className="list-none p-0 m-0 mt-3 sm:mt-5 flex flex-col items-center gap-1 sm:gap-2">
+            {heroContent.roles.map((role, rIdx) => (
+              <li key={role} className="font-hero-role tracking-wide">
+                <span aria-hidden="true" className="inline-flex">
+                  {role.split('').map((char, cIdx) => (
+                    <span
+                      key={`${role}-${cIdx}`}
+                      ref={(el) => {
+                        roleLettersRef.current.set(`role-${rIdx}-${cIdx}`, el);
+                      }}
+                      className="inline-block will-change-transform whitespace-pre"
+                    >
+                      {char}
+                    </span>
+                  ))}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 
@@ -293,7 +455,7 @@ export const PhotoCoverSplit: React.FC = () => {
         </picture>
       </div>
 
-      {/* Right Image Half (aria-hidden duplicate) */}
+      {/* Right Image Half */}
       <div
         ref={rightHalfRef}
         aria-hidden="true"

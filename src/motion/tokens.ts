@@ -16,13 +16,17 @@ export const COLOR_TOKENS = {
   ember: '#E8481F',
 } as const;
 
-// Phase 2: Pinned Scroll Story Beats & Distances
+// Phase 3: Typographic Physics Collapse Story Beats & Distances
+export const COLLAPSE_SCROLL_DISTANCE_VH = 200; // 2.0 viewport heights allocated for Beat D
+
 export const SCROLL_STORY = {
-  totalDistanceVh: 350,
+  totalDistanceVh: 550, // 5.5 viewport heights of total scroll pin
   beats: {
-    revealEnd: 0.35, // 0% to 35%: Photo split + text reveal
-    readEnd: 0.55,   // 35% to 55%: Rest & read stable text
-    exitEnd: 1.00,   // 55% to 100%: Halves off-screen + text scale up/fade
+    revealEnd: 0.22, // Beat A: 0% to 22% (photo halves split & text reveals)
+    readEnd: 0.35,   // Beat B: 22% to 35% (rest & read intact name page)
+    exitEnd: 0.60,   // Beat C: 35% to 60% (halves slide off-screen; text stays rest & intact)
+    holdEnd: 0.64,   // Clean Hold: 60% to 64% (~5% scroll story hold)
+    collapseEnd: 1.00, // Beat D: 64% to 100% (Physics collapse & background crossfade)
   },
 } as const;
 
