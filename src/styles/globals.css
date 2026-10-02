@@ -90,13 +90,13 @@
 }
 
 [data-venture="neuroshield"] {
-  --v-bg: #04070F;
+  --v-bg: #000000;
   --v-surface: #0D1829;
   --v-text: #D4E8F5;
   --v-muted: #4A6A8A;
   --v-accent: #3FD0FF;
   --v-accent2: #7DF9FF;
-  --v-on-accent: #04070F;
+  --v-on-accent: #000000;
   --v-danger: #FF4A4A;
   --v-font: 'Space Grotesk', sans-serif;
   --v-radius: 0px;
