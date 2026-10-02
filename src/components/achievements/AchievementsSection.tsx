@@ -3,6 +3,7 @@
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useEffect, useRef, useState } from 'react';
+import LiquidEther from '@/components/backgrounds/LiquidEther';
 import { achievementsContent } from '@/content/achievements';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -68,25 +69,41 @@ export const AchievementsSection: React.FC = () => {
     <section
       id="achievements-section"
       ref={containerRef}
-      className="relative w-full min-h-[100svh] bg-[#0C0907] text-[#F2E9D8] overflow-hidden flex flex-col justify-between p-6 md:p-12 select-none border-t border-white/5"
-      style={{
-        background:
-          'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.05) 0%, rgba(12, 9, 7, 1) 80%)',
-      }}
+      className="relative w-full h-screen min-h-[100vh] bg-black text-[#F2E9D8] overflow-hidden select-none border-t border-white/5"
     >
-      {/* Header Label */}
-      <div className="relative z-10 flex items-center justify-between">
+      {/* LiquidEther WebGL Fluid Simulation Background */}
+      <div className="absolute inset-0 z-0 pointer-events-auto">
+        <LiquidEther
+          colors={['#E0A93B', '#F5D061', '#9A6B1F']}
+          mouseForce={12}
+          cursorSize={90}
+          isViscous={false}
+          viscous={30}
+          iterationsViscous={32}
+          iterationsPoisson={32}
+          resolution={0.5}
+          isBounce={false}
+          autoDemo={true}
+          autoSpeed={0.25}
+          autoIntensity={1.0}
+          takeoverDuration={0.4}
+          autoResumeDelay={3000}
+          autoRampDuration={1.2}
+        />
+      </div>
+
+      {/* Top Header Label */}
+      <div className="absolute top-6 left-6 right-6 md:top-10 md:left-12 md:right-12 z-10 flex items-center justify-between pointer-events-none">
         <p className="text-xs uppercase tracking-[0.25em] font-mono text-[#E0A93B] opacity-80">
           CRAFT & DISCIPLINE / ACHIEVEMENTS
         </p>
         <span className="text-xs font-mono text-white/40">05 DISCIPLINES</span>
       </div>
 
-      {/* Spatial 2D Diagram Layout Stage */}
-      <div className="relative w-full flex-1 min-h-[70vh] my-4">
+      {/* Spatial Stage (5 Synchronized Positions: 4 Corners + Exact Center) */}
+      <div className="relative z-10 w-full h-full pointer-events-none">
         {achievementsContent.map((item, idx) => {
           const isCenter = item.id === 'table-tennis';
-          const isHovered = activeItem === item.id;
 
           return (
             <div
@@ -94,51 +111,30 @@ export const AchievementsSection: React.FC = () => {
               ref={(el) => {
                 itemsRef.current[idx] = el;
               }}
-              onMouseEnter={() => setActiveItem(item.id)}
-              onMouseLeave={() => setActiveItem(null)}
-              className="absolute -translate-x-1/2 -translate-y-1/2 cursor-pointer group transition-all duration-300"
+              className="absolute pointer-events-auto"
               style={{
                 top: item.position.top,
                 left: item.position.left,
-                transform: `translate(-50%, -50%) rotate(${item.rotationDeg}deg)`,
+                transform: 'translate(-50%, -50%)', // Completely straight 0-deg rotation
               }}
             >
-              <div
-                className="flex flex-col items-center text-center p-2 transition-all duration-300"
-              >
-                <span className="text-[11px] uppercase font-mono tracking-[0.2em] text-[#E0A93B] mb-2 opacity-80">
-                  {item.category}
-                </span>
-
+              <div className="flex flex-col items-center text-center p-2">
                 <h3
-                  className={`tracking-tight leading-none ${
-                    isCenter ? 'text-5xl md:text-8xl text-[#FFF4E0]' : 'text-4xl md:text-7xl text-[#F2E9D8]'
-                  } group-hover:text-[#E0A93B] group-hover:scale-110 transition-all duration-300`}
+                  className={`tracking-tight leading-none whitespace-nowrap ${
+                    isCenter ? 'text-6xl md:text-8xl lg:text-9xl text-[#FFF4E0]' : 'text-4xl md:text-6xl lg:text-7xl text-[#F2E9D8]'
+                  }`}
                   style={{
                     fontFamily: item.fontFamily,
                   }}
                 >
                   {item.title}
                 </h3>
-
-                <p className="text-xs md:text-sm font-mono opacity-60 mt-3 max-w-[16rem]">
-                  {item.subtitle}
-                </p>
-
-                <span className="text-[9px] font-mono text-white/30 mt-1 uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
-                  FONT: {item.fontName}
-                </span>
               </div>
             </div>
           );
         })}
       </div>
-
-      {/* Footer hint */}
-      <div className="relative z-10 flex items-center justify-between text-xs font-mono opacity-40">
-        <span>INTERACTIVE SPATIAL DIAGRAM</span>
-        <span>HOVER TO EXPLORE</span>
-      </div>
     </section>
   );
 };
+

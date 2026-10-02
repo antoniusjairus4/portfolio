@@ -18,7 +18,7 @@ export const achievementsContent: AchievementItem[] = [
     title: 'Table Tennis',
     subtitle: '2x Tamil Nadu State Champion',
     category: 'Athletics',
-    position: { top: '50%', left: '50%' }, // Center focal point
+    position: { top: '50%', left: '50%' }, // Exact Center
     rotationDeg: 0,
     fontFamily: "'Syne Tactile', cursive",
     fontName: 'Syne Tactile (Expressive Script)',
@@ -28,7 +28,7 @@ export const achievementsContent: AchievementItem[] = [
     title: 'Speaking',
     subtitle: 'Keynote & Oratory Speaker',
     category: 'Leadership',
-    position: { top: '22%', left: '16%' }, // Top-Left
+    position: { top: '20%', left: '20%' }, // Top-Left Corner
     rotationDeg: 0,
     fontFamily: "'Syne Tactile', cursive",
     fontName: 'Syne Tactile (Expressive Script)',
@@ -38,7 +38,7 @@ export const achievementsContent: AchievementItem[] = [
     title: 'Karate',
     subtitle: 'Black Belt Martial Artist',
     category: 'Discipline',
-    position: { top: '18%', left: '80%' }, // Top-Right
+    position: { top: '20%', left: '80%' }, // Top-Right Corner
     rotationDeg: 0,
     fontFamily: "'Syne Tactile', cursive",
     fontName: 'Syne Tactile (Expressive Script)',
@@ -48,7 +48,7 @@ export const achievementsContent: AchievementItem[] = [
     title: 'Chess',
     subtitle: 'Competitive Tactical Player',
     category: 'Strategy',
-    position: { top: '78%', left: '20%' }, // Bottom-Left
+    position: { top: '80%', left: '20%' }, // Bottom-Left Corner
     rotationDeg: 0,
     fontFamily: "'Syne Tactile', cursive",
     fontName: 'Syne Tactile (Expressive Script)',
@@ -58,7 +58,7 @@ export const achievementsContent: AchievementItem[] = [
     title: 'Music',
     subtitle: 'Instrumental & Acoustic Artist',
     category: 'Arts',
-    position: { top: '82%', left: '84%' }, // Bottom-Right
+    position: { top: '80%', left: '80%' }, // Bottom-Right Corner
     rotationDeg: 0,
     fontFamily: "'Syne Tactile', cursive",
     fontName: 'Syne Tactile (Expressive Script)',

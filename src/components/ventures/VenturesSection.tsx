@@ -184,12 +184,7 @@ export const VenturesSection: React.FC = () => {
       ref={rootRef}
       id="page-1-placeholder"
       data-venture={activeTheme || undefined}
-      className="relative w-full min-h-[100svh] bg-[#0C0907] transition-colors duration-500 text-[#F2E9D8] select-none overflow-hidden flex flex-col justify-center px-6 md:px-16 py-12"
-      style={{
-        background: activeTheme
-          ? undefined
-          : 'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.08) 0%, rgba(12, 9, 7, 1) 75%)',
-      }}
+      className="relative w-full min-h-[100svh] bg-black transition-colors duration-500 text-[#F2E9D8] select-none overflow-hidden flex flex-col justify-center px-6 md:px-16 py-12"
     >
       {/* Dynamic Hover Flood Background Layer */}
       <div
