@@ -22,6 +22,13 @@ const KAIFORGE_IMAGES = [
   '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-26-45.png',
 ];
 
+const NEUROSHIELD_IMAGES = [
+  '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-26.png',
+  '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-32.png',
+  '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-40.png',
+  '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-47.png',
+];
+
 export const VenturesSection: React.FC = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const clipLayerRef = useRef<HTMLDivElement>(null);
@@ -70,9 +77,9 @@ export const VenturesSection: React.FC = () => {
     return () => ctx.revert();
   }, [isReducedMotion]);
 
-  // Setup Explosive Kinetic Parallax Explosion on Palindrome / KaiForge Hover
+  // Setup Explosive Kinetic Parallax Explosion on Palindrome / KaiForge / NeuroShield Hover
   useEffect(() => {
-    if ((activeSlug !== 'palindrome' && activeSlug !== 'kaiforge') || !stackRef.current) return;
+    if (!activeSlug || !stackRef.current) return;
 
     const cards = stackRef.current.querySelectorAll('.kinetic-card');
     xQuickRefs.current = [];
@@ -305,17 +312,24 @@ export const VenturesSection: React.FC = () => {
         </div>
       )}
 
-      {/* Single Fallback Preview for NeuroShield until images are added */}
-      {activeSlug && activeSlug !== 'palindrome' && activeSlug !== 'kaiforge' && (
-        <div className="pointer-events-none fixed right-12 top-1/2 -translate-y-1/2 z-20 w-80 md:w-96 rounded-2xl overflow-hidden shadow-2xl border border-black/20 transition-all duration-300">
-          <img
-            src={`/images/ventures/${activeSlug}/preview.png`}
-            alt={`${activeSlug} preview`}
-            className="w-full h-auto object-cover"
-            onError={(e) => {
-              (e.target as HTMLElement).style.display = 'none';
-            }}
-          />
+      {/* Kinetic Parallax Stack Container on NeuroShield Hover */}
+      {activeSlug === 'neuroshield' && (
+        <div
+          ref={stackRef}
+          className="pointer-events-none fixed right-[20%] top-1/2 -translate-y-1/2 z-20 w-80 md:w-[28rem] h-64 md:h-80"
+        >
+          {NEUROSHIELD_IMAGES.map((src, idx) => (
+            <div
+              key={`${src}-${idx}`}
+              className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
+            >
+              <img
+                src={src}
+                alt={`NeuroShield Screenshot ${idx + 1}`}
+                className="w-full h-auto object-cover rounded-xl"
+              />
+            </div>
+          ))}
         </div>
       )}
     </div>
