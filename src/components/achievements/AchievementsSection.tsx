@@ -70,6 +70,10 @@ export const AchievementsSection: React.FC = () => {
       id="achievements-section"
       ref={containerRef}
       className="relative w-full h-screen min-h-[100vh] bg-black text-[#F2E9D8] overflow-hidden select-none border-t border-white/5"
+      style={{
+        background:
+          'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.05) 0%, rgba(0, 0, 0, 1) 70%)',
+      }}
     >
       {/* LiquidEther WebGL Fluid Simulation Background */}
       <div className="absolute inset-0 z-0 pointer-events-auto">
