@@ -15,6 +15,13 @@ const PALINDROME_IMAGES = [
   '/images/ventures/palindrome/Screenshot From 2026-10-02 14-19-41.png',
 ];
 
+const KAIFORGE_IMAGES = [
+  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-07.png',
+  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-22.png',
+  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-38.png',
+  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-26-45.png',
+];
+
 export const VenturesSection: React.FC = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const clipLayerRef = useRef<HTMLDivElement>(null);
@@ -63,9 +70,9 @@ export const VenturesSection: React.FC = () => {
     return () => ctx.revert();
   }, [isReducedMotion]);
 
-  // Setup Explosive Kinetic Parallax Explosion on Palindrome Hover
+  // Setup Explosive Kinetic Parallax Explosion on Palindrome / KaiForge Hover
   useEffect(() => {
-    if (activeSlug !== 'palindrome' || !stackRef.current) return;
+    if ((activeSlug !== 'palindrome' && activeSlug !== 'kaiforge') || !stackRef.current) return;
 
     const cards = stackRef.current.querySelectorAll('.kinetic-card');
     xQuickRefs.current = [];
@@ -128,7 +135,7 @@ export const VenturesSection: React.FC = () => {
 
       cards.forEach((_, idx) => {
         const base = explosiveOffsets[idx % 4];
-        const pushFactor = 35 + idx * 20; // Tightened push factor so cards never bleed off-screen
+        const pushFactor = 35 + idx * 20;
 
         if (xQuickRefs.current[idx]) xQuickRefs.current[idx]!(base.x + deltaX * pushFactor);
         if (yQuickRefs.current[idx]) yQuickRefs.current[idx]!(base.y + deltaY * pushFactor);
@@ -277,8 +284,29 @@ export const VenturesSection: React.FC = () => {
         </div>
       )}
 
-      {/* Single Fallback Preview for KaiForge / NeuroShield */}
-      {activeSlug && activeSlug !== 'palindrome' && (
+      {/* Kinetic Parallax Stack Container on KaiForge Hover */}
+      {activeSlug === 'kaiforge' && (
+        <div
+          ref={stackRef}
+          className="pointer-events-none fixed right-[20%] top-1/2 -translate-y-1/2 z-20 w-80 md:w-[28rem] h-64 md:h-80"
+        >
+          {KAIFORGE_IMAGES.map((src, idx) => (
+            <div
+              key={`${src}-${idx}`}
+              className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
+            >
+              <img
+                src={src}
+                alt={`KaiForge Screenshot ${idx + 1}`}
+                className="w-full h-auto object-cover rounded-xl"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Single Fallback Preview for NeuroShield until images are added */}
+      {activeSlug && activeSlug !== 'palindrome' && activeSlug !== 'kaiforge' && (
         <div className="pointer-events-none fixed right-12 top-1/2 -translate-y-1/2 z-20 w-80 md:w-96 rounded-2xl overflow-hidden shadow-2xl border border-black/20 transition-all duration-300">
           <img
             src={`/images/ventures/${activeSlug}/preview.png`}
