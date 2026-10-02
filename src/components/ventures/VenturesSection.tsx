@@ -8,12 +8,25 @@ import { VENTURE_THEMES } from '@/content/ventureThemes';
 
 gsap.registerPlugin(ScrollTrigger);
 
+const PALINDROME_IMAGES = [
+  '/images/ventures/palindrome/Screenshot From 2026-10-02 14-18-23.png',
+  '/images/ventures/palindrome/Screenshot From 2026-10-02 14-19-00.png',
+  '/images/ventures/palindrome/Screenshot From 2026-10-02 14-19-25.png',
+  '/images/ventures/palindrome/Screenshot From 2026-10-02 14-19-41.png',
+];
+
 export const VenturesSection: React.FC = () => {
   const rootRef = useRef<HTMLDivElement>(null);
   const clipLayerRef = useRef<HTMLDivElement>(null);
+  const stackRef = useRef<HTMLDivElement>(null);
+
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
+
+  // GSAP quickTo setters for ultra-smooth 60fps cursor parallax
+  const xQuickRefs = useRef<(Function | null)[]>([]);
+  const yQuickRefs = useRef<(Function | null)[]>([]);
 
   useEffect(() => {
     try {
@@ -22,7 +35,7 @@ export const VenturesSection: React.FC = () => {
     } catch {}
   }, []);
 
-  // Set up GSAP ScrollTriggers for index entrance animation
+  // Entrance animation for list items
   useEffect(() => {
     if (!rootRef.current || isReducedMotion) return;
 
@@ -49,6 +62,85 @@ export const VenturesSection: React.FC = () => {
 
     return () => ctx.revert();
   }, [isReducedMotion]);
+
+  // Setup Explosive Kinetic Parallax Explosion on Palindrome Hover
+  useEffect(() => {
+    if (activeSlug !== 'palindrome' || !stackRef.current) return;
+
+    const cards = stackRef.current.querySelectorAll('.kinetic-card');
+    xQuickRefs.current = [];
+    yQuickRefs.current = [];
+
+    // Explosive 3D scatter destinations safely bounded inside viewport
+    const explosiveOffsets = [
+      { x: 180, y: -220, r: -8, scale: 0.82 },
+      { x: 260, y: 30, r: 10, scale: 0.78 },
+      { x: 60, y: 220, r: -6, scale: 0.85 },
+      { x: -160, y: -240, r: 8, scale: 0.75 },
+    ];
+
+    // 1. Initial State: cards stacked directly one behind another at center origin
+    gsap.set(cards, {
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 0.4,
+      opacity: 0,
+    });
+
+    // 2. Explosive "Babb-BOOM" Scatter Timeline
+    cards.forEach((card, idx) => {
+      const target = explosiveOffsets[idx % 4];
+
+      gsap.to(card, {
+        x: target.x,
+        y: target.y,
+        rotation: target.r,
+        scale: target.scale,
+        opacity: 1,
+        duration: 0.8,
+        delay: idx * 0.05,
+        ease: 'back.out(1.8)',
+      });
+
+      // 3. Continuous floating bobbing motion after explosion
+      gsap.to(card, {
+        y: `+=${idx % 2 === 0 ? 12 : -12}`,
+        rotation: `+=${idx % 2 === 0 ? 2 : -2}`,
+        duration: 2.2 + idx * 0.4,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut',
+        delay: 0.8 + idx * 0.1,
+      });
+
+      // QuickTo interpolators for mouse drift
+      const inertia = 0.12 + idx * 0.08;
+      xQuickRefs.current.push(gsap.quickTo(card, 'x', { duration: inertia, ease: 'power2.out' }));
+      yQuickRefs.current.push(gsap.quickTo(card, 'y', { duration: inertia, ease: 'power2.out' }));
+    });
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      const deltaX = (e.clientX - centerX) / centerX;
+      const deltaY = (e.clientY - centerY) / centerY;
+
+      cards.forEach((_, idx) => {
+        const base = explosiveOffsets[idx % 4];
+        const pushFactor = 35 + idx * 20; // Tightened push factor so cards never bleed off-screen
+
+        if (xQuickRefs.current[idx]) xQuickRefs.current[idx]!(base.x + deltaX * pushFactor);
+        if (yQuickRefs.current[idx]) yQuickRefs.current[idx]!(base.y + deltaY * pushFactor);
+      });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [activeSlug]);
 
   // Hover theme flood & screenshot reveal handler
   const handleIndexHover = (e: React.MouseEvent<HTMLAnchorElement>, themeKey: string, slug: string) => {
@@ -164,15 +256,35 @@ export const VenturesSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Screenshot Preview Overlay on Hover */}
-      {activeSlug && (
+      {/* Kinetic Parallax Stack Container on Palindrome Hover */}
+      {activeSlug === 'palindrome' && (
+        <div
+          ref={stackRef}
+          className="pointer-events-none fixed right-[20%] top-1/2 -translate-y-1/2 z-20 w-80 md:w-[28rem] h-64 md:h-80"
+        >
+          {PALINDROME_IMAGES.map((src, idx) => (
+            <div
+              key={`${src}-${idx}`}
+              className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
+            >
+              <img
+                src={src}
+                alt={`Palindrome Screenshot ${idx + 1}`}
+                className="w-full h-auto object-cover rounded-xl"
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Single Fallback Preview for KaiForge / NeuroShield */}
+      {activeSlug && activeSlug !== 'palindrome' && (
         <div className="pointer-events-none fixed right-12 top-1/2 -translate-y-1/2 z-20 w-80 md:w-96 rounded-2xl overflow-hidden shadow-2xl border border-black/20 transition-all duration-300">
           <img
             src={`/images/ventures/${activeSlug}/preview.png`}
             alt={`${activeSlug} preview`}
             className="w-full h-auto object-cover"
             onError={(e) => {
-              // Hide fallback gracefully if image not yet uploaded
               (e.target as HTMLElement).style.display = 'none';
             }}
           />

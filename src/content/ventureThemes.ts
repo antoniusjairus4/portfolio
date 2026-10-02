@@ -15,12 +15,12 @@ export interface VentureTheme {
 export const VENTURE_THEMES: Record<VentureTheme['key'], VentureTheme> = {
   palindrome: {
     key: 'palindrome',
-    bg: '#FAF7F2',
-    surface: '#FFFFFF',
+    bg: '#FFFFFF', // Clean White Background
+    surface: '#F8FAFC',
     text: '#0F172A',
-    muted: '#64748B',
+    muted: '#475569',
     accent: '#6366F1',
-    accent2: '#A5B4FC',
+    accent2: '#818CF8',
     onAccent: '#FFFFFF',
     danger: '#EF4444',
     fontFamily: 'Inter, sans-serif',
@@ -28,10 +28,10 @@ export const VENTURE_THEMES: Record<VentureTheme['key'], VentureTheme> = {
   },
   kaiforge: {
     key: 'kaiforge',
-    bg: '#F4F6F9',
+    bg: '#E2E8F0', // Medium Light Blue/Slate
     surface: '#FFFFFF',
-    text: '#0B132B',
-    muted: '#5B6B83',
+    text: '#0F172A',
+    muted: '#475569',
     accent: '#0EA5E9',
     accent2: '#38BDF8',
     onAccent: '#FFFFFF',
@@ -41,12 +41,12 @@ export const VENTURE_THEMES: Record<VentureTheme['key'], VentureTheme> = {
   },
   neuroshield: {
     key: 'neuroshield',
-    bg: '#F0F7FF',
+    bg: '#F8FAFC', // Crisp Lightest Blue/White
     surface: '#FFFFFF',
-    text: '#0A192F',
-    muted: '#4A6A8A',
-    accent: '#00A8E8',
-    accent2: '#00C49F',
+    text: '#0284C7',
+    muted: '#64748B',
+    accent: '#0284C7',
+    accent2: '#38BDF8',
     onAccent: '#FFFFFF',
     danger: '#FF4A4A',
     fontFamily: '"Space Grotesk", sans-serif',
