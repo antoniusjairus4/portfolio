@@ -90,16 +90,16 @@
 }
 
 [data-venture="neuroshield"] {
-  --v-bg: #000000;
-  --v-surface: #0D1829;
-  --v-text: #D4E8F5;
+  --v-bg: #F0F7FF;
+  --v-surface: #FFFFFF;
+  --v-text: #0A192F;
   --v-muted: #4A6A8A;
-  --v-accent: #3FD0FF;
-  --v-accent2: #7DF9FF;
-  --v-on-accent: #000000;
+  --v-accent: #00A8E8;
+  --v-accent2: #00C49F;
+  --v-on-accent: #FFFFFF;
   --v-danger: #FF4A4A;
   --v-font: 'Space Grotesk', sans-serif;
-  --v-radius: 0px;
+  --v-radius: 4px;
 }
 
 html {
