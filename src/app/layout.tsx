@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import type React from 'react';
 import '@fontsource/cinzel-decorative/700.css';
 import '@fontsource-variable/cinzel';
+import '@fontsource/syne/800.css';
+import '@fontsource/syne-tactile';
+import '@fontsource/playfair-display/700.css';
+import '@fontsource/syncopate/700.css';
+import '@fontsource/unifrakturmaguntia';
 import '@/styles/globals.css';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
 

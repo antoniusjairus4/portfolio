@@ -3,6 +3,7 @@
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { Preloader } from '@/components/preloader/Preloader';
 import { VenturesSection } from '@/components/ventures/VenturesSection';
+import { AchievementsSection } from '@/components/achievements/AchievementsSection';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
 export default function Home() {
@@ -31,6 +32,9 @@ export default function Home() {
 
       {/* Page 1 Ventures Integrated Section */}
       <VenturesSection />
+
+      {/* Page 2 Achievements Spatial Diagram Section */}
+      <AchievementsSection />
     </main>
   );
 }
