@@ -62,6 +62,46 @@
   font-family: var(--font-display);
 }
 
+/* Scoped Venture Product Theme Takeovers */
+[data-venture="palindrome"] {
+  --v-bg: #FAF7F2;
+  --v-surface: #FFFFFF;
+  --v-text: #0F172A;
+  --v-muted: #64748B;
+  --v-accent: #6366F1;
+  --v-accent2: #A5B4FC;
+  --v-on-accent: #FFFFFF;
+  --v-danger: #EF4444;
+  --v-font: 'Inter', sans-serif;
+  --v-radius: 9999px;
+}
+
+[data-venture="kaiforge"] {
+  --v-bg: #F4F6F9;
+  --v-surface: #FFFFFF;
+  --v-text: #0B132B;
+  --v-muted: #5B6B83;
+  --v-accent: #0EA5E9;
+  --v-accent2: #38BDF8;
+  --v-on-accent: #FFFFFF;
+  --v-danger: #E11D48;
+  --v-font: 'Poppins', sans-serif;
+  --v-radius: 16px;
+}
+
+[data-venture="neuroshield"] {
+  --v-bg: #04070F;
+  --v-surface: #0D1829;
+  --v-text: #D4E8F5;
+  --v-muted: #4A6A8A;
+  --v-accent: #3FD0FF;
+  --v-accent2: #7DF9FF;
+  --v-on-accent: #04070F;
+  --v-danger: #FF4A4A;
+  --v-font: 'Space Grotesk', sans-serif;
+  --v-radius: 0px;
+}
+
 html {
   min-height: 100%;
   width: 100%;
