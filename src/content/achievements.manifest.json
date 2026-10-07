@@ -48,12 +48,94 @@
   "table-tennis": {
     "slug": "table-tennis",
     "title": "Table Tennis",
-    "photos": []
+    "photos": [
+      {
+        "id": "table-tennis-1",
+        "filename": "cup.png",
+        "originalPath": "/images/achievements/table-tennis/photo-1-1280.jpg",
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/table-tennis/photo-1-640.avif",
+            "webp": "/images/achievements/table-tennis/photo-1-640.webp",
+            "jpg": "/images/achievements/table-tennis/photo-1-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/table-tennis/photo-1-1280.avif",
+            "webp": "/images/achievements/table-tennis/photo-1-1280.webp",
+            "jpg": "/images/achievements/table-tennis/photo-1-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/table-tennis/photo-1-1920.avif",
+            "webp": "/images/achievements/table-tennis/photo-1-1920.webp",
+            "jpg": "/images/achievements/table-tennis/photo-1-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/table-tennis/photo-1-2560.avif",
+            "webp": "/images/achievements/table-tennis/photo-1-2560.webp",
+            "jpg": "/images/achievements/table-tennis/photo-1-2560.jpg"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRmgAAABXRUJQVlA4IFwAAAAQAgCdASoQABAABUB8JbACdADOoDZ7V7kAAP6MexltLLeXaRm4feYalvCt4UQ3EWrOlzzhoRcbdzAdVgY3p6tIeWid6Zur9apv9zH8qdy73sg6HkHfIMqy1JgAAA==",
+        "ambientBackdrop": "/images/achievements/table-tennis/photo-1-backdrop.webp",
+        "width": 349,
+        "height": 396,
+        "aspectRatio": 0.8813131313131313,
+        "isWide": false,
+        "isPortrait": true,
+        "focalPoint": [
+          0.5,
+          0.5
+        ],
+        "zoom": 1,
+        "alt": "Table Tennis photo 1"
+      }
+    ]
   },
   "karate": {
     "slug": "karate",
     "title": "Karate",
-    "photos": []
+    "photos": [
+      {
+        "id": "karate-1",
+        "filename": "beating_steve.png",
+        "originalPath": "/images/achievements/karate/photo-1-1280.jpg",
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/karate/photo-1-640.avif",
+            "webp": "/images/achievements/karate/photo-1-640.webp",
+            "jpg": "/images/achievements/karate/photo-1-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/karate/photo-1-1280.avif",
+            "webp": "/images/achievements/karate/photo-1-1280.webp",
+            "jpg": "/images/achievements/karate/photo-1-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/karate/photo-1-1920.avif",
+            "webp": "/images/achievements/karate/photo-1-1920.webp",
+            "jpg": "/images/achievements/karate/photo-1-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/karate/photo-1-2560.avif",
+            "webp": "/images/achievements/karate/photo-1-2560.webp",
+            "jpg": "/images/achievements/karate/photo-1-2560.jpg"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRmQAAABXRUJQVlA4IFgAAADQAQCdASoQABAABUB8JZACdADORjP4AAD9dn9yaYsZgl5UgzBDrJgfNEihhaEtEiiRZQ/g8tYisd/uYK3XTfhMXXtMGMJuT85vVNUDuCbdIi+/g8VhAAAA",
+        "ambientBackdrop": "/images/achievements/karate/photo-1-backdrop.webp",
+        "width": 1066,
+        "height": 911,
+        "aspectRatio": 1.1701427003293086,
+        "isWide": false,
+        "isPortrait": false,
+        "focalPoint": [
+          0.5,
+          0.5
+        ],
+        "zoom": 1,
+        "alt": "Karate photo 1"
+      }
+    ]
   },
   "chess": {
     "slug": "chess",
@@ -63,6 +145,47 @@
   "music": {
     "slug": "music",
     "title": "Music",
-    "photos": []
+    "photos": [
+      {
+        "id": "music-1",
+        "filename": "music.png",
+        "originalPath": "/images/achievements/music/photo-1-1280.jpg",
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/music/photo-1-640.avif",
+            "webp": "/images/achievements/music/photo-1-640.webp",
+            "jpg": "/images/achievements/music/photo-1-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/music/photo-1-1280.avif",
+            "webp": "/images/achievements/music/photo-1-1280.webp",
+            "jpg": "/images/achievements/music/photo-1-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/music/photo-1-1920.avif",
+            "webp": "/images/achievements/music/photo-1-1920.webp",
+            "jpg": "/images/achievements/music/photo-1-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/music/photo-1-2560.avif",
+            "webp": "/images/achievements/music/photo-1-2560.webp",
+            "jpg": "/images/achievements/music/photo-1-2560.jpg"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRnIAAABXRUJQVlA4IGYAAAAwAgCdASoQABAABUB8JbAAD5LPRKvtEnaDgAD+jhMZFx7mLT35pCrqioL+nDZkUOXAf6m5iLMNQCcPaMwUleyQVk64yYILbXBNo5mODrZpot8RxoSme5ccOtKFNtD8mf8KnZEkvAA=",
+        "ambientBackdrop": "/images/achievements/music/photo-1-backdrop.webp",
+        "width": 380,
+        "height": 518,
+        "aspectRatio": 0.7335907335907336,
+        "isWide": false,
+        "isPortrait": true,
+        "focalPoint": [
+          0.5,
+          0.5
+        ],
+        "zoom": 1,
+        "alt": "Music photo 1"
+      }
+    ]
   }
 }

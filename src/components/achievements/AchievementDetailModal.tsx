@@ -313,7 +313,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
-      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED */}
+      {/* PHOTO STAGE BACKDROP / FULL-BLEED (For wide photos & ambient background) */}
       {currentPhoto ? (
         <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
           {/* Ambient blurred fill for contained/portrait photos */}
@@ -323,13 +323,12 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
               src={currentPhoto.ambientBackdrop}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.35] saturate-125 transition-opacity duration-700"
+              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.25] saturate-125 transition-opacity duration-700"
             />
           )}
 
-          {/* Main Photo Render */}
-          {currentPhoto.isWide ? (
-            /* Wide Photo: Full-Bleed with subtle Ken Burns drift */
+          {/* Full-Bleed Wide Photo Render */}
+          {currentPhoto.isWide && (
             <div className="absolute inset-0 w-full h-full overflow-hidden">
               <picture className="w-full h-full block">
                 {currentPhoto.variants[1920]?.avif && (
@@ -352,35 +351,11 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
                 />
               </picture>
             </div>
-          ) : (
-            /* Contained Photo Stage */
-            <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-16 p-6">
-              <div ref={photoCardRef} className="relative max-h-[82vh] aspect-auto max-w-[90vw] lg:max-w-[52vw] rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.9)] border border-white/20">
-                <picture className="w-full h-full block">
-                  {currentPhoto.variants[1920]?.avif && (
-                    <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
-                  )}
-                  {currentPhoto.variants[1920]?.webp && (
-                    <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
-                  )}
-                  <img
-                    key={`photo-${currentPhoto.id}`}
-                    src={currentPhoto.originalPath}
-                    alt={currentPhoto.alt}
-                    className="max-h-[82vh] w-auto object-contain filter brightness-[1.05] contrast-[1.02]"
-                    style={{
-                      objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
-                      transform: `scale(${currentPhoto.zoom})`,
-                    }}
-                  />
-                </picture>
-              </div>
-            </div>
           )}
         </div>
       ) : null}
 
-      {/* Interactive Cursor Grid Layer - Positioned at z-[2] above ambient photo */}
+      {/* Interactive Cursor Grid Layer */}
       <div className="absolute inset-0 pointer-events-auto z-[2] opacity-90">
         <CursorGrid
           cellSize={65}
@@ -445,7 +420,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       {/* Main Content Layout */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full px-6 md:px-12 my-auto py-6">
         {/* Left Column: Huge Title + Stats Grid */}
-        <div className="lg:col-span-7 space-y-8 pointer-events-auto">
+        <div className="lg:col-span-6 space-y-8 pointer-events-auto">
           {/* Huge Script Title with character spans for letter walk animation */}
           <h2
             id={`achievement-title-${item.id}`}
@@ -505,17 +480,41 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           )}
         </div>
 
-        {/* Empty Photo State Info Badge (if no photos) */}
-        {photos.length === 0 && (
-          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+        {/* Right Column: Contained Photo Stage */}
+        <div className="lg:col-span-6 flex justify-center lg:justify-end pointer-events-auto">
+          {currentPhoto && !currentPhoto.isWide ? (
+            <div
+              ref={photoCardRef}
+              className="relative max-h-[70vh] aspect-auto rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.9)] border border-white/20"
+            >
+              <picture className="w-full h-full block">
+                {currentPhoto.variants[1920]?.avif && (
+                  <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
+                )}
+                {currentPhoto.variants[1920]?.webp && (
+                  <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
+                )}
+                <img
+                  key={`photo-${currentPhoto.id}`}
+                  src={currentPhoto.originalPath}
+                  alt={currentPhoto.alt}
+                  className="max-h-[70vh] w-auto object-contain filter brightness-[1.05] contrast-[1.02]"
+                  style={{
+                    objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
+                    transform: `scale(${currentPhoto.zoom})`,
+                  }}
+                />
+              </picture>
+            </div>
+          ) : photos.length === 0 ? (
             <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/10 text-center space-y-3 max-w-xs">
               <span className="text-3xl text-[#E0A93B]">✦</span>
               <p className="font-mono text-xs text-white/50 uppercase tracking-widest">
                 ARCHIVE RECORD
               </p>
             </div>
-          </div>
-        )}
+          ) : null}
+        </div>
       </div>
 
       {/* Photo Navigation Controls & Progress Dashes */}
