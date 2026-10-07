@@ -344,17 +344,6 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       {/* PHOTO STAGE BACKDROP / FULL-BLEED (For wide photos & ambient background) */}
       {currentPhoto ? (
         <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
-          {/* Ambient blurred fill for contained/portrait photos */}
-          {currentPhoto.ambientBackdrop && (
-            <img
-              key={`ambient-${currentPhoto.id}`}
-              src={currentPhoto.ambientBackdrop}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.25] saturate-125 transition-opacity duration-700"
-            />
-          )}
-
           {/* Full-Bleed Wide Photo Render */}
           {currentPhoto.isWide && (
             <div className="absolute inset-0 w-full h-full overflow-hidden">

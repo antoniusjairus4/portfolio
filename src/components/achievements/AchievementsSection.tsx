@@ -97,6 +97,16 @@ export const AchievementsSection: React.FC = () => {
           'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.05) 0%, rgba(12, 9, 7, 1) 70%)',
       }}
     >
+      {/* Golden Smoke Background Image Layer */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+        <img
+          src="/images/achievements/bg-fluid.png"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover opacity-80 filter brightness-110 contrast-105"
+        />
+      </div>
+
       {/* LiquidEther WebGL Fluid Simulation & CursorGrid Background (Paused when modal open) */}
       <div
         className={`absolute inset-0 z-0 pointer-events-auto transition-opacity duration-400 ${
