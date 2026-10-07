@@ -60,10 +60,6 @@ test.describe('Data-Driven Achievements Template E2E Suite', () => {
 
     const statLabel2 = dialog.locator('text=events organised');
     await expect(statLabel2).toBeVisible();
-
-    // Single line text
-    const lineText = dialog.locator('text=Spoke before Sid Ahmed and Sivakarthikeyan.');
-    await expect(lineText).toBeVisible();
   });
 
   test('navigation arrows and progress dashes cycle photos', async ({ page }) => {

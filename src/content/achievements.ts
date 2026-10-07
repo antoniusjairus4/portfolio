@@ -50,18 +50,11 @@ export const achievementsData: AchievementEntry[] = [
       { value: '7+', label: 'events organised' },
       { value: '3rd', label: 'Coimbatore Book Festival, English edition' },
     ],
-    line: 'Spoke before Sid Ahmed and Sivakarthikeyan.',
-    proofingNotes: 'Please confirm the exact spelling and formal titles of "Sid Ahmed" and "Sivakarthikeyan".',
     photoMeta: {
       '01-podium.png': {
         alt: 'Jairus speaking at keynote podium',
-        focus: [0.5, 0.35],
-        zoom: 1.15,
-      },
-      '02-stage.png': {
-        alt: 'Jairus addressing audience on event stage',
-        focus: [0.5, 0.4],
-        zoom: 1.1,
+        focus: [0.3, 0.4],
+        zoom: 1.4,
       },
     },
     isDraft: false,

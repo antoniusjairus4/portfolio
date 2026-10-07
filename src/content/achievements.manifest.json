@@ -42,46 +42,6 @@
         ],
         "zoom": 1.15,
         "alt": "Jairus speaking at keynote podium"
-      },
-      {
-        "id": "speaking-2",
-        "filename": "02-stage.png",
-        "originalPath": "/images/achievements/speaking/photo-2-1280.jpg",
-        "variants": {
-          "640": {
-            "avif": "/images/achievements/speaking/photo-2-640.avif",
-            "webp": "/images/achievements/speaking/photo-2-640.webp",
-            "jpg": "/images/achievements/speaking/photo-2-640.jpg"
-          },
-          "1280": {
-            "avif": "/images/achievements/speaking/photo-2-1280.avif",
-            "webp": "/images/achievements/speaking/photo-2-1280.webp",
-            "jpg": "/images/achievements/speaking/photo-2-1280.jpg"
-          },
-          "1920": {
-            "avif": "/images/achievements/speaking/photo-2-1920.avif",
-            "webp": "/images/achievements/speaking/photo-2-1920.webp",
-            "jpg": "/images/achievements/speaking/photo-2-1920.jpg"
-          },
-          "2560": {
-            "avif": "/images/achievements/speaking/photo-2-2560.avif",
-            "webp": "/images/achievements/speaking/photo-2-2560.webp",
-            "jpg": "/images/achievements/speaking/photo-2-2560.jpg"
-          }
-        },
-        "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoQABAABUB8JZgCdADvxSwAANth9MmgL/dY5AfxI5VMHy7JASuEhi5ROi6HSueAOVd8Zn95AAA=",
-        "ambientBackdrop": "/images/achievements/speaking/photo-2-backdrop.webp",
-        "width": 415,
-        "height": 670,
-        "aspectRatio": 0.6194029850746269,
-        "isWide": false,
-        "isPortrait": true,
-        "focalPoint": [
-          0.5,
-          0.4
-        ],
-        "zoom": 1.1,
-        "alt": "Jairus addressing audience on event stage"
       }
     ]
   },
