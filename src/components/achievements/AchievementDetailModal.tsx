@@ -64,6 +64,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
   const dialogRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const photoCardRef = useRef<HTMLDivElement>(null);
 
   const { stop, start } = useLenis();
 
@@ -92,7 +93,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     };
   }, [stop, start]);
 
-  // Shared-element FLIP transition on mount
+  // Shared-element FLIP transition & letter walk animation on mount
   useEffect(() => {
     if (isReducedMotion || !originRect || !titleRef.current) return;
 
@@ -103,6 +104,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     const deltaY = originRect.top + originRect.height / 2 - (currentRect.top + currentRect.height / 2);
     const scale = originRect.height / currentRect.height;
 
+    // Flight from origin node position
     gsap.fromTo(
       titleEl,
       {
@@ -119,6 +121,48 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         ease: 'power3.out',
       }
     );
+
+    // Stagger letter walk effect on title characters
+    const letterEls = titleEl.querySelectorAll('.title-char');
+    if (letterEls.length > 0) {
+      gsap.fromTo(
+        letterEls,
+        {
+          y: 35,
+          opacity: 0,
+          rotateX: -45,
+        },
+        {
+          y: 0,
+          opacity: 1,
+          rotateX: 0,
+          duration: 0.5,
+          stagger: 0.04,
+          ease: 'back.out(1.7)',
+          delay: 0.2,
+        }
+      );
+    }
+
+    // Photo card smooth scaling & fade reveal animation
+    if (photoCardRef.current) {
+      gsap.fromTo(
+        photoCardRef.current,
+        {
+          scale: 0.88,
+          opacity: 0,
+          y: 40,
+        },
+        {
+          scale: 1,
+          opacity: 1,
+          y: 0,
+          duration: 0.7,
+          ease: 'power3.out',
+          delay: 0.25,
+        }
+      );
+    }
   }, [originRect, isReducedMotion]);
 
   // Count-up animation for stats
@@ -338,7 +382,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           ) : (
             /* Contained Photo Stage */
             <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-16 p-6">
-              <div className="relative max-h-[82vh] aspect-auto max-w-[90vw] lg:max-w-[52vw] rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.9)] border border-white/20">
+              <div ref={photoCardRef} className="relative max-h-[82vh] aspect-auto max-w-[90vw] lg:max-w-[52vw] rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.9)] border border-white/20">
                 <picture className="w-full h-full block">
                   {currentPhoto.variants[1920]?.avif && (
                     <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
@@ -401,14 +445,18 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full px-6 md:px-12 my-auto py-6">
         {/* Left Column: Huge Title + Stats Grid */}
         <div className="lg:col-span-7 space-y-8 pointer-events-auto">
-          {/* Huge Script Title */}
+          {/* Huge Script Title with character spans for letter walk animation */}
           <h2
             id={`achievement-title-${item.id}`}
             ref={titleRef}
             className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight leading-none text-[#FFF4E0] font-bold"
             style={{ fontFamily: item.fontFamily }}
           >
-            {item.title}
+            {item.title.split('').map((char, index) => (
+              <span key={index} className="inline-block title-char">
+                {char === ' ' ? '\u00A0' : char}
+              </span>
+            ))}
           </h2>
 
           {/* Giant Stat Numbers Grid */}
