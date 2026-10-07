@@ -127,13 +127,12 @@ async function buildAchievementsManifest() {
         .toFormat('webp', { quality: 60 })
         .toFile(blurPath);
 
-      // 2. Color-Graded Responsive Variants (1280, 1920, 2560)
-      const widths = [1280, 1920, 2560];
+      // 2. Color-Graded Responsive Variants (640, 1280, 1920, 2560)
+      const widths = [640, 1280, 1920, 2560];
       const formats = ['avif', 'webp', 'jpg'];
       const variants = {};
 
       for (const w of widths) {
-        if (w > origW + 200) continue;
         variants[w] = {};
 
         for (const fmt of formats) {

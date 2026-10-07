@@ -7,7 +7,28 @@
         "id": "speaking-1",
         "filename": "01-podium.png",
         "originalPath": "/images/achievements/speaking/photo-1-1280.jpg",
-        "variants": {},
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/speaking/photo-1-640.avif",
+            "webp": "/images/achievements/speaking/photo-1-640.webp",
+            "jpg": "/images/achievements/speaking/photo-1-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/speaking/photo-1-1280.avif",
+            "webp": "/images/achievements/speaking/photo-1-1280.webp",
+            "jpg": "/images/achievements/speaking/photo-1-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/speaking/photo-1-1920.avif",
+            "webp": "/images/achievements/speaking/photo-1-1920.webp",
+            "jpg": "/images/achievements/speaking/photo-1-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/speaking/photo-1-2560.avif",
+            "webp": "/images/achievements/speaking/photo-1-2560.webp",
+            "jpg": "/images/achievements/speaking/photo-1-2560.jpg"
+          }
+        },
         "blurDataURL": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwAgCdASoQABAABUB8JagCdADDrZpJj2HYAAD+0Rd0Dl9/YcvOOYY2u2FINXDBirDXcQ5+mrDvYF8EVpQEgwzYIrEtDe9C9kNDQ4YFKhNXiduP6u9VQ74kAAA=",
         "ambientBackdrop": "/images/achievements/speaking/photo-1-backdrop.webp",
         "width": 451,
@@ -26,7 +47,28 @@
         "id": "speaking-2",
         "filename": "02-stage.png",
         "originalPath": "/images/achievements/speaking/photo-2-1280.jpg",
-        "variants": {},
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/speaking/photo-2-640.avif",
+            "webp": "/images/achievements/speaking/photo-2-640.webp",
+            "jpg": "/images/achievements/speaking/photo-2-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/speaking/photo-2-1280.avif",
+            "webp": "/images/achievements/speaking/photo-2-1280.webp",
+            "jpg": "/images/achievements/speaking/photo-2-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/speaking/photo-2-1920.avif",
+            "webp": "/images/achievements/speaking/photo-2-1920.webp",
+            "jpg": "/images/achievements/speaking/photo-2-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/speaking/photo-2-2560.avif",
+            "webp": "/images/achievements/speaking/photo-2-2560.webp",
+            "jpg": "/images/achievements/speaking/photo-2-2560.jpg"
+          }
+        },
         "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoQABAABUB8JZgCdADvxSwAANth9MmgL/dY5AfxI5VMHy7JASuEhi5ROi6HSueAOVd8Zn95AAA=",
         "ambientBackdrop": "/images/achievements/speaking/photo-2-backdrop.webp",
         "width": 415,
