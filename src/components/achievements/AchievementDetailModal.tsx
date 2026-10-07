@@ -313,56 +313,9 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
-      {/* Interactive Cursor Grid Background Layer */}
-      <div className="absolute inset-0 pointer-events-auto z-0 opacity-80">
-        <CursorGrid
-          cellSize={60}
-          color="#E0A93B"
-          radius={220}
-          falloff="smooth"
-          holdTime={600}
-          fadeDuration={1000}
-          lineWidth={1.5}
-          maxOpacity={1}
-          fillOpacity={0.25}
-          gridOpacity={0.15}
-          cellRadius={6}
-          clickPulse
-          pulseSpeed={700}
-        />
-      </div>
-
-      {/* Dark Readability Gradient Overlay for Left Text */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          background:
-            'linear-gradient(to right, rgba(12, 9, 7, 0.85) 0%, rgba(12, 9, 7, 0.65) 45%, rgba(12, 9, 7, 0.15) 75%, transparent 100%)',
-        }}
-      />
-
-      {/* Gold Radial Glow Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none z-0"
-        style={{
-          background:
-            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 0.8) 60%, rgba(12, 9, 7, 0.98) 100%)',
-        }}
-      />
-
-      {/* SVG Noise Film Grain Overlay */}
-      <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.04]">
-        <svg className="w-full h-full">
-          <filter id="template-noise">
-            <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
-          </filter>
-          <rect width="100%" height="100%" filter="url(#template-noise)" />
-        </svg>
-      </div>
-
-      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED (Placed at z-5 so photo shines clearly) */}
+      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED */}
       {currentPhoto ? (
-        <div className="absolute inset-0 pointer-events-none z-[5] overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
           {/* Ambient blurred fill for contained/portrait photos */}
           {currentPhoto.ambientBackdrop && (
             <img
@@ -370,7 +323,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
               src={currentPhoto.ambientBackdrop}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.5] saturate-125 transition-opacity duration-700"
+              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.35] saturate-125 transition-opacity duration-700"
             />
           )}
 
@@ -426,6 +379,34 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           )}
         </div>
       ) : null}
+
+      {/* Interactive Cursor Grid Layer - Positioned at z-[2] above ambient photo */}
+      <div className="absolute inset-0 pointer-events-auto z-[2] opacity-90">
+        <CursorGrid
+          cellSize={65}
+          color="#E0A93B"
+          radius={240}
+          falloff="smooth"
+          holdTime={600}
+          fadeDuration={1000}
+          lineWidth={1.5}
+          maxOpacity={1}
+          fillOpacity={0.3}
+          gridOpacity={0.12}
+          cellRadius={6}
+          clickPulse
+          pulseSpeed={700}
+        />
+      </div>
+
+      {/* Soft Vignette Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[3]"
+        style={{
+          background:
+            'radial-gradient(circle at 30% 50%, rgba(12, 9, 7, 0.4) 0%, rgba(12, 9, 7, 0.85) 80%)',
+        }}
+      />
 
       {/* Backdrop Tap/Click Dismissal */}
       <div
