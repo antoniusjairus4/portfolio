@@ -1,0 +1,69 @@
+{
+  "chess": {
+    "photos": [],
+    "preblurredBackdrop": null
+  },
+  "karate": {
+    "photos": [],
+    "preblurredBackdrop": null
+  },
+  "music": {
+    "photos": [],
+    "preblurredBackdrop": null
+  },
+  "public-speaking": {
+    "photos": [
+      {
+        "id": "public-speaking-1",
+        "originalPath": "/images/achievements/public-speaking/Pasted image (2).png",
+        "variants": {
+          "400": {
+            "webp": "/images/achievements/public-speaking/photo-1-400.webp",
+            "avif": "/images/achievements/public-speaking/photo-1-400.avif"
+          },
+          "640": {
+            "webp": "/images/achievements/public-speaking/photo-1-640.webp",
+            "avif": "/images/achievements/public-speaking/photo-1-640.avif"
+          },
+          "1024": {
+            "webp": "/images/achievements/public-speaking/photo-1-1024.webp",
+            "avif": "/images/achievements/public-speaking/photo-1-1024.avif"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoQABAABUB8JZgCdADvxSwAANth9MmgL/dY5AfxI5VMHy7JASuEhi5ROi6HSueAOVd8Zn95AAA=",
+        "width": 415,
+        "height": 670,
+        "aspectRatio": 0.6194029850746269,
+        "isPortrait": true
+      },
+      {
+        "id": "public-speaking-2",
+        "originalPath": "/images/achievements/public-speaking/Pasted image.png",
+        "variants": {
+          "400": {
+            "webp": "/images/achievements/public-speaking/photo-2-400.webp",
+            "avif": "/images/achievements/public-speaking/photo-2-400.avif"
+          },
+          "640": {
+            "webp": "/images/achievements/public-speaking/photo-2-640.webp",
+            "avif": "/images/achievements/public-speaking/photo-2-640.avif"
+          },
+          "1024": {
+            "webp": "/images/achievements/public-speaking/photo-2-1024.webp",
+            "avif": "/images/achievements/public-speaking/photo-2-1024.avif"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwAgCdASoQABAABUB8JagCdADDrZpJj2HYAAD+0Rd0Dl9/YcvOOYY2u2FINXDBirDXcQ5+mrDvYF8EVpQEgwzYIrEtDe9C9kNDQ4YFKhNXiduP6u9VQ74kAAA=",
+        "width": 451,
+        "height": 672,
+        "aspectRatio": 0.6711309523809523,
+        "isPortrait": true
+      }
+    ],
+    "preblurredBackdrop": "/images/achievements/public-speaking/backdrop-blur.webp"
+  },
+  "table-tennis": {
+    "photos": [],
+    "preblurredBackdrop": null
+  }
+}

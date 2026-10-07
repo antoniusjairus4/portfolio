@@ -26,6 +26,7 @@ export interface LiquidEtherProps {
   autoRampDuration?: number;
   backgroundColor?: string;
   lightMode?: boolean;
+  paused?: boolean;
 }
 
 interface SimOptions {
@@ -80,7 +81,8 @@ export default function LiquidEther({
   autoResumeDelay = 1000,
   autoRampDuration = 0.6,
   backgroundColor = '#FFFFFF',
-  lightMode = false
+  lightMode = false,
+  paused = false
 }: LiquidEtherProps): React.ReactElement {
   const mountRef = useRef<HTMLDivElement | null>(null);
   const webglRef = useRef<LiquidEtherWebGL | null>(null);
@@ -89,6 +91,15 @@ export default function LiquidEther({
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const isVisibleRef = useRef<boolean>(true);
   const resizeRafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (!webglRef.current) return;
+    if (paused) {
+      webglRef.current.pause();
+    } else if (isVisibleRef.current && !document.hidden) {
+      webglRef.current.start();
+    }
+  }, [paused]);
 
   useEffect(() => {
     if (!mountRef.current) return;
