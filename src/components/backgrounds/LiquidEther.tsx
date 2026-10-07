@@ -153,9 +153,18 @@ export default function LiquidEther({
         this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
         this.resize();
         try {
+          // Check if WebGL context can actually be created to avoid Three.js internal uncaught errors on lost context
+          const canvas = document.createElement('canvas');
+          const gl = (canvas.getContext('webgl2') || canvas.getContext('webgl') || canvas.getContext('experimental-webgl')) as WebGLRenderingContext | null;
+          if (!gl || (typeof gl.isContextLost === 'function' && gl.isContextLost())) {
+            console.warn('WebGL is blocked or context was lost by the browser.');
+            this.renderer = null;
+            return;
+          }
           this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, failIfMajorPerformanceCaveat: false });
         } catch (e) {
           console.warn('WebGL context creation failed or context was lost:', e);
+          this.renderer = null;
           return;
         }
         if (!this.renderer) return;
@@ -1072,22 +1081,24 @@ const color_frag = `
         this.output = new Output();
       }
       resize() {
+        if (!Common.renderer) return;
         Common.resize();
-        this.output.resize();
+        if (this.output) this.output.resize();
       }
       render() {
+        if (!Common.renderer) return;
         if (this.autoDriver) this.autoDriver.update();
         Mouse.update();
         Common.update();
-        this.output.update();
+        if (this.output) this.output.update();
       }
       loop() {
-        if (!this.running) return;
+        if (!this.running || !Common.renderer) return;
         this.render();
         rafRef.current = requestAnimationFrame(this._loop);
       }
       start() {
-        if (this.running) return;
+        if (this.running || !Common.renderer) return;
         this.running = true;
         this._loop();
       }
