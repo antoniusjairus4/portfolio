@@ -13,8 +13,7 @@ import '@fontsource/syncopate/700.css';
 import '@fontsource/unifrakturmaguntia';
 import '@/styles/globals.css';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
-
-
+import { GlobalFluidBackground } from '@/components/backgrounds/GlobalFluidBackground';
 
 export const metadata: Metadata = {
   title: 'Jairus — Portfolio',
@@ -36,7 +35,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
-        <LenisProvider>{children}</LenisProvider>
+        <LenisProvider>
+          <GlobalFluidBackground />
+          {children}
+        </LenisProvider>
       </body>
     </html>
   );

@@ -24,7 +24,7 @@ export interface DisciplineChapter {
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   {
     id: 'table-tennis',
-    number: '01 / 05',
+    number: '01 / 03',
     title: 'Table Tennis',
     descriptor: '2x Tamil Nadu State Champion',
     stats: [
@@ -37,7 +37,7 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   },
   {
     id: 'public-speaking',
-    number: '02 / 05',
+    number: '02 / 03',
     title: 'Public Speaking',
     descriptor: 'Keynote & Oratory Speaker',
     stats: [
@@ -49,21 +49,8 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     caption: 'Keynote Address on Cybersecurity & Tech Futures',
   },
   {
-    id: 'karate',
-    number: '03 / 05',
-    title: 'Karate',
-    descriptor: 'Black belt martial artist',
-    stats: [
-      { value: 'Black Belt', label: 'Martial Artist' },
-      { value: '4x', label: 'National Champion' },
-      { value: '15+', label: 'State Medals' },
-    ],
-    imageSrc: '/images/karate.jpg',
-    caption: 'National Kumite Tournament Demonstration',
-  },
-  {
     id: 'chess',
-    number: '04 / 05',
+    number: '03 / 03',
     title: 'Chess',
     descriptor: 'Tactical Tournament Player',
     stats: [
@@ -73,19 +60,6 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     ],
     imageSrc: '/images/chess.jpg',
     caption: 'State Level FIDE Rated Tournament Trophies',
-  },
-  {
-    id: 'music',
-    number: '05 / 05',
-    title: 'Music',
-    descriptor: 'Instrumental & Keyboard Artist',
-    stats: [
-      { value: '3 Grades', label: 'Trinity College London' },
-      { value: 'Silver', label: 'Medalist, Campofez 2022' },
-      { value: '4', label: 'Events Participated' },
-    ],
-    imageSrc: '/images/music.jpg',
-    caption: 'Live Piano & Keyboard Solo Performance',
   },
 ];
 
@@ -163,7 +137,7 @@ export const DisciplinesScrollSection: React.FC = () => {
           end: `+=${totalScrollVh * 100}vh`,
           pin: stageRef.current,
           pinSpacing: true,
-          scrub: 1,
+          scrub: 1.5,
           anticipatePin: 1,
           refreshPriority: 0,
           onToggle: (self) => {
@@ -384,7 +358,7 @@ export const DisciplinesScrollSection: React.FC = () => {
             CRAFT & DISCIPLINE / ACHIEVEMENTS
           </p>
           <span className="text-xs uppercase tracking-[0.18em] text-white/50">
-            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 05'}
+            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 03'}
           </span>
         </div>
 
