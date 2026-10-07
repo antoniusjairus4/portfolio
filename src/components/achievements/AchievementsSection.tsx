@@ -4,6 +4,7 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useEffect, useRef, useState } from 'react';
 import LiquidEther from '@/components/backgrounds/LiquidEther';
+import CursorGrid from '@/components/backgrounds/CursorGrid';
 import { achievementsContent, AchievementItem } from '@/content/achievements';
 import { AchievementDetailModal } from './AchievementDetailModal';
 
@@ -96,12 +97,31 @@ export const AchievementsSection: React.FC = () => {
           'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.05) 0%, rgba(12, 9, 7, 1) 70%)',
       }}
     >
-      {/* LiquidEther WebGL Fluid Simulation Background (Paused when modal open) */}
+      {/* LiquidEther WebGL Fluid Simulation & CursorGrid Background (Paused when modal open) */}
       <div
         className={`absolute inset-0 z-0 pointer-events-auto transition-opacity duration-400 ${
           selectedItem ? 'opacity-0 pointer-events-none' : 'opacity-100'
         }`}
       >
+        {/* Interactive Cursor Grid Background */}
+        <div className="absolute inset-0 z-0 opacity-40">
+          <CursorGrid
+            cellSize={70}
+            color="#E0A93B"
+            radius={150}
+            falloff="smooth"
+            holdTime={400}
+            fadeDuration={800}
+            lineWidth={1.2}
+            maxOpacity={0.8}
+            fillOpacity={0.08}
+            gridOpacity={0.05}
+            cellRadius={8}
+            clickPulse
+            pulseSpeed={600}
+          />
+        </div>
+
         <LiquidEther
           colors={['#E0A93B', '#F5D061', '#9A6B1F']}
           mouseForce={12}

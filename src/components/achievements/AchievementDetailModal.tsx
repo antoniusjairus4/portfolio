@@ -5,6 +5,7 @@ import gsap from 'gsap';
 import { AchievementEntry, AchievementStat } from '@/content/achievements';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 import manifestData from '@/content/achievements.manifest.json';
+import CursorGrid from '@/components/backgrounds/CursorGrid';
 
 interface ManifestPhoto {
   id: string;
@@ -312,12 +313,31 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
+      {/* Interactive Cursor Grid Background Layer */}
+      <div className="absolute inset-0 pointer-events-auto z-0 opacity-80">
+        <CursorGrid
+          cellSize={60}
+          color="#E0A93B"
+          radius={220}
+          falloff="smooth"
+          holdTime={600}
+          fadeDuration={1000}
+          lineWidth={1.5}
+          maxOpacity={1}
+          fillOpacity={0.25}
+          gridOpacity={0.15}
+          cellRadius={6}
+          clickPulse
+          pulseSpeed={700}
+        />
+      </div>
+
       {/* Dark Readability Gradient Overlay for Left Text */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
           background:
-            'linear-gradient(to right, rgba(12, 9, 7, 0.98) 0%, rgba(12, 9, 7, 0.85) 45%, rgba(12, 9, 7, 0.2) 75%, transparent 100%)',
+            'linear-gradient(to right, rgba(12, 9, 7, 0.85) 0%, rgba(12, 9, 7, 0.65) 45%, rgba(12, 9, 7, 0.15) 75%, transparent 100%)',
         }}
       />
 
