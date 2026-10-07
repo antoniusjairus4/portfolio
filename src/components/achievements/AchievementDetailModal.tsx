@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { AchievementItem, AchievementPhoto } from '@/content/achievements';
-import manifestData from '../../../../public/images/achievements/manifest.json';
+import manifestData from '../../../public/images/achievements/manifest.json';
 
 const manifest = manifestData as Record<
   string,

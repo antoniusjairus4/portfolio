@@ -4,7 +4,7 @@
 Personal portfolio of Jairus: cybersecurity student, two-time Tamil Nadu state table tennis champion, and young founder. Built to a competition standard, aiming for Awwards Site of the Day and the Developer award.
 
 ## Status
-Status: Phase 3: typographic physics collapse transition implemented (Awwards-standard Matter.js letter collapse, 60 fps scrubbed bake, right-to-left ping-pong bounce, floor tilt slide-away, background crossfade & fallbacks).
+Status: Phase 3.5: Achievements spatial detail view implemented (cinematic FLIP modal, pre-blurred backdrops, photo stack tilt/cycling, accessible dialog controls, WebGL pause).
 
 ---
 

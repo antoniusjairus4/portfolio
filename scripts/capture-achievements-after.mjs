@@ -20,9 +20,10 @@ async function captureAchievementsAfter() {
     await desktopPage.waitForTimeout(500);
   }
 
+  // Scroll to achievements section
   await desktopPage.evaluate(() => {
     const el = document.getElementById('achievements-section');
-    if (el) el.scrollIntoView();
+    if (el) el.scrollIntoView({ behavior: 'instant', block: 'center' });
   });
   await desktopPage.waitForTimeout(600);
 
@@ -31,15 +32,19 @@ async function captureAchievementsAfter() {
 
   // Capture detail view for all 5 disciplines at 1440
   for (const title of disciplines) {
-    const node = desktopPage.locator('div[role="button"]', { hasText: title });
-    await node.click({ force: true });
-    await desktopPage.waitForTimeout(600);
-    const slug = title.toLowerCase().replace(/\s+/g, '-');
-    await desktopPage.screenshot({ path: path.join(screenshotDir, `detail-${slug}-desktop-1440.png`) });
+    const node = desktopPage.locator('h3', { hasText: title });
+    if (await node.isVisible()) {
+      await node.click({ force: true });
+      await desktopPage.waitForTimeout(600);
+      const slug = title.toLowerCase().replace(/\s+/g, '-');
+      await desktopPage.screenshot({ path: path.join(screenshotDir, `detail-${slug}-desktop-1440.png`) });
 
-    const closeBtn = desktopPage.getByRole('button', { name: 'CLOSE' });
-    await closeBtn.click();
-    await desktopPage.waitForTimeout(500);
+      const closeBtn = desktopPage.getByRole('button', { name: 'CLOSE' });
+      if (await closeBtn.isVisible()) {
+        await closeBtn.click();
+        await desktopPage.waitForTimeout(500);
+      }
+    }
   }
 
   // Mobile 390x844
@@ -54,7 +59,7 @@ async function captureAchievementsAfter() {
 
   await mobilePage.evaluate(() => {
     const el = document.getElementById('achievements-section');
-    if (el) el.scrollIntoView();
+    if (el) el.scrollIntoView({ behavior: 'instant', block: 'center' });
   });
   await mobilePage.waitForTimeout(600);
 
@@ -62,15 +67,19 @@ async function captureAchievementsAfter() {
 
   // Capture detail view for all 5 disciplines at 390
   for (const title of disciplines) {
-    const node = mobilePage.locator('div[role="button"]', { hasText: title });
-    await node.click({ force: true });
-    await mobilePage.waitForTimeout(600);
-    const slug = title.toLowerCase().replace(/\s+/g, '-');
-    await mobilePage.screenshot({ path: path.join(screenshotDir, `detail-${slug}-mobile-390.png`) });
+    const node = mobilePage.locator('h3', { hasText: title });
+    if (await node.isVisible()) {
+      await node.click({ force: true });
+      await mobilePage.waitForTimeout(600);
+      const slug = title.toLowerCase().replace(/\s+/g, '-');
+      await mobilePage.screenshot({ path: path.join(screenshotDir, `detail-${slug}-mobile-390.png`) });
 
-    const closeBtn = mobilePage.getByRole('button', { name: 'CLOSE' });
-    await closeBtn.click();
-    await mobilePage.waitForTimeout(500);
+      const closeBtn = mobilePage.getByRole('button', { name: 'CLOSE' });
+      if (await closeBtn.isVisible()) {
+        await closeBtn.click();
+        await mobilePage.waitForTimeout(500);
+      }
+    }
   }
 
   await browser.close();
