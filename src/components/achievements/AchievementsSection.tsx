@@ -132,21 +132,21 @@ export const AchievementsSection: React.FC = () => {
         </div>
 
         <LiquidEther
-          colors={['#0A0908', '#7A4E12', '#D99B26']}
-          mouseForce={16}
-          cursorSize={120}
+          colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
+          mouseForce={28}
+          cursorSize={160}
           isViscous={true}
-          viscous={35}
-          iterationsViscous={32}
-          iterationsPoisson={32}
-          resolution={0.45}
+          viscous={45}
+          iterationsViscous={40}
+          iterationsPoisson={48}
+          resolution={0.75}
           isBounce={false}
           autoDemo={true}
-          autoSpeed={0.3}
-          autoIntensity={1.8}
-          takeoverDuration={0.4}
-          autoResumeDelay={2500}
-          autoRampDuration={1.2}
+          autoSpeed={0.55}
+          autoIntensity={3.5}
+          takeoverDuration={0.3}
+          autoResumeDelay={1500}
+          autoRampDuration={0.8}
           backgroundColor="#0A0908"
         />
       </div>
