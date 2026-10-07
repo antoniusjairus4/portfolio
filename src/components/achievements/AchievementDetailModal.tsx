@@ -313,6 +313,24 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
+      {/* Dark Readability Gradient Overlay for Left Text */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background:
+            'linear-gradient(to right, rgba(12, 9, 7, 0.95) 0%, rgba(12, 9, 7, 0.8) 45%, rgba(12, 9, 7, 0.2) 75%, transparent 100%)',
+        }}
+      />
+
+      {/* Gold Radial Glow Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-[1]"
+        style={{
+          background:
+            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 0.8) 60%, rgba(12, 9, 7, 0.98) 100%)',
+        }}
+      />
+
       {/* PHOTO STAGE BACKDROP / FULL-BLEED (For wide photos & ambient background) */}
       {currentPhoto ? (
         <div className="absolute inset-0 pointer-events-none z-[1] overflow-hidden">
@@ -420,12 +438,16 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       {/* Main Content Layout */}
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full px-6 md:px-12 my-auto py-6">
         {/* Left Column: Huge Title + Stats Grid */}
-        <div className="lg:col-span-6 space-y-8 pointer-events-auto">
+        <div className="lg:col-span-7 space-y-8 pointer-events-auto">
           {/* Huge Script Title with character spans for letter walk animation */}
           <h2
             id={`achievement-title-${item.id}`}
             ref={titleRef}
-            className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl tracking-tight leading-none text-[#FFF4E0] font-bold"
+            className={`tracking-tight leading-none text-[#FFF4E0] font-bold whitespace-nowrap ${
+              item.title.length > 10
+                ? 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
+                : 'text-6xl sm:text-7xl md:text-8xl lg:text-9xl'
+            }`}
             style={{ fontFamily: item.fontFamily }}
           >
             {item.title.split('').map((char, index) => (
@@ -481,7 +503,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         </div>
 
         {/* Right Column: Contained Photo Stage */}
-        <div className="lg:col-span-6 flex justify-center lg:justify-end pointer-events-auto">
+        <div className="lg:col-span-5 flex justify-center lg:justify-end pointer-events-auto">
           {currentPhoto && !currentPhoto.isWide ? (
             <div
               ref={photoCardRef}
