@@ -318,16 +318,26 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         className="absolute inset-0 pointer-events-none z-[1]"
         style={{
           background:
-            'linear-gradient(to right, rgba(12, 9, 7, 0.95) 0%, rgba(12, 9, 7, 0.8) 45%, rgba(12, 9, 7, 0.2) 75%, transparent 100%)',
+            'linear-gradient(to right, rgba(12, 9, 7, 0.75) 0%, rgba(12, 9, 7, 0.5) 45%, rgba(12, 9, 7, 0.1) 75%, transparent 100%)',
         }}
       />
+
+      {/* Fluid Smoke Background Image Layer */}
+      <div className="absolute inset-0 pointer-events-none z-[0] overflow-hidden">
+        <img
+          src="/images/achievements/bg-fluid.png"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover opacity-90 filter brightness-110 contrast-105"
+        />
+      </div>
 
       {/* Gold Radial Glow Overlay */}
       <div
         className="absolute inset-0 pointer-events-none z-[1]"
         style={{
           background:
-            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 0.8) 60%, rgba(12, 9, 7, 0.98) 100%)',
+            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.18) 0%, rgba(12, 9, 7, 0.4) 60%, rgba(12, 9, 7, 0.75) 100%)',
         }}
       />
 
@@ -397,7 +407,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         className="absolute inset-0 pointer-events-none z-[3]"
         style={{
           background:
-            'radial-gradient(circle at 30% 50%, rgba(12, 9, 7, 0.4) 0%, rgba(12, 9, 7, 0.85) 80%)',
+            'radial-gradient(circle at 30% 50%, rgba(12, 9, 7, 0.1) 0%, rgba(12, 9, 7, 0.5) 80%)',
         }}
       />
 
