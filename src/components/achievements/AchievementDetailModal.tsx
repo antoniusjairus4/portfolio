@@ -268,79 +268,12 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
-      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED */}
-      {currentPhoto ? (
-        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          {/* Ambient blurred fill for contained/portrait photos */}
-          {currentPhoto.ambientBackdrop && (
-            <img
-              key={`ambient-${currentPhoto.id}`}
-              src={currentPhoto.ambientBackdrop}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.35] saturate-125 transition-opacity duration-700"
-            />
-          )}
-
-          {/* Main Photo Render */}
-          {currentPhoto.isWide ? (
-            /* Wide Photo: Full-Bleed with subtle Ken Burns drift */
-            <div className="absolute inset-0 w-full h-full overflow-hidden">
-              <picture className="w-full h-full block">
-                {currentPhoto.variants[1920]?.avif && (
-                  <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
-                )}
-                {currentPhoto.variants[1920]?.webp && (
-                  <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
-                )}
-                <img
-                  key={`photo-${currentPhoto.id}`}
-                  src={currentPhoto.originalPath}
-                  alt={currentPhoto.alt}
-                  className={`w-full h-full object-cover filter brightness-[0.55] transition-opacity duration-500 ${
-                    isReducedMotion ? '' : 'animate-kenburns'
-                  }`}
-                  style={{
-                    objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
-                    transform: `scale(${currentPhoto.zoom})`,
-                  }}
-                />
-              </picture>
-            </div>
-          ) : (
-            /* Contained Photo Stage */
-            <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-16 p-6">
-              <div className="relative max-h-[80vh] aspect-auto max-w-[90vw] lg:max-w-[50vw] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-                <picture className="w-full h-full block">
-                  {currentPhoto.variants[1920]?.avif && (
-                    <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
-                  )}
-                  {currentPhoto.variants[1920]?.webp && (
-                    <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
-                  )}
-                  <img
-                    key={`photo-${currentPhoto.id}`}
-                    src={currentPhoto.originalPath}
-                    alt={currentPhoto.alt}
-                    className="max-h-[80vh] w-auto object-contain filter brightness-[0.9]"
-                    style={{
-                      objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
-                      transform: `scale(${currentPhoto.zoom})`,
-                    }}
-                  />
-                </picture>
-              </div>
-            </div>
-          )}
-        </div>
-      ) : null}
-
-      {/* Dark Readability Gradient Overlay */}
+      {/* Dark Readability Gradient Overlay for Left Text */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
           background:
-            'linear-gradient(to right, rgba(12, 9, 7, 0.95) 0%, rgba(12, 9, 7, 0.75) 50%, rgba(12, 9, 7, 0.4) 100%)',
+            'linear-gradient(to right, rgba(12, 9, 7, 0.98) 0%, rgba(12, 9, 7, 0.85) 45%, rgba(12, 9, 7, 0.2) 75%, transparent 100%)',
         }}
       />
 
@@ -362,6 +295,73 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
           <rect width="100%" height="100%" filter="url(#template-noise)" />
         </svg>
       </div>
+
+      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED (Placed at z-5 so photo shines clearly) */}
+      {currentPhoto ? (
+        <div className="absolute inset-0 pointer-events-none z-[5] overflow-hidden">
+          {/* Ambient blurred fill for contained/portrait photos */}
+          {currentPhoto.ambientBackdrop && (
+            <img
+              key={`ambient-${currentPhoto.id}`}
+              src={currentPhoto.ambientBackdrop}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.5] saturate-125 transition-opacity duration-700"
+            />
+          )}
+
+          {/* Main Photo Render */}
+          {currentPhoto.isWide ? (
+            /* Wide Photo: Full-Bleed with subtle Ken Burns drift */
+            <div className="absolute inset-0 w-full h-full overflow-hidden">
+              <picture className="w-full h-full block">
+                {currentPhoto.variants[1920]?.avif && (
+                  <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
+                )}
+                {currentPhoto.variants[1920]?.webp && (
+                  <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
+                )}
+                <img
+                  key={`photo-${currentPhoto.id}`}
+                  src={currentPhoto.originalPath}
+                  alt={currentPhoto.alt}
+                  className={`w-full h-full object-cover filter brightness-[0.85] transition-opacity duration-500 ${
+                    isReducedMotion ? '' : 'animate-kenburns'
+                  }`}
+                  style={{
+                    objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
+                    transform: `scale(${currentPhoto.zoom})`,
+                  }}
+                />
+              </picture>
+            </div>
+          ) : (
+            /* Contained Photo Stage */
+            <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-16 p-6">
+              <div className="relative max-h-[82vh] aspect-auto max-w-[90vw] lg:max-w-[52vw] rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.9)] border border-white/20">
+                <picture className="w-full h-full block">
+                  {currentPhoto.variants[1920]?.avif && (
+                    <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
+                  )}
+                  {currentPhoto.variants[1920]?.webp && (
+                    <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
+                  )}
+                  <img
+                    key={`photo-${currentPhoto.id}`}
+                    src={currentPhoto.originalPath}
+                    alt={currentPhoto.alt}
+                    className="max-h-[82vh] w-auto object-contain filter brightness-[1.05] contrast-[1.02]"
+                    style={{
+                      objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
+                      transform: `scale(${currentPhoto.zoom})`,
+                    }}
+                  />
+                </picture>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : null}
 
       {/* Backdrop Tap/Click Dismissal */}
       <div
