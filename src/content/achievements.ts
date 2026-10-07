@@ -44,7 +44,7 @@ export const achievementsData: AchievementEntry[] = [
     category: 'Leadership',
     order: 1,
     position: { top: '20%', left: '20%' },
-    fontFamily: "'Syne Tactile', cursive",
+    fontFamily: "'Inter', 'Manrope', sans-serif",
     stats: [
       { value: '15,000', label: 'people addressed' },
       { value: '7+', label: 'events organised' },
@@ -67,7 +67,7 @@ export const achievementsData: AchievementEntry[] = [
     category: 'Athletics',
     order: 2,
     position: { top: '50%', left: '50%' },
-    fontFamily: "'Syne Tactile', cursive",
+    fontFamily: "'Inter', 'Manrope', sans-serif",
     stats: [
       { value: '2x', label: 'Tamil Nadu state champion' },
       { value: 'Gold', label: 'National, Goa' },
@@ -83,7 +83,7 @@ export const achievementsData: AchievementEntry[] = [
     category: 'Discipline',
     order: 3,
     position: { top: '20%', left: '80%' },
-    fontFamily: "'Syne Tactile', cursive",
+    fontFamily: "'Inter', 'Manrope', sans-serif",
     stats: [
       { value: 'Black belt', label: '' },
       { value: '4x', label: 'National champion' },
@@ -99,7 +99,7 @@ export const achievementsData: AchievementEntry[] = [
     category: 'Strategy',
     order: 4,
     position: { top: '80%', left: '20%' },
-    fontFamily: "'Syne Tactile', cursive",
+    fontFamily: "'Inter', 'Manrope', sans-serif",
     stats: [
       { value: '2143', label: 'Peak bullet' },
       { value: '1985', label: 'Rapid' },
@@ -115,7 +115,7 @@ export const achievementsData: AchievementEntry[] = [
     category: 'Arts',
     order: 5,
     position: { top: '80%', left: '80%' },
-    fontFamily: "'Syne Tactile', cursive",
+    fontFamily: "'Inter', 'Manrope', sans-serif",
     stats: [
       { value: '3 Grades', label: 'Trinity College London' },
       { value: 'Silver', label: 'Medalist, Campofez 2022' },

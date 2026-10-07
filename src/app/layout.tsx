@@ -1,5 +1,9 @@
 import type { Metadata } from 'next';
 import type React from 'react';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '@fontsource-variable/jetbrains-mono';
 import '@fontsource/cinzel-decorative/700.css';
 import '@fontsource-variable/cinzel';
 import '@fontsource/syne/800.css';

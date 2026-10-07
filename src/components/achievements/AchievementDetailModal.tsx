@@ -412,16 +412,16 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full px-6 md:px-12 my-auto py-6">
         {/* Left Column: Huge Title + Stats Grid */}
         <div className="lg:col-span-7 space-y-8 pointer-events-auto">
-          {/* Huge Script Title with character spans for letter walk animation */}
+          {/* Clean Sans Title */}
           <h2
             id={`achievement-title-${item.id}`}
             ref={titleRef}
-            className={`tracking-tight leading-none text-[#FFF4E0] font-bold whitespace-nowrap ${
+            className={`tracking-[-0.02em] leading-none text-[#FFF4E6] font-medium whitespace-nowrap ${
               item.title.length > 10
                 ? 'text-5xl sm:text-6xl md:text-7xl lg:text-8xl'
                 : 'text-6xl sm:text-7xl md:text-8xl lg:text-9xl'
             }`}
-            style={{ fontFamily: item.fontFamily }}
+            style={{ fontFamily: "'Inter', 'Manrope', sans-serif" }}
           >
             {item.title.split('').map((char, index) => (
               <span key={index} className="inline-block title-char">
@@ -451,7 +451,8 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
                     {/* Visual Count-Up Number */}
                     <p
                       aria-hidden="true"
-                      className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#FFF4E0] font-display"
+                      className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#FFF4E6] font-sans"
+                      style={{ fontFamily: "'Inter', 'Manrope', sans-serif" }}
                     >
                       {displayValue}
                     </p>
