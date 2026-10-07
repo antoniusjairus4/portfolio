@@ -97,35 +97,34 @@ export const AchievementsSection: React.FC = () => {
           'radial-gradient(circle at 50% 50%, rgba(224, 169, 59, 0.05) 0%, rgba(12, 9, 7, 1) 70%)',
       }}
     >
-      {/* Golden Smoke Background Image Layer */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <img
-          src="/images/achievements/bg-fluid.png"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover opacity-80 filter brightness-110 contrast-105"
-        />
-      </div>
-
-      {/* LiquidEther WebGL Fluid Simulation & CursorGrid Background (Paused when modal open) */}
+      {/* Full-Screen WebGL LiquidEther Fluid Simulation & CursorGrid Background */}
       <div
-        className={`absolute inset-0 z-0 pointer-events-auto transition-opacity duration-400 ${
-          selectedItem ? 'opacity-0 pointer-events-none' : 'opacity-100'
+        className={`absolute inset-0 z-0 pointer-events-auto transition-opacity duration-700 ease-out ${
+          selectedItem ? 'opacity-15' : 'opacity-100'
         }`}
       >
+        {/* Film Grain & Edge Vignette Overlay for Depth */}
+        <div
+          className="absolute inset-0 z-[1] pointer-events-none opacity-40 mix-blend-overlay"
+          style={{
+            background:
+              'radial-gradient(circle at 50% 50%, transparent 20%, rgba(10, 9, 8, 0.75) 80%, rgba(10, 9, 8, 0.95) 100%)',
+          }}
+        />
+
         {/* Interactive Cursor Grid Background */}
-        <div className="absolute inset-0 z-0 opacity-40">
+        <div className="absolute inset-0 z-[1] opacity-100 pointer-events-none">
           <CursorGrid
             cellSize={70}
             color="#E0A93B"
-            radius={150}
+            radius={200}
             falloff="smooth"
             holdTime={400}
             fadeDuration={800}
             lineWidth={1.2}
             maxOpacity={0.8}
-            fillOpacity={0.08}
-            gridOpacity={0.05}
+            fillOpacity={0.2}
+            gridOpacity={0.02}
             cellRadius={8}
             clickPulse
             pulseSpeed={600}
@@ -133,22 +132,22 @@ export const AchievementsSection: React.FC = () => {
         </div>
 
         <LiquidEther
-          colors={['#E0A93B', '#F5D061', '#9A6B1F']}
-          mouseForce={12}
-          cursorSize={90}
-          isViscous={false}
-          viscous={30}
+          colors={['#0A0908', '#7A4E12', '#D99B26']}
+          mouseForce={16}
+          cursorSize={120}
+          isViscous={true}
+          viscous={35}
           iterationsViscous={32}
           iterationsPoisson={32}
-          resolution={0.5}
+          resolution={0.45}
           isBounce={false}
           autoDemo={true}
-          autoSpeed={0.25}
-          autoIntensity={1.0}
+          autoSpeed={0.3}
+          autoIntensity={1.8}
           takeoverDuration={0.4}
-          autoResumeDelay={3000}
+          autoResumeDelay={2500}
           autoRampDuration={1.2}
-          paused={Boolean(selectedItem)}
+          backgroundColor="#0A0908"
         />
       </div>
 

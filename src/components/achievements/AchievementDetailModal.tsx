@@ -313,33 +313,15 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       onTouchEnd={handleTouchEnd}
       className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
-      {/* Dark Readability Gradient Overlay for Left Text */}
-      <div
-        className="absolute inset-0 pointer-events-none z-[1]"
-        style={{
-          background:
-            'linear-gradient(to right, rgba(12, 9, 7, 0.75) 0%, rgba(12, 9, 7, 0.5) 45%, rgba(12, 9, 7, 0.1) 75%, transparent 100%)',
-        }}
-      />
-
       {/* Fluid Smoke Background Image Layer */}
       <div className="absolute inset-0 pointer-events-none z-[0] overflow-hidden">
         <img
           src="/images/achievements/bg-fluid.png"
           alt=""
           aria-hidden="true"
-          className="w-full h-full object-cover opacity-90 filter brightness-110 contrast-105"
+          className="w-full h-full object-cover"
         />
       </div>
-
-      {/* Gold Radial Glow Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none z-[1]"
-        style={{
-          background:
-            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.18) 0%, rgba(12, 9, 7, 0.4) 60%, rgba(12, 9, 7, 0.75) 100%)',
-        }}
-      />
 
       {/* PHOTO STAGE BACKDROP / FULL-BLEED (For wide photos & ambient background) */}
       {currentPhoto ? (
@@ -373,32 +355,24 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       ) : null}
 
       {/* Interactive Cursor Grid Layer */}
-      <div className="absolute inset-0 pointer-events-auto z-[2] opacity-90">
+      <div className="absolute inset-0 pointer-events-auto z-[2] opacity-100">
         <CursorGrid
           cellSize={65}
           color="#E0A93B"
-          radius={240}
+          radius={260}
           falloff="smooth"
           holdTime={600}
           fadeDuration={1000}
-          lineWidth={1.5}
-          maxOpacity={1}
-          fillOpacity={0.3}
-          gridOpacity={0.12}
+          lineWidth={1.2}
+          maxOpacity={0.85}
+          fillOpacity={0.25}
+          gridOpacity={0.03}
           cellRadius={6}
           clickPulse
           pulseSpeed={700}
         />
       </div>
 
-      {/* Soft Vignette Overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none z-[3]"
-        style={{
-          background:
-            'radial-gradient(circle at 30% 50%, rgba(12, 9, 7, 0.1) 0%, rgba(12, 9, 7, 0.5) 80%)',
-        }}
-      />
 
       {/* Backdrop Tap/Click Dismissal */}
       <div
