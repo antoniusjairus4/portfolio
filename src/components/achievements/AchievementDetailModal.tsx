@@ -468,10 +468,10 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
             </div>
           )}
 
-          {/* Optional Single Line Text */}
-          {item.line && (
+          {/* Optional Caption Line Text */}
+          {item.caption && (
             <p className="font-mono text-sm sm:text-base text-[#F2E9D8]/90 tracking-wide border-l-2 border-[#E0A93B] pl-4 py-1">
-              {item.line}
+              {item.caption}
             </p>
           )}
         </div>
