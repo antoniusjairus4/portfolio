@@ -140,7 +140,48 @@
   "chess": {
     "slug": "chess",
     "title": "Chess",
-    "photos": []
+    "photos": [
+      {
+        "id": "chess-1",
+        "filename": "trophies.jpg",
+        "originalPath": "/images/achievements/chess/photo-1-1280.jpg",
+        "variants": {
+          "640": {
+            "avif": "/images/achievements/chess/photo-1-640.avif",
+            "webp": "/images/achievements/chess/photo-1-640.webp",
+            "jpg": "/images/achievements/chess/photo-1-640.jpg"
+          },
+          "1280": {
+            "avif": "/images/achievements/chess/photo-1-1280.avif",
+            "webp": "/images/achievements/chess/photo-1-1280.webp",
+            "jpg": "/images/achievements/chess/photo-1-1280.jpg"
+          },
+          "1920": {
+            "avif": "/images/achievements/chess/photo-1-1920.avif",
+            "webp": "/images/achievements/chess/photo-1-1920.webp",
+            "jpg": "/images/achievements/chess/photo-1-1920.jpg"
+          },
+          "2560": {
+            "avif": "/images/achievements/chess/photo-1-2560.avif",
+            "webp": "/images/achievements/chess/photo-1-2560.webp",
+            "jpg": "/images/achievements/chess/photo-1-2560.jpg"
+          }
+        },
+        "blurDataURL": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAAAQAgCdASoQABAABUB8JbACdAywClG4oOQAAP7l52yh9GiVf9XnDjJ/f+D89Z7Vq8+zDjqyB1V763gYov4sRQtKa5/XAJphh81xfkAyEsSIRqAA",
+        "ambientBackdrop": "/images/achievements/chess/photo-1-backdrop.webp",
+        "width": 492,
+        "height": 1024,
+        "aspectRatio": 0.48046875,
+        "isWide": false,
+        "isPortrait": true,
+        "focalPoint": [
+          0.5,
+          0.5
+        ],
+        "zoom": 1,
+        "alt": "Chess photo 1"
+      }
+    ]
   },
   "music": {
     "slug": "music",
