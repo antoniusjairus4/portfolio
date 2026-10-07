@@ -117,7 +117,9 @@ export const achievementsData: AchievementEntry[] = [
     position: { top: '80%', left: '80%' },
     fontFamily: "'Syne Tactile', cursive",
     stats: [
-      { value: '3', label: 'Trinity College London graded exams' },
+      { value: '3 Grades', label: 'Trinity College London' },
+      { value: 'Silver', label: 'Medalist, Campofez 2022' },
+      { value: '4', label: 'Events participated' },
     ],
     isDraft: true,
   },
