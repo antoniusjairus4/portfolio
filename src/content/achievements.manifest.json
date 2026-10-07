@@ -1,0 +1,66 @@
+{
+  "speaking": {
+    "slug": "speaking",
+    "title": "Speaking",
+    "photos": [
+      {
+        "id": "speaking-1",
+        "filename": "01-podium.png",
+        "originalPath": "/images/achievements/speaking/photo-1-1280.jpg",
+        "variants": {},
+        "blurDataURL": "data:image/webp;base64,UklGRmYAAABXRUJQVlA4IFoAAAAwAgCdASoQABAABUB8JagCdADDrZpJj2HYAAD+0Rd0Dl9/YcvOOYY2u2FINXDBirDXcQ5+mrDvYF8EVpQEgwzYIrEtDe9C9kNDQ4YFKhNXiduP6u9VQ74kAAA=",
+        "ambientBackdrop": "/images/achievements/speaking/photo-1-backdrop.webp",
+        "width": 451,
+        "height": 672,
+        "aspectRatio": 0.6711309523809523,
+        "isWide": false,
+        "isPortrait": true,
+        "focalPoint": [
+          0.5,
+          0.35
+        ],
+        "zoom": 1.15,
+        "alt": "Jairus speaking at keynote podium"
+      },
+      {
+        "id": "speaking-2",
+        "filename": "02-stage.png",
+        "originalPath": "/images/achievements/speaking/photo-2-1280.jpg",
+        "variants": {},
+        "blurDataURL": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAACwAQCdASoQABAABUB8JZgCdADvxSwAANth9MmgL/dY5AfxI5VMHy7JASuEhi5ROi6HSueAOVd8Zn95AAA=",
+        "ambientBackdrop": "/images/achievements/speaking/photo-2-backdrop.webp",
+        "width": 415,
+        "height": 670,
+        "aspectRatio": 0.6194029850746269,
+        "isWide": false,
+        "isPortrait": true,
+        "focalPoint": [
+          0.5,
+          0.4
+        ],
+        "zoom": 1.1,
+        "alt": "Jairus addressing audience on event stage"
+      }
+    ]
+  },
+  "table-tennis": {
+    "slug": "table-tennis",
+    "title": "Table Tennis",
+    "photos": []
+  },
+  "karate": {
+    "slug": "karate",
+    "title": "Karate",
+    "photos": []
+  },
+  "chess": {
+    "slug": "chess",
+    "title": "Chess",
+    "photos": []
+  },
+  "music": {
+    "slug": "music",
+    "title": "Music",
+    "photos": []
+  }
+}

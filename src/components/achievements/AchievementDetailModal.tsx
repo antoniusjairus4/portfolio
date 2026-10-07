@@ -2,50 +2,77 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
-import { AchievementItem, AchievementPhoto } from '@/content/achievements';
-import manifestData from '../../../public/images/achievements/manifest.json';
+import { AchievementEntry, AchievementStat } from '@/content/achievements';
+import { useLenis } from '@/motion/lenis/LenisProvider';
+import manifestData from '@/content/achievements.manifest.json';
 
-const manifest = manifestData as Record<
-  string,
-  {
-    photos: Omit<AchievementPhoto, 'alt'>[];
-    preblurredBackdrop: string | null;
-  }
->;
+interface ManifestPhoto {
+  id: string;
+  filename: string;
+  originalPath: string;
+  variants: Record<number, Record<string, string>>;
+  blurDataURL: string;
+  ambientBackdrop: string;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  isWide: boolean;
+  isPortrait: boolean;
+  focalPoint: [number, number];
+  zoom: number;
+  alt: string;
+}
+
+interface DisciplineManifest {
+  slug: string;
+  title: string;
+  photos: ManifestPhoto[];
+}
+
+const manifest = manifestData as unknown as Record<string, DisciplineManifest>;
 
 interface AchievementDetailModalProps {
-  item: AchievementItem;
+  item: AchievementEntry;
+  disciplineIndex: number;
+  totalDisciplines: number;
   originRect: DOMRect | null;
   onClose: () => void;
   triggerElement: HTMLElement | null;
 }
 
+// Helper to extract numeric part and suffix for stat count-up
+function parseStatValue(val: string): { num: number; prefix: string; suffix: string } | null {
+  const match = val.match(/^([^\d]*)([\d,.]+)(.*)$/);
+  if (!match) return null;
+  const num = parseFloat(match[2].replace(/,/g, ''));
+  if (isNaN(num)) return null;
+  return {
+    prefix: match[1],
+    num,
+    suffix: match[3],
+  };
+}
+
 export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
   item,
+  disciplineIndex,
+  totalDisciplines,
   originRect,
   onClose,
   triggerElement,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
-  const textRef = useRef<HTMLParagraphElement>(null);
-  const stackRef = useRef<HTMLDivElement>(null);
   const closeBtnRef = useRef<HTMLButtonElement>(null);
-  const backdropImgRef = useRef<HTMLImageElement>(null);
 
-  const discData = manifest[item.folderName] || { photos: [], preblurredBackdrop: null };
-  const rawPhotos = discData.photos || [];
+  const { stop, start } = useLenis();
 
-  const photos: AchievementPhoto[] = rawPhotos.map((p, idx) => ({
-    ...p,
-    alt: `${item.title} photo ${idx + 1}`,
-  }));
+  const discManifest = manifest[item.slug] || { slug: item.slug, title: item.title, photos: [] };
+  const photos = discManifest.photos || [];
 
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [isTypewriterDone, setIsTypewriterDone] = useState(false);
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [isReducedMotion, setIsReducedMotion] = useState(false);
-  const [parallax, setParallax] = useState({ x: 0, y: 0 });
+  const [statCounts, setStatCounts] = useState<number[]>([]);
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -56,6 +83,14 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       setIsReducedMotion(mq.matches);
     } catch {}
   }, []);
+
+  // Stop Lenis smooth scroll while dialog is open & restore on close
+  useEffect(() => {
+    stop();
+    return () => {
+      start();
+    };
+  }, [stop, start]);
 
   // Shared-element FLIP transition on mount
   useEffect(() => {
@@ -84,35 +119,43 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         ease: 'power3.out',
       }
     );
+  }, [originRect, isReducedMotion]);
 
-    if (stackRef.current && photos.length > 0) {
-      gsap.fromTo(
-        stackRef.current.children,
-        {
-          x: deltaX * 0.4,
-          y: deltaY * 0.4 + 40,
-          scale: 0.5,
-          opacity: 0,
-        },
-        {
-          x: 0,
-          y: 0,
-          scale: 1,
-          opacity: 1,
-          duration: 0.7,
-          stagger: 0.08,
-          delay: 0.15,
-          ease: 'power3.out',
-        }
-      );
+  // Count-up animation for stats
+  useEffect(() => {
+    if (isReducedMotion) {
+      setStatCounts(item.stats.map((s) => parseStatValue(s.value)?.num ?? 0));
+      return;
     }
-  }, [originRect, isReducedMotion, photos.length]);
 
-  // Focus trap & Focus return
+    setStatCounts(item.stats.map(() => 0));
+
+    const obj = { progress: 0 };
+    const tween = gsap.to(obj, {
+      progress: 1,
+      duration: 1.2,
+      ease: 'power2.out',
+      delay: 0.2,
+      onUpdate: () => {
+        setStatCounts(
+          item.stats.map((s) => {
+            const parsed = parseStatValue(s.value);
+            if (!parsed) return 0;
+            return Math.floor(parsed.num * obj.progress);
+          })
+        );
+      },
+    });
+
+    return () => {
+      tween.kill();
+    };
+  }, [item.stats, isReducedMotion]);
+
+  // Focus Trap & Focus Return
   useEffect(() => {
     const prevActiveElement = triggerElement || (document.activeElement as HTMLElement);
 
-    // Initial focus on Close button
     setTimeout(() => {
       closeBtnRef.current?.focus();
     }, 50);
@@ -123,10 +166,10 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         handleClose();
       } else if (e.key === 'ArrowRight' && photos.length > 1) {
         e.preventDefault();
-        setActiveIndex((prev) => (prev + 1) % photos.length);
+        setActivePhotoIdx((prev) => (prev + 1) % photos.length);
       } else if (e.key === 'ArrowLeft' && photos.length > 1) {
         e.preventDefault();
-        setActiveIndex((prev) => (prev - 1 + photos.length) % photos.length);
+        setActivePhotoIdx((prev) => (prev - 1 + photos.length) % photos.length);
       } else if (e.key === 'Tab' && dialogRef.current) {
         const focusables = dialogRef.current.querySelectorAll<HTMLElement>(
           'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -154,49 +197,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     };
   }, [photos.length, triggerElement]);
 
-  // Typewriter effect
-  useEffect(() => {
-    if (isReducedMotion) {
-      setTypedText(item.summary);
-      setIsTypewriterDone(true);
-      return;
-    }
-
-    let idx = 0;
-    setTypedText('');
-    setIsTypewriterDone(false);
-
-    const interval = setInterval(() => {
-      if (idx < item.summary.length) {
-        setTypedText(item.summary.slice(0, idx + 1));
-        idx++;
-      } else {
-        setIsTypewriterDone(true);
-        clearInterval(interval);
-      }
-    }, 24);
-
-    return () => clearInterval(interval);
-  }, [item.summary, isReducedMotion]);
-
-  const completeTypewriter = () => {
-    if (!isTypewriterDone) {
-      setTypedText(item.summary);
-      setIsTypewriterDone(true);
-    }
-  };
-
-  // Parallax on Mouse move (gentle tilt/translation for photos)
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isReducedMotion) return;
-    const { clientX, clientY } = e;
-    const { innerWidth, innerHeight } = window;
-    const nx = (clientX / innerWidth - 0.5) * 2; // -1 to 1
-    const ny = (clientY / innerHeight - 0.5) * 2;
-    setParallax({ x: nx * 12, y: ny * 12 });
-  };
-
-  // Touch Handlers for swipe down to close or horizontal photo switch
+  // Touch Handlers for Swipe-down to close & Horizontal swipe for photos
   const handleTouchStart = (e: React.TouchEvent) => {
     const t = e.touches[0];
     touchStartRef.current = { x: t.clientX, y: t.clientY };
@@ -209,21 +210,18 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     const dy = t.clientY - touchStartRef.current.y;
     touchStartRef.current = null;
 
-    // Swipe Down (dy > 100) -> Close
     if (dy > 100 && Math.abs(dy) > Math.abs(dx)) {
       handleClose();
-    }
-    // Horizontal swipe -> photo cycle
-    else if (Math.abs(dx) > 50 && photos.length > 1) {
+    } else if (Math.abs(dx) > 50 && photos.length > 1) {
       if (dx < 0) {
-        setActiveIndex((prev) => (prev + 1) % photos.length);
+        setActivePhotoIdx((prev) => (prev + 1) % photos.length);
       } else {
-        setActiveIndex((prev) => (prev - 1 + photos.length) % photos.length);
+        setActivePhotoIdx((prev) => (prev - 1 + photos.length) % photos.length);
       }
     }
   };
 
-  // Handle Animated Closing
+  // Close animation
   const handleClose = useCallback(() => {
     if (isReducedMotion || !originRect || !titleRef.current) {
       onClose();
@@ -256,9 +254,9 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     }
   }, [isReducedMotion, originRect, onClose]);
 
-  // Preload top photo hover variant
-  const topPhoto = photos[activeIndex];
-  const backdropSrc = discData.preblurredBackdrop;
+  const currentPhoto = photos[activePhotoIdx];
+  const formattedIndex = String(disciplineIndex + 1).padStart(2, '0');
+  const formattedTotal = String(totalDisciplines).padStart(2, '0');
 
   return (
     <div
@@ -266,46 +264,106 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       role="dialog"
       aria-modal="true"
       aria-labelledby={`achievement-title-${item.id}`}
-      onMouseMove={handleMouseMove}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
-      className="fixed inset-0 z-50 flex flex-col justify-between p-6 md:p-12 text-[#F2E9D8] select-none overflow-y-auto"
-      style={{ backgroundColor: '#0C0907' }}
+      className="fixed inset-0 z-50 flex flex-col justify-between text-[#F2E9D8] select-none overflow-y-auto bg-[#0C0907]"
     >
-      {/* STEP 3: AMBIENT PRE-BLURRED PHOTO BACKDROP */}
-      {backdropSrc ? (
+      {/* PHOTO STAGE BACKDROP / FULL-BLEED / CONTAINED */}
+      {currentPhoto ? (
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
-          <img
-            ref={backdropImgRef}
-            src={backdropSrc}
-            alt=""
-            aria-hidden="true"
-            className="w-full h-full object-cover scale-110 filter brightness-[0.45] saturate-150 transition-opacity duration-700"
-          />
+          {/* Ambient blurred fill for contained/portrait photos */}
+          {currentPhoto.ambientBackdrop && (
+            <img
+              key={`ambient-${currentPhoto.id}`}
+              src={currentPhoto.ambientBackdrop}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover filter brightness-[0.35] saturate-125 transition-opacity duration-700"
+            />
+          )}
+
+          {/* Main Photo Render */}
+          {currentPhoto.isWide ? (
+            /* Wide Photo: Full-Bleed with subtle Ken Burns drift */
+            <div className="absolute inset-0 w-full h-full overflow-hidden">
+              <picture className="w-full h-full block">
+                {currentPhoto.variants[1920]?.avif && (
+                  <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
+                )}
+                {currentPhoto.variants[1920]?.webp && (
+                  <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
+                )}
+                <img
+                  key={`photo-${currentPhoto.id}`}
+                  src={currentPhoto.originalPath}
+                  alt={currentPhoto.alt}
+                  className={`w-full h-full object-cover filter brightness-[0.55] transition-opacity duration-500 ${
+                    isReducedMotion ? '' : 'animate-kenburns'
+                  }`}
+                  style={{
+                    objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
+                    transform: `scale(${currentPhoto.zoom})`,
+                  }}
+                />
+              </picture>
+            </div>
+          ) : (
+            /* Contained Photo Stage */
+            <div className="absolute inset-0 flex items-center justify-center lg:justify-end lg:pr-16 p-6">
+              <div className="relative max-h-[80vh] aspect-auto max-w-[90vw] lg:max-w-[50vw] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
+                <picture className="w-full h-full block">
+                  {currentPhoto.variants[1920]?.avif && (
+                    <source srcSet={currentPhoto.variants[1920].avif} type="image/avif" />
+                  )}
+                  {currentPhoto.variants[1920]?.webp && (
+                    <source srcSet={currentPhoto.variants[1920].webp} type="image/webp" />
+                  )}
+                  <img
+                    key={`photo-${currentPhoto.id}`}
+                    src={currentPhoto.originalPath}
+                    alt={currentPhoto.alt}
+                    className="max-h-[80vh] w-auto object-contain filter brightness-[0.9]"
+                    style={{
+                      objectPosition: `${currentPhoto.focalPoint[0] * 100}% ${currentPhoto.focalPoint[1] * 100}%`,
+                      transform: `scale(${currentPhoto.zoom})`,
+                    }}
+                  />
+                </picture>
+              </div>
+            </div>
+          )}
         </div>
       ) : null}
 
-      {/* Gold Radial Glow */}
+      {/* Dark Readability Gradient Overlay */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
           background:
-            'radial-gradient(circle at 70% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 0.85) 60%, rgba(12, 9, 7, 0.98) 100%)',
+            'linear-gradient(to right, rgba(12, 9, 7, 0.95) 0%, rgba(12, 9, 7, 0.75) 50%, rgba(12, 9, 7, 0.4) 100%)',
+        }}
+      />
+
+      {/* Gold Radial Glow Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(circle at 20% 50%, rgba(224, 169, 59, 0.12) 0%, rgba(12, 9, 7, 0.8) 60%, rgba(12, 9, 7, 0.98) 100%)',
         }}
       />
 
       {/* SVG Noise Film Grain Overlay */}
       <div className="absolute inset-0 pointer-events-none z-0 opacity-[0.04]">
         <svg className="w-full h-full">
-          <filter id="detail-noise">
+          <filter id="template-noise">
             <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
           </filter>
-
-          <rect width="100%" height="100%" filter="url(#detail-noise)" />
+          <rect width="100%" height="100%" filter="url(#template-noise)" />
         </svg>
       </div>
 
-      {/* Backdrop Click Dismissal Target */}
+      {/* Backdrop Tap/Click Dismissal */}
       <div
         onClick={handleClose}
         className="absolute inset-0 z-0 cursor-pointer"
@@ -313,33 +371,37 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         title="Click background to close"
       />
 
-      {/* Header Controls Bar */}
-      <div className="relative z-10 flex items-center justify-between pointer-events-none">
-        <div className="flex items-center space-x-3">
-          <span className="w-2 h-2 rounded-full bg-[#E0A93B]" />
-          <p className="text-xs font-mono tracking-[0.25em] text-[#E0A93B] uppercase">
-            {item.category} / DETAIL
-          </p>
-        </div>
+      {/* Top Header Bar */}
+      <div className="relative z-10 flex items-center justify-between p-6 md:p-12 pointer-events-none">
+        <p className="text-xs font-mono tracking-[0.25em] text-[#E0A93B] uppercase">
+          CRAFT & DISCIPLINE
+        </p>
 
-        <button
-          ref={closeBtnRef}
-          onClick={handleClose}
-          type="button"
-          aria-label="Close detail view"
-          className="pointer-events-auto flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#E0A93B]/60 text-xs font-mono tracking-wider text-white/80 hover:text-[#E0A93B] hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-[#E0A93B]"
-        >
-          <span>CLOSE</span>
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <div className="flex items-center space-x-6">
+          <span className="text-xs font-mono text-white/50 tracking-wider">
+            {formattedIndex} / {formattedTotal}
+          </span>
+
+          <button
+            ref={closeBtnRef}
+            onClick={handleClose}
+            type="button"
+            aria-label="Close detail view"
+            className="pointer-events-auto flex items-center space-x-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 hover:border-[#E0A93B]/60 text-xs font-mono tracking-wider text-white/80 hover:text-[#E0A93B] hover:bg-white/10 transition-all focus:outline-none focus:ring-2 focus:ring-[#E0A93B]"
+          >
+            <span>CLOSE</span>
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Main Grid Content Layout */}
-      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full my-auto py-8">
-        {/* Left Column: Enormous Title + Concise Text */}
-        <div className="lg:col-span-6 space-y-6">
+      {/* Main Content Layout */}
+      <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-center max-w-7xl mx-auto w-full px-6 md:px-12 my-auto py-6">
+        {/* Left Column: Huge Title + Stats Grid */}
+        <div className="lg:col-span-7 space-y-8 pointer-events-auto">
+          {/* Huge Script Title */}
           <h2
             id={`achievement-title-${item.id}`}
             ref={titleRef}
@@ -349,114 +411,110 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
             {item.title}
           </h2>
 
-          <div
-            onClick={completeTypewriter}
-            className="cursor-pointer group relative p-6 md:p-8 rounded-2xl bg-[#17110C]/80 border border-white/10 backdrop-blur-xl shadow-2xl transition-border duration-300 hover:border-[#E0A93B]/30"
-          >
-            {/* Screen Reader Full Accessible Text */}
-            <p className="sr-only">{item.summary}</p>
+          {/* Giant Stat Numbers Grid */}
+          {item.stats.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-white/10">
+              {item.stats.map((stat, sIdx) => {
+                const parsed = parseStatValue(stat.value);
+                const currentNum = statCounts[sIdx] ?? 0;
 
-            {/* Visual Typewriter Text */}
-            <p
-              aria-hidden="true"
-              className="font-mono text-base sm:text-lg md:text-xl text-[#F2E9D8] leading-relaxed min-h-[6rem]"
-            >
-              {typedText}
-              {!isTypewriterDone && (
-                <span className="inline-block w-2.5 h-5 bg-[#E0A93B] ml-1.5 animate-pulse align-middle" />
-              )}
-            </p>
-
-            {!isTypewriterDone && (
-              <span className="text-[10px] font-mono text-[#E0A93B]/60 tracking-wider uppercase block mt-3">
-                Tap text to reveal all
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Right Column: Photo Stack OR Text-Only Layout */}
-        <div className="lg:col-span-6 relative flex flex-col items-center justify-center min-h-[360px] md:min-h-[460px]">
-          {photos.length > 0 ? (
-            <div
-              ref={stackRef}
-              className="relative w-full max-w-[420px] aspect-[3/4] flex items-center justify-center transition-transform duration-300 ease-out"
-              style={{
-                transform: `translate3d(${parallax.x}px, ${parallax.y}px, 0)`,
-              }}
-            >
-              {photos.map((photo, idx) => {
-                // Stack positioning math: index relative to activeIndex
-                const offset = (idx - activeIndex + photos.length) % photos.length;
-                const isTop = offset === 0;
-                const seedRotation = idx % 2 === 0 ? -4 : 4;
-                const rotateDeg = isTop ? seedRotation : seedRotation + offset * 3;
-                const scale = 1 - offset * 0.06;
-                const translateY = offset * 14;
-
-                const webpVariant = photo.variants['640']?.webp || photo.originalPath;
-                const avifVariant = photo.variants['640']?.avif;
+                const displayValue = parsed
+                  ? `${parsed.prefix}${currentNum}${parsed.suffix}`
+                  : stat.value;
 
                 return (
-                  <div
-                    key={photo.id}
-                    onClick={() => {
-                      if (photos.length > 1) {
-                        setActiveIndex((prev) => (prev + 1) % photos.length);
-                      }
-                    }}
-                    className={`absolute inset-0 rounded-2xl overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.85)] border border-white/15 transition-all duration-500 cursor-pointer ${
-                      isTop ? 'z-30 hover:scale-[1.02] hover:border-[#E0A93B]/50' : 'z-10 pointer-events-none'
-                    }`}
-                    style={{
-                      transform: `translateY(${translateY}px) rotate(${rotateDeg}deg) scale(${scale})`,
-                      opacity: offset > 2 ? 0 : 1 - offset * 0.2,
-                      backgroundImage: `url(${photo.blurDataURL})`,
-                      backgroundSize: 'cover',
-                    }}
-                  >
-                    <picture className="w-full h-full block">
-                      {avifVariant && <source srcSet={avifVariant} type="image/avif" />}
-                      {webpVariant && <source srcSet={webpVariant} type="image/webp" />}
-                      <img
-                        src={photo.originalPath}
-                        alt={photo.alt}
-                        className="w-full h-full object-cover object-center"
-                        loading={isTop ? 'eager' : 'lazy'}
-                      />
-                    </picture>
+                  <div key={`${item.id}-stat-${sIdx}`} className="space-y-1">
+                    {/* Screen Reader Sentence */}
+                    <span className="sr-only">
+                      {stat.value} {stat.label}
+                    </span>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
+                    {/* Visual Count-Up Number */}
+                    <p
+                      aria-hidden="true"
+                      className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#FFF4E0] font-display"
+                    >
+                      {displayValue}
+                    </p>
+
+                    {stat.label ? (
+                      <p aria-hidden="true" className="text-xs font-mono text-[#A89880] uppercase tracking-wider">
+                        {stat.label}
+                      </p>
+                    ) : null}
                   </div>
                 );
               })}
-
-              {/* Counter Indicator */}
-              {photos.length > 1 && (
-                <div className="absolute -bottom-10 left-1/2 -translate-x-1/2 z-40 px-3 py-1 rounded-full bg-black/60 border border-white/10 backdrop-blur-md text-xs font-mono text-[#E0A93B]">
-                  {activeIndex + 1} / {photos.length}
-                </div>
-              )}
-            </div>
-          ) : (
-            /* Intentional Text-Only Layout when no photos exist */
-            <div className="w-full max-w-md p-8 rounded-3xl bg-white/[0.02] border border-white/10 text-center space-y-4">
-              <span className="text-4xl text-[#E0A93B] block">✦</span>
-              <h3 className="font-mono text-sm tracking-[0.2em] text-[#E0A93B] uppercase">
-                {item.subtitle}
-              </h3>
-              <p className="font-mono text-xs text-white/40 leading-relaxed max-w-xs mx-auto">
-                Discipline records & archives held in physical trophies and certificates.
-              </p>
             </div>
           )}
+
+          {/* Optional Single Line Text */}
+          {item.line && (
+            <p className="font-mono text-sm sm:text-base text-[#F2E9D8]/90 tracking-wide border-l-2 border-[#E0A93B] pl-4 py-1">
+              {item.line}
+            </p>
+          )}
         </div>
+
+        {/* Empty Photo State Info Badge (if no photos) */}
+        {photos.length === 0 && (
+          <div className="lg:col-span-5 flex justify-center lg:justify-end">
+            <div className="p-8 rounded-3xl bg-white/[0.03] border border-white/10 text-center space-y-3 max-w-xs">
+              <span className="text-3xl text-[#E0A93B]">✦</span>
+              <p className="font-mono text-xs text-white/50 uppercase tracking-widest">
+                ARCHIVE RECORD
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Footer Controls & Instructions */}
-      <div className="relative z-10 flex items-center justify-between text-xs font-mono text-white/40 border-t border-white/5 pt-4">
-        <span>SWIPE DOWN OR PRESS ESC TO CLOSE</span>
-        {photos.length > 1 && <span>USE ARROW KEYS OR TAP PHOTO TO CYCLE</span>}
+      {/* Photo Navigation Controls & Progress Dashes */}
+      <div className="relative z-10 p-6 md:p-12 flex items-center justify-between pointer-events-auto">
+        {photos.length > 1 ? (
+          <>
+            {/* Previous Photo Button */}
+            <button
+              onClick={() => setActivePhotoIdx((prev) => (prev - 1 + photos.length) % photos.length)}
+              type="button"
+              aria-label="Previous photo"
+              className="p-3 rounded-full bg-white/5 border border-white/10 hover:border-[#E0A93B] text-white/80 hover:text-[#E0A93B] transition-all focus:outline-none focus:ring-2 focus:ring-[#E0A93B]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            {/* Progress Dashes */}
+            <div className="flex items-center space-x-2">
+              {photos.map((p, pIdx) => (
+                <button
+                  key={`dash-${p.id}`}
+                  onClick={() => setActivePhotoIdx(pIdx)}
+                  type="button"
+                  aria-label={`Go to photo ${pIdx + 1}`}
+                  className={`h-1 rounded-full transition-all duration-300 ${
+                    pIdx === activePhotoIdx ? 'w-8 bg-[#E0A93B]' : 'w-3 bg-white/20 hover:bg-white/40'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Next Photo Button */}
+            <button
+              onClick={() => setActivePhotoIdx((prev) => (prev + 1) % photos.length)}
+              type="button"
+              aria-label="Next photo"
+              className="p-3 rounded-full bg-white/5 border border-white/10 hover:border-[#E0A93B] text-white/80 hover:text-[#E0A93B] transition-all focus:outline-none focus:ring-2 focus:ring-[#E0A93B]"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </>
+        ) : (
+          <div className="w-full" />
+        )}
       </div>
     </div>
   );

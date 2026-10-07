@@ -188,6 +188,8 @@ export const AchievementsSection: React.FC = () => {
       {selectedItem && (
         <AchievementDetailModal
           item={selectedItem}
+          disciplineIndex={achievementsContent.findIndex((a) => a.id === selectedItem.id)}
+          totalDisciplines={achievementsContent.length}
           originRect={originRect}
           onClose={handleCloseModal}
           triggerElement={triggerEl}

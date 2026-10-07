@@ -4,6 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "predev": "node scripts/build-achievements.mjs",
+    "prebuild": "node scripts/build-achievements.mjs",
+    "achievements:build": "node scripts/build-achievements.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -85,6 +88,7 @@
     "raw-loader": "^4.0.2",
     "sharp": "^0.35.5",
     "tailwindcss": "^4.3.3",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2",
     "vitest": "^5.0.2"
   }

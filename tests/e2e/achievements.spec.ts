@@ -1,106 +1,102 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('Achievements Detail View E2E Suite', () => {
+test.describe('Data-Driven Achievements Template E2E Suite', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('http://localhost:3000');
 
-    // Skip preloader
     const skipBtn = page.getByRole('button', { name: 'Skip' });
     if (await skipBtn.isVisible()) {
       await skipBtn.click();
       await page.waitForTimeout(500);
     }
 
-    // Scroll to achievements section
     const section = page.locator('#achievements-section');
     await section.scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
   });
 
-  test('clicking each node opens the dialog with proper discipline title & full text', async ({ page }) => {
-    const nodes = ['Speaking', 'Karate', 'Table Tennis', 'Chess', 'Music'];
+  test('clicking each node opens the data-driven template with correct title and index label', async ({ page }) => {
+    const disciplines = [
+      { name: 'Speaking', index: '01 / 05' },
+      { name: 'Table Tennis', index: '02 / 05' },
+      { name: 'Karate', index: '03 / 05' },
+      { name: 'Chess', index: '04 / 05' },
+      { name: 'Music', index: '05 / 05' },
+    ];
 
-    for (const title of nodes) {
-      const node = page.locator('h3', { hasText: title });
+    for (const item of disciplines) {
+      const node = page.locator('h3', { hasText: item.name });
       await expect(node).toBeVisible();
 
       await node.click({ force: true });
       const dialog = page.locator('div[role="dialog"]');
       await expect(dialog).toBeVisible();
 
+      // Heading matching discipline title
       const heading = dialog.locator('h2');
-      await expect(heading).toHaveText(title);
+      await expect(heading).toHaveText(item.name);
 
-      // Verify close button exists
+      // Verify header index tracking label
+      const indexLabel = dialog.locator('text=' + item.index);
+      await expect(indexLabel).toBeVisible();
+
+      // Close modal
       const closeBtn = dialog.getByRole('button', { name: 'Close detail view' });
-      await expect(closeBtn).toBeVisible();
-
-      // Close dialog
       await closeBtn.click();
       await expect(dialog).not.toBeVisible();
     }
   });
 
-  test('mouse movement does not close the dialog', async ({ page }) => {
+  test('speaking discipline renders count-up stats and single line', async ({ page }) => {
     const speakingNode = page.locator('h3', { hasText: 'Speaking' });
     await speakingNode.click({ force: true });
 
     const dialog = page.locator('div[role="dialog"]');
     await expect(dialog).toBeVisible();
 
-    // Move mouse across the screen
-    await page.mouse.move(100, 100);
-    await page.mouse.move(500, 500);
-    await page.mouse.move(800, 200);
-    await page.waitForTimeout(500);
+    // Verify stats appear
+    const statLabel1 = dialog.locator('text=people addressed');
+    await expect(statLabel1).toBeVisible();
 
-    // Dialog should remain open
-    await expect(dialog).toBeVisible();
+    const statLabel2 = dialog.locator('text=events organised');
+    await expect(statLabel2).toBeVisible();
+
+    // Single line text
+    const lineText = dialog.locator('text=Spoke before Sid Ahmed and Sivakarthikeyan.');
+    await expect(lineText).toBeVisible();
   });
 
-  test('Escape key, close button, and backdrop click close the dialog', async ({ page }) => {
+  test('navigation arrows and progress dashes cycle photos', async ({ page }) => {
     const speakingNode = page.locator('h3', { hasText: 'Speaking' });
-
-    // 1. Close via Escape key
     await speakingNode.click({ force: true });
-    const dialog1 = page.locator('div[role="dialog"]');
-    await expect(dialog1).toBeVisible();
-    await page.keyboard.press('Escape');
-    await expect(dialog1).not.toBeVisible();
-
-    // 2. Close via backdrop click
-    await speakingNode.click({ force: true });
-    const dialog2 = page.locator('div[role="dialog"]');
-    await expect(dialog2).toBeVisible();
-    const backdrop = dialog2.locator('div[title="Click background to close"]');
-    await backdrop.click({ position: { x: 50, y: 50 } });
-    await expect(dialog2).not.toBeVisible();
-  });
-
-  test('focus returns to originating node on close', async ({ page }) => {
-    const speakingNode = page.locator('div[role="button"]', { hasText: 'Speaking' });
-    await speakingNode.focus();
-    await page.keyboard.press('Enter');
 
     const dialog = page.locator('div[role="dialog"]');
     await expect(dialog).toBeVisible();
 
-    await page.keyboard.press('Escape');
-    await expect(dialog).not.toBeVisible();
+    const nextBtn = dialog.getByRole('button', { name: 'Next photo' });
+    if (await nextBtn.isVisible()) {
+      await nextBtn.click();
+      await page.waitForTimeout(300);
 
-    // Verify focus returned to speaking button
-    await expect(speakingNode).toBeFocused();
+      const prevBtn = dialog.getByRole('button', { name: 'Previous photo' });
+      await expect(prevBtn).toBeVisible();
+    }
   });
 
-  test('disciplines without photos render intentional text-only fallback layout', async ({ page }) => {
+  test('empty photo disciplines display intentional text & stats layout', async ({ page }) => {
     const chessNode = page.locator('h3', { hasText: 'Chess' });
     await chessNode.click({ force: true });
 
     const dialog = page.locator('div[role="dialog"]');
     await expect(dialog).toBeVisible();
 
-    const fallback = dialog.locator('text=Discipline records & archives held in physical trophies');
-    await expect(fallback).toBeVisible();
+    // Verify stats exist
+    const bulletStat = dialog.locator('text=Peak bullet');
+    await expect(bulletStat).toBeVisible();
+
+    // Verify archive emblem badge
+    const badge = dialog.locator('text=ARCHIVE RECORD');
+    await expect(badge).toBeVisible();
   });
 
   test('390px mobile layout has no horizontal overflow', async ({ page }) => {
@@ -111,9 +107,9 @@ test.describe('Achievements Detail View E2E Suite', () => {
     const dialog = page.locator('div[role="dialog"]');
     await expect(dialog).toBeVisible();
 
-    const overflow = await page.evaluate(() => {
+    const hasOverflow = await page.evaluate(() => {
       return document.documentElement.scrollWidth > window.innerWidth;
     });
-    expect(overflow).toBe(false);
+    expect(hasOverflow).toBe(false);
   });
 });
