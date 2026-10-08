@@ -11,6 +11,9 @@ if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
 }
 
+// Global Pacing Multiplier constant
+const PACE = 1.0;
+
 export interface DisciplineChapter {
   id: string;
   number: string;
@@ -24,7 +27,7 @@ export interface DisciplineChapter {
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   {
     id: 'table-tennis',
-    number: '01 / 03',
+    number: '01 / 05',
     title: 'Table Tennis',
     descriptor: '2x Tamil Nadu State Champion',
     stats: [
@@ -37,7 +40,7 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   },
   {
     id: 'public-speaking',
-    number: '02 / 03',
+    number: '02 / 05',
     title: 'Public Speaking',
     descriptor: 'Keynote & Oratory Speaker',
     stats: [
@@ -49,8 +52,21 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     caption: 'Keynote Address on Cybersecurity & Tech Futures',
   },
   {
+    id: 'karate',
+    number: '03 / 05',
+    title: 'Karate',
+    descriptor: 'Black belt martial artist',
+    stats: [
+      { value: 'Black Belt', label: 'Martial Artist' },
+      { value: '4x', label: 'National Champion' },
+      { value: '15+', label: 'State Medals' },
+    ],
+    imageSrc: '/images/karate.jpg',
+    caption: 'National Kumite Tournament Demonstration',
+  },
+  {
     id: 'chess',
-    number: '03 / 03',
+    number: '04 / 05',
     title: 'Chess',
     descriptor: 'Tactical Tournament Player',
     stats: [
@@ -60,6 +76,19 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     ],
     imageSrc: '/images/chess.jpg',
     caption: 'State Level FIDE Rated Tournament Trophies',
+  },
+  {
+    id: 'music',
+    number: '05 / 05',
+    title: 'Music',
+    descriptor: 'Instrumental & Keyboard Artist',
+    stats: [
+      { value: '3 Grades', label: 'Trinity College London' },
+      { value: 'Silver', label: 'Medalist, Campofez 2022' },
+      { value: '4', label: 'Events Participated' },
+    ],
+    imageSrc: '/images/music.jpg',
+    caption: 'Live Piano & Keyboard Solo Performance',
   },
 ];
 
@@ -89,7 +118,7 @@ export const DisciplinesScrollSection: React.FC = () => {
     } catch {}
   }, []);
 
-  // Preload all chapter images and trigger refresh
+  // Preload all chapter images
   useEffect(() => {
     DISCIPLINE_CHAPTERS.forEach((ch) => {
       const img = new Image();
@@ -100,44 +129,27 @@ export const DisciplinesScrollSection: React.FC = () => {
     });
   }, []);
 
-  // Master GSAP Context & ScrollTrigger Timeline
+  // Master GSAP Context & ScrollTrigger Timeline with 9 units per chapter (TOTAL_UNITS = 45)
   useEffect(() => {
     if (!sectionRef.current || !stageRef.current) return;
 
     const ctx = gsap.context(() => {
       const numChapters = DISCIPLINE_CHAPTERS.length;
-      const totalScrollVh = numChapters * 3.5; // 350% per chapter
-
-      // Intro animation for first chapter title before section pin
-      const introTl = gsap.timeline({
-        scrollTrigger: {
-          id: 'disc-intro',
-          trigger: sectionRef.current,
-          start: 'top 65%',
-          toggleActions: 'play none none reverse',
-          refreshPriority: 0,
-        },
-      });
-
-      const firstTitleChars = sectionRef.current?.querySelectorAll('.chapter-0-title-char');
-      if (firstTitleChars && firstTitleChars.length > 0) {
-        introTl.fromTo(
-          firstTitleChars,
-          { opacity: 0, yPercent: 40 },
-          { opacity: 1, yPercent: 0, duration: 0.8, stagger: 0.02, ease: 'power2.out' }
-        );
-      }
+      const isMobile = window.innerWidth < 768;
+      const unitsPerChapter = (isMobile ? 6.5 : 9.0) * PACE;
+      const totalUnits = numChapters * unitsPerChapter;
 
       // Master Pinned Timeline
       const masterTl = gsap.timeline({
+        defaults: { ease: 'none' },
         scrollTrigger: {
           id: 'disc-master-pin',
           trigger: sectionRef.current,
           start: 'top top',
-          end: `+=${totalScrollVh * 100}vh`,
+          end: () => `+=${totalUnits * window.innerHeight}`,
           pin: stageRef.current,
           pinSpacing: true,
-          scrub: 1.5,
+          scrub: 2, // Smooth inertia on wheel ticks
           anticipatePin: 1,
           refreshPriority: 0,
           onToggle: (self) => {
@@ -151,10 +163,10 @@ export const DisciplinesScrollSection: React.FC = () => {
         },
       });
 
-      // Build 5 Chapter Timeline Slots
+      // Build 5 Chapter Timeline Slots mapped explicitly to units
       DISCIPLINE_CHAPTERS.forEach((ch, i) => {
-        const slotDuration = 1 / numChapters;
-        const slotStart = i * slotDuration;
+        const slotUnits = unitsPerChapter;
+        const slotStartUnit = i * slotUnits;
 
         const chapterEl = chaptersRef.current[i];
         if (!chapterEl) return;
@@ -164,126 +176,243 @@ export const DisciplinesScrollSection: React.FC = () => {
         const descEl = chapterEl.querySelector('.chapter-desc');
         const statsEls = chapterEl.querySelectorAll('.stat-item');
         const photoCardEl = chapterEl.querySelector('.photo-card');
+        const innerImgEl = chapterEl.querySelector('.photo-card-img');
         const captionEl = chapterEl.querySelector('.photo-caption');
         const spotLightEl = chapterEl.querySelector('.spotlight-layer');
 
-        // Set initial visibility & positions
+        // Set initial state
         gsap.set(chapterEl, { visibility: i === 0 ? 'visible' : 'hidden', opacity: i === 0 ? 1 : 0 });
-
+        gsap.set(titleEl, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', scale: 1, color: '#FFF4E6' });
+        
         if (i !== 0) {
-          gsap.set(titleEl, { xPercent: 0, yPercent: 0, scale: 1, color: '#FFF4E6', position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
-          gsap.set(chars, { opacity: 0, yPercent: 50 });
+          gsap.set(chars, { opacity: 0, yPercent: 40 });
         } else {
-          // Chapter 01 starts docked/centered
-          gsap.set(titleEl, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' });
+          gsap.set(chars, { opacity: 1, yPercent: 0 });
         }
 
         gsap.set(descEl, { opacity: 0, y: 15 });
-        gsap.set(statsEls, { opacity: 0, y: 20 });
-        gsap.set(photoCardEl, { opacity: 0, x: 60, scale: 0.95 });
-        gsap.set(captionEl, { opacity: 0, y: 10 });
+        gsap.set(statsEls, { opacity: 0, y: 25 });
+        gsap.set(photoCardEl, { opacity: 0, xPercent: 12, scale: 0.92, filter: 'blur(12px)', clipPath: 'inset(0% 0% 0% 100%)' });
+        if (innerImgEl) gsap.set(innerImgEl, { scale: 1.12 });
+        gsap.set(captionEl, { opacity: 0, y: 15 });
         gsap.set(spotLightEl, { opacity: 0 });
 
-        // Phase 1: Title Walk-In (0% -> 12% of slot)
-        if (i > 0) {
-          masterTl
-            .to(chapterEl, { visibility: 'visible', opacity: 1, duration: 0.01 }, slotStart)
-            .to(chars, { opacity: 1, yPercent: 0, stagger: 0.003, ease: 'power2.out', duration: 0.1 * slotDuration }, slotStart);
+        // Reduced Motion simplified path
+        if (isReducedMotion) {
+          masterTl.to(chapterEl, { visibility: 'visible', opacity: 1, duration: 0.1 }, slotStartUnit);
+          masterTl.to([titleEl, descEl, statsEls, photoCardEl, captionEl], { opacity: 1, duration: 2.0 }, slotStartUnit + 1.0);
+          if (i < numChapters - 1) {
+            masterTl.to(chapterEl, { opacity: 0, duration: 1.0 }, slotStartUnit + slotUnits - 1.0);
+          }
+          return;
         }
 
-        // Phase 2: Title Travel to Top-Left Dock (22% -> 38% of slot)
-        const travelStart = slotStart + 0.22 * slotDuration;
-        const travelDur = 0.16 * slotDuration;
+        // --- BEAT A: Title Entrance (0.0 to 0.8 units) ---
+        if (i > 0) {
+          const titleEnterStart = slotStartUnit - 0.4; // Handoff overlap starting at 8.6 of previous chapter
+          masterTl.to(chapterEl, { visibility: 'visible', opacity: 1, duration: 0.01 }, titleEnterStart);
+          masterTl.to(
+            chars,
+            { opacity: 1, yPercent: 0, stagger: 0.04 * PACE, ease: 'sine.out', duration: 0.5 * PACE },
+            titleEnterStart
+          );
+        }
+
+        // --- BEAT B: Read Hold (0.8 to 1.6 units) ---
+        // Pinned centered hold (no movement)
+
+        // --- BEAT C: Dock to Top-Left (1.6 to 2.6 units) ---
+        const dockStart = slotStartUnit + 1.6 * PACE;
+        const dockDur = 1.0 * PACE;
 
         masterTl
           .to(
             titleEl,
             {
-              top: '96px',
-              left: '48px',
+              top: isMobile ? '72px' : '96px',
+              left: isMobile ? '24px' : '48px',
               transform: 'translate(0%, 0%)',
-              scale: 0.38,
+              scale: isMobile ? 0.32 : 0.38,
               color: '#FFF4E6',
-              ease: 'power3.inOut',
-              duration: travelDur,
+              ease: 'power1.inOut',
+              duration: dockDur,
             },
-            travelStart
+            dockStart
           )
-          .to(descEl, { opacity: 1, y: 0, duration: travelDur * 0.8 }, travelStart + travelDur * 0.2)
-          .to(spotLightEl, { opacity: 1, duration: travelDur }, travelStart);
+          .to(descEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.6 * PACE }, dockStart + 0.3 * PACE)
+          .to(spotLightEl, { opacity: 1, ease: 'sine.inOut', duration: 1.0 * PACE }, dockStart);
 
-        // Phase 3: Content Appears One-by-One (38% -> 82% of slot)
-        const contentStart = slotStart + 0.38 * slotDuration;
-        const contentStep = (0.44 * slotDuration) / 5;
-
-        // Stats sequential reveal + count-up
-        statsEls.forEach((statEl, sIdx) => {
-          const numEl = statEl.querySelector('.stat-number');
-          const statData = ch.stats[sIdx];
-          const parsed = statData ? parseStatValue(statData.value) : null;
-
+        // --- BEAT D: Sequential Content Reveal (2.9 to 7.5 units) ---
+        
+        // Stat 1: 2.9 to 3.5 units
+        const stat1Start = slotStartUnit + 2.9 * PACE;
+        const stat1Dur = 0.6 * PACE;
+        const s1El = statsEls[0];
+        if (s1El) {
+          const num1 = s1El.querySelector('.stat-number');
+          const parsed1 = ch.stats[0] ? parseStatValue(ch.stats[0].value) : null;
           masterTl.to(
-            statEl,
+            s1El,
             {
               opacity: 1,
               y: 0,
-              duration: contentStep,
-              ease: 'power2.out',
+              ease: 'power1.out',
+              duration: stat1Dur,
               onStart: () => {
-                if (parsed && numEl) {
+                if (parsed1 && num1) {
                   gsap.to(
                     { val: 0 },
                     {
-                      val: parsed.num,
-                      duration: 0.8,
-                      ease: 'power2.out',
+                      val: parsed1.num,
+                      duration: stat1Dur,
+                      ease: 'power1.out',
                       onUpdate: function () {
-                        numEl.textContent = `${parsed.prefix}${Math.floor(this.targets()[0].val)}${parsed.suffix}`;
+                        num1.textContent = `${parsed1.prefix}${Math.floor(this.targets()[0].val)}${parsed1.suffix}`;
                       },
                     }
                   );
                 }
               },
             },
-            contentStart + sIdx * contentStep
+            stat1Start
           );
-        });
+        }
 
-        // Photo card slide-in
+        // Stat 2: 3.7 to 4.3 units
+        const stat2Start = slotStartUnit + 3.7 * PACE;
+        const stat2Dur = 0.6 * PACE;
+        const s2El = statsEls[1];
+        if (s2El) {
+          const num2 = s2El.querySelector('.stat-number');
+          const parsed2 = ch.stats[1] ? parseStatValue(ch.stats[1].value) : null;
+          masterTl.to(
+            s2El,
+            {
+              opacity: 1,
+              y: 0,
+              ease: 'power1.out',
+              duration: stat2Dur,
+              onStart: () => {
+                if (parsed2 && num2) {
+                  gsap.to(
+                    { val: 0 },
+                    {
+                      val: parsed2.num,
+                      duration: stat2Dur,
+                      ease: 'power1.out',
+                      onUpdate: function () {
+                        num2.textContent = `${parsed2.prefix}${Math.floor(this.targets()[0].val)}${parsed2.suffix}`;
+                      },
+                    }
+                  );
+                }
+              },
+            },
+            stat2Start
+          );
+        }
+
+        // Stat 3: 4.5 to 5.1 units
+        const stat3Start = slotStartUnit + 4.5 * PACE;
+        const stat3Dur = 0.6 * PACE;
+        const s3El = statsEls[2];
+        if (s3El) {
+          const num3 = s3El.querySelector('.stat-number');
+          const parsed3 = ch.stats[2] ? parseStatValue(ch.stats[2].value) : null;
+          masterTl.to(
+            s3El,
+            {
+              opacity: 1,
+              y: 0,
+              ease: 'power1.out',
+              duration: stat3Dur,
+              onStart: () => {
+                if (parsed3 && num3) {
+                  gsap.to(
+                    { val: 0 },
+                    {
+                      val: parsed3.num,
+                      duration: stat3Dur,
+                      ease: 'power1.out',
+                      onUpdate: function () {
+                        num3.textContent = `${parsed3.prefix}${Math.floor(this.targets()[0].val)}${parsed3.suffix}`;
+                      },
+                    }
+                  );
+                }
+              },
+            },
+            stat3Start
+          );
+        }
+
+        // Photo Card Reveal: 5.3 to 6.9 units (1.6 units total duration)
+        const photoStart = slotStartUnit + 5.3 * PACE;
+        // Phase 1 (5.3 to 5.9): Clip-path reveal from right edge + opacity + blur
         masterTl.to(
           photoCardEl,
           {
+            clipPath: 'inset(0% 0% 0% 0%)',
             opacity: 1,
-            x: 0,
-            scale: 1,
-            duration: contentStep * 1.5,
-            ease: 'power3.out',
+            filter: 'blur(0px)',
+            ease: 'sine.inOut',
+            duration: 0.6 * PACE,
           },
-          contentStart + 3 * contentStep
+          photoStart
         );
+        // Phase 2 (5.9 to 6.9): Slide, scale & inner parallax
+        masterTl.to(
+          photoCardEl,
+          {
+            xPercent: 0,
+            scale: 1,
+            ease: 'sine.out',
+            duration: 1.0 * PACE,
+          },
+          photoStart + 0.6 * PACE
+        );
+        if (innerImgEl) {
+          masterTl.to(
+            innerImgEl,
+            {
+              scale: 1.0,
+              ease: 'sine.out',
+              duration: 1.0 * PACE,
+            },
+            photoStart + 0.6 * PACE
+          );
+        }
 
-        // Caption reveal
+        // Caption Reveal: 7.0 to 7.5 units
         masterTl.to(
           captionEl,
-          { opacity: 1, y: 0, duration: contentStep },
-          contentStart + 4 * contentStep
+          { opacity: 1, y: 0, ease: 'sine.out', duration: 0.5 * PACE },
+          slotStartUnit + 7.0 * PACE
         );
 
-        // Phase 4: Chapter Exit / Fade Out (90% -> 100% of slot)
-        if (i < numChapters - 1) {
-          const exitStart = slotStart + 0.9 * slotDuration;
-          const exitDur = 0.1 * slotDuration;
+        // --- BEAT E: Full Composition Hold (7.5 to 8.3 units) ---
+        // Clean hold
 
-          masterTl.to(
-            [titleEl, descEl, statsEls, photoCardEl, captionEl, spotLightEl],
-            { opacity: 0, y: -20, duration: exitDur, ease: 'power2.in' },
-            exitStart
-          ).to(chapterEl, { visibility: 'hidden', duration: 0.01 }, exitStart + exitDur);
+        // --- BEAT F: Exit & Handoff (8.3 to 9.0 units) ---
+        if (i < numChapters - 1) {
+          const exitStart = slotStartUnit + 8.3 * PACE;
+          const exitDur = 0.7 * PACE;
+
+          masterTl
+            .to(
+              [titleEl, descEl, statsEls, photoCardEl, captionEl],
+              { opacity: 0, y: -40, ease: 'sine.in', duration: exitDur, stagger: 0.05 },
+              exitStart
+            )
+            .to(spotLightEl, { opacity: 0, ease: 'sine.in', duration: 0.7 * PACE }, exitStart)
+            .to(chapterEl, { visibility: 'hidden', duration: 0.01 }, exitStart + exitDur);
+        } else {
+          // Last chapter (Music) holds composition before pin releases
+          masterTl.to(chapterEl, { opacity: 1, duration: 1.5 * PACE }, slotStartUnit + 7.5 * PACE);
         }
       });
     }, sectionRef);
 
-    // Refresh triggers after fonts and initial render
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
         ScrollTrigger.refresh();
@@ -301,7 +430,7 @@ export const DisciplinesScrollSection: React.FC = () => {
       const endPos = ST.end;
       const targetPos = startPos + (index / DISCIPLINE_CHAPTERS.length) * (endPos - startPos);
       if (lenisContext && lenisContext.lenis) {
-        lenisContext.lenis.scrollTo(targetPos, { duration: 1.2 });
+        lenisContext.lenis.scrollTo(targetPos, { duration: 1.5 });
       } else {
         window.scrollTo({ top: targetPos, behavior: 'smooth' });
       }
@@ -358,7 +487,7 @@ export const DisciplinesScrollSection: React.FC = () => {
             CRAFT & DISCIPLINE / ACHIEVEMENTS
           </p>
           <span className="text-xs uppercase tracking-[0.18em] text-white/50">
-            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 03'}
+            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 05'}
           </span>
         </div>
 
@@ -417,7 +546,7 @@ export const DisciplinesScrollSection: React.FC = () => {
                   {ch.title.split('').map((char, cIdx) => (
                     <span
                       key={`char-${cIdx}`}
-                      className={`inline-block ${i === 0 ? 'chapter-0-title-char' : 'title-char'}`}
+                      className="inline-block title-char"
                     >
                       {char === ' ' ? '\u00A0' : char}
                     </span>
@@ -457,7 +586,7 @@ export const DisciplinesScrollSection: React.FC = () => {
                         src={ch.imageSrc}
                         alt={ch.title}
                         loading="eager"
-                        className="w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
+                        className="photo-card-img w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
                         onError={() => setImgErrorMap((prev) => ({ ...prev, [ch.id]: true }))}
                       />
                     ) : (
