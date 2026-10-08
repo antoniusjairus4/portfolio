@@ -14,81 +14,87 @@ if (typeof window !== 'undefined') {
 // Global Pacing Multiplier constant
 const PACE = 1.0;
 
+export interface DisciplineMoment {
+  year?: string;
+  text: string;
+}
+
 export interface DisciplineChapter {
   id: string;
   number: string;
+  ghostNum: string;
   title: string;
   descriptor: string;
+  summary?: string;
   stats: { value: string; label: string }[];
+  moments?: DisciplineMoment[];
+  quote?: string;
   imageSrc: string;
+  image2Src?: string;
+  cropPosition?: string;
   caption: string;
+  nextLabel?: string;
 }
 
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   {
     id: 'table-tennis',
-    number: '01 / 05',
+    number: '01 / 03',
+    ghostNum: '01',
     title: 'Table Tennis',
     descriptor: '2x Tamil Nadu State Champion',
+    // FILL_ME: Add optional summary, moments, or quote here
+    summary: '',
     stats: [
       { value: '2x', label: 'Tamil Nadu State Champion' },
       { value: 'Gold', label: 'National Tournament, Goa' },
       { value: 'Gold', label: 'RDS Championship' },
     ],
+    moments: [],
+    quote: '',
     imageSrc: '/images/table-tennis.jpg',
+    cropPosition: 'center 20%',
     caption: 'State Championship Finals Victory & Trophy Presentation',
+    nextLabel: 'NEXT / 02 PUBLIC SPEAKING',
   },
   {
     id: 'public-speaking',
-    number: '02 / 05',
+    number: '02 / 03',
+    ghostNum: '02',
     title: 'Public Speaking',
     descriptor: 'Keynote & Oratory Speaker',
+    // FILL_ME: Add optional summary, moments, or quote here
+    summary: '',
     stats: [
       { value: '15000', label: 'People addressed' },
       { value: '7+', label: 'Events organised' },
       { value: '3rd', label: 'Coimbatore Book Festival, English edition' },
     ],
+    moments: [],
+    quote: '',
     imageSrc: '/images/speaking.jpg',
+    cropPosition: 'center 30%',
     caption: 'Keynote Address on Cybersecurity & Tech Futures',
+    nextLabel: 'NEXT / 03 KARATE',
   },
   {
     id: 'karate',
-    number: '03 / 05',
+    number: '03 / 03',
+    ghostNum: '03',
     title: 'Karate',
-    descriptor: 'Black belt martial artist',
+    descriptor: 'Black Belt Martial Artist',
+    // FILL_ME: Add optional summary, moments, or quote here
+    summary: '',
     stats: [
       { value: 'Black Belt', label: 'Martial Artist' },
       { value: '4x', label: 'National Champion' },
       { value: '15+', label: 'State Medals' },
     ],
+    moments: [],
+    quote: '',
     imageSrc: '/images/karate.jpg',
+    cropPosition: 'center 25%',
     caption: 'National Kumite Tournament Demonstration',
-  },
-  {
-    id: 'chess',
-    number: '04 / 05',
-    title: 'Chess',
-    descriptor: 'Tactical Tournament Player',
-    stats: [
-      { value: '2143', label: 'Peak Bullet Rating' },
-      { value: '1985', label: 'Rapid Rating' },
-      { value: '1924', label: 'Blitz Rating' },
-    ],
-    imageSrc: '/images/chess.jpg',
-    caption: 'State Level FIDE Rated Tournament Trophies',
-  },
-  {
-    id: 'music',
-    number: '05 / 05',
-    title: 'Music',
-    descriptor: 'Instrumental & Keyboard Artist',
-    stats: [
-      { value: '3 Grades', label: 'Trinity College London' },
-      { value: 'Silver', label: 'Medalist, Campofez 2022' },
-      { value: '4', label: 'Events Participated' },
-    ],
-    imageSrc: '/images/music.jpg',
-    caption: 'Live Piano & Keyboard Solo Performance',
   },
 ];
 
@@ -118,7 +124,7 @@ export const DisciplinesScrollSection: React.FC = () => {
     } catch {}
   }, []);
 
-  // Preload all chapter images
+  // Preload all chapter main images
   useEffect(() => {
     DISCIPLINE_CHAPTERS.forEach((ch) => {
       const img = new Image();
@@ -129,14 +135,14 @@ export const DisciplinesScrollSection: React.FC = () => {
     });
   }, []);
 
-  // Master GSAP Context & ScrollTrigger Timeline with 9 units per chapter (TOTAL_UNITS = 45)
+  // Master GSAP Context & ScrollTrigger Timeline with 10 units per chapter (TOTAL_UNITS = 30)
   useEffect(() => {
     if (!sectionRef.current || !stageRef.current) return;
 
     const ctx = gsap.context(() => {
       const numChapters = DISCIPLINE_CHAPTERS.length;
       const isMobile = window.innerWidth < 768;
-      const unitsPerChapter = (isMobile ? 6.5 : 9.0) * PACE;
+      const unitsPerChapter = (isMobile ? 7.0 : 10.0) * PACE;
       const totalUnits = numChapters * unitsPerChapter;
 
       // Master Pinned Timeline
@@ -149,7 +155,7 @@ export const DisciplinesScrollSection: React.FC = () => {
           end: () => `+=${totalUnits * window.innerHeight}`,
           pin: stageRef.current,
           pinSpacing: true,
-          scrub: 2, // Smooth inertia on wheel ticks
+          scrub: 2, // Smooth weighted inertia on wheel ticks
           anticipatePin: 1,
           refreshPriority: 0,
           onToggle: (self) => {
@@ -163,7 +169,7 @@ export const DisciplinesScrollSection: React.FC = () => {
         },
       });
 
-      // Build 5 Chapter Timeline Slots mapped explicitly to units
+      // Build 3 Chapter Timeline Slots mapped explicitly to 10 units each
       DISCIPLINE_CHAPTERS.forEach((ch, i) => {
         const slotUnits = unitsPerChapter;
         const slotStartUnit = i * slotUnits;
@@ -174,11 +180,23 @@ export const DisciplinesScrollSection: React.FC = () => {
         const titleEl = chapterEl.querySelector('.chapter-title');
         const chars = chapterEl.querySelectorAll('.title-char');
         const descEl = chapterEl.querySelector('.chapter-desc');
+        const summaryEl = chapterEl.querySelector('.chapter-summary');
         const statsEls = chapterEl.querySelectorAll('.stat-item');
+        const momentsEl = chapterEl.querySelector('.chapter-moments');
+        const quoteEl = chapterEl.querySelector('.chapter-quote');
         const photoCardEl = chapterEl.querySelector('.photo-card');
         const innerImgEl = chapterEl.querySelector('.photo-card-img');
+        const secondCardEl = chapterEl.querySelector('.second-photo-card');
         const captionEl = chapterEl.querySelector('.photo-caption');
+        const nextCueEl = chapterEl.querySelector('.next-cue');
+        const ghostNumEl = chapterEl.querySelector('.ghost-numeral');
         const spotLightEl = chapterEl.querySelector('.spotlight-layer');
+        const progressBarEl = chapterEl.querySelector('.chapter-progress-line');
+
+        // Check optional slot contents
+        const hasSummary = Boolean(ch.summary && ch.summary.trim());
+        const hasMoments = Boolean(ch.moments && ch.moments.length > 0);
+        const hasQuote = Boolean(ch.quote && ch.quote.trim());
 
         // Set initial state
         gsap.set(chapterEl, { visibility: i === 0 ? 'visible' : 'hidden', opacity: i === 0 ? 1 : 0 });
@@ -191,11 +209,19 @@ export const DisciplinesScrollSection: React.FC = () => {
         }
 
         gsap.set(descEl, { opacity: 0, y: 15 });
+        if (summaryEl) gsap.set(summaryEl, { opacity: 0, y: 15 });
         gsap.set(statsEls, { opacity: 0, y: 25 });
+        if (momentsEl) gsap.set(momentsEl, { opacity: 0, y: 15 });
+        if (quoteEl) gsap.set(quoteEl, { opacity: 0, y: 15 });
+
         gsap.set(photoCardEl, { opacity: 0, xPercent: 12, scale: 0.92, filter: 'blur(12px)', clipPath: 'inset(0% 0% 0% 100%)' });
         if (innerImgEl) gsap.set(innerImgEl, { scale: 1.12 });
+        if (secondCardEl) gsap.set(secondCardEl, { opacity: 0, y: 35, rotate: 2 });
         gsap.set(captionEl, { opacity: 0, y: 15 });
+        if (nextCueEl) gsap.set(nextCueEl, { opacity: 0, y: 10 });
+        if (ghostNumEl) gsap.set(ghostNumEl, { opacity: 0, y: 50 });
         gsap.set(spotLightEl, { opacity: 0 });
+        if (progressBarEl) gsap.set(progressBarEl, { scaleX: 0 });
 
         // Reduced Motion simplified path
         if (isReducedMotion) {
@@ -207,23 +233,28 @@ export const DisciplinesScrollSection: React.FC = () => {
           return;
         }
 
+        // --- Chapter Top Progress Line (0 to 100% across the 10 units) ---
+        if (progressBarEl) {
+          masterTl.to(progressBarEl, { scaleX: 1, ease: 'none', duration: slotUnits }, slotStartUnit);
+        }
+
         // --- BEAT A: Title Entrance (0.0 to 0.8 units) ---
         if (i > 0) {
-          const titleEnterStart = slotStartUnit - 0.4; // Handoff overlap starting at 8.6 of previous chapter
+          const titleEnterStart = slotStartUnit - 0.6; // Handoff starting at 9.4 of previous chapter
           masterTl.to(chapterEl, { visibility: 'visible', opacity: 1, duration: 0.01 }, titleEnterStart);
           masterTl.to(
             chars,
-            { opacity: 1, yPercent: 0, stagger: 0.04 * PACE, ease: 'sine.out', duration: 0.5 * PACE },
+            { opacity: 1, yPercent: 0, stagger: 0.04 * PACE, ease: 'sine.out', duration: 0.8 * PACE },
             titleEnterStart
           );
         }
 
-        // --- BEAT B: Read Hold (0.8 to 1.6 units) ---
+        // --- BEAT B: Read Hold (0.8 to 1.5 units) ---
         // Pinned centered hold (no movement)
 
-        // --- BEAT C: Dock to Top-Left (1.6 to 2.6 units) ---
-        const dockStart = slotStartUnit + 1.6 * PACE;
-        const dockDur = 1.0 * PACE;
+        // --- BEAT C: Dock to Top-Left (1.5 to 2.4 units) ---
+        const dockStart = slotStartUnit + 1.5 * PACE;
+        const dockDur = 0.9 * PACE;
 
         masterTl
           .to(
@@ -232,7 +263,7 @@ export const DisciplinesScrollSection: React.FC = () => {
               top: isMobile ? '72px' : '96px',
               left: isMobile ? '24px' : '48px',
               transform: 'translate(0%, 0%)',
-              scale: isMobile ? 0.32 : 0.38,
+              scale: isMobile ? 0.32 : 0.42,
               color: '#FFF4E6',
               ease: 'power1.inOut',
               duration: dockDur,
@@ -240,13 +271,20 @@ export const DisciplinesScrollSection: React.FC = () => {
             dockStart
           )
           .to(descEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.6 * PACE }, dockStart + 0.3 * PACE)
-          .to(spotLightEl, { opacity: 1, ease: 'sine.inOut', duration: 1.0 * PACE }, dockStart);
+          .to(spotLightEl, { opacity: 1, ease: 'sine.inOut', duration: 0.9 * PACE }, dockStart);
 
-        // --- BEAT D: Sequential Content Reveal (2.9 to 7.5 units) ---
-        
-        // Stat 1: 2.9 to 3.5 units
-        const stat1Start = slotStartUnit + 2.9 * PACE;
-        const stat1Dur = 0.6 * PACE;
+        if (ghostNumEl) {
+          masterTl.to(ghostNumEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 1.2 * PACE }, dockStart + 0.2 * PACE);
+        }
+
+        // --- BEAT D1: Summary (2.5 to 3.2 units) ---
+        if (hasSummary && summaryEl) {
+          masterTl.to(summaryEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.7 * PACE }, slotStartUnit + 2.5 * PACE);
+        }
+
+        // --- BEAT D2: Stats (3.3 to 5.0 units) ---
+        const s1Start = slotStartUnit + 3.3 * PACE;
+        const s1Dur = 0.5 * PACE;
         const s1El = statsEls[0];
         if (s1El) {
           const num1 = s1El.querySelector('.stat-number');
@@ -257,30 +295,19 @@ export const DisciplinesScrollSection: React.FC = () => {
               opacity: 1,
               y: 0,
               ease: 'power1.out',
-              duration: stat1Dur,
+              duration: s1Dur,
               onStart: () => {
                 if (parsed1 && num1) {
-                  gsap.to(
-                    { val: 0 },
-                    {
-                      val: parsed1.num,
-                      duration: stat1Dur,
-                      ease: 'power1.out',
-                      onUpdate: function () {
-                        num1.textContent = `${parsed1.prefix}${Math.floor(this.targets()[0].val)}${parsed1.suffix}`;
-                      },
-                    }
-                  );
+                  gsap.to({ val: 0 }, { val: parsed1.num, duration: s1Dur, ease: 'power1.out', onUpdate: function() { num1.textContent = `${parsed1.prefix}${Math.floor(this.targets()[0].val)}${parsed1.suffix}`; } });
                 }
               },
             },
-            stat1Start
+            s1Start
           );
         }
 
-        // Stat 2: 3.7 to 4.3 units
-        const stat2Start = slotStartUnit + 3.7 * PACE;
-        const stat2Dur = 0.6 * PACE;
+        const s2Start = slotStartUnit + 3.9 * PACE;
+        const s2Dur = 0.5 * PACE;
         const s2El = statsEls[1];
         if (s2El) {
           const num2 = s2El.querySelector('.stat-number');
@@ -291,30 +318,19 @@ export const DisciplinesScrollSection: React.FC = () => {
               opacity: 1,
               y: 0,
               ease: 'power1.out',
-              duration: stat2Dur,
+              duration: s2Dur,
               onStart: () => {
                 if (parsed2 && num2) {
-                  gsap.to(
-                    { val: 0 },
-                    {
-                      val: parsed2.num,
-                      duration: stat2Dur,
-                      ease: 'power1.out',
-                      onUpdate: function () {
-                        num2.textContent = `${parsed2.prefix}${Math.floor(this.targets()[0].val)}${parsed2.suffix}`;
-                      },
-                    }
-                  );
+                  gsap.to({ val: 0 }, { val: parsed2.num, duration: s2Dur, ease: 'power1.out', onUpdate: function() { num2.textContent = `${parsed2.prefix}${Math.floor(this.targets()[0].val)}${parsed2.suffix}`; } });
                 }
               },
             },
-            stat2Start
+            s2Start
           );
         }
 
-        // Stat 3: 4.5 to 5.1 units
-        const stat3Start = slotStartUnit + 4.5 * PACE;
-        const stat3Dur = 0.6 * PACE;
+        const s3Start = slotStartUnit + 4.5 * PACE;
+        const s3Dur = 0.5 * PACE;
         const s3El = statsEls[2];
         if (s3El) {
           const num3 = s3El.querySelector('.stat-number');
@@ -325,30 +341,28 @@ export const DisciplinesScrollSection: React.FC = () => {
               opacity: 1,
               y: 0,
               ease: 'power1.out',
-              duration: stat3Dur,
+              duration: s3Dur,
               onStart: () => {
                 if (parsed3 && num3) {
-                  gsap.to(
-                    { val: 0 },
-                    {
-                      val: parsed3.num,
-                      duration: stat3Dur,
-                      ease: 'power1.out',
-                      onUpdate: function () {
-                        num3.textContent = `${parsed3.prefix}${Math.floor(this.targets()[0].val)}${parsed3.suffix}`;
-                      },
-                    }
-                  );
+                  gsap.to({ val: 0 }, { val: parsed3.num, duration: s3Dur, ease: 'power1.out', onUpdate: function() { num3.textContent = `${parsed3.prefix}${Math.floor(this.targets()[0].val)}${parsed3.suffix}`; } });
                 }
               },
             },
-            stat3Start
+            s3Start
           );
         }
 
-        // Photo Card Reveal: 5.3 to 6.9 units (1.6 units total duration)
-        const photoStart = slotStartUnit + 5.3 * PACE;
-        // Phase 1 (5.3 to 5.9): Clip-path reveal from right edge + opacity + blur
+        // --- BEAT D3: Moments & Quote (5.1 to 6.3 units) ---
+        if (hasMoments && momentsEl) {
+          masterTl.to(momentsEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.8 * PACE }, slotStartUnit + 5.1 * PACE);
+        }
+        if (hasQuote && quoteEl) {
+          masterTl.to(quoteEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.6 * PACE }, slotStartUnit + 5.7 * PACE);
+        }
+
+        // --- BEAT D4: Main Photo Card (6.4 to 7.8 units - 1.4 units duration) ---
+        const mainPhotoStart = slotStartUnit + 6.4 * PACE;
+        // Phase 1 (6.4 to 7.0): Clip reveal from right + blur 12px to 0
         masterTl.to(
           photoCardEl,
           {
@@ -358,57 +372,52 @@ export const DisciplinesScrollSection: React.FC = () => {
             ease: 'sine.inOut',
             duration: 0.6 * PACE,
           },
-          photoStart
+          mainPhotoStart
         );
-        // Phase 2 (5.9 to 6.9): Slide, scale & inner parallax
+        // Phase 2 (7.0 to 7.8): Slide, scale 0.92 to 1 & inner image parallax 1.12 to 1.0
         masterTl.to(
           photoCardEl,
-          {
-            xPercent: 0,
-            scale: 1,
-            ease: 'sine.out',
-            duration: 1.0 * PACE,
-          },
-          photoStart + 0.6 * PACE
+          { xPercent: 0, scale: 1, ease: 'sine.out', duration: 0.8 * PACE },
+          mainPhotoStart + 0.6 * PACE
         );
         if (innerImgEl) {
+          masterTl.to(innerImgEl, { scale: 1.0, ease: 'sine.out', duration: 0.8 * PACE }, mainPhotoStart + 0.6 * PACE);
+        }
+
+        // --- BEAT D5: Secondary Photo Card (7.7 to 8.4 units) ---
+        if (secondCardEl) {
           masterTl.to(
-            innerImgEl,
-            {
-              scale: 1.0,
-              ease: 'sine.out',
-              duration: 1.0 * PACE,
-            },
-            photoStart + 0.6 * PACE
+            secondCardEl,
+            { opacity: 1, y: 0, rotate: 0, ease: 'power2.out', duration: 0.7 * PACE },
+            slotStartUnit + 7.7 * PACE
           );
         }
 
-        // Caption Reveal: 7.0 to 7.5 units
-        masterTl.to(
-          captionEl,
-          { opacity: 1, y: 0, ease: 'sine.out', duration: 0.5 * PACE },
-          slotStartUnit + 7.0 * PACE
-        );
+        // --- BEAT D6: Caption and Next Cue (8.3 to 8.8 units) ---
+        masterTl.to(captionEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.5 * PACE }, slotStartUnit + 8.3 * PACE);
+        if (nextCueEl) {
+          masterTl.to(nextCueEl, { opacity: 1, y: 0, ease: 'sine.out', duration: 0.5 * PACE }, slotStartUnit + 8.4 * PACE);
+        }
 
-        // --- BEAT E: Full Composition Hold (7.5 to 8.3 units) ---
+        // --- BEAT E: Full Composition Hold (8.8 to 9.2 units) ---
         // Clean hold
 
-        // --- BEAT F: Exit & Handoff (8.3 to 9.0 units) ---
+        // --- BEAT F: Exit & Handoff (9.2 to 10.0 units) ---
         if (i < numChapters - 1) {
-          const exitStart = slotStartUnit + 8.3 * PACE;
-          const exitDur = 0.7 * PACE;
+          const exitStart = slotStartUnit + 9.2 * PACE;
+          const exitDur = 0.8 * PACE;
 
           masterTl
             .to(
-              [titleEl, descEl, statsEls, photoCardEl, captionEl],
-              { opacity: 0, y: -40, ease: 'sine.in', duration: exitDur, stagger: 0.05 },
+              [titleEl, descEl, summaryEl, statsEls, momentsEl, quoteEl, photoCardEl, secondCardEl, captionEl, nextCueEl, ghostNumEl].filter(Boolean),
+              { opacity: 0, y: -40, ease: 'sine.in', duration: exitDur, stagger: 0.03 },
               exitStart
             )
-            .to(spotLightEl, { opacity: 0, ease: 'sine.in', duration: 0.7 * PACE }, exitStart)
+            .to(spotLightEl, { opacity: 0, ease: 'sine.in', duration: 0.8 * PACE }, exitStart)
             .to(chapterEl, { visibility: 'hidden', duration: 0.01 }, exitStart + exitDur);
         } else {
-          // Last chapter (Music) holds composition before pin releases
-          masterTl.to(chapterEl, { opacity: 1, duration: 1.5 * PACE }, slotStartUnit + 7.5 * PACE);
+          // Last chapter (Karate) holds composition for 1.5 units before pin releases
+          masterTl.to(chapterEl, { opacity: 1, duration: 1.5 * PACE }, slotStartUnit + 8.8 * PACE);
         }
       });
     }, sectionRef);
@@ -449,7 +458,7 @@ export const DisciplinesScrollSection: React.FC = () => {
         className="relative w-full h-screen min-h-[100vh] overflow-hidden bg-[#0C0907]"
       >
         {/* Dim Golden Smoke Fallback Layer */}
-        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-25">
+        <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-20">
           <img
             src="/images/achievements/bg-fluid.png"
             alt=""
@@ -458,22 +467,22 @@ export const DisciplinesScrollSection: React.FC = () => {
           />
         </div>
 
-        {/* WebGL Fluid Canvas (Mounted inside stage, active when visible) */}
+        {/* Soft Translucent WebGL Fluid Canvas */}
         {isSectionVisible && (
-          <div className="absolute inset-0 z-0 pointer-events-none opacity-90">
+          <div className="absolute inset-0 z-0 pointer-events-none opacity-70 mix-blend-screen">
             <LiquidEther
-              colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
-              mouseForce={22}
-              cursorSize={130}
+              colors={['#0A0908', '#6A4310', '#C28822', '#E0A030']}
+              mouseForce={14}
+              cursorSize={110}
               isViscous={true}
-              viscous={40}
-              iterationsViscous={36}
-              iterationsPoisson={40}
-              resolution={0.65}
+              viscous={35}
+              iterationsViscous={32}
+              iterationsPoisson={32}
+              resolution={0.6}
               isBounce={false}
               autoDemo={true}
-              autoSpeed={0.4}
-              autoIntensity={2.5}
+              autoSpeed={0.3}
+              autoIntensity={1.8}
               takeoverDuration={0.3}
               autoResumeDelay={2000}
               backgroundColor="#0A0908"
@@ -487,11 +496,11 @@ export const DisciplinesScrollSection: React.FC = () => {
             CRAFT & DISCIPLINE / ACHIEVEMENTS
           </p>
           <span className="text-xs uppercase tracking-[0.18em] text-white/50">
-            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 05'}
+            {DISCIPLINE_CHAPTERS[activeIndex]?.number || '01 / 03'}
           </span>
         </div>
 
-        {/* Right-Edge Navigation Dots */}
+        {/* Right-Edge Navigation Dots (3 Dots) */}
         <div className="absolute right-6 md:right-12 top-1/2 -translate-y-1/2 z-20 flex flex-col space-y-3 pointer-events-auto">
           {DISCIPLINE_CHAPTERS.map((ch, idx) => (
             <button
@@ -508,9 +517,19 @@ export const DisciplinesScrollSection: React.FC = () => {
           ))}
         </div>
 
-        {/* 5 Chapter Layers */}
+        {/* Keyword Marquee Strip at Bottom of Stage */}
+        <div className="absolute bottom-4 left-6 right-6 z-20 overflow-hidden pointer-events-none opacity-35 hidden md:block">
+          <div className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.3em] text-[#E0A030] animate-marquee">
+            {DISCIPLINE_CHAPTERS[activeIndex]?.stats.map((s) => s.label).filter(Boolean).join(' • ')} • {DISCIPLINE_CHAPTERS[activeIndex]?.descriptor} • {DISCIPLINE_CHAPTERS[activeIndex]?.stats.map((s) => s.label).filter(Boolean).join(' • ')}
+          </div>
+        </div>
+
+        {/* 3 Chapter Layers */}
         {DISCIPLINE_CHAPTERS.map((ch, i) => {
           const hasImageError = imgErrorMap[ch.id];
+          const hasSummary = Boolean(ch.summary && ch.summary.trim());
+          const hasMoments = Boolean(ch.moments && ch.moments.length > 0);
+          const hasQuote = Boolean(ch.quote && ch.quote.trim());
 
           return (
             <div
@@ -520,6 +539,21 @@ export const DisciplinesScrollSection: React.FC = () => {
               }}
               className="absolute inset-0 z-10 w-full h-full flex flex-col justify-between p-6 md:p-12 pointer-events-none"
             >
+              {/* Chapter Top Progress Bar Line */}
+              <div className="chapter-progress-line absolute top-0 left-0 right-0 h-[1px] bg-[#E0A030] z-30 origin-left scale-x-0 opacity-60" />
+
+              {/* Ghost Numeral Background (Bottom Right) */}
+              <div
+                aria-hidden="true"
+                className="ghost-numeral absolute bottom-6 right-16 z-0 pointer-events-none text-[clamp(14rem,38vw,32rem)] font-extrabold leading-none select-none hidden md:block text-transparent"
+                style={{
+                  fontFamily: "'Inter', sans-serif",
+                  WebkitTextStroke: '1px rgba(224, 160, 48, 0.06)',
+                }}
+              >
+                {ch.ghostNum}
+              </div>
+
               {/* Tile Spotlight Cluster Layer */}
               <div className="spotlight-layer absolute inset-0 z-0 pointer-events-none opacity-0">
                 <CursorGrid
@@ -540,7 +574,7 @@ export const DisciplinesScrollSection: React.FC = () => {
               {/* Title Element (Animates from Center to Top-Left Dock) */}
               <div className="chapter-title absolute z-20 whitespace-nowrap pointer-events-none origin-top-left">
                 <h2
-                  className="text-[clamp(56px,8vw,120px)] font-bold tracking-[-0.02em] leading-none text-[#FFF4E6]"
+                  className="text-[clamp(40px,4vw,64px)] font-bold tracking-[-0.02em] leading-none text-[#FFF4E6]"
                   style={{ fontFamily: "'Inter', 'Manrope', sans-serif" }}
                 >
                   {ch.title.split('').map((char, cIdx) => (
@@ -552,71 +586,112 @@ export const DisciplinesScrollSection: React.FC = () => {
                     </span>
                   ))}
                 </h2>
-                <p className="chapter-desc text-xs md:text-sm font-mono text-[#E0A030] uppercase tracking-[0.2em] mt-2 opacity-0">
+                <p className="chapter-desc text-xs md:text-sm font-mono text-[#E0A030] uppercase tracking-[0.18em] mt-2 opacity-0">
                   {ch.descriptor}
                 </p>
               </div>
 
-              {/* Chapter Main Grid Layout (Docked Left Content + Right Photo Card) */}
-              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center w-full max-w-7xl mx-auto my-auto pt-24 md:pt-28">
-                {/* Left Column: 3 Stat Blocks */}
-                <div className="lg:col-span-6 space-y-6 md:space-y-8 pointer-events-auto">
+              {/* Reworked Two-Column CSS Grid Layout (Centered vertically) */}
+              <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center w-full max-w-7xl mx-auto my-auto min-h-[calc(100vh-220px)] pt-24 md:pt-28">
+                {/* LEFT Column (46% width / col-span-6): Summary + Stats + Moments + Quote */}
+                <div className="lg:col-span-6 space-y-6 md:space-y-8 pointer-events-auto flex flex-col justify-center">
+                  {/* Optional Summary Paragraph */}
+                  {hasSummary && (
+                    <p className="chapter-summary text-sm md:text-base text-[#F2E9D8]/90 leading-relaxed font-sans max-w-xl opacity-0">
+                      {ch.summary}
+                    </p>
+                  )}
+
+                  {/* Stats Row (3 Columns, White-space nowrap values) */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-4 border-t border-white/10">
                     {ch.stats.map((stat, sIdx) => (
                       <div key={`${ch.id}-stat-${sIdx}`} className="stat-item space-y-1 opacity-0">
                         <p
-                          className="stat-number text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-[#FFF4E6]"
+                          className="stat-number text-[clamp(36px,3.8vw,64px)] font-bold tracking-tight text-[#FFF4E6] whitespace-nowrap"
                           style={{ fontFamily: "'Inter', 'Manrope', sans-serif" }}
                         >
                           {stat.value}
                         </p>
-                        <p className="text-[11px] font-mono text-[#A89880] uppercase tracking-wider">
-                          {stat.label || 'TBD'}
+                        <p className="text-[12px] font-mono text-[#A89880] uppercase tracking-wider">
+                          {stat.label}
                         </p>
                       </div>
                     ))}
                   </div>
+
+                  {/* Optional Key Moments List */}
+                  {hasMoments && ch.moments && (
+                    <div className="chapter-moments space-y-2 pt-2 opacity-0">
+                      {ch.moments.map((m, mIdx) => (
+                        <div key={`moment-${mIdx}`} className="flex items-baseline space-x-3 text-xs font-mono">
+                          {m.year && <span className="text-[#E0A030] font-bold">{m.year}</span>}
+                          <span className="text-[#F2E9D8]/80">{m.text}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Optional Quote Line */}
+                  {hasQuote && (
+                    <div className="chapter-quote border-l-2 border-[#E0A030] pl-4 py-1 italic text-[#FFF4E6] text-lg font-sans opacity-0">
+                      "{ch.quote}"
+                    </div>
+                  )}
                 </div>
 
-                {/* Right Column: Photo Card & Caption */}
+                {/* RIGHT Column (42% width / col-span-6): Main Photo Card + Overlapping Secondary Photo */}
                 <div className="lg:col-span-6 flex flex-col items-center lg:items-end pointer-events-auto">
-                  <div className="photo-card relative w-[min(34vw,420px)] aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#17110C] opacity-0">
-                    {!hasImageError ? (
+                  <div className="relative">
+                    {/* Main Photo Card */}
+                    <div className="photo-card relative w-[min(30vw,460px)] aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#17110C] opacity-0">
+                      {!hasImageError ? (
+                        <img
+                          src={ch.imageSrc}
+                          alt={ch.title}
+                          loading="eager"
+                          className="photo-card-img w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
+                          onError={() => setImgErrorMap((prev) => ({ ...prev, [ch.id]: true }))}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-[#261C12] to-[#0C0907]">
+                          <svg className="w-12 h-12 text-[#E0A030] mb-3 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                          <p className="font-bold text-[#FFF4E6] text-lg">{ch.title}</p>
+                          <span className="text-xs font-mono text-[#E0A030] uppercase tracking-widest mt-1">PHOTO COMING SOON</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Secondary Overlapping Photo Card (Bottom Left Corner) */}
+                    <div className="second-photo-card absolute -bottom-10 -left-12 w-[55%] aspect-[3/4] rounded-xl overflow-hidden shadow-2xl border border-[#E0A030]/40 bg-[#17110C] opacity-0 hidden md:block">
                       <img
-                        src={ch.imageSrc}
-                        alt={ch.title}
+                        src={ch.image2Src || ch.imageSrc}
+                        alt={`${ch.title} detail`}
                         loading="eager"
-                        className="photo-card-img w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
-                        onError={() => setImgErrorMap((prev) => ({ ...prev, [ch.id]: true }))}
+                        className="w-full h-full object-cover"
+                        style={{
+                          objectPosition: ch.cropPosition || 'center center',
+                          transform: ch.image2Src ? 'none' : 'scale(2.2)',
+                        }}
                       />
-                    ) : (
-                      /* Styled Fallback Placeholder Card */
-                      <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-[#261C12] to-[#0C0907]">
-                        <svg
-                          className="w-12 h-12 text-[#E0A030] mb-3 opacity-60"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={1.5}
-                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        <p className="font-bold text-[#FFF4E6] text-lg">{ch.title}</p>
-                        <span className="text-xs font-mono text-[#E0A030] uppercase tracking-widest mt-1">
-                          PHOTO COMING SOON
-                        </span>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                  <p className="photo-caption text-xs font-mono text-white/40 uppercase tracking-wider mt-3 max-w-[420px] text-center lg:text-right opacity-0">
+
+                  {/* Caption */}
+                  <p className="photo-caption text-xs font-mono text-white/40 uppercase tracking-wider mt-12 max-w-[460px] text-center lg:text-right opacity-0">
                     {ch.caption}
                   </p>
                 </div>
               </div>
+
+              {/* Next Chapter Cue (Bottom Left) */}
+              {ch.nextLabel && (
+                <div className="next-cue absolute bottom-8 left-6 md:left-12 z-20 flex items-center space-x-3 font-mono text-xs uppercase tracking-[0.2em] text-[#E0A030] opacity-0 pointer-events-none">
+                  <span>{ch.nextLabel}</span>
+                  <div className="w-12 h-[1px] bg-[#E0A030]/60" />
+                </div>
+              )}
             </div>
           );
         })}
