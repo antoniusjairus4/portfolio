@@ -97,7 +97,7 @@ export const DisciplinesScrollSection: React.FC = () => {
     try {
       const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
       setIsReducedMotion(mq.matches);
-    } catch {}
+    } catch { }
   }, []);
 
   // Preload all chapter images
@@ -165,7 +165,7 @@ export const DisciplinesScrollSection: React.FC = () => {
         // Set initial state
         gsap.set(chapterEl, { visibility: i === 0 ? 'visible' : 'hidden', opacity: i === 0 ? 1 : 0 });
         gsap.set(titleEl, { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', scale: 1, color: '#FFF4E6' });
-        
+
         if (i !== 0) {
           gsap.set(chars, { opacity: 0, yPercent: 40 });
         } else {
@@ -225,7 +225,7 @@ export const DisciplinesScrollSection: React.FC = () => {
           .to(spotLightEl, { opacity: 1, ease: 'sine.inOut', duration: 1.0 * PACE }, dockStart);
 
         // --- BEAT D: Sequential Content Reveal (2.9 to 7.5 units) ---
-        
+
         // Stat 1: 2.9 to 3.5 units
         const stat1Start = slotStartUnit + 2.9 * PACE;
         const stat1Dur = 0.6 * PACE;
@@ -481,11 +481,10 @@ export const DisciplinesScrollSection: React.FC = () => {
               type="button"
               onClick={() => handleDotClick(idx)}
               aria-label={`Jump to chapter ${ch.number} ${ch.title}`}
-              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#E0A030] ${
-                activeIndex === idx
+              className={`w-2.5 h-2.5 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#E0A030] ${activeIndex === idx
                   ? 'bg-[#E0A030] scale-125 shadow-[0_0_10px_rgba(224,160,48,0.8)]'
                   : 'bg-white/20 hover:bg-white/50'
-              }`}
+                }`}
             />
           ))}
         </div>
@@ -563,11 +562,10 @@ export const DisciplinesScrollSection: React.FC = () => {
                 {/* Right Column: Photo Card & Caption */}
                 <div className="lg:col-span-6 flex flex-col items-center lg:items-end pointer-events-auto">
                   <div
-                    className={`photo-card relative ${
-                      ch.frameless
+                    className={`photo-card relative ${ch.frameless
                         ? `w-[min(42vw,540px)] ${ch.aspectRatio || 'aspect-[4/3]'} rounded-xl overflow-hidden shadow-2xl opacity-0`
                         : `w-[min(34vw,420px)] ${ch.aspectRatio || 'aspect-[3/4]'} rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#17110C] opacity-0`
-                    }`}
+                      }`}
                   >
                     {!hasImageError ? (
                       <img
