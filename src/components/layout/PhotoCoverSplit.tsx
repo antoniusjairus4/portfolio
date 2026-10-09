@@ -7,6 +7,7 @@ import { heroContent } from '@/content/heroContent';
 import { SCROLL_STORY } from '@/motion/tokens';
 import { BakeResult, LetterBox } from './collapse/bakePhysics';
 import { createPhysicsCollapseController, PhysicsCollapseController } from './collapse/usePhysicsCollapse';
+import LiquidEther from '@/components/backgrounds/LiquidEther';
 import { PhysicsDebugOverlay } from './collapse/PhysicsDebugOverlay';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -353,6 +354,7 @@ export const PhotoCoverSplit: React.FC = () => {
         ref={pageBgRef}
         className="absolute inset-0 w-full h-full z-0 overflow-hidden transition-opacity duration-75"
       >
+
         {/* Revealed Background Image */}
         <picture className="absolute inset-0 w-full h-full">
           <source
@@ -371,12 +373,34 @@ export const PhotoCoverSplit: React.FC = () => {
           />
         </picture>
 
+        {/* Autonomous WebGL LiquidEther Simulation Layer */}
+        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-80 mix-blend-screen">
+          <LiquidEther
+            colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
+            mouseForce={0}
+            cursorSize={130}
+            isViscous={true}
+            viscous={40}
+            iterationsViscous={36}
+            iterationsPoisson={40}
+            resolution={0.65}
+            isBounce={false}
+            autoDemo={true}
+            autoSpeed={0.5}
+            autoIntensity={3.0}
+            takeoverDuration={0.3}
+            autoResumeDelay={0}
+            autoRampDuration={0.6}
+            backgroundColor="#0C0907"
+          />
+        </div>
+
         {/* Static Darkening Scrim */}
         <div
-          className="absolute inset-0 w-full h-full pointer-events-none"
+          className="absolute inset-0 w-full h-full pointer-events-none z-0"
           style={{
             background:
-              'radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.65) 0%, rgba(12, 9, 7, 0.88) 100%)',
+              'radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.45) 0%, rgba(12, 9, 7, 0.85) 100%)',
           }}
         />
       </div>
