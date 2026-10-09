@@ -6,6 +6,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 import { executeCommand } from '@/lib/terminalCommands';
 import {
+  HOME_SEGMENTS,
+  resolvePath,
+  ROOT_FS,
+  segmentsToPrompt,
+} from '@/lib/terminalFs';
+import {
   COLOR_PALETTE_ROW_1,
   COLOR_PALETTE_ROW_2,
   JAIRUS_BANNER_ASCII,
@@ -53,10 +59,15 @@ export const TechnicalSkillsTerminal: React.FC = () => {
   const [showTerminal, setShowTerminal] = useState(false);
   const [booted, setBooted] = useState(false);
   const [autoSequenceDone, setAutoSequenceDone] = useState(false);
-  const [currentPath, setCurrentPath] = useState('~');
+  
+  // Single source of truth for CWD and OLDPWD
+  const [cwdSegments, setCwdSegments] = useState<string[]>([...HOME_SEGMENTS]);
+  const [oldPwdSegments, setOldPwdSegments] = useState<string[] | null>(null);
+
   const [inputText, setInputText] = useState('');
   const [ghostSuggestion, setGhostSuggestion] = useState('cd programming');
-  const [hintText, setHintText] = useState('Hint: type \'help\' | try: ls, cd skills, tree');
+  const [hintText, setHintText] = useState('your turn: cd into a folder to see what is inside');
+  const [failedCdCount, setFailedCdCount] = useState(0);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState<number>(-1);
@@ -64,10 +75,12 @@ export const TechnicalSkillsTerminal: React.FC = () => {
   const [isReducedMotion, setIsReducedMotion] = useState(false);
   const [showPulse, setShowPulse] = useState(false);
   const [glitchTitleText, setGlitchTitleText] = useState('');
-  
+
   const overscrollDeltaRef = useRef<number>(0);
   const overscrollTimerRef = useRef<NodeJS.Timeout | null>(null);
   const autoSequenceRef = useRef<boolean>(false);
+
+  const currentPathPrompt = segmentsToPrompt(cwdSegments);
 
   const focusInput = () => {
     if (autoSequenceDone) {
@@ -97,7 +110,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     }
   };
 
-  // CHANGE 1: Cyberpunk Glitch Intro Animation
+  // Cyberpunk Glitch Intro Animation
   useEffect(() => {
     if (!sectionRef.current) return;
 
@@ -106,7 +119,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       setShowTerminal(true);
       setBooted(true);
       setAutoSequenceDone(true);
-      setCurrentPath('~/skills');
+      setCwdSegments([...HOME_SEGMENTS, 'skills']);
       return;
     }
 
@@ -203,14 +216,81 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     return () => ctx.revert();
   }, [isReducedMotion, lenisContext]);
 
-  // Fast Auto-typed sequence after boot
+  // Command Execution Engine
+  const runCommandInternal = (
+    cmdLine: string,
+    currentCwd: string[],
+    currentOldPwd: string[] | null,
+    options: { silent?: boolean } = {}
+  ) => {
+    const res = executeCommand(cmdLine, currentCwd, currentOldPwd, options);
+    let nextCwd = currentCwd;
+    let nextOldPwd = currentOldPwd;
+
+    if (res.newCwdSegments) {
+      nextCwd = res.newCwdSegments;
+      setCwdSegments(nextCwd);
+    }
+    if (res.newOldPwdSegments) {
+      nextOldPwd = res.newOldPwdSegments;
+      setOldPwdSegments(nextOldPwd);
+    }
+
+    if (res.clear) {
+      setHistory([]);
+      return { res, nextCwd, nextOldPwd };
+    }
+
+    if (res.cmatrixToggle) {
+      setIsDenseMatrix((prev) => !prev);
+    }
+
+    if (cmdLine.trim() === 'exit' || cmdLine.trim() === 'logout') {
+      scrollToPreviousSection();
+    }
+
+    // Track failed cd count for tip hint
+    if (cmdLine.trim().startsWith('cd ') && res.isError) {
+      setFailedCdCount((prev) => {
+        const next = prev + 1;
+        if (next >= 2) {
+          setHintText('tip: press Tab to autocomplete, or run ls to see what is here');
+        }
+        return next;
+      });
+    } else if (cmdLine.trim().startsWith('cd ') && !res.isError) {
+      setFailedCdCount(0);
+    }
+
+    const outputToRender = res.autoListOutput
+      ? [res.autoListOutput as string]
+      : res.output;
+
+    setHistory((prev) => [
+      ...prev,
+      {
+        id: Math.random().toString(),
+        path: segmentsToPrompt(currentCwd),
+        command: cmdLine,
+        output: outputToRender,
+        isError: res.isError,
+        isAmber: res.isAmber,
+        isGreen: res.isGreen,
+      },
+    ]);
+
+    return { res, nextCwd, nextOldPwd };
+  };
+
+  // Auto-typed intro sequence (Step 1: cd skills silent -> Step 2: ls)
   useEffect(() => {
     if (!booted || autoSequenceDone || autoSequenceRef.current) return;
     autoSequenceRef.current = true;
 
     let cancelSequence = false;
 
-    const skipHandler = () => {
+    const skipHandler = (e: Event) => {
+      e.preventDefault();
       cancelSequence = true;
       finishAutoSequenceImmediately();
     };
@@ -218,7 +298,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     window.addEventListener('keydown', skipHandler, { once: true });
     window.addEventListener('mousedown', skipHandler, { once: true });
 
-    const typeText = async (text: string, path: string) => {
+    const typeText = async (text: string) => {
       for (let i = 1; i <= text.length; i++) {
         if (cancelSequence) return;
         setInputText(text.slice(0, i));
@@ -228,47 +308,32 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     };
 
     const runAutoFlow = async () => {
+      let activeCwd = [...HOME_SEGMENTS];
+      let activeOldPwd: string[] | null = null;
+
       await new Promise((r) => setTimeout(r, 600));
       if (cancelSequence) return;
 
-      // 1. ls
-      await typeText('ls', '~');
+      // Step 1: cd skills (silent: true -> updates cwd to ~/skills, no auto-list)
+      await typeText('cd skills');
       if (cancelSequence) return;
       await new Promise((r) => setTimeout(r, AUTO_PAUSE_MS));
       if (cancelSequence) return;
-      const res1 = executeCommand('ls', '~');
-      setHistory((prev) => [
-        ...prev,
-        { id: 'auto-1', path: '~', command: 'ls', output: res1.output },
-      ]);
+      
+      const step1Result = runCommandInternal('cd skills', activeCwd, activeOldPwd, { silent: true });
+      activeCwd = step1Result.nextCwd;
+      activeOldPwd = step1Result.nextOldPwd;
       setInputText('');
 
-      // 2. cd skills
+      // Step 2: ls in ~/skills
       await new Promise((r) => setTimeout(r, 700));
       if (cancelSequence) return;
-      await typeText('cd skills', '~');
+      await typeText('ls');
       if (cancelSequence) return;
       await new Promise((r) => setTimeout(r, AUTO_PAUSE_MS));
       if (cancelSequence) return;
-      setCurrentPath('~/skills');
-      setHistory((prev) => [
-        ...prev,
-        { id: 'auto-2', path: '~', command: 'cd skills', output: '' },
-      ]);
-      setInputText('');
 
-      // 3. ls
-      await new Promise((r) => setTimeout(r, 500));
-      if (cancelSequence) return;
-      await typeText('ls', '~/skills');
-      if (cancelSequence) return;
-      await new Promise((r) => setTimeout(r, AUTO_PAUSE_MS));
-      if (cancelSequence) return;
-      const res3 = executeCommand('ls', '~/skills');
-      setHistory((prev) => [
-        ...prev,
-        { id: 'auto-3', path: '~/skills', command: 'ls', output: res3.output },
-      ]);
+      runCommandInternal('ls', activeCwd, activeOldPwd);
       setInputText('');
 
       // Handover
@@ -278,25 +343,36 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       window.removeEventListener('mousedown', skipHandler);
       setAutoSequenceDone(true);
       setGhostSuggestion('cd programming');
-      setHintText('your turn: try  cd programming  |  cat Python  |  tree  |  help');
+      setHintText('your turn: cd into a folder to see what is inside');
       focusInput();
     };
 
     const finishAutoSequenceImmediately = () => {
       window.removeEventListener('keydown', skipHandler);
       window.removeEventListener('mousedown', skipHandler);
-      const res1 = executeCommand('ls', '~');
-      const res3 = executeCommand('ls', '~/skills');
-      setCurrentPath('~/skills');
+      const skillsCwd = [...HOME_SEGMENTS, 'skills'];
+      setCwdSegments(skillsCwd);
+      setOldPwdSegments([...HOME_SEGMENTS]);
+
+      const lsRes = executeCommand('ls', skillsCwd);
       setHistory([
-        { id: 'auto-1', path: '~', command: 'ls', output: res1.output },
-        { id: 'auto-2', path: '~', command: 'cd skills', output: '' },
-        { id: 'auto-3', path: '~/skills', command: 'ls', output: res3.output },
+        {
+          id: 'auto-cd-skills',
+          path: '~',
+          command: 'cd skills',
+          output: '',
+        },
+        {
+          id: 'auto-ls-skills',
+          path: '~/skills',
+          command: 'ls',
+          output: lsRes.output,
+        },
       ]);
       setInputText('');
       setAutoSequenceDone(true);
       setGhostSuggestion('cd programming');
-      setHintText('your turn: try  cd programming  |  cat Python  |  tree  |  help');
+      setHintText('your turn: cd into a folder to see what is inside');
       focusInput();
     };
 
@@ -349,7 +425,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     };
   }, [lenisContext]);
 
-  // Command Runner
+  // User Interactive Command Handler
   const handleRunCommand = (cmdToRun?: string) => {
     const rawCmd = cmdToRun !== undefined ? cmdToRun : inputText;
     const trimmed = rawCmd.trim();
@@ -360,7 +436,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
           ...prev,
           {
             id: Math.random().toString(),
-            path: currentPath,
+            path: currentPathPrompt,
             command: '',
             output: '',
           },
@@ -372,39 +448,8 @@ export const TechnicalSkillsTerminal: React.FC = () => {
 
     setShowPulse(false);
     setGhostSuggestion('');
-    const result = executeCommand(trimmed, currentPath);
-
-    if (result.clear) {
-      setHistory([]);
-      setInputText('');
-      return;
-    }
-
-    if (result.cmatrixToggle) {
-      setIsDenseMatrix((prev) => !prev);
-    }
-
-    if (result.newPath) {
-      setCurrentPath(result.newPath);
-    }
-
-    if (trimmed === 'exit' || trimmed === 'logout') {
-      scrollToPreviousSection();
-    }
-
-    setHistory((prev) => [
-      ...prev,
-      {
-        id: Math.random().toString(),
-        path: currentPath,
-        command: rawCmd,
-        output: result.output,
-        isError: result.isError,
-        isAmber: result.isAmber,
-        isGreen: result.isGreen,
-      },
-    ]);
-
+    runCommandInternal(trimmed, cwdSegments, oldPwdSegments);
+    
     setCmdHistory((prev) => [...prev, rawCmd]);
     setHistoryIdx(-1);
     setInputText('');
@@ -418,6 +463,54 @@ export const TechnicalSkillsTerminal: React.FC = () => {
         }
       }
     }, 50);
+  };
+
+  // Tab Completion
+  const handleTabCompletion = () => {
+    if (!inputText && ghostSuggestion) {
+      setInputText(ghostSuggestion);
+      setGhostSuggestion('');
+      return;
+    }
+
+    const { node: currNode } = resolvePath('.', cwdSegments, oldPwdSegments, ROOT_FS);
+    if (!currNode || !currNode.children) return;
+
+    const parts = inputText.trim().split(/\s+/);
+    if (parts.length === 1) {
+      // Command name completion
+      const cmds = ['ls', 'cd', 'pwd', 'cat', 'tree', 'whoami', 'echo', 'clear', 'history', 'neofetch', 'cmatrix', 'exit', 'logout'];
+      const matches = cmds.filter((c) => c.startsWith(parts[0].toLowerCase()));
+      if (matches.length === 1) {
+        setInputText(matches[0] + ' ');
+      }
+    } else if (parts.length >= 2) {
+      const mainCmd = parts[0];
+      const targetPrefix = parts.slice(1).join(' ').toLowerCase();
+
+      const children = Object.values(currNode.children);
+      let candidates = children;
+
+      if (mainCmd === 'cd') {
+        candidates = children.filter((c) => c.type === 'dir');
+      } else if (mainCmd === 'cat') {
+        candidates = children.filter((c) => c.type === 'file');
+      }
+
+      const matches = candidates.filter((c) => c.name.toLowerCase().startsWith(targetPrefix));
+
+      if (matches.length === 1) {
+        const match = matches[0];
+        let formattedName = match.name;
+        if (formattedName.includes(' ')) {
+          formattedName = `"${formattedName}"`;
+        }
+        if (match.type === 'dir') {
+          formattedName += '/';
+        }
+        setInputText(`${mainCmd} ${formattedName}`);
+      }
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -442,21 +535,39 @@ export const TechnicalSkillsTerminal: React.FC = () => {
         setInputText(cmdHistory[nextIdx]);
       }
     } else if (e.key === 'Tab' || e.key === 'ArrowRight') {
-      if (!inputText && ghostSuggestion) {
-        e.preventDefault();
-        setInputText(ghostSuggestion);
-        setGhostSuggestion('');
-      } else if (!inputText) {
-        e.preventDefault();
-        setInputText('ls');
-      }
+      e.preventDefault();
+      handleTabCompletion();
     } else if (e.ctrlKey && e.key.toLowerCase() === 'l') {
       e.preventDefault();
       setHistory([]);
     }
   };
 
-  const QUICK_CHIPS = ['help', 'ls', 'skills', 'cd skills', 'tree', 'neofetch', 'exit'];
+  // Context-Aware Quick Chips based on current CWD
+  const getContextChips = (): string[] => {
+    const { node: currNode } = resolvePath('.', cwdSegments, oldPwdSegments, ROOT_FS);
+    const chips: string[] = ['ls'];
+
+    if (currentPathPrompt !== '~') {
+      chips.push('cd ..');
+    }
+
+    if (currNode && currNode.children) {
+      Object.values(currNode.children).forEach((child) => {
+        if (child.type === 'dir') {
+          chips.push(`cd ${child.name}`);
+        } else if (child.type === 'file') {
+          const catName = child.name.includes(' ') ? `"${child.name}"` : child.name;
+          chips.push(`cat ${catName}`);
+        }
+      });
+    }
+
+    chips.push('tree', 'neofetch', 'clear', 'exit');
+    return chips;
+  };
+
+  const currentChips = getContextChips();
 
   return (
     <section
@@ -535,7 +646,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
             <div className="w-3 h-3 rounded-full bg-[#28c840]" />
           </div>
           <div className="text-xs font-mono text-white/80 font-medium tracking-wide">
-            jairus@linux: <span className="text-[#00ff9c]">{currentPath}</span>
+            jairus@linux: <span className="text-[#00ff9c]">{currentPathPrompt}</span>
           </div>
           <div className="flex items-center gap-3">
             <span className="text-xs font-mono text-[#00ff9c] font-semibold hidden md:inline">
@@ -570,7 +681,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
           {/* Boot Output */}
           {booted && (
             <div className="space-y-4">
-              {/* Responsive Slant ASCII Banner */}
               <pre
                 className="text-xs md:text-sm font-mono leading-none tracking-normal bg-gradient-to-b from-[#22d3ee] to-[#3b82f6] bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(59,130,246,0.5)] overflow-hidden select-none whitespace-pre"
                 style={{
@@ -582,7 +692,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
                 {JAIRUS_BANNER_ASCII}
               </pre>
 
-              {/* Tagline Box */}
               <div className="text-[10px] md:text-xs font-mono font-bold tracking-tighter overflow-x-auto whitespace-pre">
                 <p className="text-[#a3e635]">{TAGLINE_TOP}</p>
                 <p className="text-[#fb923c]">
@@ -592,16 +701,13 @@ export const TechnicalSkillsTerminal: React.FC = () => {
                 <p className="text-[#fb923c]">{TAGLINE_BOTTOM}</p>
               </div>
 
-              {/* Neofetch Block */}
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6 py-3 border-y border-white/10">
-                {/* Kali Dragon ASCII Logo */}
                 <div className="text-[#3b82f6] font-mono font-bold text-xs leading-none select-none flex-shrink-0">
                   {KALI_DRAGON_LOGO.map((l, i) => (
                     <p key={i}>{l}</p>
                   ))}
                 </div>
 
-                {/* Neofetch System Information */}
                 <div className="space-y-1 text-xs md:text-sm flex-1">
                   <p className="text-[#22d3ee] font-bold text-sm">jairus@linux</p>
                   <p className="text-white/30 border-b border-white/20 pb-1">------------------------</p>
@@ -612,7 +718,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
                   <p><span className="text-[#22d3ee] font-bold">Stack:</span> <span className="text-white">MERN, Python, C++</span></p>
                   <p><span className="text-[#22d3ee] font-bold">Skills:</span> <span className="text-white">6 categories</span></p>
 
-                  {/* 16-Color Palette Blocks */}
                   <div className="pt-2 space-y-1">
                     <div className="flex items-center gap-1">
                       {COLOR_PALETTE_ROW_1.map((color, i) => (
@@ -660,17 +765,19 @@ export const TechnicalSkillsTerminal: React.FC = () => {
                   {Array.isArray(item.output) ? (
                     item.output.map((line, lIdx) => {
                       if (line.includes('/')) {
-                        // Dir / skill interactive token rendering
                         const parts = line.split(/\s{2,}/);
                         return (
                           <div key={lIdx} className="flex flex-wrap gap-3 py-0.5">
                             {parts.map((p, pIdx) => {
                               const isDir = p.endsWith('/');
                               const cleanName = p.replace(/\/$/, '');
+                              const formattedCmd = isDir
+                                ? `cd ${cleanName}`
+                                : `cat ${cleanName.includes(' ') ? `"${cleanName}"` : cleanName}`;
                               return (
                                 <span
                                   key={pIdx}
-                                  onClick={() => handleRunCommand(isDir ? `cd ${cleanName}` : `cat ${cleanName}`)}
+                                  onClick={() => handleRunCommand(formattedCmd)}
                                   className={`cursor-pointer hover:underline transition-colors ${
                                     isDir
                                       ? 'text-[#5b9dff] font-bold hover:text-[#00ff9c]'
@@ -698,7 +805,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
           {booted && (
             <div className="space-y-1 pt-1">
               <div className="text-[#5b9dff] font-bold text-xs md:text-[15px]">
-                ┌──(<span className="text-[#5b9dff]">jairus㉿linux</span>)-[<span className="text-white">{currentPath}</span>]
+                ┌──(<span className="text-[#5b9dff]">jairus㉿linux</span>)-[<span className="text-white">{currentPathPrompt}</span>]
               </div>
 
               <div className="flex items-center gap-2 relative">
@@ -738,7 +845,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
         {/* Bottom Bar */}
         <div className="h-12 px-4 pl-16 bg-[#0c0e12] border-t border-white/10 flex items-center justify-between z-30 flex-shrink-0">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
-            {QUICK_CHIPS.map((chip, idx) => (
+            {currentChips.map((chip) => (
               <button
                 key={chip}
                 disabled={!autoSequenceDone}
@@ -749,8 +856,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
                 className={`px-3 py-1 rounded text-xs font-mono border whitespace-nowrap transition-all duration-200 ${
                   !autoSequenceDone
                     ? 'opacity-40 border-white/5 text-white/30 cursor-not-allowed'
-                    : idx === 1 && showPulse
-                    ? 'border-[#00ff9c] text-[#00ff9c] shadow-[0_0_10px_#00ff9c]'
                     : 'border-white/10 bg-white/5 text-white/70 hover:border-[#00ff9c]/50 hover:text-[#00ff9c] hover:bg-[#00ff9c]/10'
                 }`}
               >
