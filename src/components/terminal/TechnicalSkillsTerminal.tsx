@@ -16,9 +16,6 @@ import {
   COLOR_PALETTE_ROW_2,
   JAIRUS_BANNER_ASCII,
   KALI_DRAGON_LOGO,
-  TAGLINE_BOTTOM,
-  TAGLINE_TEXT,
-  TAGLINE_TOP,
 } from '@/lib/terminalBanner';
 import { MatrixRain } from './MatrixRain';
 
@@ -691,15 +688,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
               >
                 {JAIRUS_BANNER_ASCII}
               </pre>
-
-              <div className="text-[10px] md:text-xs font-mono font-bold tracking-tighter overflow-x-auto whitespace-pre">
-                <p className="text-[#a3e635]">{TAGLINE_TOP}</p>
-                <p className="text-[#fb923c]">
-                  {TAGLINE_TEXT.slice(0, 48)}
-                  <span className="text-[#e879f9]">{TAGLINE_TEXT.slice(48)}</span>
-                </p>
-                <p className="text-[#fb923c]">{TAGLINE_BOTTOM}</p>
-              </div>
 
               <div className="flex flex-col md:flex-row items-start md:items-center gap-6 py-3 border-y border-white/10">
                 <div className="text-[#3b82f6] font-mono font-bold text-xs leading-none select-none flex-shrink-0">
