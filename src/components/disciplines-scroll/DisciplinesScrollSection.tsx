@@ -22,6 +22,8 @@ export interface DisciplineChapter {
   stats: { value: string; label: string }[];
   imageSrc: string;
   caption: string;
+  objectFit?: 'cover' | 'contain';
+  objectPosition?: string;
 }
 
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
@@ -63,6 +65,8 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     ],
     imageSrc: '/images/karate.jpg',
     caption: 'National Kumite Tournament Demonstration',
+    objectFit: 'contain',
+    objectPosition: 'center center',
   },
 ];
 
@@ -560,7 +564,11 @@ export const DisciplinesScrollSection: React.FC = () => {
                         src={ch.imageSrc}
                         alt={ch.title}
                         loading="eager"
-                        className="photo-card-img w-full h-full object-cover filter brightness-95 hover:scale-105 transition-transform duration-700"
+                        className="photo-card-img w-full h-full filter brightness-95 hover:scale-105 transition-transform duration-700"
+                        style={{
+                          objectFit: ch.objectFit || 'cover',
+                          objectPosition: ch.objectPosition || 'center center',
+                        }}
                         onError={() => setImgErrorMap((prev) => ({ ...prev, [ch.id]: true }))}
                       />
                     ) : (
