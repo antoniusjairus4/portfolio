@@ -27,7 +27,7 @@ export interface DisciplineChapter {
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   {
     id: 'table-tennis',
-    number: '01 / 05',
+    number: '01 / 03',
     title: 'Table Tennis',
     descriptor: '2x Tamil Nadu State Champion',
     stats: [
@@ -40,7 +40,7 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   },
   {
     id: 'public-speaking',
-    number: '02 / 05',
+    number: '02 / 03',
     title: 'Public Speaking',
     descriptor: 'Keynote & Oratory Speaker',
     stats: [
@@ -53,7 +53,7 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
   },
   {
     id: 'karate',
-    number: '03 / 05',
+    number: '03 / 03',
     title: 'Karate',
     descriptor: 'Black belt martial artist',
     stats: [
@@ -63,32 +63,6 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     ],
     imageSrc: '/images/karate.jpg',
     caption: 'National Kumite Tournament Demonstration',
-  },
-  {
-    id: 'chess',
-    number: '04 / 05',
-    title: 'Chess',
-    descriptor: 'Tactical Tournament Player',
-    stats: [
-      { value: '2143', label: 'Peak Bullet Rating' },
-      { value: '1985', label: 'Rapid Rating' },
-      { value: '1924', label: 'Blitz Rating' },
-    ],
-    imageSrc: '/images/chess.jpg',
-    caption: 'State Level FIDE Rated Tournament Trophies',
-  },
-  {
-    id: 'music',
-    number: '05 / 05',
-    title: 'Music',
-    descriptor: 'Instrumental & Keyboard Artist',
-    stats: [
-      { value: '3 Grades', label: 'Trinity College London' },
-      { value: 'Silver', label: 'Medalist, Campofez 2022' },
-      { value: '4', label: 'Events Participated' },
-    ],
-    imageSrc: '/images/music.jpg',
-    caption: 'Live Piano & Keyboard Solo Performance',
   },
 ];
 
@@ -407,7 +381,7 @@ export const DisciplinesScrollSection: React.FC = () => {
             .to(spotLightEl, { opacity: 0, ease: 'sine.in', duration: 0.7 * PACE }, exitStart)
             .to(chapterEl, { visibility: 'hidden', duration: 0.01 }, exitStart + exitDur);
         } else {
-          // Last chapter (Music) holds composition before pin releases
+          // Last chapter holds composition before pin releases
           masterTl.to(chapterEl, { opacity: 1, duration: 1.5 * PACE }, slotStartUnit + 7.5 * PACE);
         }
       });
