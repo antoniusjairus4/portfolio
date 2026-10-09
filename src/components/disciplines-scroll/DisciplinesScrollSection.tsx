@@ -24,6 +24,8 @@ export interface DisciplineChapter {
   caption: string;
   objectFit?: 'cover' | 'contain';
   objectPosition?: string;
+  aspectRatio?: string;
+  frameless?: boolean;
 }
 
 export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
@@ -65,8 +67,10 @@ export const DISCIPLINE_CHAPTERS: DisciplineChapter[] = [
     ],
     imageSrc: '/images/karate.jpg',
     caption: 'National Kumite Tournament Demonstration',
-    objectFit: 'contain',
-    objectPosition: 'center center',
+    objectFit: 'cover',
+    objectPosition: 'right 30%',
+    aspectRatio: 'aspect-[4/3]',
+    frameless: true,
   },
 ];
 
@@ -558,7 +562,13 @@ export const DisciplinesScrollSection: React.FC = () => {
 
                 {/* Right Column: Photo Card & Caption */}
                 <div className="lg:col-span-6 flex flex-col items-center lg:items-end pointer-events-auto">
-                  <div className="photo-card relative w-[min(34vw,420px)] aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#17110C] opacity-0">
+                  <div
+                    className={`photo-card relative ${
+                      ch.frameless
+                        ? `w-[min(42vw,540px)] ${ch.aspectRatio || 'aspect-[4/3]'} rounded-xl overflow-hidden shadow-2xl opacity-0`
+                        : `w-[min(34vw,420px)] ${ch.aspectRatio || 'aspect-[3/4]'} rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#17110C] opacity-0`
+                    }`}
+                  >
                     {!hasImageError ? (
                       <img
                         src={ch.imageSrc}
