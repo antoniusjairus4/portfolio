@@ -580,13 +580,13 @@ export const TechnicalSkillsTerminal: React.FC = () => {
         <p>Fullscreen interactive Kali Linux terminal. Type commands to view programming, web development, cybersecurity, tools, and AI skills.</p>
       </div>
 
-      {/* Full-Page Dim Golden LetterGlitch Backdrop */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+      {/* Full-Page Vibrant Golden LetterGlitch Backdrop */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-65">
         <LetterGlitch
-          glitchColors={['#17110C', '#4A3212', '#9A6318', '#E0A030', '#F5B031']}
-          glitchSpeed={60}
+          glitchColors={['#2A1D0E', '#804E10', '#D49020', '#F5B031', '#FFE082']}
+          glitchSpeed={45}
           centerVignette={false}
-          outerVignette={true}
+          outerVignette={false}
           smooth={true}
           backgroundColor="#0C0907"
         />
@@ -636,7 +636,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       <div
         ref={terminalWindowRef}
         onClick={focusInput}
-        className={`relative z-10 w-full h-[100dvh] bg-[#040806]/80 backdrop-blur-sm flex flex-col cursor-text ${
+        className={`relative z-10 w-full h-[100dvh] bg-[#040806]/40 backdrop-blur-[2px] flex flex-col cursor-text ${
           showTerminal ? 'opacity-100' : 'opacity-0'
         }`}
       >
