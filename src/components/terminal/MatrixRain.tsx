@@ -8,10 +8,10 @@ interface MatrixRainProps {
 
 export const MatrixRain: React.FC<MatrixRainProps> = ({ isDense = false }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const opacityRef = useRef(isDense ? 0.35 : 0.15);
+  const opacityRef = useRef(isDense ? 0.35 : 0.12);
 
   useEffect(() => {
-    opacityRef.current = isDense ? 0.35 : 0.15;
+    opacityRef.current = isDense ? 0.35 : 0.12;
   }, [isDense]);
 
   useEffect(() => {

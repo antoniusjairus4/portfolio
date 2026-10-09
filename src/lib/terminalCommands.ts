@@ -83,6 +83,7 @@ export function executeCommand(cmdLine: string, currentPath: string): CommandRes
         '  clear             - Clear terminal screen (or Ctrl+L)',
         '  history           - Display executed command history',
         '  echo <text>       - Print text to terminal',
+        '  exit / logout     - Exit terminal and scroll back up',
         '  sudo open skills  - Gain privileged access to skills tree',
       ],
     };
@@ -101,7 +102,7 @@ export function executeCommand(cmdLine: string, currentPath: string): CommandRes
   }
 
   if (mainCmd === 'exit' || mainCmd === 'logout') {
-    return { output: 'nice try :)' };
+    return { output: 'logout' };
   }
 
   if (trimmed === 'sudo open skills') {
@@ -135,9 +136,10 @@ export function executeCommand(cmdLine: string, currentPath: string): CommandRes
   }
 
   if (mainCmd === 'ls') {
-    const { node } = resolvePathNode(currentPath, args.find(a => !a.startsWith('-')) || '.');
+    const rawTarget = (args || []).find((a) => !a.startsWith('-')) || '.';
+    const { node } = resolvePathNode(currentPath, rawTarget);
     if (!node) {
-      return { output: `ls: cannot access '${args[0]}': No such file or directory`, isError: true };
+      return { output: `ls: cannot access '${rawTarget}': No such file or directory`, isError: true };
     }
     if (node.type === 'file') {
       return { output: node.name };
@@ -151,7 +153,7 @@ export function executeCommand(cmdLine: string, currentPath: string): CommandRes
   }
 
   if (mainCmd === 'cat') {
-    const target = args.join(' ');
+    const target = (args || []).join(' ');
     if (!target) return { output: 'cat: missing file operand', isError: true };
 
     const { node } = resolvePathNode(currentPath, target);
@@ -163,10 +165,12 @@ export function executeCommand(cmdLine: string, currentPath: string): CommandRes
     }
     return {
       output: [
-        `${node.name} ${node.category ? `(${node.category})` : ''}`,
-        `----------------------------------------`,
-        node.description || 'No description available.',
+        `┌──[ ${node.name} ]─────────────────────────────────┐`,
+        `│ Category : ${(node.category || 'General').padEnd(38)} │`,
+        `│ Info     : ${(node.description || 'Skill item').padEnd(38)} │`,
+        `└───────────────────────────────────────────────────┘`,
       ],
+      isGreen: true,
     };
   }
 
