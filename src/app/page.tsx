@@ -4,6 +4,7 @@ import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { Preloader } from '@/components/preloader/Preloader';
 import { VenturesSection } from '@/components/ventures/VenturesSection';
 import { DisciplinesScrollSection } from '@/components/disciplines-scroll/DisciplinesScrollSection';
+import { TechnicalSkillsTerminal } from '@/components/terminal/TechnicalSkillsTerminal';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
 export default function Home() {
@@ -35,6 +36,9 @@ export default function Home() {
 
       {/* Page 2 Achievements Spatial Scroll-Driven Section */}
       <DisciplinesScrollSection />
+
+      {/* Page 3 Technical Skills Terminal Section */}
+      <TechnicalSkillsTerminal />
     </main>
   );
 }
