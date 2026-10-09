@@ -374,24 +374,24 @@ export const PhotoCoverSplit: React.FC = () => {
         </picture>
 
         {/* Autonomous WebGL LiquidEther Simulation Layer */}
-        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-80 mix-blend-screen">
+        <div className="absolute inset-0 w-full h-full z-0 pointer-events-none opacity-90">
           <LiquidEther
-            colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
-            mouseForce={0}
-            cursorSize={130}
+            colors={['#804E10', '#D49020', '#F5B031', '#FFE082']}
+            mouseForce={20}
+            cursorSize={150}
             isViscous={true}
-            viscous={40}
+            viscous={30}
             iterationsViscous={36}
             iterationsPoisson={40}
-            resolution={0.65}
+            resolution={0.75}
             isBounce={false}
             autoDemo={true}
-            autoSpeed={0.5}
-            autoIntensity={3.0}
-            takeoverDuration={0.3}
+            autoSpeed={0.6}
+            autoIntensity={4.5}
+            takeoverDuration={0.25}
             autoResumeDelay={0}
             autoRampDuration={0.6}
-            backgroundColor="#0C0907"
+            backgroundColor="transparent"
           />
         </div>
 

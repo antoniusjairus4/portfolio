@@ -477,7 +477,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
     const parts = inputText.trim().split(/\s+/);
     if (parts.length === 1) {
       // Command name completion
-      const cmds = ['ls', 'cd', 'pwd', 'cat', 'tree', 'whoami', 'echo', 'clear', 'history', 'neofetch', 'cmatrix', 'exit', 'logout'];
+      const cmds = ['ls', 'cd', 'pwd', 'cat', 'whoami', 'echo', 'clear', 'history', 'cmatrix', 'exit', 'logout'];
       const matches = cmds.filter((c) => c.startsWith(parts[0].toLowerCase()));
       if (matches.length === 1) {
         setInputText(matches[0] + ' ');
@@ -561,7 +561,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       });
     }
 
-    chips.push('tree', 'neofetch', 'clear', 'exit');
+    chips.push('clear', 'exit');
     return chips;
   };
 

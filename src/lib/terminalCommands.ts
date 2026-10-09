@@ -168,43 +168,5 @@ export function executeCommand(
     };
   }
 
-  if (mainCmd === 'tree') {
-    const pathArg = args.find((a) => !a.startsWith('-')) || '.';
-    const { node, segments } = resolvePath(pathArg, cwdSegments, oldPwdSegments, ROOT_FS);
-
-    if (!node) {
-      return { output: `tree: ${pathArg}: No such file or directory`, isError: true };
-    }
-
-    const rootLabel = segmentsToPrompt(segments);
-    const lines: string[] = [rootLabel];
-
-    const buildTree = (dirNode: FsNode, prefix: string) => {
-      if (!dirNode.children) return;
-      const keys = Object.keys(dirNode.children);
-      keys.forEach((k, idx) => {
-        const isLast = idx === keys.length - 1;
-        const child = dirNode.children![k];
-        const connector = isLast ? '└── ' : '├── ';
-        const childPrefix = isLast ? '    ' : '│   ';
-
-        if (child.type === 'dir') {
-          lines.push(`${prefix}${connector}${child.name}/`);
-          buildTree(child, prefix + childPrefix);
-        } else {
-          lines.push(`${prefix}${connector}${child.name}`);
-        }
-      });
-    };
-
-    if (node.type === 'dir') {
-      buildTree(node, '');
-    } else {
-      lines.push(`└── ${node.name}`);
-    }
-
-    return { output: lines };
-  }
-
   return { output: `zsh: command not found: ${mainCmd}`, isError: true };
 }

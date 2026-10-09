@@ -21,7 +21,7 @@ export const ROOT_FS: FsNode = {
             'README.md': {
               name: 'README.md',
               type: 'file',
-              description: 'Welcome to my skills terminal. Try: ls, cd skills, tree',
+              description: 'Welcome to my skills terminal. Try: ls, cd skills',
             },
             skills: {
               name: 'skills',
