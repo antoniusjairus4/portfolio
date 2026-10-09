@@ -18,6 +18,7 @@ import {
   KALI_DRAGON_LOGO,
 } from '@/lib/terminalBanner';
 import { MatrixRain } from './MatrixRain';
+import LetterGlitch from '../backgrounds/LetterGlitch';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -577,6 +578,18 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       <div className="sr-only">
         <h2>Technical Skills Terminal</h2>
         <p>Fullscreen interactive Kali Linux terminal. Type commands to view programming, web development, cybersecurity, tools, and AI skills.</p>
+      </div>
+
+      {/* Full-Page Dim Golden LetterGlitch Backdrop */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+        <LetterGlitch
+          glitchColors={['#17110C', '#4A3212', '#9A6318', '#E0A030', '#F5B031']}
+          glitchSpeed={60}
+          centerVignette={false}
+          outerVignette={true}
+          smooth={true}
+          backgroundColor="#0C0907"
+        />
       </div>
 
       <MatrixRain isDense={isDenseMatrix} />
