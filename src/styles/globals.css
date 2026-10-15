@@ -155,28 +155,52 @@ body {
   background: var(--hero-parchment);
 }
 
-.hero-editorial-rail {
+.hero-editorial-spine {
   position: absolute;
-  top: clamp(1rem, 3.2vw, 3.75rem);
-  bottom: clamp(1rem, 3.2vw, 3.75rem);
-  width: clamp(0.2rem, 0.32vw, 0.38rem);
+  inset: 0 auto 0 0;
+  display: flex;
+  width: clamp(4.75rem, 7vw, 8.5rem);
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.4rem;
+  padding-block: clamp(2rem, 5vh, 4rem);
+  background: var(--hero-charcoal);
+  color: var(--hero-parchment);
+  font-family: 'Satoshi', system-ui, sans-serif;
+  font-size: clamp(0.6rem, 0.68vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+.hero-editorial-spine > span {
+  writing-mode: vertical-rl;
+}
+
+.hero-editorial-crossbar {
+  position: absolute;
+  top: clamp(4.5rem, 13vh, 8.5rem);
+  left: clamp(4.75rem, 7vw, 8.5rem);
+  width: clamp(7rem, 14vw, 17rem);
+  height: clamp(0.3rem, 0.45vw, 0.5rem);
   background: var(--hero-charcoal);
 }
 
-.hero-editorial-rail-left {
-  left: clamp(1rem, 3.2vw, 3.75rem);
+.hero-editorial-accent {
+  position: absolute;
+  top: 62%;
+  left: clamp(4.75rem, 7vw, 8.5rem);
+  width: clamp(0.65rem, 0.85vw, 1rem);
+  height: clamp(5.5rem, 14vh, 9rem);
+  background: var(--hero-crimson);
 }
 
-.hero-editorial-rail-right {
-  right: clamp(1rem, 3.2vw, 3.75rem);
-}
-
-.hero-editorial-corner {
+.hero-editorial-counterweight {
   position: absolute;
   right: 0;
   bottom: 0;
-  width: clamp(4.5rem, 10vw, 12rem);
-  height: clamp(1rem, 2.4vw, 2.75rem);
+  width: clamp(15rem, 29vw, 34rem);
+  height: clamp(2.25rem, 5.5vh, 4rem);
   background: var(--hero-charcoal);
 }
 
@@ -236,17 +260,32 @@ body {
     letter-spacing: 0.06em;
   }
 
-  .hero-editorial-rail {
-    top: clamp(0.9rem, 4vw, 2rem);
-    bottom: clamp(0.9rem, 4vw, 2rem);
+  .hero-editorial-spine {
+    width: clamp(1rem, 4vw, 1.5rem);
+    padding: 0;
   }
 
-  .hero-editorial-rail-left {
-    left: clamp(0.9rem, 4vw, 2rem);
+  .hero-editorial-spine > span {
+    display: none;
   }
 
-  .hero-editorial-rail-right {
-    right: clamp(0.9rem, 4vw, 2rem);
+  .hero-editorial-crossbar {
+    top: clamp(3rem, 9vh, 5rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    width: clamp(4.5rem, 24vw, 8rem);
+    height: 0.25rem;
+  }
+
+  .hero-editorial-accent {
+    top: 68%;
+    left: clamp(1rem, 4vw, 1.5rem);
+    width: clamp(0.4rem, 1.8vw, 0.65rem);
+    height: clamp(4rem, 10vh, 6rem);
+  }
+
+  .hero-editorial-counterweight {
+    width: clamp(8rem, 42vw, 18rem);
+    height: clamp(1.25rem, 3.5vh, 2.25rem);
   }
 }
 

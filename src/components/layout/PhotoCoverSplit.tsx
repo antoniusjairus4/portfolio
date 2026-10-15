@@ -297,9 +297,13 @@ export const PhotoCoverSplit: React.FC = () => {
         aria-hidden="true"
         className="hero-editorial-surface absolute inset-0 z-0 h-full w-full overflow-hidden"
       >
-        <div className="hero-editorial-rail hero-editorial-rail-left" />
-        <div className="hero-editorial-rail hero-editorial-rail-right" />
-        <div className="hero-editorial-corner" />
+        <div className="hero-editorial-spine">
+          <span>01</span>
+          <span>IDENTITY</span>
+        </div>
+        <div className="hero-editorial-crossbar" />
+        <div className="hero-editorial-accent" />
+        <div className="hero-editorial-counterweight" />
         <div className="hero-crimson-rupture" />
       </div>
 
