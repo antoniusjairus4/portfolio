@@ -56,6 +56,12 @@ test('Hero handoff and forward/reverse/direct jumps reconstruct one shared rende
   await setChapterProgress(page, 0.67);
   await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'understanding');
   await expect(page.locator('[data-experience-renderer="shared"]')).toHaveCount(1);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await setChapterProgress(page, 0.67);
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'understanding');
+  await expect(page.locator('[data-experience-renderer="shared"]')).toHaveCount(1);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
 });
 
 for (const viewport of [
