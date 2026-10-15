@@ -19,6 +19,7 @@ import {
 } from '@/lib/terminalBanner';
 import { MatrixRain } from './MatrixRain';
 import LetterGlitch from '../backgrounds/LetterGlitch';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -70,7 +71,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
   const [cmdHistory, setCmdHistory] = useState<string[]>([]);
   const [historyIdx, setHistoryIdx] = useState<number>(-1);
   const [isDenseMatrix, setIsDenseMatrix] = useState(false);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { ready, reducedMotion: isReducedMotion } = useExperienceEnvironment();
   const [showPulse, setShowPulse] = useState(false);
   const [glitchTitleText, setGlitchTitleText] = useState('');
 
@@ -85,13 +86,6 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       inputRef.current?.focus({ preventScroll: true });
     }
   };
-
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mq.matches);
-    } catch {}
-  }, []);
 
   const scrollToPreviousSection = () => {
     if (lenisContext && lenisContext.lenis) {
@@ -110,7 +104,7 @@ export const TechnicalSkillsTerminal: React.FC = () => {
 
   // Cyberpunk Glitch Intro Animation
   useEffect(() => {
-    if (!sectionRef.current) return;
+    if (!sectionRef.current || !ready) return;
 
     if (isReducedMotion) {
       setIntroDone(true);
@@ -121,6 +115,8 @@ export const TechnicalSkillsTerminal: React.FC = () => {
       return;
     }
 
+    let releaseIntroLock: (() => void) | null = null;
+    let safetyTimer: number | null = null;
     const ctx = gsap.context(() => {
       ScrollTrigger.create({
         trigger: sectionRef.current,
@@ -129,12 +125,10 @@ export const TechnicalSkillsTerminal: React.FC = () => {
         onEnter: () => {
           if (introDone) return;
 
-          if (lenisContext && lenisContext.lenis) {
-            lenisContext.lenis.stop();
-          }
-
-          const safetyTimer = setTimeout(() => {
-            if (lenisContext && lenisContext.lenis) lenisContext.lenis.start();
+          releaseIntroLock = lenisContext.acquireScrollLock();
+          safetyTimer = window.setTimeout(() => {
+            releaseIntroLock?.();
+            releaseIntroLock = null;
           }, 3000);
 
           const targetStr = 'MY SKILLS';
@@ -143,10 +137,9 @@ export const TechnicalSkillsTerminal: React.FC = () => {
 
           const introTl = gsap.timeline({
             onComplete: () => {
-              clearTimeout(safetyTimer);
-              if (lenisContext && lenisContext.lenis) {
-                lenisContext.lenis.start();
-              }
+              if (safetyTimer !== null) window.clearTimeout(safetyTimer);
+              releaseIntroLock?.();
+              releaseIntroLock = null;
               setIntroDone(true);
               setShowTerminal(true);
 
@@ -211,8 +204,12 @@ export const TechnicalSkillsTerminal: React.FC = () => {
 
     ScrollTrigger.refresh();
 
-    return () => ctx.revert();
-  }, [isReducedMotion, lenisContext]);
+    return () => {
+      if (safetyTimer !== null) window.clearTimeout(safetyTimer);
+      releaseIntroLock?.();
+      ctx.revert();
+    };
+  }, [ready, isReducedMotion, lenisContext]);
 
   // Command Execution Engine
   const runCommandInternal = (

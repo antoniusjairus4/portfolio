@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import './LiquidEther.css';
 
 export interface LiquidEtherProps {
@@ -84,15 +85,18 @@ export default function LiquidEther({
   lightMode = false,
   paused = false
 }: LiquidEtherProps): React.ReactElement {
+  const { ready, reducedMotion, quality, dprCap } = useExperienceEnvironment();
   const mountRef = useRef<HTMLDivElement | null>(null);
   const webglRef = useRef<LiquidEtherWebGL | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
   const rafRef = useRef<number | null>(null);
   const intersectionObserverRef = useRef<IntersectionObserver | null>(null);
   const isVisibleRef = useRef<boolean>(true);
+  const pausedRef = useRef(paused);
   const resizeRafRef = useRef<number | null>(null);
 
   useEffect(() => {
+    pausedRef.current = paused;
     if (!webglRef.current) return;
     if (paused) {
       webglRef.current.pause();
@@ -102,7 +106,7 @@ export default function LiquidEther({
   }, [paused]);
 
   useEffect(() => {
-    if (!mountRef.current) return;
+    if (!mountRef.current || !ready || reducedMotion || quality === 'fallback') return;
 
     function makePaletteTexture(stops: string[]): THREE.DataTexture {
       let arr: string[];
@@ -150,7 +154,7 @@ export default function LiquidEther({
       clock: THREE.Clock | null = null;
       init(container: HTMLElement) {
         this.container = container;
-        this.pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+        this.pixelRatio = Math.min(window.devicePixelRatio || 1, dprCap);
         this.resize();
         try {
           // Check if WebGL context can actually be created to avoid Three.js internal uncaught errors on lost context
@@ -1069,7 +1073,7 @@ const color_frag = `
           const hidden = document.hidden;
           if (hidden) {
             this.pause();
-          } else if (isVisibleRef.current) {
+          } else if (isVisibleRef.current && !pausedRef.current) {
             this.start();
           }
         };
@@ -1161,7 +1165,7 @@ const color_frag = `
       if (resolution !== prevRes) sim.resize();
     };
     applyOptionsFromProps();
-    webgl.start();
+    if (!pausedRef.current) webgl.start();
 
     const io = new IntersectionObserver(
       entries => {
@@ -1169,7 +1173,7 @@ const color_frag = `
         const isVisible = entry.isIntersecting && entry.intersectionRatio > 0;
         isVisibleRef.current = isVisible;
         if (!webglRef.current) return;
-        if (isVisible && !document.hidden) {
+        if (isVisible && !document.hidden && !pausedRef.current) {
           webglRef.current.start();
         } else {
           webglRef.current.pause();
@@ -1193,6 +1197,7 @@ const color_frag = `
 
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (resizeRafRef.current) cancelAnimationFrame(resizeRafRef.current);
       if (resizeObserverRef.current) {
         try {
           resizeObserverRef.current.disconnect();
@@ -1213,6 +1218,10 @@ const color_frag = `
       webglRef.current = null;
     };
   }, [
+    ready,
+    reducedMotion,
+    quality,
+    dprCap,
     BFECC,
     cursorSize,
     dt,

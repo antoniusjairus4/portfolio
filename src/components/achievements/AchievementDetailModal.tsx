@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import gsap from 'gsap';
 import { AchievementEntry, AchievementStat } from '@/content/achievements';
 import { useLenis } from '@/motion/lenis/LenisProvider';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import manifestData from '@/content/achievements.manifest.json';
 import CursorGrid from '@/components/backgrounds/CursorGrid';
 
@@ -67,32 +68,18 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
   const closeBtnRef = useRef<HTMLButtonElement>(null);
   const photoCardRef = useRef<HTMLDivElement>(null);
 
-  const { stop, start } = useLenis();
+  const { acquireScrollLock } = useLenis();
 
   const discManifest = manifest[item.slug] || { slug: item.slug, title: item.title, photos: [] };
   const photos = discManifest.photos || [];
 
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { reducedMotion: isReducedMotion } = useExperienceEnvironment();
   const [statCounts, setStatCounts] = useState<number[]>([]);
 
   const touchStartRef = useRef<{ x: number; y: number } | null>(null);
 
-  // Check reduced motion
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mq.matches);
-    } catch {}
-  }, []);
-
-  // Stop Lenis smooth scroll while dialog is open & restore on close
-  useEffect(() => {
-    stop();
-    return () => {
-      start();
-    };
-  }, [stop, start]);
+  useEffect(() => acquireScrollLock(), [acquireScrollLock]);
 
   // Shared-element FLIP transition & letter walk animation on mount
   useEffect(() => {
@@ -307,6 +294,7 @@ export const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
     <div
       ref={dialogRef}
       role="dialog"
+      data-scroll-lock-allow="true"
       aria-modal="true"
       aria-labelledby={`achievement-title-${item.id}`}
       onTouchStart={handleTouchStart}

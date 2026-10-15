@@ -9,6 +9,7 @@ import { BakeResult, LetterBox } from './collapse/bakePhysics';
 import { createPhysicsCollapseController, PhysicsCollapseController } from './collapse/usePhysicsCollapse';
 import LiquidEther from '@/components/backgrounds/LiquidEther';
 import { PhysicsDebugOverlay } from './collapse/PhysicsDebugOverlay';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -26,7 +27,7 @@ export const PhotoCoverSplit: React.FC = () => {
   const roleLettersRef = useRef<Map<string, HTMLSpanElement | null>>(new Map());
   const scrollCueRef = useRef<HTMLDivElement>(null);
 
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { ready, reducedMotion: isReducedMotion } = useExperienceEnvironment();
   const [collapseProgress, setCollapseProgress] = useState(0);
   const [bakedFrameIndex, setBakedFrameIndex] = useState(0);
   const [debugConfig, setDebugConfig] = useState<{ enabled: boolean }>({ enabled: false });
@@ -40,18 +41,11 @@ export const PhotoCoverSplit: React.FC = () => {
   });
 
   useEffect(() => {
-    try {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mediaQuery.matches);
-
-      if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('physDebug') === '1') {
-          setDebugConfig({ enabled: true });
-        }
+    if (typeof window !== 'undefined' && process.env.NODE_ENV !== 'production') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('physDebug') === '1') {
+        setDebugConfig({ enabled: true });
       }
-    } catch {
-      // Fallback
     }
   }, []);
 
@@ -119,7 +113,7 @@ export const PhotoCoverSplit: React.FC = () => {
   };
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !ready) return;
 
     let ctx: gsap.Context | null = null;
     let cancelled = false;
@@ -290,7 +284,7 @@ export const PhotoCoverSplit: React.FC = () => {
       window.removeEventListener('resize', handleResize);
       if (ctx) (ctx as gsap.Context).revert();
     };
-  }, [isReducedMotion]);
+  }, [ready, isReducedMotion]);
 
   // Pre-decode revealed background image after page load
   useEffect(() => {

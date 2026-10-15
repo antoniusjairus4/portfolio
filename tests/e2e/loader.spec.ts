@@ -1,15 +1,15 @@
 import { expect, test } from '@playwright/test';
 
 test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => {
-  test('preloader finishes within 8.0 seconds and reveals photo cover', async ({ page }) => {
+  test('preloader releases when critical resources settle and reveals photo cover', async ({ page }) => {
     await page.goto('http://localhost:3000');
 
     // Check preloader is present
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
     await expect(preloader).toBeVisible();
 
-    // Preloader finishes between 6.0s and 8.0s
-    await expect(preloader).toBeHidden({ timeout: 8800 });
+    // Readiness may finish quickly; eight seconds is a failure fallback, not a minimum.
+    await expect(preloader).toBeHidden({ timeout: 12000 });
 
     // Photo cover is visible
     const coverImage = page.getByAltText('Jairus Portfolio Cover');
@@ -91,7 +91,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     // First Visit Path
     await page.goto('http://localhost:3000');
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
-    await expect(preloader).toBeHidden({ timeout: 8800 });
+    await expect(preloader).toBeHidden({ timeout: 12000 });
 
     // Assert strictly zero scroll occurred
     const scrollYBefore = await page.evaluate(() => window.scrollY);

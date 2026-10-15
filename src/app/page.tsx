@@ -8,22 +8,14 @@ import { TechnicalSkillsTerminal } from '@/components/terminal/TechnicalSkillsTe
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
 export default function Home() {
-  const { stop, start } = useLenis();
+  const { refresh } = useLenis();
 
   return (
     <main className="relative w-full bg-[#0C0907]">
       {/* Preloader (Phase 1/2) */}
       <Preloader
         onComplete={() => {
-          start();
-          // Frame after preloader exits: refresh ScrollTrigger and verify pin position
-          requestAnimationFrame(() => {
-            if (typeof window !== 'undefined' && 'ScrollTrigger' in window) {
-              const ST = (window as unknown as { ScrollTrigger: { refresh: () => void; update: () => void } }).ScrollTrigger;
-              ST.refresh();
-              ST.update();
-            }
-          });
+          requestAnimationFrame(refresh);
         }}
       />
 

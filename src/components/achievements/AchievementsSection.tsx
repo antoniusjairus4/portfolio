@@ -7,6 +7,7 @@ import LiquidEther from '@/components/backgrounds/LiquidEther';
 import CursorGrid from '@/components/backgrounds/CursorGrid';
 import { achievementsContent, AchievementItem } from '@/content/achievements';
 import { AchievementDetailModal } from './AchievementDetailModal';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,7 +33,7 @@ export const AchievementsSection: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<AchievementItem | null>(null);
   const [originRect, setOriginRect] = useState<DOMRect | null>(null);
   const [triggerEl, setTriggerEl] = useState<HTMLElement | null>(null);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { reducedMotion: isReducedMotion } = useExperienceEnvironment();
 
   // Constellation & Glow state
   const [lines, setLines] = useState<LineCoords[]>([]);
@@ -44,13 +45,6 @@ export const AchievementsSection: React.FC = () => {
   const [showHint, setShowHint] = useState(true);
 
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mq.matches);
-    } catch {}
-  }, []);
 
   // Compute SVG constellation endpoints based on bounding boxes
   const updateConstellation = useCallback(() => {

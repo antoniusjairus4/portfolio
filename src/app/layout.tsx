@@ -14,6 +14,8 @@ import '@fontsource/unifrakturmaguntia';
 import '@/styles/globals.css';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
 import { GlobalFluidBackground } from '@/components/backgrounds/GlobalFluidBackground';
+import { ExperienceEnvironmentProvider } from '@/experience/ExperienceEnvironment';
+import { GlobalEtherProvider } from '@/experience/GlobalEtherProvider';
 
 export const metadata: Metadata = {
   title: 'Jairus — Portfolio',
@@ -35,10 +37,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
-        <LenisProvider>
-          <GlobalFluidBackground />
-          {children}
-        </LenisProvider>
+        <ExperienceEnvironmentProvider>
+          <LenisProvider>
+            <GlobalEtherProvider>
+              <GlobalFluidBackground />
+              {children}
+            </GlobalEtherProvider>
+          </LenisProvider>
+        </ExperienceEnvironmentProvider>
       </body>
     </html>
   );

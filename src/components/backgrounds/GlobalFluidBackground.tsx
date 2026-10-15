@@ -2,8 +2,15 @@
 
 import React from 'react';
 import LiquidEther from '@/components/backgrounds/LiquidEther';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
+import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 
 export const GlobalFluidBackground: React.FC = () => {
+  const { mode } = useGlobalEther();
+  const { ready, reducedMotion, quality } = useExperienceEnvironment();
+  if (mode === 'disabled') return null;
+
+  const canRender = ready && !reducedMotion && quality !== 'fallback';
   return (
     <div className="fixed inset-0 z-[0] pointer-events-none overflow-hidden">
       {/* Dim Fallback Image Layer */}
@@ -17,8 +24,9 @@ export const GlobalFluidBackground: React.FC = () => {
       </div>
 
       {/* WebGL LiquidEther Simulation Layer */}
-      <div className="absolute inset-0 z-[1] pointer-events-none opacity-85">
+      {canRender && <div className="absolute inset-0 z-[1] pointer-events-none opacity-85">
         <LiquidEther
+          paused={mode === 'paused'}
           colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
           mouseForce={24}
           cursorSize={140}
@@ -35,7 +43,7 @@ export const GlobalFluidBackground: React.FC = () => {
           autoResumeDelay={1800}
           backgroundColor="#0A0908"
         />
-      </div>
+      </div>}
     </div>
   );
 };

@@ -5,6 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import React, { useEffect, useRef, useState } from 'react';
 import { venturesContent } from '@/content/ventures';
 import { VENTURE_THEMES } from '@/content/ventureThemes';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -36,18 +37,11 @@ export const VenturesSection: React.FC = () => {
 
   const [activeTheme, setActiveTheme] = useState<string | null>(null);
   const [activeSlug, setActiveSlug] = useState<string | null>(null);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { reducedMotion: isReducedMotion } = useExperienceEnvironment();
 
   // GSAP quickTo setters for ultra-smooth 60fps cursor parallax
   const xQuickRefs = useRef<(Function | null)[]>([]);
   const yQuickRefs = useRef<(Function | null)[]>([]);
-
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mq.matches);
-    } catch {}
-  }, []);
 
   // Entrance animation for list items
   useEffect(() => {

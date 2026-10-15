@@ -1,83 +1,75 @@
 'use client';
 
-import React, { useCallback, useEffect, useState } from 'react';
-import { PRELOADER_TIMINGS } from '@/motion/tokens';
-import { usePreloaderProgress } from './usePreloaderProgress';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
+import { useLenis } from '@/motion/lenis/LenisProvider';
+import { useCriticalReadiness } from './useCriticalReadiness';
 
 interface PreloaderProps {
   onComplete: () => void;
 }
 
 export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [skipped, setSkipped] = useState(false);
   const [isServing, setIsServing] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { ready, reducedMotion } = useExperienceEnvironment();
+  const { acquireScrollLock } = useLenis();
+  const readiness = useCriticalReadiness();
+  const releaseRef = useRef<(() => void) | null>(null);
+  const finishTimerRef = useRef<number | null>(null);
+  const finishingRef = useRef(false);
+  const completeRef = useRef(onComplete);
+  completeRef.current = onComplete;
 
-  // Check reduced motion & session storage on mount
   useEffect(() => {
-    try {
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mediaQuery.matches);
+    const release = acquireScrollLock();
+    releaseRef.current = release;
+    return () => {
+      if (finishTimerRef.current !== null) window.clearTimeout(finishTimerRef.current);
+      release();
+      releaseRef.current = null;
+    };
+  }, [acquireScrollLock]);
 
-      const hasVisited = sessionStorage.getItem('jairus_portfolio_visited');
-      if (hasVisited) {
-        setSkipped(true);
-        onComplete();
-        setIsDismissed(true);
-      }
-    } catch {
-      // Fallback if sessionStorage is disabled/blocked
-    }
-  }, [onComplete]);
-
-  const { progress, isDone } = usePreloaderProgress({
-    minDurationMs: PRELOADER_TIMINGS.minDurationMs,
-    maxDurationMs: PRELOADER_TIMINGS.maxDurationMs,
-  });
-
-  const handleFinish = useCallback(() => {
+  const finish = useCallback((instant: boolean) => {
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     try {
       sessionStorage.setItem('jairus_portfolio_visited', 'true');
-    } catch {
-      // Ignore storage error
-    }
+    } catch { /* Storage can be unavailable. */ }
 
-    onComplete();
-
-    if (isReducedMotion) {
+    const dismiss = () => {
+      releaseRef.current?.();
+      releaseRef.current = null;
       setIsDismissed(true);
+      completeRef.current();
+    };
+    if (instant) {
+      dismiss();
       return;
     }
-
-    // Trigger serve animation & wipe
     setIsServing(true);
-    setTimeout(() => {
-      setIsDismissed(true);
-    }, 700);
-  }, [isReducedMotion, onComplete]);
+    finishTimerRef.current = window.setTimeout(dismiss, 700);
+  }, []);
 
   useEffect(() => {
-    if (isDone && !isServing && !isDismissed && !skipped) {
-      handleFinish();
-    }
-  }, [isDone, isServing, isDismissed, skipped, handleFinish]);
+    if (!ready) return;
+    let visited = false;
+    try { visited = sessionStorage.getItem('jairus_portfolio_visited') === 'true'; } catch { /* ignore */ }
+    if (reducedMotion || visited) finish(true);
+    else if (readiness.status !== 'loading') finish(false);
+  }, [ready, reducedMotion, readiness.status, finish]);
 
-  const handleSkip = () => {
-    setSkipped(true);
-    handleFinish();
-  };
-
-  if (isDismissed || skipped) {
+  if (isDismissed) {
     return <div className="hidden pointer-events-none" aria-hidden="true" />;
   }
 
-  const formattedCounter = String(progress).padStart(2, '0');
+  const formattedCounter = String(readiness.progress).padStart(2, '0');
 
   return (
     <div
       role="progressbar"
-      aria-valuenow={progress}
+      aria-valuenow={readiness.progress}
       aria-valuemin={0}
       aria-valuemax={100}
       aria-label="Site preloader"
@@ -88,14 +80,18 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
     >
       {/* Screen reader live region */}
       <div className="sr-only" aria-live="polite">
-        {progress < 100 ? `Loading ${progress}%` : 'Loaded'}
+        {readiness.status === 'degraded'
+          ? 'Continuing with available resources'
+          : readiness.status === 'ready'
+            ? 'Critical resources ready'
+            : `${readiness.completed} of ${readiness.total} critical resources ready`}
       </div>
 
       {/* Top bar with minimal skip button */}
       <div className="flex justify-end w-full z-40">
         <button
           type="button"
-          onClick={handleSkip}
+          onClick={() => finish(true)}
           className="text-xs uppercase tracking-widest text-[#A89880] hover:text-[#E0A93B] focus-visible:ring-2 focus-visible:ring-[#E0A93B] transition-colors py-2 px-3 rounded"
         >
           Skip
@@ -115,7 +111,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         <div className="absolute bottom-12 left-0 right-0 h-[2px] bg-[#E0A93B]/40 shadow-[0_0_12px_rgba(224,169,59,0.3)]" />
 
         {/* Dynamic Contact Shadow */}
-        {!isReducedMotion && (
+        {!reducedMotion && (
           <div
             className={`absolute bottom-[42px] w-[clamp(60px,8vw,140px)] h-3 rounded-[50%] bg-[#E0A93B]/30 blur-sm transition-all ${
               isServing ? 'animate-shadow-serve' : 'animate-shadow-bounce-8'
@@ -124,7 +120,7 @@ export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
         )}
 
         {/* Large Ember Ball (clamp 96px to 220px) with Gold Glow */}
-        {!isReducedMotion && (
+        {!reducedMotion && (
           <div
             className={`w-[clamp(96px,12vw,220px)] h-[clamp(96px,12vw,220px)] rounded-full bg-[#E8481F] shadow-[0_0_50px_rgba(224,169,59,0.45),0_0_20px_rgba(232,72,31,0.8)] border border-[#E0A93B]/30 ${
               isServing ? 'animate-ball-serve' : 'animate-ball-bounce-8'

@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import LiquidEther from '@/components/backgrounds/LiquidEther';
 import CursorGrid from '@/components/backgrounds/CursorGrid';
 import { useLenis } from '@/motion/lenis/LenisProvider';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -82,7 +83,7 @@ export const DisciplinesScrollSection: React.FC = () => {
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [isSectionVisible, setIsSectionVisible] = useState(false);
-  const [isReducedMotion, setIsReducedMotion] = useState(false);
+  const { ready, reducedMotion: isReducedMotion } = useExperienceEnvironment();
   const [imgErrorMap, setImgErrorMap] = useState<Record<string, boolean>>({});
 
   // Parse numeric stat for count-up animation
@@ -92,13 +93,6 @@ export const DisciplinesScrollSection: React.FC = () => {
     const num = parseFloat(match[2].replace(/,/g, ''));
     return isNaN(num) ? null : { prefix: match[1], num, suffix: match[3] };
   };
-
-  useEffect(() => {
-    try {
-      const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setIsReducedMotion(mq.matches);
-    } catch { }
-  }, []);
 
   // Preload all chapter images
   useEffect(() => {
@@ -113,7 +107,7 @@ export const DisciplinesScrollSection: React.FC = () => {
 
   // Master GSAP Context & ScrollTrigger Timeline with 9 units per chapter (TOTAL_UNITS = 45)
   useEffect(() => {
-    if (!sectionRef.current || !stageRef.current) return;
+    if (!sectionRef.current || !stageRef.current || !ready) return;
 
     const ctx = gsap.context(() => {
       const numChapters = DISCIPLINE_CHAPTERS.length;
@@ -402,7 +396,7 @@ export const DisciplinesScrollSection: React.FC = () => {
     }
 
     return () => ctx.revert();
-  }, []);
+  }, [ready, isReducedMotion]);
 
   const handleDotClick = (index: number) => {
     if (!sectionRef.current) return;
