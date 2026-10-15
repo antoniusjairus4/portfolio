@@ -36,6 +36,31 @@ test('forward, reverse, and rapid scroll derive deterministic Hero states', asyn
   await expect(hero).toHaveAttribute('data-hero-state', 'portrait');
 });
 
+test('typographic split opens and reconstructs from scroll progress', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterSite(page);
+  const hero = page.locator('#hero');
+  const lines = page.locator('.hero-name-line');
+  const distance = 900 * 4.2;
+
+  await page.evaluate((position) => window.scrollTo(0, position), distance * 0.78);
+  await expect(hero).toHaveAttribute('data-hero-depth', 'active');
+  await expect
+    .poll(async () => {
+      const [antoniusY, jairusY] = await lines.evaluateAll((elements) =>
+        elements.map(
+          (element) => new DOMMatrixReadOnly(window.getComputedStyle(element).transform).m42,
+        ),
+      );
+      return { antoniusMovesUp: antoniusY < 0, jairusMovesDown: jairusY > 0 };
+    })
+    .toEqual({ antoniusMovesUp: true, jairusMovesDown: true });
+
+  await page.evaluate((position) => window.scrollTo(0, position), distance * 0.58);
+  await expect(hero).toHaveAttribute('data-hero-depth', 'inactive');
+  await expect(hero).toHaveCSS('--hero-opening', '0.0000');
+});
+
 for (const viewport of [
   { width: 320, height: 700 },
   { width: 390, height: 844 },

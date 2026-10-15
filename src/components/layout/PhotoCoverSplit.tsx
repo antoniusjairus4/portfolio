@@ -110,7 +110,18 @@ export const PhotoCoverSplit: React.FC = () => {
 
     const setHeroState = (progress: number) => {
       const state = getHeroChoreographyState(progress);
+      const { holdEnd, collapseEnd } = SCROLL_STORY.beats;
+      const ruptureProgress = Math.min(Math.max((progress - (holdEnd - 0.04)) / 0.08, 0), 1);
+      const openingStart = holdEnd + 0.04;
+      const openingProgress = Math.min(
+        Math.max((progress - openingStart) / (collapseEnd - openingStart), 0),
+        1,
+      );
       container.style.setProperty('--hero-progress', progress.toFixed(4));
+      container.style.setProperty('--hero-rupture', ruptureProgress.toFixed(4));
+      container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
+      container.dataset.heroDepth =
+        !reducedMotion && openingProgress > 0.04 && progress < 0.995 ? 'active' : 'inactive';
       if (lastStateRef.current !== state) {
         lastStateRef.current = state;
         container.dataset.heroState = state;
@@ -191,7 +202,7 @@ export const PhotoCoverSplit: React.FC = () => {
               setHeroState(progress);
 
               if (collapseProgress > 0) {
-                pageBackground.style.opacity = String(1 - collapseProgress);
+                pageBackground.style.opacity = '1';
                 controllerRef.current?.applyFrame(collapseProgress, letterMapRef.current);
               } else {
                 pageBackground.style.opacity = '1';
@@ -266,8 +277,11 @@ export const PhotoCoverSplit: React.FC = () => {
       controllerRef.current = null;
       letterMapRef.current.clear();
       delete container.dataset.heroState;
+      delete container.dataset.heroDepth;
       delete container.dataset.reducedMotion;
       container.style.removeProperty('--hero-progress');
+      container.style.removeProperty('--hero-rupture');
+      container.style.removeProperty('--hero-opening');
     };
   }, [debugEnabled, ready, reducedMotion]);
 
@@ -297,13 +311,18 @@ export const PhotoCoverSplit: React.FC = () => {
         aria-hidden="true"
         className="hero-editorial-surface absolute inset-0 z-0 h-full w-full overflow-hidden"
       >
-        <div className="hero-editorial-spine">
-          <span>01</span>
-          <span>IDENTITY</span>
+        <div className="hero-depth-curtain hero-depth-curtain-top" />
+        <div className="hero-depth-curtain hero-depth-curtain-bottom" />
+        <div className="hero-editorial-ornament">
+          <div className="hero-editorial-spine">
+            <span>01</span>
+            <span>IDENTITY</span>
+          </div>
+          <div className="hero-editorial-crossbar" />
+          <div className="hero-editorial-accent" />
+          <div className="hero-editorial-counterweight" />
         </div>
-        <div className="hero-editorial-crossbar" />
-        <div className="hero-editorial-accent" />
-        <div className="hero-editorial-counterweight" />
+        <div className="hero-horizontal-rupture" />
         <div className="hero-crimson-rupture" />
       </div>
 
@@ -341,7 +360,7 @@ export const PhotoCoverSplit: React.FC = () => {
             </span>
           </h1>
 
-          <ul className="mt-5 flex list-none flex-col items-center gap-1 p-0 sm:mt-7 sm:gap-2">
+          <ul className="hero-role-list mt-5 flex list-none flex-col items-center gap-1 p-0 sm:mt-7 sm:gap-2">
             {heroContent.roles.map((role, roleIndex) => (
               <li key={role} className="font-hero-role">
                 <span className="sr-only">{role}</span>

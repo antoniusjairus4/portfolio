@@ -148,11 +148,44 @@ body {
   --hero-charcoal: #27231f;
   --hero-parchment: #eadfcd;
   --hero-crimson: #791f2b;
-  background: var(--hero-ink);
+  --hero-rupture-y: 44%;
+  z-index: 3;
+  background: transparent;
 }
 
 .hero-editorial-surface {
+  perspective: 1200px;
+  background: transparent;
+}
+
+.hero-depth-curtain {
+  position: absolute;
+  right: 0;
+  left: 0;
+  overflow: hidden;
   background: var(--hero-parchment);
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+.hero-depth-curtain-top {
+  top: 0;
+  height: calc(var(--hero-rupture-y) + 1px);
+  transform: translate3d(0, calc(var(--hero-opening) * -60vh), 0)
+    rotateX(calc(var(--hero-opening) * 7deg));
+  transform-origin: center bottom;
+}
+
+.hero-depth-curtain-bottom {
+  top: var(--hero-rupture-y);
+  bottom: 0;
+  transform: translate3d(0, calc(var(--hero-opening) * 60vh), 0)
+    rotateX(calc(var(--hero-opening) * -7deg));
+  transform-origin: center top;
+}
+
+.hero-editorial-ornament {
+  opacity: clamp(0, calc(1 - var(--hero-opening) * 2.4), 1);
 }
 
 .hero-editorial-spine {
@@ -216,10 +249,31 @@ body {
   transform-origin: center;
 }
 
+.hero-horizontal-rupture {
+  position: absolute;
+  top: var(--hero-rupture-y);
+  left: 50%;
+  width: min(78vw, 88rem);
+  height: clamp(0.12rem, 0.18vw, 0.22rem);
+  background: var(--hero-ink);
+  transform: translate3d(-50%, -50%, 0) scaleX(var(--hero-rupture));
+  transform-origin: center;
+  will-change: transform;
+}
+
 .hero-name-line {
   display: flex;
   justify-content: center;
   white-space: nowrap;
+  will-change: transform;
+}
+
+.hero-name-line:first-child {
+  transform: translate3d(0, calc(var(--hero-opening, 0) * -60vh), 0);
+}
+
+.hero-name-line:last-child {
+  transform: translate3d(0, calc(var(--hero-opening, 0) * 60vh), 0);
 }
 
 .hero-letter {
@@ -248,7 +302,23 @@ body {
   mix-blend-mode: difference;
 }
 
+.hero-role-list {
+  opacity: clamp(0, calc(1 - var(--hero-opening, 0) * 3), 1);
+  transform: translate3d(0, calc(var(--hero-opening, 0) * 18vh), 0);
+}
+
+body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
+  position: fixed;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+}
+
 @media (orientation: portrait) {
+  .hero-editorial-composition {
+    --hero-rupture-y: 45%;
+  }
+
   .font-hero-name {
     font-size: clamp(2.7rem, 15vw, 6.4rem);
     line-height: 0.86;
