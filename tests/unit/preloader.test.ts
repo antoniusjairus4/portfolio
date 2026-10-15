@@ -1,8 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { heroContent } from '../../src/content/heroContent';
 import { criticalProgress } from '../../src/components/preloader/useCriticalReadiness';
+import { heroContent } from '../../src/content/heroContent';
 import { SCROLL_STORY } from '../../src/motion/tokens';
-
 
 describe('Preloader readiness and story constants', () => {
   it('reports completed resources, not elapsed time', () => {
@@ -12,17 +11,15 @@ describe('Preloader readiness and story constants', () => {
   });
 
   it('exports valid scroll story beat boundary constants', () => {
-    expect(SCROLL_STORY.beats.revealEnd).toBe(0.22);
-    expect(SCROLL_STORY.beats.readEnd).toBe(0.35);
-    expect(SCROLL_STORY.beats.exitEnd).toBe(0.60);
-    expect(SCROLL_STORY.beats.holdEnd).toBe(0.64);
-    expect(SCROLL_STORY.beats.collapseEnd).toBe(1.00);
-    expect(SCROLL_STORY.totalDistanceVh).toBe(550);
+    expect(SCROLL_STORY.beats.revealEnd).toBe(0.24);
+    expect(SCROLL_STORY.beats.readEnd).toBe(0.42);
+    expect(SCROLL_STORY.beats.exitEnd).toBe(0.62);
+    expect(SCROLL_STORY.beats.holdEnd).toBe(0.66);
+    expect(SCROLL_STORY.beats.collapseEnd).toBe(0.94);
+    expect(SCROLL_STORY.totalDistanceVh).toBe(420);
   });
 
   it('contains the updated role copy: Student, Freelancer, Entrepreneur', () => {
     expect(heroContent.roles).toEqual(['Student', 'Freelancer', 'Entrepreneur']);
   });
 });
-
-

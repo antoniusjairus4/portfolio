@@ -196,6 +196,10 @@ export function bakePhysicsSimulation(config: PhysicsConfig): BakeResult {
 
   const hash = hashBakeFrames(frames);
 
+  // Recorded frames are the runtime artifact; the temporary Matter world is not retained.
+  Matter.Composite.clear(world, false, true);
+  Matter.Engine.clear(engine);
+
   return {
     fps,
     duration: totalDurationSec,

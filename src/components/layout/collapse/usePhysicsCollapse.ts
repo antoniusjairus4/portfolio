@@ -1,4 +1,4 @@
-import { bakePhysicsSimulation, BakeResult, LetterBox } from './bakePhysics';
+import { type BakeResult, bakePhysicsSimulation, type LetterBox } from './bakePhysics';
 
 export interface PhysicsCollapseController {
   bakeResult: BakeResult | null;
@@ -7,6 +7,7 @@ export interface PhysicsCollapseController {
   bake: (viewportWidth: number, viewportHeight: number, boxes: LetterBox[]) => BakeResult | null;
   applyFrame: (progress: number, letterElementsMap: Map<string, HTMLElement>) => void;
   resetTransforms: (letterElementsMap: Map<string, HTMLElement>) => void;
+  dispose: (letterElementsMap: Map<string, HTMLElement>) => void;
 }
 
 export function createPhysicsCollapseController(): PhysicsCollapseController {
@@ -60,14 +61,23 @@ export function createPhysicsCollapseController(): PhysicsCollapseController {
       const y = t1.y + (t2.y - t1.y) * lerpFactor;
       const r = t1.rotation + (t2.rotation - t1.rotation) * lerpFactor;
 
-      el.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0px) rotate(${r.toFixed(3)}rad)`;
+      el.style.translate = `${x.toFixed(2)}px ${y.toFixed(2)}px`;
+      el.style.rotate = `${r.toFixed(3)}rad`;
     });
   };
 
   const resetTransforms = (letterElementsMap: Map<string, HTMLElement>) => {
     letterElementsMap.forEach((el) => {
-      el.style.transform = '';
+      el.style.removeProperty('translate');
+      el.style.removeProperty('rotate');
     });
+  };
+
+  const dispose = (letterElementsMap: Map<string, HTMLElement>) => {
+    resetTransforms(letterElementsMap);
+    bakeResult = null;
+    bakeTimeMs = 0;
+    isBaking = false;
   };
 
   return {
@@ -83,5 +93,6 @@ export function createPhysicsCollapseController(): PhysicsCollapseController {
     bake,
     applyFrame,
     resetTransforms,
+    dispose,
   };
 }

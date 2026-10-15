@@ -37,7 +37,9 @@ export class ScrollLockManager {
 
   dispose() {
     this.locks.clear();
-    this.deactivate();
+    // Provider teardown must restore DOM state without restarting Lenis or
+    // refreshing ScrollTriggers that React is concurrently unmounting.
+    this.deactivate(false);
   }
 
   private preventScroll = (event: Event) => {
@@ -73,7 +75,7 @@ export class ScrollLockManager {
     this.onChange(true);
   }
 
-  private deactivate() {
+  private deactivate(notify = true) {
     if (!this.previousStyles) return;
     document.documentElement.style.overflow = this.previousStyles.htmlOverflow;
     document.body.style.overflow = this.previousStyles.bodyOverflow;
@@ -81,6 +83,6 @@ export class ScrollLockManager {
     document.removeEventListener('wheel', this.preventScroll, true);
     document.removeEventListener('touchmove', this.preventScroll, true);
     document.removeEventListener('keydown', this.preventKeys, true);
-    this.onChange(false);
+    if (notify) this.onChange(false);
   }
 }

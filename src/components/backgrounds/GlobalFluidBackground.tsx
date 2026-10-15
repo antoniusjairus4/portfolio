@@ -1,9 +1,11 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import LiquidEther from '@/components/backgrounds/LiquidEther';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
+
+const GLOBAL_ETHER_COLORS = ['#0A0908', '#9A6318', '#F5B031', '#FFD275'];
 
 export const GlobalFluidBackground: React.FC = () => {
   const { mode } = useGlobalEther();
@@ -24,26 +26,28 @@ export const GlobalFluidBackground: React.FC = () => {
       </div>
 
       {/* WebGL LiquidEther Simulation Layer */}
-      {canRender && <div className="absolute inset-0 z-[1] pointer-events-none opacity-85">
-        <LiquidEther
-          paused={mode === 'paused'}
-          colors={['#0A0908', '#9A6318', '#F5B031', '#FFD275']}
-          mouseForce={24}
-          cursorSize={140}
-          isViscous={true}
-          viscous={40}
-          iterationsViscous={36}
-          iterationsPoisson={40}
-          resolution={0.65}
-          isBounce={false}
-          autoDemo={true}
-          autoSpeed={0.4}
-          autoIntensity={2.8}
-          takeoverDuration={0.3}
-          autoResumeDelay={1800}
-          backgroundColor="#0A0908"
-        />
-      </div>}
+      {canRender && (
+        <div className="absolute inset-0 z-[1] pointer-events-none opacity-85">
+          <LiquidEther
+            paused={mode === 'paused'}
+            colors={GLOBAL_ETHER_COLORS}
+            mouseForce={24}
+            cursorSize={140}
+            isViscous={true}
+            viscous={40}
+            iterationsViscous={36}
+            iterationsPoisson={40}
+            resolution={0.65}
+            isBounce={false}
+            autoDemo={true}
+            autoSpeed={0.4}
+            autoIntensity={2.8}
+            takeoverDuration={0.3}
+            autoResumeDelay={1800}
+            backgroundColor="#0A0908"
+          />
+        </div>
+      )}
     </div>
   );
 };

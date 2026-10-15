@@ -11,14 +11,13 @@ test('preloader locks document scrolling and always releases it', async ({ page 
   await expect
     .poll(() => page.evaluate(() => document.documentElement.style.overflow))
     .toBe('hidden');
-  await page.keyboard.press('PageDown');
+  await page.mouse.wheel(0, 600);
   expect(await page.evaluate(() => window.scrollY)).toBe(0);
   await expect(preloader).toBeHidden({ timeout: 12000 });
   await expect
     .poll(() => page.evaluate(() => document.documentElement.style.overflow))
     .not.toBe('hidden');
-  await page.locator('section[aria-label*="Full-screen photo cover"]').focus();
-  await page.keyboard.press('ArrowDown');
+  await page.mouse.wheel(0, 600);
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 });
 
@@ -30,7 +29,7 @@ test('reduced motion bypasses decorative waiting and retains normal scrolling', 
   await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden({
     timeout: 3000,
   });
-  await expect(page.getByAltText('Jairus Portfolio Cover')).toBeVisible();
+  await expect(page.getByAltText('Portrait of Antonius Jairus')).toBeVisible();
   await expect
     .poll(() => page.evaluate(() => document.documentElement.style.overflow))
     .not.toBe('hidden');
@@ -75,8 +74,8 @@ test('existing chapters remain reachable in both scroll directions after resize'
     await expect(page.locator(selector)).toBeVisible();
   }
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.locator('section[aria-label*="Full-screen photo cover"]').scrollIntoViewIfNeeded();
-  await expect(page.getByAltText('Jairus Portfolio Cover')).toBeVisible();
+  await page.locator('#hero').scrollIntoViewIfNeeded();
+  await expect(page.getByAltText('Portrait of Antonius Jairus')).toBeVisible();
   await expect
     .poll(() => page.evaluate(() => document.documentElement.style.overflow))
     .not.toBe('hidden');

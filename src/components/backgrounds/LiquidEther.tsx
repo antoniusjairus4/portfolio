@@ -151,7 +151,7 @@ export default function LiquidEther({
       delta = 0;
       container: HTMLElement | null = null;
       renderer: THREE.WebGLRenderer | null = null;
-      clock: THREE.Clock | null = null;
+      lastFrameTime = 0;
       init(container: HTMLElement) {
         this.container = container;
         this.pixelRatio = Math.min(window.devicePixelRatio || 1, dprCap);
@@ -181,8 +181,7 @@ export default function LiquidEther({
         el.style.width = '100%';
         el.style.height = '100%';
         el.style.display = 'block';
-        this.clock = new THREE.Clock();
-        this.clock.start();
+        this.resetFrameTime();
       }
       resize() {
         if (!this.container) return;
@@ -193,9 +192,13 @@ export default function LiquidEther({
         if (this.renderer) this.renderer.setSize(this.width, this.height, false);
       }
       update() {
-        if (!this.clock) return;
-        this.delta = this.clock.getDelta();
+        const now = performance.now();
+        this.delta = this.lastFrameTime === 0 ? 0 : Math.min((now - this.lastFrameTime) / 1000, 0.1);
+        this.lastFrameTime = now;
         this.time += this.delta;
+      }
+      resetFrameTime() {
+        this.lastFrameTime = performance.now();
       }
     }
     const Common = new CommonClass();
@@ -1104,6 +1107,7 @@ const color_frag = `
       start() {
         if (this.running || !Common.renderer) return;
         this.running = true;
+        Common.resetFrameTime();
         this._loop();
       }
       pause() {

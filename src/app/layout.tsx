@@ -12,15 +12,15 @@ import '@fontsource/playfair-display/700.css';
 import '@fontsource/syncopate/700.css';
 import '@fontsource/unifrakturmaguntia';
 import '@/styles/globals.css';
-import { LenisProvider } from '@/motion/lenis/LenisProvider';
 import { GlobalFluidBackground } from '@/components/backgrounds/GlobalFluidBackground';
 import { ExperienceEnvironmentProvider } from '@/experience/ExperienceEnvironment';
 import { GlobalEtherProvider } from '@/experience/GlobalEtherProvider';
+import { LenisProvider } from '@/motion/lenis/LenisProvider';
 
 export const metadata: Metadata = {
-  title: 'Jairus — Portfolio',
+  title: 'Antonius Jairus — Portfolio',
   description:
-    'Personal portfolio of Jairus: cybersecurity student, table tennis state champion, and founder.',
+    'Personal portfolio of Antonius Jairus: cybersecurity student, table tennis state champion, and founder.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
