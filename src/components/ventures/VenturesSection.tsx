@@ -16,13 +16,6 @@ const PALINDROME_IMAGES = [
   '/images/ventures/palindrome/Screenshot From 2026-10-02 14-19-41.png',
 ];
 
-const KAIFORGE_IMAGES = [
-  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-07.png',
-  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-22.png',
-  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-25-38.png',
-  '/images/ventures/kaiforge/Screenshot From 2026-10-02 16-26-45.png',
-];
-
 const NEUROSHIELD_IMAGES = [
   '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-26.png',
   '/images/ventures/neuroshield/Screenshot From 2026-10-02 16-40-32.png',
@@ -203,7 +196,7 @@ export const VenturesSection: React.FC = () => {
         </p>
 
         <div className="space-y-4 md:space-y-6">
-          {venturesContent.map((v) => {
+          {venturesContent.filter((venture) => venture.slug !== 'kaiforge').map((v) => {
             const itemTheme = VENTURE_THEMES[v.themeKey];
             const isHovered = activeTheme === v.themeKey;
 
@@ -278,27 +271,6 @@ export const VenturesSection: React.FC = () => {
               <img
                 src={src}
                 alt={`Palindrome Screenshot ${idx + 1}`}
-                className="w-full h-auto object-cover rounded-xl"
-              />
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Kinetic Parallax Stack Container on KaiForge Hover */}
-      {activeSlug === 'kaiforge' && (
-        <div
-          ref={stackRef}
-          className="pointer-events-none fixed right-[20%] top-1/2 -translate-y-1/2 z-20 w-80 md:w-[28rem] h-64 md:h-80"
-        >
-          {KAIFORGE_IMAGES.map((src, idx) => (
-            <div
-              key={`${src}-${idx}`}
-              className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
-            >
-              <img
-                src={src}
-                alt={`KaiForge Screenshot ${idx + 1}`}
                 className="w-full h-auto object-cover rounded-xl"
               />
             </div>

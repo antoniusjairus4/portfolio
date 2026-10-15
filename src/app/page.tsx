@@ -1,10 +1,11 @@
 'use client';
 
+import { DisciplinesScrollSection } from '@/components/disciplines-scroll/DisciplinesScrollSection';
+import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { Preloader } from '@/components/preloader/Preloader';
-import { VenturesSection } from '@/components/ventures/VenturesSection';
-import { DisciplinesScrollSection } from '@/components/disciplines-scroll/DisciplinesScrollSection';
 import { TechnicalSkillsTerminal } from '@/components/terminal/TechnicalSkillsTerminal';
+import { VenturesSection } from '@/components/ventures/VenturesSection';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
 export default function Home() {
@@ -19,11 +20,13 @@ export default function Home() {
         }}
       />
 
-
       {/* Page 0 Cover & Pinned Scroll Story Reveal */}
       <PhotoCoverSplit />
 
-      {/* Page 1 Ventures Integrated Section */}
+      {/* Phase 2: KaiForge spatial and camera greybox */}
+      <KaiForgeChapter />
+
+      {/* Legacy Palindrome / NeuroShield index; redesign is intentionally deferred. */}
       <VenturesSection />
 
       {/* Page 2 Achievements Spatial Scroll-Driven Section */}

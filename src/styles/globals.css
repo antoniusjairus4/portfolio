@@ -189,3 +189,471 @@ body {
   outline-offset: 4px;
 }
 
+/* Phase 2 KaiForge greybox: spatial composition before production art. */
+.kaiforge-chapter {
+  --kaiforge-progress: 0;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 520svh;
+  color: #f2e9d8;
+  background: #0b0908;
+}
+
+.kaiforge-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, transparent 49.94%, rgba(242, 233, 216, 0.08) 50%, transparent 50.06%),
+    #0b0908;
+}
+
+.kaiforge-render-layer,
+.kaiforge-render-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.kaiforge-render-layer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.kaiforge-render-placeholder {
+  background:
+    radial-gradient(circle at 50% 52%, rgba(111, 98, 82, 0.12), transparent 32%),
+    #0b0908;
+}
+
+.kaiforge-sticky::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: '';
+  background:
+    linear-gradient(180deg, rgba(11, 9, 8, 0.44), transparent 22%, transparent 72%, rgba(11, 9, 8, 0.7)),
+    radial-gradient(circle at 50% 45%, transparent 35%, rgba(11, 9, 8, 0.42) 100%);
+}
+
+.kaiforge-semantic-header {
+  position: absolute;
+  top: clamp(5rem, 11vh, 8.5rem);
+  left: clamp(1.5rem, 6vw, 7rem);
+  z-index: 4;
+  width: min(43rem, 48vw);
+  transition: none;
+  will-change: transform, opacity;
+}
+
+.kaiforge-semantic-header > p:first-child,
+.kaiforge-beat > span,
+.kaiforge-chapter-index,
+.kaiforge-destination,
+.kaiforge-fallback-copy > p {
+  margin: 0;
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: clamp(0.62rem, 0.72vw, 0.78rem);
+  line-height: 1.3;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #a89880;
+}
+
+.kaiforge-semantic-header h2 {
+  margin: 0.12em 0 0.2em;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 12vw, 12rem);
+  font-weight: 600;
+  line-height: 0.78;
+  letter-spacing: -0.065em;
+  text-transform: uppercase;
+  color: #f2e9d8;
+}
+
+.kaiforge-semantic-header > p:nth-of-type(2) {
+  max-width: 36rem;
+  margin: 1.8rem 0 0;
+  font-family: var(--font-secondary);
+  font-size: clamp(1rem, 1.35vw, 1.35rem);
+  line-height: 1.45;
+  color: rgba(242, 233, 216, 0.88);
+}
+
+.kaiforge-purpose {
+  max-width: 34rem;
+  margin: 0.85rem 0 0;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.82rem, 0.95vw, 1rem);
+  line-height: 1.55;
+  color: #a89880;
+}
+
+.kaiforge-beats {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.kaiforge-beat {
+  position: absolute;
+  width: min(42rem, 47vw);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.kaiforge-beat strong {
+  display: block;
+  margin-top: 0.7rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 6vw, 7rem);
+  font-weight: 560;
+  line-height: 0.88;
+  letter-spacing: -0.055em;
+  color: #e9dfce;
+}
+
+.kaiforge-beat small {
+  display: block;
+  max-width: 29rem;
+  margin-top: 1.1rem;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.72rem, 0.8vw, 0.9rem);
+  line-height: 1.55;
+  color: #a89880;
+}
+
+.beat-recognition {
+  right: clamp(1.5rem, 6vw, 7rem);
+  bottom: clamp(6.8rem, 14vh, 10rem);
+  text-align: right;
+}
+
+.beat-recognition strong {
+  font-size: clamp(3.4rem, 8.5vw, 9.5rem);
+}
+
+.beat-approach {
+  top: 15vh;
+  right: clamp(1.5rem, 6vw, 7rem);
+  text-align: right;
+}
+
+.beat-impact {
+  left: 50%;
+  bottom: 8vh;
+  width: min(56rem, 70vw);
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.beat-impact strong {
+  color: #f2e9d8;
+}
+
+.beat-understanding {
+  left: clamp(1.5rem, 6vw, 7rem);
+  top: 12vh;
+}
+
+.beat-understanding strong {
+  font-size: clamp(3.5rem, 7.2vw, 8rem);
+}
+
+.beat-release {
+  right: clamp(1.5rem, 7vw, 8rem);
+  bottom: 13vh;
+  text-align: right;
+}
+
+.kaiforge-chapter-index {
+  position: absolute;
+  top: 2rem;
+  right: clamp(1.5rem, 3vw, 3rem);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.kaiforge-chapter-index i {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: rgba(242, 233, 216, 0.28);
+}
+
+.kaiforge-destination {
+  position: absolute;
+  left: clamp(1.5rem, 3vw, 3rem);
+  bottom: 2rem;
+  z-index: 5;
+  display: inline-flex;
+  gap: 0.55rem;
+  align-items: center;
+  min-height: 2.75rem;
+  color: #d9cdbc;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.kaiforge-destination span {
+  transition: transform 180ms ease;
+}
+
+.kaiforge-destination:hover span {
+  transform: translate(0.2rem, -0.2rem);
+}
+
+.kaiforge-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.kaiforge-fallback-stage {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: min(76vw, 62rem);
+  height: min(46vw, 35rem);
+  transform: translate(-50%, -50%) perspective(900px) rotateX(8deg);
+}
+
+.kaiforge-fallback-table {
+  position: absolute;
+  left: 50%;
+  top: 55%;
+  width: 72%;
+  height: 30%;
+  transform: translate(-50%, -50%) skewY(-7deg);
+  border: 1px solid rgba(242, 233, 216, 0.5);
+  background: #333331;
+  box-shadow: 0 2.2rem 0 -2rem #252321;
+}
+
+.kaiforge-fallback-net {
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 1px;
+  height: 65%;
+  background: #e9dfce;
+}
+
+.kaiforge-fallback-player {
+  position: absolute;
+  left: 7%;
+  top: 18%;
+  width: 24%;
+  height: 64%;
+  transform: rotate(-8deg);
+}
+
+.kaiforge-fallback-player > span {
+  position: absolute;
+  display: block;
+  background: #858078;
+}
+
+.kaiforge-fallback-head {
+  top: 0;
+  left: 42%;
+  width: 19%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+}
+
+.kaiforge-fallback-body {
+  top: 20%;
+  left: 30%;
+  width: 36%;
+  height: 48%;
+  border-radius: 45% 45% 24% 24%;
+}
+
+.kaiforge-fallback-arm {
+  top: 26%;
+  left: 58%;
+  width: 58%;
+  height: 8%;
+  transform: rotate(-28deg);
+  transform-origin: left center;
+  border-radius: 999px;
+}
+
+.kaiforge-fallback-player > .kaiforge-fallback-paddle {
+  top: 3%;
+  right: -30%;
+  width: 21%;
+  aspect-ratio: 0.78;
+  transform: rotate(18deg);
+  border-radius: 50%;
+  background: #292624;
+}
+
+.kaiforge-fallback-trace {
+  position: absolute;
+  left: 28%;
+  top: 32%;
+  width: 55%;
+  height: 33%;
+  border-top: 2px solid rgba(207, 197, 180, 0.6);
+  border-radius: 50%;
+  transform: rotate(7deg);
+}
+
+.kaiforge-fallback-ball {
+  position: absolute;
+  left: 57%;
+  top: 43%;
+  width: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #e9dfce;
+  box-shadow: 0 0 0 0.55rem rgba(165, 43, 36, 0.24);
+}
+
+.kaiforge-fallback-copy {
+  position: absolute;
+  left: clamp(1.5rem, 6vw, 7rem);
+  bottom: 9vh;
+  max-width: 26rem;
+}
+
+.kaiforge-fallback-copy h3 {
+  margin: 0.6rem 0 0;
+  font-size: clamp(2rem, 4vw, 4.8rem);
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+  text-transform: uppercase;
+}
+
+.kaiforge-fallback-copy-final {
+  right: clamp(1.5rem, 6vw, 7rem);
+  left: auto;
+  text-align: right;
+}
+
+.kaiforge-fallback-copy > span {
+  display: block;
+  margin-top: 0.8rem;
+  font-family: var(--font-secondary);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: #a89880;
+}
+
+.kaiforge-static {
+  height: auto;
+  min-height: 100svh;
+}
+
+.kaiforge-static .kaiforge-sticky {
+  position: relative;
+  min-height: 100svh;
+}
+
+.kaiforge-static .kaiforge-semantic-header {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+@media (orientation: portrait) {
+  .kaiforge-chapter {
+    height: 450svh;
+  }
+
+  .kaiforge-semantic-header {
+    top: 8svh;
+    left: 1.25rem;
+    width: calc(100% - 2.5rem);
+  }
+
+  .kaiforge-semantic-header h2 {
+    font-size: clamp(4rem, 20vw, 7rem);
+  }
+
+  .kaiforge-semantic-header > p:nth-of-type(2) {
+    max-width: 23rem;
+    margin-top: 1rem;
+    font-size: clamp(0.9rem, 3.7vw, 1.1rem);
+  }
+
+  .kaiforge-purpose {
+    max-width: 22rem;
+    font-size: clamp(0.74rem, 3.15vw, 0.9rem);
+  }
+
+  .kaiforge-beat {
+    right: 1.25rem;
+    left: 1.25rem;
+    width: auto;
+  }
+
+  .kaiforge-beat strong,
+  .beat-recognition strong,
+  .beat-understanding strong {
+    font-size: clamp(2.35rem, 12vw, 4.6rem);
+  }
+
+  .beat-recognition,
+  .beat-approach,
+  .beat-release {
+    top: auto;
+    bottom: 12svh;
+    text-align: right;
+  }
+
+  .beat-impact {
+    bottom: 10svh;
+    transform: none;
+    text-align: left;
+  }
+
+  .beat-understanding {
+    top: 10svh;
+    bottom: auto;
+  }
+
+  .kaiforge-chapter-index {
+    top: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .kaiforge-destination {
+    left: 1.25rem;
+    bottom: 1.1rem;
+  }
+
+  .kaiforge-fallback-stage {
+    top: 54%;
+    width: 125vw;
+    height: 90vw;
+  }
+
+  .kaiforge-fallback-copy {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kaiforge-chapter,
+  .kaiforge-sticky,
+  .kaiforge-beat,
+  .kaiforge-semantic-header {
+    scroll-behavior: auto;
+    will-change: auto;
+  }
+}
+
