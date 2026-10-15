@@ -117,11 +117,18 @@ export const PhotoCoverSplit: React.FC = () => {
         Math.max((progress - openingStart) / (collapseEnd - openingStart), 0),
         1,
       );
+      const crimsonRetireEnd = collapseEnd - 0.04;
+      const crimsonRetireProgress = Math.min(
+        Math.max((progress - openingStart) / (crimsonRetireEnd - openingStart), 0),
+        1,
+      );
+      const crimsonAxisProgress = ruptureProgress * (1 - crimsonRetireProgress);
       container.style.setProperty('--hero-progress', progress.toFixed(4));
       container.style.setProperty('--hero-rupture', ruptureProgress.toFixed(4));
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
+      container.style.setProperty('--hero-crimson-axis', crimsonAxisProgress.toFixed(4));
       container.dataset.heroDepth =
-        !reducedMotion && openingProgress > 0.04 && progress < 0.995 ? 'active' : 'inactive';
+        !reducedMotion && openingProgress > 0.04 && progress < 1 ? 'active' : 'inactive';
       if (lastStateRef.current !== state) {
         lastStateRef.current = state;
         container.dataset.heroState = state;
@@ -282,6 +289,7 @@ export const PhotoCoverSplit: React.FC = () => {
       container.style.removeProperty('--hero-progress');
       container.style.removeProperty('--hero-rupture');
       container.style.removeProperty('--hero-opening');
+      container.style.removeProperty('--hero-crimson-axis');
     };
   }, [debugEnabled, ready, reducedMotion]);
 

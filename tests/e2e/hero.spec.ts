@@ -63,6 +63,51 @@ test('typographic split opens and reconstructs from scroll progress', async ({ p
   await expect(hero).toHaveCSS('--hero-opening', '0.0000');
 });
 
+test('Hero reveal and KaiForge chapter share one continuous Recognition frame', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterSite(page);
+  const hero = page.locator('#hero');
+  const chapter = page.locator('#kaiforge');
+  const axis = page.locator('.hero-crimson-rupture');
+  const renderer = page.locator('[data-experience-renderer="shared"]');
+  const heroDistance = 900 * 4.2;
+
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.7);
+  await expect(axis).toHaveCSS('opacity', '1');
+
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.94);
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
+  await expect(axis).toHaveCSS('opacity', '0');
+  await expect(renderer).toHaveCount(1);
+  await renderer.evaluate((canvas) => {
+    canvas.dataset.handoffIdentity = 'same-renderer';
+  });
+
+  const chapterTop = await chapter.evaluate((element) =>
+    Math.round(element.getBoundingClientRect().top + window.scrollY),
+  );
+  await page.evaluate((position) => window.scrollTo(0, position), chapterTop);
+  await expect(hero).toHaveAttribute('data-hero-depth', 'inactive');
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
+  await expect(axis).toHaveCSS('opacity', '0');
+
+  await chapter.evaluate((element) => {
+    const top = element.getBoundingClientRect().top + window.scrollY;
+    const distance = element.getBoundingClientRect().height - window.innerHeight;
+    window.scrollTo({ top: top + distance * 0.28, behavior: 'instant' });
+  });
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'approach');
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
+
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.94);
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
+  await expect(axis).toHaveCSS('opacity', '0');
+});
+
 for (const viewport of [
   { width: 320, height: 700 },
   { width: 390, height: 844 },

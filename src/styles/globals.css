@@ -235,8 +235,8 @@ body {
   left: calc(var(--hero-seam-x) * 100%);
   width: clamp(0.18rem, 0.28vw, 0.34rem);
   background: var(--hero-crimson);
-  opacity: var(--hero-rupture, 0);
-  transform: translateX(-50%) scaleY(var(--hero-rupture, 0));
+  opacity: var(--hero-crimson-axis, 0);
+  transform: translateX(-50%) scaleY(var(--hero-crimson-axis, 0));
   transform-origin: center;
 }
 
@@ -303,6 +303,12 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   z-index: 0;
   inset: 0;
   pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  main > #kaiforge {
+    margin-top: -100svh;
+  }
 }
 
 @media (orientation: portrait) {
