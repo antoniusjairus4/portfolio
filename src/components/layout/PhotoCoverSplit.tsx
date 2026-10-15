@@ -319,7 +319,6 @@ export const PhotoCoverSplit: React.FC = () => {
             <span>IDENTITY</span>
           </div>
           <div className="hero-editorial-crossbar" />
-          <div className="hero-editorial-accent" />
           <div className="hero-editorial-counterweight" />
         </div>
         <div className="hero-horizontal-rupture" />

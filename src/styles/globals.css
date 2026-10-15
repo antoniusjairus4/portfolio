@@ -219,15 +219,6 @@ body {
   background: var(--hero-charcoal);
 }
 
-.hero-editorial-accent {
-  position: absolute;
-  top: 62%;
-  left: clamp(4.75rem, 7vw, 8.5rem);
-  width: clamp(0.65rem, 0.85vw, 1rem);
-  height: clamp(5.5rem, 14vh, 9rem);
-  background: var(--hero-crimson);
-}
-
 .hero-editorial-counterweight {
   position: absolute;
   right: 0;
@@ -244,8 +235,8 @@ body {
   left: calc(var(--hero-seam-x) * 100%);
   width: clamp(0.18rem, 0.28vw, 0.34rem);
   background: var(--hero-crimson);
-  opacity: clamp(0, calc((var(--hero-progress, 0) - 0.66) * 12), 1);
-  transform: translateX(-50%) scaleY(clamp(0, calc((var(--hero-progress, 0) - 0.66) * 5), 1));
+  opacity: var(--hero-rupture, 0);
+  transform: translateX(-50%) scaleY(var(--hero-rupture, 0));
   transform-origin: center;
 }
 
@@ -344,13 +335,6 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
     left: clamp(1rem, 4vw, 1.5rem);
     width: clamp(4.5rem, 24vw, 8rem);
     height: 0.25rem;
-  }
-
-  .hero-editorial-accent {
-    top: 68%;
-    left: clamp(1rem, 4vw, 1.5rem);
-    width: clamp(0.4rem, 1.8vw, 0.65rem);
-    height: clamp(4rem, 10vh, 6rem);
   }
 
   .hero-editorial-counterweight {

@@ -14,6 +14,8 @@ test('full identity and handoff contract are available in semantic HTML', async 
   await expect(page.getByRole('heading', { level: 1, name: 'ANTONIUS JAIRUS' })).toBeAttached();
   await expect(page.locator('#hero')).toHaveAttribute('data-hero-handoff', 'center-seam');
   await expect(page.locator('[data-hero-surface="editorial"]')).toHaveCount(1);
+  await expect(page.locator('.hero-editorial-accent')).toHaveCount(0);
+  await expect(page.locator('.hero-crimson-rupture')).toHaveCount(1);
   await expect(page.locator('#hero img[src*="after_split"]')).toHaveCount(0);
 });
 
