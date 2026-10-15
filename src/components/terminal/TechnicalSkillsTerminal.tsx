@@ -20,6 +20,7 @@ import {
 import { MatrixRain } from './MatrixRain';
 import LetterGlitch from '../backgrounds/LetterGlitch';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
+import { useChapterActivity } from '@/experience/useChapterActivity';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -72,6 +73,9 @@ export const TechnicalSkillsTerminal: React.FC = () => {
   const [historyIdx, setHistoryIdx] = useState<number>(-1);
   const [isDenseMatrix, setIsDenseMatrix] = useState(false);
   const { ready, reducedMotion: isReducedMotion } = useExperienceEnvironment();
+  const activity = useChapterActivity(sectionRef);
+  const decorativeCanvasesActive =
+    ready && !isReducedMotion && activity !== 'inactive';
   const [showPulse, setShowPulse] = useState(false);
   const [glitchTitleText, setGlitchTitleText] = useState('');
 
@@ -579,17 +583,19 @@ export const TechnicalSkillsTerminal: React.FC = () => {
 
       {/* Full-Page Vibrant Golden LetterGlitch Backdrop */}
       <div className="absolute inset-0 z-0 pointer-events-none opacity-65">
-        <LetterGlitch
-          glitchColors={['#2A1D0E', '#804E10', '#D49020', '#F5B031', '#FFE082']}
-          glitchSpeed={45}
-          centerVignette={false}
-          outerVignette={false}
-          smooth={true}
-          backgroundColor="#0C0907"
-        />
+        {decorativeCanvasesActive && (
+          <LetterGlitch
+            glitchColors={['#2A1D0E', '#804E10', '#D49020', '#F5B031', '#FFE082']}
+            glitchSpeed={45}
+            centerVignette={false}
+            outerVignette={false}
+            smooth={true}
+            backgroundColor="#0C0907"
+          />
+        )}
       </div>
 
-      <MatrixRain isDense={isDenseMatrix} />
+      {decorativeCanvasesActive && <MatrixRain isDense={isDenseMatrix} />}
 
       {/* Cyberpunk Glitch Intro Screen */}
       {!introDone && !isReducedMotion && (

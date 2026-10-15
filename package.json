@@ -8,7 +8,7 @@
     "prebuild": "node scripts/build-achievements.mjs",
     "achievements:build": "node scripts/build-achievements.mjs",
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build --webpack",
     "start": "next start",
     "lint": "biome check .",
     "test": "vitest run",

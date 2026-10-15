@@ -9,6 +9,9 @@ const allCases = [
 ];
 const allBeats = [0.06, 0.28, 0.455, 0.67, 0.91];
 const quick = process.argv.includes('--quick');
+const baseURL =
+  process.argv.find((argument) => argument.startsWith('--url='))?.slice('--url='.length) ??
+  'http://localhost:3000';
 const cases = quick
   ? allCases.filter(({ name }) => name === 'desktop' || name === 'phone')
   : allCases;
@@ -22,7 +25,7 @@ for (const viewport of cases) {
     if (message.type() === 'error') errors.push(message.text());
   });
   page.on('pageerror', (error) => errors.push(error.message));
-  await page.goto('http://localhost:3000', { waitUntil: 'networkidle' });
+  await page.goto(baseURL, { waitUntil: 'networkidle' });
   const skip = page.getByRole('button', { name: 'Skip' });
   if (await skip.isVisible()) await skip.click({ force: true }).catch(() => {});
   await page

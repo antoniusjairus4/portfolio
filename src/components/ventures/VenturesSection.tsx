@@ -265,7 +265,7 @@ export const VenturesSection: React.FC = () => {
         >
           {PALINDROME_IMAGES.map((src, idx) => (
             <div
-              key={`${src}-${idx}`}
+              key={src}
               className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
             >
               <img
@@ -286,7 +286,7 @@ export const VenturesSection: React.FC = () => {
         >
           {NEUROSHIELD_IMAGES.map((src, idx) => (
             <div
-              key={`${src}-${idx}`}
+              key={src}
               className="kinetic-card absolute top-0 left-0 w-full rounded-2xl overflow-hidden shadow-2xl border border-black/10 transition-transform will-change-transform bg-white p-1"
             >
               <img
