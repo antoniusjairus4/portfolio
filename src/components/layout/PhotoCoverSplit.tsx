@@ -4,7 +4,6 @@ import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type React from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import LiquidEther from '@/components/backgrounds/LiquidEther';
 import type { BakeResult, LetterBox } from '@/components/layout/collapse/bakePhysics';
 import { PhysicsDebugOverlay } from '@/components/layout/collapse/PhysicsDebugOverlay';
 import {
@@ -22,8 +21,6 @@ import { useChapterActivity } from '@/experience/useChapterActivity';
 import { SCROLL_STORY } from '@/motion/tokens';
 
 gsap.registerPlugin(ScrollTrigger);
-
-const HERO_ETHER_COLORS = ['#804E10', '#D49020', '#F5B031', '#FFE082'];
 
 interface DebugSnapshot {
   collapseProgress: number;
@@ -274,13 +271,6 @@ export const PhotoCoverSplit: React.FC = () => {
     };
   }, [debugEnabled, ready, reducedMotion]);
 
-  useEffect(() => {
-    const image = new Image();
-    image.src = '/images/hero/after_split-1672.webp';
-    void image.decode?.().catch(() => {});
-  }, []);
-
-  const heroOwnsAtmosphere = activity === 'approaching' || activity === 'active';
   const textLayerClass = reducedMotion ? 'z-30' : 'z-10';
 
   return (
@@ -289,7 +279,7 @@ export const PhotoCoverSplit: React.FC = () => {
       id="hero"
       aria-labelledby="hero-name"
       data-hero-handoff="center-seam"
-      className="relative h-[100svh] w-full select-none overflow-hidden bg-[#0C0907] [--hero-seam-x:0.5]"
+      className="hero-editorial-composition relative h-[100svh] w-full select-none overflow-hidden [--hero-seam-x:0.5]"
     >
       {debugEnabled && (
         <PhysicsDebugOverlay
@@ -301,60 +291,20 @@ export const PhotoCoverSplit: React.FC = () => {
         />
       )}
 
-      <div ref={pageBgRef} className="absolute inset-0 z-0 h-full w-full overflow-hidden">
-        <picture className="absolute inset-0 h-full w-full">
-          <source
-            srcSet="/images/hero/after_split-1672.avif 1672w, /images/hero/after_split-1280.avif 1280w"
-            type="image/avif"
-          />
-          <source
-            srcSet="/images/hero/after_split-1672.webp 1672w, /images/hero/after_split-1280.webp 1280w"
-            type="image/webp"
-          />
-          <img
-            src="/images/hero/after_split-1672.jpg"
-            alt=""
-            aria-hidden="true"
-            className="h-full w-full object-cover object-center"
-            loading="lazy"
-          />
-        </picture>
-
-        <div className="pointer-events-none absolute inset-0 z-0 h-full w-full opacity-90">
-          {heroOwnsAtmosphere && (
-            <LiquidEther
-              colors={HERO_ETHER_COLORS}
-              mouseForce={20}
-              cursorSize={150}
-              isViscous={true}
-              viscous={30}
-              iterationsViscous={36}
-              iterationsPoisson={40}
-              resolution={0.75}
-              isBounce={false}
-              autoDemo={true}
-              autoSpeed={0.6}
-              autoIntensity={4.5}
-              takeoverDuration={0.25}
-              autoResumeDelay={0}
-              autoRampDuration={0.6}
-              backgroundColor="transparent"
-            />
-          )}
-        </div>
-
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-0 h-full w-full"
-          style={{
-            background:
-              'radial-gradient(circle at 50% 50%, rgba(12, 9, 7, 0.45) 0%, rgba(12, 9, 7, 0.85) 100%)',
-          }}
-        />
+      <div
+        ref={pageBgRef}
+        data-hero-surface="editorial"
+        aria-hidden="true"
+        className="hero-editorial-surface absolute inset-0 z-0 h-full w-full overflow-hidden"
+      >
+        <div className="hero-editorial-rail hero-editorial-rail-left" />
+        <div className="hero-editorial-rail hero-editorial-rail-right" />
+        <div className="hero-editorial-corner" />
+        <div className="hero-crimson-rupture" />
       </div>
 
       <div
-        className={`pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center px-3 text-center sm:px-6 ${textLayerClass}`}
+        className={`hero-editorial-copy pointer-events-none absolute inset-0 flex h-full w-full items-center justify-center px-3 text-center sm:px-6 ${textLayerClass}`}
       >
         <div
           ref={contentWrapperRef}
