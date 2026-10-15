@@ -25,7 +25,7 @@ export function ExperienceCanvas({ controller, dprCap, portrait }: ExperienceCan
       dpr={[1, dprCap]}
       camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      shadows={!portrait}
+      shadows={portrait ? false : 'basic'}
       onCreated={({ gl }) => {
         gl.setClearColor('#0b0908');
       }}

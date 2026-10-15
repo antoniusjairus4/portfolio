@@ -32,10 +32,10 @@ export function KaiForgeChapter() {
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const ownsEtherRef = useRef(false);
-  const { ready, reducedMotion, quality, dprCap } = useExperienceEnvironment();
+  const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
   const { setMode: setGlobalEtherMode } = useGlobalEther();
   const activity = useChapterActivity(sectionRef);
-  const portrait = ready && quality === 'reduced';
+  const portraitComposition = ready && portrait;
   const renderWebGL = ready && !reducedMotion && quality !== 'fallback';
   const rendererActive = renderWebGL && activity !== 'inactive';
 
@@ -102,7 +102,11 @@ export function KaiForgeChapter() {
       <div className="kaiforge-sticky">
         <div className="kaiforge-render-layer" aria-hidden="true">
           {rendererActive && controller ? (
-            <ExperienceCanvas controller={controller} dprCap={dprCap} portrait={portrait} />
+            <ExperienceCanvas
+              controller={controller}
+              dprCap={dprCap}
+              portrait={portraitComposition}
+            />
           ) : (
             <div className="kaiforge-render-placeholder" />
           )}

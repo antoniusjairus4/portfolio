@@ -8,6 +8,7 @@ interface ExperienceEnvironment {
   ready: boolean;
   reducedMotion: boolean;
   finePointer: boolean;
+  portrait: boolean;
   quality: QualityTier;
   dprCap: number;
 }
@@ -16,6 +17,7 @@ const initialEnvironment: ExperienceEnvironment = {
   ready: false,
   reducedMotion: false,
   finePointer: true,
+  portrait: false,
   quality: 'fallback',
   dprCap: 1,
 };
@@ -53,6 +55,7 @@ export function ExperienceEnvironmentProvider({ children }: { children: ReactNod
         ready: true,
         reducedMotion: motionQuery.matches,
         finePointer,
+        portrait: window.innerHeight > window.innerWidth,
         quality,
         dprCap: quality === 'high' ? 2 : quality === 'reduced' ? 1.5 : 1,
       });

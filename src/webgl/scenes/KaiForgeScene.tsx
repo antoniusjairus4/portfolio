@@ -237,8 +237,8 @@ export function KaiForgeScene({ controller, portrait }: KaiForgeSceneProps) {
   );
   const portraitCamera = useMemo(
     () => [
-      new Vector3(0.1, 5.7, 12.8),
-      new Vector3(-1.7, 4.4, 10.6),
+      new Vector3(-1.4, 5.7, 12.8),
+      new Vector3(-2.3, 4.4, 10.6),
       new Vector3(-1.45, 3.7, 8.9),
       new Vector3(2.2, 6.2, 11.4),
       new Vector3(0, 7.2, 13.2),
@@ -252,7 +252,7 @@ export function KaiForgeScene({ controller, portrait }: KaiForgeSceneProps) {
     const impact = getImpactProgress(p);
     const understanding = getUnderstandingProgress(p);
     target.set(
-      -0.3 + impact * 0.7 - understanding * 0.1,
+      (portrait ? -0.8 : -0.3) + impact * (portrait ? 1.1 : 0.7) - understanding * 0.1,
       1.38 + impact * 0.45,
       understanding * -0.22,
     );
