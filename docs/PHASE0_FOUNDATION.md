@@ -1,10 +1,14 @@
 # Phase 0 foundation contract
 
+**Status:** Current foundation contract, updated after completion of Phases 1–7.
+
 The [Experience Bible](./EXPERIENCE_BIBLE.md) remains the creative authority. This file records the small runtime boundaries added before any new world is built.
 
 ## Scroll
 
-The browser document position is authoritative. `LenisProvider` owns the only Lenis instance and its named GSAP ticker callback. `ScrollTrigger` reads Lenis scroll updates, and continues to work with native scrolling when reduced motion disables Lenis. The provider no longer forces the page to the top or overrides browser restoration. Consumers receive the live Lenis instance after it exists; they can fall back to native scrolling while it is absent.
+The browser document position is authoritative. `LenisProvider` owns the only Lenis instance and its named GSAP ticker callback. `ScrollTrigger` reads Lenis scroll updates, and continues to work with native scrolling when reduced motion disables Lenis. Consumers receive the live Lenis instance after it exists; they can fall back to native scrolling while it is absent.
+
+The document scroll contract distinguishes navigation types. Fresh entry and intentional reload without a hash begin at the Hero. Back/Forward traversal keeps native `history.scrollRestoration = 'auto'` and is never reset by `pageshow`, including bfcache restoration. Because the pinned Hero and long chapters establish their final document height after hydration, the outgoing history entry records its browser scroll coordinate and reapplies it once after readiness only when a non-bfcache Back/Forward load needs repair. This one-shot repair does not become a scroll owner. Direct hashes are resolved after the preloader releases its lock. Back to Top is a native in-page anchor, does not reload, and does not replay the preloader.
 
 `ScrollLockManager` owns page overflow and wheel, touch, and keyboard scroll blocking. Every caller acquires a release function, including the preloader and the legacy modal/terminal. Locks are reference-counted, idempotently released, and cleared when the provider unmounts. Internal scroll regions can opt in with `data-scroll-lock-allow`. Future modal or transition code must use this manager rather than manipulating body overflow or directly stopping Lenis.
 
@@ -16,9 +20,9 @@ The current preloader counts two real critical resources: the Hero portrait's de
 
 `useChapterActivity` supplies approximate, position-derived `inactive`, `approaching`, `active`, and `leaving` states. It is for prefetch and pause decisions, not high-frequency camera animation. Reversal or a direct jump recomputes from the document position.
 
-No empty R3F canvas is mounted in Phase 0. The future shared renderer belongs above the project and Skills chapters, reads the same chapter activity/progress, and owns only the active world plus a bounded transition neighbor. Existing raw Three effects stay separate until their migration is justified. Achievements and Contact remain DOM/CSS chapters. The story must work without the renderer: essential names, descriptions, facts, and links belong in semantic HTML.
+The shared R3F renderer now lives above KaiForge, Palindrome, NeuroShield, and Skills. It reads the same position-derived chapter activity and progress, mounts only the selected world, uses demand rendering, and releases before Achievements. Existing raw Three Ether remains a separately controlled legacy renderer. Achievements and Contact are DOM/CSS chapters. The story works without WebGL because essential names, descriptions, facts, and links remain in semantic HTML.
 
-`GlobalEtherProvider` explicitly sets legacy global Ether to `enabled`, `paused`, or `disabled`. `disabled` unmounts the renderer. Reduced motion and no-WebGL fallback avoid mounting it; a paused mode retains its current frame. Future Contact must select `disabled`. Local `LiquidEther` instances now also respect reduced motion and the quality tier, but their chapter-specific ownership still requires review during the relevant chapter work.
+`GlobalEtherProvider` retains the legacy `enabled`, `paused`, and `disabled` control API while old chapter code remains under review. The global Liquid Ether renderer is no longer mounted by the current layout because no accepted Phase 1–7 chapter uses it. This removes a confirmed second canvas beneath KaiForge without deleting the historical implementation. Reduced motion, no-WebGL, Achievements, and Contact contain no Ether canvas.
 
 ## Environment
 
@@ -26,8 +30,7 @@ No empty R3F canvas is mounted in Phase 0. The future shared renderer belongs ab
 
 ## Deliberately deferred
 
-- Shared R3F renderer and project scene resources, pending a real scene prototype.
-- Asset and GPU memory budgets, pending actual models and textures.
-- Future Contact shutdown wiring; Contact does not exist yet, but Ether now has an explicit disable control.
-- Replacement of old visual chapters and stale tests that assert the old five-discipline modal or unmounted project demos.
-- Visual art direction, factual copy, and the Hero's full-name composition.
+- Production asset loading, decode/upload scheduling, disposal policy, and GPU memory budgets, pending actual models and textures.
+- Final real-device, screen-reader, zoom, QR, and GPU-memory validation.
+- Approved removal of safely unmounted legacy implementations.
+- Human verification of unresolved public claims in `PUBLICATION_VERIFICATION.md`.

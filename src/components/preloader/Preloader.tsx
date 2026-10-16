@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type React from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 import { useCriticalReadiness } from './useCriticalReadiness';

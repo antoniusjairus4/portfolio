@@ -1,5 +1,7 @@
 # Phase 4 (v2): Ventures Integrated Section Documentation
 
+> **HISTORICAL / SUPERSEDED:** This records the former Ventures implementation. The current mounted journey uses the separate KaiForge, Palindrome, and NeuroShield chapters documented in `PHASE2_KAIFORGE.md`, `PHASE3_PALINDROME.md`, and `PHASE4_NEUROSHIELD.md`.
+
 ## 1. Overview & Architecture
 
 The **Ventures** section is integrated into `#page-1-placeholder` right after the hero typographic physics collapse. It presents three products in a fixed order:

@@ -59,9 +59,8 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
         expect(stepInfo.leftTransform).not.toBe('matrix(1, 0, 0, 1, 0, 0)');
         expect(stepInfo.textOpacity).toBeGreaterThan(0.8);
       } else if (p === 1.0) {
-        // Collapse complete: Next page placeholder visible
-        const nextPage = page.locator('#page-1-placeholder');
-        await expect(nextPage).toBeVisible();
+        // Collapse complete: the current KaiForge chapter owns the next frame.
+        await expect(page.locator('#kaiforge')).toBeVisible();
       }
     }
   });

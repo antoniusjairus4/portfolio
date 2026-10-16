@@ -21,9 +21,28 @@ export default function Home() {
         onComplete={() => {
           requestAnimationFrame(() => {
             refresh();
-            if (window.location.hash === '#contact') {
-              document.getElementById('contact')?.scrollIntoView({ behavior: 'instant' });
-            }
+            requestAnimationFrame(() => {
+              const targetId = decodeURIComponent(window.location.hash.slice(1));
+              if (targetId) {
+                document.getElementById(targetId)?.scrollIntoView({ behavior: 'instant' });
+                return;
+              }
+
+              const navigation = performance.getEntriesByType(
+                'navigation',
+              )[0] as PerformanceNavigationTiming;
+              const state = history.state as { __portfolioScrollY?: unknown } | null;
+              if (navigation?.type === 'reload' || navigation?.type === 'navigate') {
+                window.scrollTo({ top: 0, behavior: 'instant' });
+                return;
+              }
+              if (
+                navigation?.type === 'back_forward' &&
+                typeof state?.__portfolioScrollY === 'number'
+              ) {
+                window.scrollTo({ top: state.__portfolioScrollY, behavior: 'instant' });
+              }
+            });
           });
         }}
       />

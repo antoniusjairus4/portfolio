@@ -1,5 +1,7 @@
 # Section Blueprint & Technical Specifications
 
+> **HISTORICAL / SUPERSEDED:** This document records an earlier portfolio structure. The current authority is `EXPERIENCE_BIBLE.md` together with the Phase 0–7 greybox contracts. Do not use this blueprint to infer mounted chapters or current implementation requirements.
+
 > **Status**: Phase 0.5 Brief (Comprehension & Architectural Specifications)
 > **Goal**: Awwards Site of the Day & Developer Award Standards
 

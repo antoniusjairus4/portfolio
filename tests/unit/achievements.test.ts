@@ -4,8 +4,8 @@ import { getValidatedAchievements, achievementsData } from '../../src/content/ac
 describe('Achievements Schema & Manifest Validation', () => {
   it('validates achievementsData entries against Zod schema without error', () => {
     const validated = getValidatedAchievements();
-    expect(validated).toHaveLength(5);
-    expect(validated[0].slug).toBe('speaking');
+    expect(validated.map((entry) => entry.slug)).toEqual(['speaking', 'table-tennis', 'karate']);
+    expect(validated).toEqual(achievementsData);
   });
 
   it('correctly categorizes wide vs portrait photos by aspect ratio rule', () => {

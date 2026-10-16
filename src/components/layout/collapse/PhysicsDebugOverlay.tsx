@@ -1,5 +1,5 @@
-import React from 'react';
-import { BakeResult } from './bakePhysics';
+import type React from 'react';
+import type { BakeResult } from './bakePhysics';
 
 interface PhysicsDebugOverlayProps {
   scrollProgress: number;

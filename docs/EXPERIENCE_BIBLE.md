@@ -1,6 +1,6 @@
 # Portfolio Experience Bible
 
-**Status:** Creative direction locked. Factual copy, asset choices, and implementation mechanisms in the content and prototype gates remain conditional.  
+**Status:** Creative direction locked; Phases 0–7 form the current complete greybox. Factual copy, production assets, and publication gates remain conditional.
 **Scope:** Homepage journey from Preloader through Contact and Back to Top. Future case-study pages inherit the visual identity but are outside this document.  
 **Authority:** This document records the approved future experience. Existing `SECTION_BLUEPRINT.md`, phase documents, and current components describe earlier concepts or the live implementation; they do not override this direction.  
 **Implementation:** No production implementation is authorized by this document alone. Build and review one phase at a time.
@@ -41,7 +41,7 @@ Preserve its recognizable identity while making completion reflect meaningful cr
 
 ### Hero — identity
 
-Preserve the full-screen portrait, the scroll-driven image split, the name revealed behind/inside it, and a deliberate reading hold. Preserve Cinzel Decorative. The intended full name is **ANTONIUS JAIRUS**; the current source says `JAIRUS`, so the full-name composition requires a layout prototype before changing content. Improve choreography and performance without discarding the concept. Hero identity is the introduction; the Contact name is an intimate signature.
+Preserve the full-screen portrait, the scroll-driven image split, the name revealed behind/inside it, and a deliberate reading hold. Preserve Cinzel Decorative. The implemented full-name composition is **ANTONIUS JAIRUS**. Improve choreography and performance without discarding the concept. Hero identity is the introduction; the Contact name is an intimate signature.
 
 ### KaiForge — understanding the point
 
@@ -130,7 +130,7 @@ The following are **not locked as public claims** merely because they appear in 
 - Karate: 3× versus the current 4× National Champion claim; official title wording, Black Belt context, and any state-medal total.
 - Chess: source and date/context for the three **peak** ratings; exact state-medal count. Do not publish `2–3`.
 - Public Speaking: 15+ speeches, whether 15,000+ was one audience, role in seven events, and context for Sivakarthikeyan/Sid Ahmed if used.
-- Contact: verify `antoniusjairusofficial@gmail.com`, exact GitHub/LinkedIn/Instagram URLs, and the decision to publish the phone number with international dialing format.
+- Contact: `antoniusjairusofficial@gmail.com` and the current GitHub, LinkedIn, and Instagram URLs are user-approved. Phone publication is intentionally declined.
 
 Any statistic, medical implication, product capability, award, or role without evidence stays out of public copy. Placeholders are for the planning document, not the shipped page.
 

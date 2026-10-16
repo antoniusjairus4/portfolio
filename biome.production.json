@@ -1,0 +1,41 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.14/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "src/app/**",
+      "src/components/achievements-kinetic/**",
+      "src/components/contact-finale/**",
+      "src/components/kaiforge/**",
+      "src/components/layout/**",
+      "src/components/neuroshield/**",
+      "src/components/palindrome/**",
+      "src/components/preloader/**",
+      "src/components/skills/**",
+      "src/content/achievementsKinetic.ts",
+      "src/content/heroContent.ts",
+      "src/content/kaiforge.ts",
+      "src/content/neuroshield.ts",
+      "src/content/palindrome.ts",
+      "src/content/skills.ts",
+      "src/experience/**",
+      "src/motion/**",
+      "src/styles/**",
+      "src/webgl/**",
+      "next.config.ts"
+    ]
+  },
+  "linter": {
+    "enabled": true
+  },
+  "css": {
+    "parser": {
+      "tailwindDirectives": true
+    }
+  }
+}

@@ -70,11 +70,7 @@ test('existing chapters remain reachable in both scroll directions after resize'
     timeout: 12000,
   });
 
-  for (const selector of [
-    '#page-1-placeholder',
-    '#achievements-section',
-    '#technical-skills-section',
-  ]) {
+  for (const selector of ['#kaiforge', '#skills', '#achievements-section']) {
     await page.locator(selector).scrollIntoViewIfNeeded();
     await expect(page.locator(selector)).toBeVisible();
   }
