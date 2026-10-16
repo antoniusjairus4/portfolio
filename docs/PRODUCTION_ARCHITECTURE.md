@@ -34,11 +34,13 @@ Current facts:
 | DOM/CSS | Identity, chapter titles, labels, disclosures, links, Skills taxonomy, Achievements, Contact, fallback composition | Unverified copy hidden inside decorative graphics |
 | Static assets | Existing portrait, fonts, QR; future compressed surface maps and approved graph vectors | Cinematic background replacement, screenshot-led storytelling |
 
-## Resource service proposal
+## Resource service
 
-Future module boundaries: `src/experience/assets/{manifest,resourceRegistry,scheduler,qualityPolicy}.ts`. Keep this separate from chapter choreography. Registry owns resources; provider owns which scene can draw; chapter owns progress. Scene components acquire/release explicit leases. Loader state updates can use React only at lifecycle boundaries, never per animation frame.
+**Implemented foundation:** `src/experience/assets/` now owns the typed runtime manifest, lifecycle manager, variant selection and proximity coordinator. `ProjectExperienceProvider` owns one session-stable manager and calls its coordinator from the provider's existing scene-selection RAF. No second scroll listener, RAF, renderer or production asset was added. Registry owns resources; provider still owns which scene can draw; chapter controllers still own progress. Future production scene components acquire/release explicit manager leases from inside the existing R3F boundary. React changes only when the preloader reports critical readiness and when the session manager is created, never per animation frame.
 
-Each record contains asset ID/version/tier, URL/hash, byte budgets, generation token, request abort handle, compressed-byte reference, decoded root, resource reference counts, estimated GPU bytes, last-use boundary, and failure/retry state. A scene cannot dispose another scene's shared material/map. A cached GLTF root must not be treated as automatically disposed merely because `<primitive>` unmounts.
+The production manifest is intentionally empty until a real export passes its gate. A 42-byte local development/test fixture is opt-in through `?assetLifecycleFixture=1`; it is absent from the normal journey and cannot be enabled in production builds. It proves byte request/proximity preparation only. Unit drivers prove residency/activation/disposal without pretending a byte buffer is a real GPU object.
+
+Each implemented record contains asset ID/owner/type/priority/policy, selected stable variant, generation token, abort handle, compressed-byte reference, prepared value, resident value, leases, one controlled retry count and failure state. Hashes, measured byte ledgers and GLTF-specific decoding remain integration work for the first real asset. A scene cannot dispose another scene's shared resource. A cached GLTF root must not be treated as automatically disposed merely because `<primitive>` unmounts.
 
 | State | Meaning | Allowed next states |
 | --- | --- | --- |

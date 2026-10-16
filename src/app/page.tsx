@@ -10,15 +10,18 @@ import { Preloader } from '@/components/preloader/Preloader';
 import { SkillsChapter } from '@/components/skills/SkillsChapter';
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
+import { useState } from 'react';
 
 export default function Home() {
   const { refresh } = useLenis();
+  const [criticalReady, setCriticalReady] = useState(false);
 
   return (
     <main id="top" className="relative w-full bg-[#0C0907]">
       {/* Preloader (Phase 1/2) */}
       <Preloader
         onComplete={() => {
+          setCriticalReady(true);
           requestAnimationFrame(() => {
             refresh();
             requestAnimationFrame(() => {
@@ -50,7 +53,7 @@ export default function Home() {
       {/* Page 0 Cover & Pinned Scroll Story Reveal */}
       <PhotoCoverSplit />
 
-      <ProjectExperienceProvider>
+      <ProjectExperienceProvider criticalReady={criticalReady}>
         {/* Phase 2: accepted KaiForge spatial and camera greybox */}
         <KaiForgeChapter />
 

@@ -14,6 +14,15 @@ import {
 } from 'react';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ChapterActivity } from '@/experience/useChapterActivity';
+import { AssetLifecycleManager } from '@/experience/assets/AssetLifecycleManager';
+import { coordinateProductionAssets } from '@/experience/assets/coordinator';
+import {
+  lifecycleTestFixture,
+  lifecycleTestFixtureDriver,
+} from '@/experience/assets/fixture';
+import { productionAssetManifest } from '@/experience/assets/manifest';
+import type { ProductionAssetSnapshot } from '@/experience/assets/types';
+import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
 const ExperienceCanvas = dynamic(
   () => import('@/experience/ExperienceCanvas').then((module) => module.ExperienceCanvas),
@@ -34,16 +43,67 @@ interface SceneRegistration {
 
 interface ProjectExperienceContextValue {
   registerScene: (key: ProjectSceneKey, registration: SceneRegistration) => () => void;
+  assetManager: AssetLifecycleManager | null;
 }
 
 const ProjectExperienceContext = createContext<ProjectExperienceContextValue | null>(null);
 
-export function ProjectExperienceProvider({ children }: { children: ReactNode }) {
+declare global {
+  interface Window {
+    __portfolioAssetLifecycle?: {
+      snapshot: () => readonly ProductionAssetSnapshot[];
+    };
+  }
+}
+
+export function ProjectExperienceProvider({
+  children,
+  criticalReady = false,
+}: {
+  children: ReactNode;
+  criticalReady?: boolean;
+}) {
+  const environment = useExperienceEnvironment();
   const [registrations, setRegistrations] = useState<
     Partial<Record<ProjectSceneKey, SceneRegistration>>
   >({});
   const [activeKey, setActiveKey] = useState<ProjectSceneKey | null>(null);
+  const [assetManager, setAssetManager] = useState<AssetLifecycleManager | null>(null);
+  const assetManagerRef = useRef<AssetLifecycleManager | null>(null);
   const frameRef = useRef(0);
+
+  useEffect(() => {
+    if (!environment.ready || assetManagerRef.current) return;
+    const manager = new AssetLifecycleManager(
+      { quality: environment.quality, portrait: environment.portrait },
+      productionAssetManifest,
+    );
+    const fixtureEnabled =
+      process.env.NODE_ENV !== 'production' &&
+      new URLSearchParams(window.location.search).has('assetLifecycleFixture');
+    if (fixtureEnabled) {
+      manager.register(lifecycleTestFixture);
+      manager.registerDriver('test-fixture', lifecycleTestFixtureDriver);
+    }
+    assetManagerRef.current = manager;
+    setAssetManager(manager);
+  }, [environment.portrait, environment.quality, environment.ready]);
+
+  useEffect(
+    () => () => {
+      assetManagerRef.current?.disposeAll();
+      assetManagerRef.current = null;
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (!assetManager || process.env.NODE_ENV === 'production') return;
+    window.__portfolioAssetLifecycle = { snapshot: () => assetManager.getSnapshot() };
+    return () => {
+      delete window.__portfolioAssetLifecycle;
+    };
+  }, [assetManager]);
 
   const registerScene = useCallback((key: ProjectSceneKey, registration: SceneRegistration) => {
     setRegistrations((current) => ({ ...current, [key]: registration }));
@@ -67,6 +127,24 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
       const palindromeTop = palindrome?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
       const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
+      const chapterSignals = Object.fromEntries(
+        (['kaiforge', 'palindrome', 'neuroshield', 'skills'] as const).flatMap((key) => {
+          const registration = registrations[key];
+          const rect = registration?.sectionRef.current?.getBoundingClientRect();
+          return registration && rect
+            ? [[key, { progress: registration.controller.progress.current, top: rect.top, bottom: rect.bottom }]]
+            : [];
+        }),
+      );
+      if (assetManager) {
+        coordinateProductionAssets(assetManager, {
+          eligible:
+            environment.ready && !environment.reducedMotion && environment.quality !== 'fallback',
+          criticalReady,
+          viewportHeight: window.innerHeight,
+          chapters: chapterSignals,
+        });
+      }
       const palindromeOwnsFrame =
         palindrome?.enabled &&
         palindrome.activity !== 'inactive' &&
@@ -113,10 +191,13 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
       frameRef.current = 0;
     };
-  }, [registrations]);
+  }, [assetManager, criticalReady, environment.quality, environment.ready, environment.reducedMotion, registrations]);
 
   const activeRegistration = activeKey ? registrations[activeKey] : null;
-  const contextValue = useMemo(() => ({ registerScene }), [registerScene]);
+  const contextValue = useMemo(
+    () => ({ registerScene, assetManager }),
+    [assetManager, registerScene],
+  );
 
   return (
     <ProjectExperienceContext.Provider value={contextValue}>
@@ -140,6 +221,12 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
       </div>
     </ProjectExperienceContext.Provider>
   );
+}
+
+export function useProductionAssetManager() {
+  const context = useContext(ProjectExperienceContext);
+  if (!context) throw new Error('Production assets must be inside ProjectExperienceProvider.');
+  return context.assetManager;
 }
 
 export function useProjectSceneRegistration(
