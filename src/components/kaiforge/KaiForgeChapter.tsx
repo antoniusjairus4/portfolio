@@ -1,7 +1,6 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { KaiForgeFallback } from '@/components/kaiforge/KaiForgeFallback';
 import { getBeatOpacity, getKaiForgeBeat } from '@/components/kaiforge/kaiforgeChoreography';
 import { kaiForgeContent } from '@/content/kaiforge';
@@ -11,12 +10,8 @@ import {
 } from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
+import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
-
-const ExperienceCanvas = dynamic(
-  () => import('@/experience/ExperienceCanvas').then((module) => module.ExperienceCanvas),
-  { ssr: false },
-);
 
 const BEAT_PRESENTATION = [
   { center: 0.08, width: 0.16 },
@@ -38,6 +33,21 @@ export function KaiForgeChapter() {
   const portraitComposition = ready && portrait;
   const renderWebGL = ready && !reducedMotion && quality !== 'fallback';
   const rendererActive = renderWebGL && activity !== 'inactive';
+  const sceneRegistration = useMemo(
+    () =>
+      controller
+        ? {
+            controller,
+            sectionRef,
+            activity,
+            enabled: rendererActive,
+            portrait: portraitComposition,
+            dprCap,
+          }
+        : null,
+    [activity, controller, dprCap, portraitComposition, rendererActive],
+  );
+  useProjectSceneRegistration('kaiforge', sceneRegistration);
 
   useEffect(() => {
     const next = createChapterProgressController(sectionRef);
@@ -100,17 +110,7 @@ export function KaiForgeChapter() {
       className={`kaiforge-chapter ${reducedMotion || quality === 'fallback' ? 'kaiforge-static' : ''}`}
     >
       <div className="kaiforge-sticky">
-        <div className="kaiforge-render-layer" aria-hidden="true">
-          {rendererActive && controller ? (
-            <ExperienceCanvas
-              controller={controller}
-              dprCap={dprCap}
-              portrait={portraitComposition}
-            />
-          ) : (
-            <div className="kaiforge-render-placeholder" />
-          )}
-        </div>
+        {!rendererActive && <div className="kaiforge-render-placeholder" aria-hidden="true" />}
 
         {ready && (reducedMotion || quality === 'fallback') && (
           <KaiForgeFallback reason={reducedMotion ? 'reduced-motion' : 'no-webgl'} />

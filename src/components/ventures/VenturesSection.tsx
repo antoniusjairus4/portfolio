@@ -196,7 +196,7 @@ export const VenturesSection: React.FC = () => {
         </p>
 
         <div className="space-y-4 md:space-y-6">
-          {venturesContent.filter((venture) => venture.slug !== 'kaiforge').map((v) => {
+          {venturesContent.filter((venture) => !['kaiforge', 'palindrome'].includes(venture.slug)).map((v) => {
             const itemTheme = VENTURE_THEMES[v.themeKey];
             const isHovered = activeTheme === v.themeKey;
 

@@ -46,15 +46,20 @@ test('failed critical image does not leave the page locked', async ({ page }) =>
     .not.toBe('hidden');
 });
 
-test('refresh preserves the browser scroll position', async ({ page }) => {
+test('refresh resets to the opening portrait at the top', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden({
     timeout: 12000,
   });
-  await page.evaluate(() => window.scrollTo(0, 500));
+  await page.locator('#kaiforge').scrollIntoViewIfNeeded();
   await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
   await page.reload();
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden({
+    timeout: 12000,
+  });
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await expect(page.locator('#hero')).toHaveAttribute('data-hero-state', 'portrait');
+  await expect(page.getByAltText('Portrait of Antonius Jairus')).toBeVisible();
 });
 
 test('existing chapters remain reachable in both scroll directions after resize', async ({

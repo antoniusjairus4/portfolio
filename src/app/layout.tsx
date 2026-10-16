@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Script from 'next/script';
 import type React from 'react';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
@@ -37,6 +38,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
+        <Script id="reset-document-scroll" strategy="beforeInteractive">
+          {`history.scrollRestoration = 'manual';
+window.scrollTo(0, 0);
+window.addEventListener('pageshow', () => window.scrollTo(0, 0), { once: true });`}
+        </Script>
         <ExperienceEnvironmentProvider>
           <LenisProvider>
             <GlobalEtherProvider>

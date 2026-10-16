@@ -3,9 +3,11 @@
 import { DisciplinesScrollSection } from '@/components/disciplines-scroll/DisciplinesScrollSection';
 import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
+import { PalindromeChapter } from '@/components/palindrome/PalindromeChapter';
 import { Preloader } from '@/components/preloader/Preloader';
 import { TechnicalSkillsTerminal } from '@/components/terminal/TechnicalSkillsTerminal';
 import { VenturesSection } from '@/components/ventures/VenturesSection';
+import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
 export default function Home() {
@@ -23,8 +25,13 @@ export default function Home() {
       {/* Page 0 Cover & Pinned Scroll Story Reveal */}
       <PhotoCoverSplit />
 
-      {/* Phase 2: KaiForge spatial and camera greybox */}
-      <KaiForgeChapter />
+      <ProjectExperienceProvider>
+        {/* Phase 2: accepted KaiForge spatial and camera greybox */}
+        <KaiForgeChapter />
+
+        {/* Phase 3: Palindrome domestic-information greybox */}
+        <PalindromeChapter />
+      </ProjectExperienceProvider>
 
       {/* Legacy Palindrome / NeuroShield index; redesign is intentionally deferred. */}
       <VenturesSection />

@@ -3,7 +3,9 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
+import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
+import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
   const invalidate = useThree((state) => state.invalidate);
@@ -12,12 +14,13 @@ function ProgressInvalidator({ controller }: { controller: ChapterProgressContro
 }
 
 interface ExperienceCanvasProps {
+  scene: ProjectSceneKey;
   controller: ChapterProgressController;
   dprCap: number;
   portrait: boolean;
 }
 
-export function ExperienceCanvas({ controller, dprCap, portrait }: ExperienceCanvasProps) {
+export function ExperienceCanvas({ scene, controller, dprCap, portrait }: ExperienceCanvasProps) {
   return (
     <Canvas
       data-experience-renderer="shared"
@@ -31,7 +34,11 @@ export function ExperienceCanvas({ controller, dprCap, portrait }: ExperienceCan
       }}
     >
       <ProgressInvalidator controller={controller} />
-      <KaiForgeScene controller={controller} portrait={portrait} />
+      {scene === 'kaiforge' ? (
+        <KaiForgeScene controller={controller} portrait={portrait} />
+      ) : (
+        <PalindromeScene controller={controller} portrait={portrait} />
+      )}
     </Canvas>
   );
 }

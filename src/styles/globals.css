@@ -306,7 +306,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  main > #kaiforge {
+  .project-experience-root > #kaiforge {
     margin-top: -100svh;
   }
 }
@@ -391,6 +391,26 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 /* Phase 2 KaiForge greybox: spatial composition before production art. */
+.project-experience-root {
+  position: relative;
+  z-index: 2;
+  isolation: isolate;
+  background: #0b0908;
+}
+
+.project-experience-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.project-experience-layer canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
 .kaiforge-chapter {
   --kaiforge-progress: 0;
   position: relative;
@@ -398,7 +418,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   width: 100%;
   height: 520svh;
   color: #f2e9d8;
-  background: #0b0908;
+  background: transparent;
 }
 
 .kaiforge-sticky {
@@ -408,9 +428,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  background:
-    linear-gradient(90deg, transparent 49.94%, rgba(242, 233, 216, 0.08) 50%, transparent 50.06%),
-    #0b0908;
+  background: linear-gradient(90deg, transparent 49.94%, rgba(242, 233, 216, 0.08) 50%, transparent 50.06%);
 }
 
 .kaiforge-render-layer,
@@ -853,6 +871,412 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   .kaiforge-sticky,
   .kaiforge-beat,
   .kaiforge-semantic-header {
+    scroll-behavior: auto;
+    will-change: auto;
+  }
+}
+
+/* Phase 3 Palindrome greybox: one room, reorganized information. */
+.palindrome-chapter {
+  --palindrome-progress: 0;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 500svh;
+  color: #e8ddca;
+}
+
+.palindrome-sticky {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.palindrome-render-placeholder {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(90deg, #1d1a18 0 19%, transparent 19%),
+    linear-gradient(180deg, transparent 0 66%, #171412 66%), #0b0908;
+}
+
+.palindrome-sticky::after {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: '';
+  background: linear-gradient(180deg, rgba(11, 9, 8, 0.54), transparent 22%, transparent 72%, rgba(11, 9, 8, 0.72)),
+    radial-gradient(circle at 48% 49%, transparent 34%, rgba(11, 9, 8, 0.44));
+}
+
+.palindrome-semantic-header {
+  position: absolute;
+  top: clamp(5rem, 10vh, 7.5rem);
+  left: clamp(1.5rem, 5vw, 6rem);
+  z-index: 4;
+  width: min(56rem, 64vw);
+  will-change: transform, opacity;
+}
+
+.palindrome-semantic-header > p:first-child,
+.palindrome-beat > span,
+.palindrome-chapter-index,
+.palindrome-disclosure,
+.palindrome-fallback-room > p {
+  margin: 0;
+  font-family: 'JetBrains Mono Variable', monospace;
+  font-size: clamp(0.62rem, 0.72vw, 0.78rem);
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #9f9382;
+}
+
+.palindrome-semantic-header h2 {
+  margin: 0.12em 0 0.18em;
+  font-family: var(--font-display);
+  font-size: clamp(4.5rem, 10.6vw, 11rem);
+  font-weight: 610;
+  line-height: 0.82;
+  letter-spacing: -0.072em;
+  text-transform: uppercase;
+  color: #e8ddca;
+}
+
+.palindrome-semantic-header > p:nth-of-type(2) {
+  max-width: 41rem;
+  margin: 1.55rem 0 0;
+  font-family: var(--font-secondary);
+  font-size: clamp(1rem, 1.25vw, 1.28rem);
+  line-height: 1.48;
+  color: rgba(232, 221, 202, 0.88);
+}
+
+.palindrome-purpose {
+  max-width: 38rem;
+  margin: 0.8rem 0 0;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.8rem, 0.9vw, 0.96rem);
+  line-height: 1.55;
+  color: #9f9382;
+}
+
+.palindrome-beats {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.palindrome-beat {
+  position: absolute;
+  width: min(37rem, 43vw);
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.palindrome-beat strong {
+  display: block;
+  margin-top: 0.62rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.6vw, 6.8rem);
+  font-weight: 560;
+  line-height: 0.88;
+  letter-spacing: -0.055em;
+  color: #e8ddca;
+}
+
+.palindrome-beat small {
+  display: block;
+  max-width: 27rem;
+  margin-top: 0.9rem;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.74rem, 0.84vw, 0.92rem);
+  line-height: 1.55;
+  color: #a99d8b;
+}
+
+.palindrome-beat.beat-ordinary,
+.palindrome-beat.beat-control {
+  right: clamp(1.5rem, 5vw, 6rem);
+  bottom: 13vh;
+  text-align: right;
+}
+
+.palindrome-beat.beat-fragmentation,
+.palindrome-beat.beat-organization {
+  top: 13vh;
+  right: clamp(1.5rem, 5vw, 6rem);
+  text-align: right;
+}
+
+.palindrome-beat.beat-relationships {
+  left: clamp(1.5rem, 5vw, 6rem);
+  bottom: 11vh;
+}
+
+.palindrome-beat.beat-ordinary small,
+.palindrome-beat.beat-fragmentation small,
+.palindrome-beat.beat-organization small,
+.palindrome-beat.beat-control small {
+  margin-left: auto;
+}
+
+.palindrome-chapter-index {
+  position: absolute;
+  top: 2rem;
+  right: clamp(1.5rem, 3vw, 3rem);
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.palindrome-chapter-index i {
+  display: block;
+  width: 3.5rem;
+  height: 1px;
+  background: rgba(232, 221, 202, 0.28);
+}
+
+.palindrome-disclosure {
+  position: absolute;
+  right: clamp(1.5rem, 3vw, 3rem);
+  bottom: 1.4rem;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  gap: 2rem;
+  max-width: min(49rem, 70vw);
+  text-align: right;
+}
+
+.palindrome-disclosure p {
+  max-width: 35rem;
+  margin: 0;
+  color: #766e64;
+}
+
+.palindrome-disclosure a {
+  flex: 0 0 auto;
+  min-height: 2.6rem;
+  color: #d9cdbc;
+  text-decoration: none;
+  pointer-events: auto;
+}
+
+.palindrome-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.palindrome-fallback-room {
+  position: absolute;
+  inset: 12% 8% 8%;
+  border-left: 1px solid rgba(232, 221, 202, 0.2);
+  border-bottom: 1px solid rgba(232, 221, 202, 0.2);
+}
+
+.palindrome-fallback-shelf {
+  position: absolute;
+  right: 5%;
+  bottom: 23%;
+  width: 22%;
+  height: 42%;
+  border: 1px solid rgba(232, 221, 202, 0.2);
+  background: repeating-linear-gradient(180deg, transparent 0 31%, rgba(232, 221, 202, 0.14) 31% 32%);
+}
+
+.palindrome-fallback-table {
+  position: absolute;
+  left: 17%;
+  bottom: 20%;
+  width: 48%;
+  height: 9%;
+  border: solid #332e29;
+  border-width: 0 0.35rem 0.5rem;
+}
+
+.palindrome-fallback-person {
+  position: absolute;
+  left: 48%;
+  bottom: 21%;
+  width: 5rem;
+  height: 15rem;
+}
+
+.palindrome-fallback-person i,
+.palindrome-fallback-person b {
+  position: absolute;
+  left: 50%;
+  display: block;
+  transform: translateX(-50%);
+  background: #77716a;
+}
+
+.palindrome-fallback-person i {
+  top: 0;
+  width: 2.7rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #b6a48e;
+}
+
+.palindrome-fallback-person b {
+  top: 2.9rem;
+  width: 4rem;
+  height: 8rem;
+  border-radius: 45% 45% 16% 16%;
+}
+
+.palindrome-fallback-information {
+  position: absolute;
+  top: 23%;
+  left: 16%;
+  display: grid;
+  grid-template-columns: repeat(3, 4.2rem);
+  gap: 0.75rem;
+}
+
+.palindrome-fallback-information span {
+  display: block;
+  height: 2.8rem;
+  border: 1px solid rgba(11, 9, 8, 0.5);
+  background: #c9bda9;
+  box-shadow: inset 0 0.45rem 0 -0.36rem #746c62;
+}
+
+.palindrome-fallback-room > p {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+}
+
+.palindrome-static {
+  height: auto;
+  min-height: 100svh;
+}
+
+.palindrome-static .palindrome-sticky {
+  position: relative;
+  min-height: 100svh;
+  background: #0b0908;
+}
+
+.palindrome-static .palindrome-semantic-header {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
+
+@media (orientation: portrait) {
+  .palindrome-chapter {
+    height: 460svh;
+  }
+
+  .palindrome-semantic-header {
+    top: 8svh;
+    left: 1.25rem;
+    width: calc(100% - 2.5rem);
+  }
+
+  .palindrome-semantic-header h2 {
+    font-size: clamp(2.7rem, 12.4vw, 4.8rem);
+  }
+
+  .palindrome-semantic-header > p:nth-of-type(2) {
+    margin-top: 1rem;
+    font-size: clamp(0.88rem, 3.7vw, 1.05rem);
+  }
+
+  .palindrome-purpose {
+    font-size: clamp(0.72rem, 3.1vw, 0.88rem);
+  }
+
+  .palindrome-beat,
+  .palindrome-beat.beat-ordinary,
+  .palindrome-beat.beat-fragmentation,
+  .palindrome-beat.beat-relationships,
+  .palindrome-beat.beat-organization,
+  .palindrome-beat.beat-control {
+    top: auto;
+    right: 1.25rem;
+    bottom: 11svh;
+    left: 1.25rem;
+    width: auto;
+    text-align: left;
+  }
+
+  .palindrome-beat strong {
+    font-size: clamp(2.2rem, 11.4vw, 4.4rem);
+  }
+
+  .palindrome-beat small,
+  .palindrome-beat.beat-ordinary small,
+  .palindrome-beat.beat-fragmentation small,
+  .palindrome-beat.beat-organization small,
+  .palindrome-beat.beat-control small {
+    max-width: 22rem;
+    margin-left: 0;
+  }
+
+  .palindrome-chapter-index {
+    top: 1.25rem;
+    right: 1.25rem;
+  }
+
+  .palindrome-disclosure {
+    right: 1.25rem;
+    bottom: 1rem;
+    left: auto;
+    max-width: none;
+    text-align: right;
+  }
+
+  .palindrome-disclosure p,
+  .palindrome-fallback-room > p {
+    display: none;
+  }
+
+  .palindrome-fallback-room {
+    inset: 19% 1.25rem 8%;
+  }
+
+  .palindrome-fallback-shelf {
+    right: 0;
+    width: 30%;
+  }
+
+  .palindrome-fallback-table {
+    left: 5%;
+    width: 58%;
+  }
+
+  .palindrome-fallback-person {
+    left: 45%;
+    transform: scale(0.78);
+    transform-origin: bottom center;
+  }
+
+  .palindrome-fallback-information {
+    top: 18%;
+    left: 5%;
+    grid-template-columns: repeat(2, 3.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palindrome-chapter,
+  .palindrome-sticky,
+  .palindrome-beat,
+  .palindrome-semantic-header {
     scroll-behavior: auto;
     will-change: auto;
   }
