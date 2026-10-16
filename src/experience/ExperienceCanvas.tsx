@@ -5,11 +5,15 @@ import { useEffect } from 'react';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
+import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
   const invalidate = useThree((state) => state.invalidate);
-  useEffect(() => controller.subscribe(invalidate), [controller, invalidate]);
+  useEffect(() => {
+    invalidate();
+    return controller.subscribe(invalidate);
+  }, [controller, invalidate]);
   return null;
 }
 
@@ -34,11 +38,9 @@ export function ExperienceCanvas({ scene, controller, dprCap, portrait }: Experi
       }}
     >
       <ProgressInvalidator controller={controller} />
-      {scene === 'kaiforge' ? (
-        <KaiForgeScene controller={controller} portrait={portrait} />
-      ) : (
-        <PalindromeScene controller={controller} portrait={portrait} />
-      )}
+      {scene === 'kaiforge' && <KaiForgeScene controller={controller} portrait={portrait} />}
+      {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
+      {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
     </Canvas>
   );
 }
