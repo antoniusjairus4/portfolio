@@ -20,7 +20,7 @@ const ExperienceCanvas = dynamic(
   { ssr: false },
 );
 
-export type ProjectSceneKey = 'kaiforge' | 'palindrome' | 'neuroshield';
+export type ProjectSceneKey = 'kaiforge' | 'palindrome' | 'neuroshield' | 'skills';
 
 interface SceneRegistration {
   controller: ChapterProgressController;
@@ -29,6 +29,7 @@ interface SceneRegistration {
   enabled: boolean;
   portrait: boolean;
   dprCap: number;
+  finePointer?: boolean;
 }
 
 interface ProjectExperienceContextValue {
@@ -62,8 +63,10 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
       const kaiForge = registrations.kaiforge;
       const palindrome = registrations.palindrome;
       const neuroShield = registrations.neuroshield;
+      const skills = registrations.skills;
       const palindromeTop = palindrome?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
+      const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
       const palindromeOwnsFrame =
         palindrome?.enabled &&
         palindrome.activity !== 'inactive' &&
@@ -74,18 +77,27 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
         neuroShield.activity !== 'inactive' &&
         neuroShieldTop !== undefined &&
         neuroShieldTop <= window.innerHeight * 0.45;
+      const skillsOwnsFrame =
+        skills?.enabled &&
+        skills.activity !== 'inactive' &&
+        skillsTop !== undefined &&
+        skillsTop <= window.innerHeight * 0.45;
 
-      const nextKey = neuroShieldOwnsFrame
-        ? 'neuroshield'
-        : palindromeOwnsFrame
-          ? 'palindrome'
-          : kaiForge?.enabled && kaiForge.activity !== 'inactive'
-            ? 'kaiforge'
-            : palindrome?.enabled && palindrome.activity !== 'inactive'
-              ? 'palindrome'
-              : neuroShield?.enabled && neuroShield.activity !== 'inactive'
-                ? 'neuroshield'
-                : null;
+      const nextKey = skillsOwnsFrame
+        ? 'skills'
+        : neuroShieldOwnsFrame
+          ? 'neuroshield'
+          : palindromeOwnsFrame
+            ? 'palindrome'
+            : kaiForge?.enabled && kaiForge.activity !== 'inactive'
+              ? 'kaiforge'
+              : palindrome?.enabled && palindrome.activity !== 'inactive'
+                ? 'palindrome'
+                : neuroShield?.enabled && neuroShield.activity !== 'inactive'
+                  ? 'neuroshield'
+                  : skills?.enabled && skills.activity !== 'inactive'
+                    ? 'skills'
+                    : null;
       setActiveKey((current) => (current === nextKey ? current : nextKey));
     };
     const schedule = () => {
@@ -120,6 +132,7 @@ export function ProjectExperienceProvider({ children }: { children: ReactNode })
               controller={activeRegistration.controller}
               dprCap={activeRegistration.dprCap}
               portrait={activeRegistration.portrait}
+              finePointer={activeRegistration.finePointer ?? false}
             />
           </div>
         )}

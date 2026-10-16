@@ -6,7 +6,7 @@ import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { NeuroShieldChapter } from '@/components/neuroshield/NeuroShieldChapter';
 import { PalindromeChapter } from '@/components/palindrome/PalindromeChapter';
 import { Preloader } from '@/components/preloader/Preloader';
-import { TechnicalSkillsTerminal } from '@/components/terminal/TechnicalSkillsTerminal';
+import { SkillsChapter } from '@/components/skills/SkillsChapter';
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
@@ -34,13 +34,13 @@ export default function Home() {
 
         {/* Phase 4: NeuroShield research-uncertainty greybox */}
         <NeuroShieldChapter />
+
+        {/* Phase 5: continuous spatial capability landscape */}
+        <SkillsChapter />
       </ProjectExperienceProvider>
 
       {/* Page 2 Achievements Spatial Scroll-Driven Section */}
       <DisciplinesScrollSection />
-
-      {/* Page 3 Technical Skills Terminal Section */}
-      <TechnicalSkillsTerminal />
     </main>
   );
 }

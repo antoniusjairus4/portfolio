@@ -7,6 +7,7 @@ import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
+import { SkillsScene } from '@/webgl/scenes/SkillsScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
   const invalidate = useThree((state) => state.invalidate);
@@ -22,9 +23,16 @@ interface ExperienceCanvasProps {
   controller: ChapterProgressController;
   dprCap: number;
   portrait: boolean;
+  finePointer: boolean;
 }
 
-export function ExperienceCanvas({ scene, controller, dprCap, portrait }: ExperienceCanvasProps) {
+export function ExperienceCanvas({
+  scene,
+  controller,
+  dprCap,
+  portrait,
+  finePointer,
+}: ExperienceCanvasProps) {
   return (
     <Canvas
       data-experience-renderer="shared"
@@ -41,6 +49,9 @@ export function ExperienceCanvas({ scene, controller, dprCap, portrait }: Experi
       {scene === 'kaiforge' && <KaiForgeScene controller={controller} portrait={portrait} />}
       {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
       {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
+      {scene === 'skills' && (
+        <SkillsScene controller={controller} portrait={portrait} finePointer={finePointer} />
+      )}
     </Canvas>
   );
 }
