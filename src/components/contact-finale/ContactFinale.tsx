@@ -6,6 +6,11 @@ const email = 'antoniusjairusofficial@gmail.com';
 export function ContactFinale() {
   return (
     <section id="contact" className={styles.chapter} aria-labelledby="contact-name">
+      <noscript>
+        <style>
+          {'[role="progressbar"][aria-label="Site preloader"] { display: none !important; }'}
+        </style>
+      </noscript>
       <div className={styles.arrival} aria-hidden="true" />
       <div className={styles.composition}>
         <div className={styles.identity}>

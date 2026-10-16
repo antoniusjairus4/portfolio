@@ -72,11 +72,20 @@ test('direct Contact jump and reverse traversal reconstruct chapter ownership', 
   await enter(page, '/#contact');
   await expect(page.locator('#contact')).toBeInViewport();
   await expect(page.locator('canvas')).toHaveCount(0);
-  await page.locator('[data-achievement-discipline="public-speaking"]').scrollIntoViewIfNeeded();
-  await expect(page.locator('[data-achievement-discipline="public-speaking"]')).toBeInViewport();
+  await expect(page.locator('[data-project-scene]')).toHaveCount(0);
+  await expect(page.locator('img[src="/images/achievements/bg-fluid.png"]')).toHaveCount(0);
+  for (const discipline of ['public-speaking', 'chess', 'karate', 'table-tennis']) {
+    const panel = page.locator(`[data-achievement-discipline="${discipline}"]`);
+    await panel.scrollIntoViewIfNeeded();
+    await expect(panel).toBeInViewport();
+  }
+  await page.locator('#skills').scrollIntoViewIfNeeded();
+  await expect(page.locator('#skills')).toBeInViewport();
   await page.locator('#contact').scrollIntoViewIfNeeded();
   await expect(page.locator('#contact')).toBeInViewport();
   await expect(page.locator('canvas')).toHaveCount(0);
+  await expect(page.locator('[data-project-scene]')).toHaveCount(0);
+  await expect(page.locator('img[src="/images/achievements/bg-fluid.png"]')).toHaveCount(0);
 });
 
 test('Contact is static, keyboard reachable, and works without WebGL', async ({ page }) => {
@@ -94,4 +103,19 @@ test('Contact is static, keyboard reachable, and works without WebGL', async ({ 
   await expect(page.locator('canvas')).toHaveCount(0);
   await contact.getByRole('link', { name: email }).focus();
   await expect(contact.getByRole('link', { name: email })).toBeFocused();
+});
+
+test('direct email and Back to Top remain usable without JavaScript', async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto('/#contact');
+  await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden();
+  await expect(page.locator('#contact').getByRole('link', { name: email })).toHaveAttribute(
+    'href',
+    `mailto:${email}`,
+  );
+  await expect(
+    page.locator('#contact').getByRole('link', { name: /back to top/i }),
+  ).toHaveAttribute('href', '#top');
+  await context.close();
 });

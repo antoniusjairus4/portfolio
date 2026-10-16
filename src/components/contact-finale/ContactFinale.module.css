@@ -168,7 +168,7 @@
   }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 900px) {
   .arrival {
     height: clamp(5rem, 12svh, 8rem);
   }
