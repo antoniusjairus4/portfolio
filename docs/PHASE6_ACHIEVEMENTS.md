@@ -70,3 +70,10 @@ After the 15,000+ peak, the audience composition fades, rules retire, crimson is
 - Browser zoom, keyboard, and screen-reader review after production typography
 - Optional refinement of the existing global cursor toward its quiet editorial state
 - Explicit removal of the legacy achievement gallery and photo pipeline after approval
+
+## Phase 6 validation
+
+- Reviewed 1440×900 captures across discipline entry, peak, and exit states; a 1920×1080 Speaking peak; and 390×844 discipline peaks and the Contact-facing silence. Also reviewed the Skills/Achievements boundary and reduced-motion frames. The final focused review corrected portrait Karate title/rule spacing and the 15+ to 15,000+ hierarchy.
+- Confirmed forward scroll, reverse reconstruction, direct jumps, portrait overflow, semantic claims, renderer release, no canvas, and forced WebGL failure through the focused Achievements Playwright suite: 8 passed.
+- Choreography and chapter-progress unit suites: 7 passed. TypeScript and production build passed. Biome passed with two non-blocking selector-specificity warnings in the new CSS.
+- Greybox verdict: **PASS WITH ISSUES**. The visual and technical structure is ready for production art, but contested Karate title wording and other publication details require evidence before public release.

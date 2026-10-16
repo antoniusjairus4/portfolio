@@ -1,6 +1,7 @@
 'use client';
 
 import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
+import { ContactFinale } from '@/components/contact-finale/ContactFinale';
 import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { NeuroShieldChapter } from '@/components/neuroshield/NeuroShieldChapter';
@@ -14,11 +15,16 @@ export default function Home() {
   const { refresh } = useLenis();
 
   return (
-    <main className="relative w-full bg-[#0C0907]">
+    <main id="top" className="relative w-full bg-[#0C0907]">
       {/* Preloader (Phase 1/2) */}
       <Preloader
         onComplete={() => {
-          requestAnimationFrame(refresh);
+          requestAnimationFrame(() => {
+            refresh();
+            if (window.location.hash === '#contact') {
+              document.getElementById('contact')?.scrollIntoView({ behavior: 'instant' });
+            }
+          });
         }}
       />
 
@@ -41,6 +47,9 @@ export default function Home() {
 
       {/* Phase 6: kinetic editorial achievements sequence */}
       <AchievementsChapter />
+
+      {/* Phase 7: quiet contact and document end */}
+      <ContactFinale />
     </main>
   );
 }

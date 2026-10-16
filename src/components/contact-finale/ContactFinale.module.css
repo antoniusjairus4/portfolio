@@ -1,0 +1,222 @@
+.chapter {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  min-height: 100svh;
+  overflow: clip;
+  background: #e5dac7;
+  color: #11100f;
+}
+
+.arrival {
+  height: clamp(5rem, 16svh, 11rem);
+}
+
+.composition {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: start;
+  gap: clamp(4rem, 9vw, 10rem);
+  min-height: 57svh;
+  padding: 0 clamp(1.5rem, 6vw, 8rem);
+}
+
+.kicker,
+.label,
+.qr figcaption,
+.socials,
+.end {
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.68rem, 0.74vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+}
+
+.kicker {
+  margin: 0 0 clamp(2rem, 6svh, 5rem);
+  color: #645e55;
+}
+
+.identity h2 {
+  max-width: 9ch;
+  margin: 0;
+  font-family: "Cinzel Decorative", "Cinzel", serif;
+  font-size: clamp(3rem, 4.6vw, 6rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.055em;
+}
+
+.invitation {
+  margin: clamp(2rem, 5svh, 4.5rem) 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.5vw, 1.55rem);
+  font-weight: 500;
+}
+
+.actions {
+  padding-top: clamp(4rem, 12svh, 9rem);
+}
+
+.address {
+  display: grid;
+  gap: 1.2rem;
+  font-style: normal;
+}
+
+.label {
+  color: #645e55;
+}
+
+.email {
+  width: fit-content;
+  max-width: 100%;
+  color: inherit;
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2vw, 2.5rem);
+  font-weight: 550;
+  letter-spacing: -0.035em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-decoration-color: rgba(17, 16, 15, 0.35);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.35em;
+}
+
+.email:hover,
+.end a:hover {
+  text-decoration-color: currentColor;
+}
+
+.qr {
+  width: fit-content;
+  margin: clamp(3rem, 7svh, 5rem) 0 0;
+}
+
+.qr img {
+  display: block;
+  width: clamp(8rem, 11vw, 10.75rem);
+  height: auto;
+  background: #fff;
+}
+
+.qr figcaption {
+  margin-top: 0.8rem;
+  color: #645e55;
+}
+
+.socials {
+  display: flex;
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding: 2rem clamp(1.5rem, 6vw, 8rem) clamp(4rem, 9svh, 6rem);
+}
+
+.socials a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  color: #645e55;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.35em;
+}
+
+.socials a:hover {
+  color: #11100f;
+  text-decoration-color: currentColor;
+}
+
+.end {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: clamp(7rem, 17svh, 11rem);
+  margin: 0 clamp(1.5rem, 6vw, 8rem);
+  border-top: 1px solid rgba(17, 16, 15, 0.28);
+}
+
+.end span {
+  color: #645e55;
+}
+
+.end a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 3rem;
+  color: inherit;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.35em;
+}
+
+.email:focus-visible,
+.socials a:focus-visible,
+.end a:focus-visible {
+  outline: 2px solid #11100f;
+  outline-offset: 5px;
+}
+
+@media (max-width: 960px) {
+  .composition {
+    gap: 3rem;
+  }
+
+  .identity h2 {
+    font-size: clamp(3rem, 5.3vw, 5rem);
+  }
+
+  .email {
+    font-size: clamp(1.15rem, 2.25vw, 2rem);
+  }
+}
+
+@media (max-width: 700px) {
+  .arrival {
+    height: clamp(5rem, 12svh, 8rem);
+  }
+
+  .composition {
+    display: block;
+    min-height: 0;
+    padding: 0 1.25rem;
+  }
+
+  .kicker {
+    margin-bottom: 2.5rem;
+  }
+
+  .identity h2 {
+    max-width: 10ch;
+    font-size: clamp(2.6rem, 11vw, 4.2rem);
+  }
+
+  .invitation {
+    margin-top: 2.7rem;
+    font-size: 1.15rem;
+  }
+
+  .actions {
+    padding-top: clamp(4rem, 10svh, 6rem);
+  }
+
+  .address {
+    gap: 1.1rem;
+  }
+
+  .email {
+    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
+  }
+
+  .qr {
+    display: none;
+  }
+
+  .socials {
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    padding: clamp(5rem, 13svh, 8rem) 1.25rem 4rem;
+  }
+
+  .end {
+    min-height: 8rem;
+    margin: 0 1.25rem;
+  }
+}
