@@ -36,9 +36,15 @@
   height: 158svh;
 }
 
-.karate { height: 146svh; }
-.chess { height: 178svh; }
-.public-speaking { height: 224svh; }
+.karate {
+  height: 146svh;
+}
+.chess {
+  height: 178svh;
+}
+.public-speaking {
+  height: 224svh;
+}
 
 .stage {
   position: sticky;
@@ -59,7 +65,7 @@
   display: flex;
   align-items: center;
   gap: 0.8rem;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.57rem, 0.7vw, 0.72rem);
   letter-spacing: 0.16em;
   color: #8f8577;
@@ -75,7 +81,7 @@
 .verificationNote,
 .audience p {
   margin: 0;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.6rem, 0.75vw, 0.78rem);
   letter-spacing: 0.17em;
   text-transform: uppercase;
@@ -147,8 +153,12 @@
   color: #11100f;
 }
 
-.karate .meta { color: #615a51; }
-.karate .meta i { background: rgba(17, 16, 15, 0.25); }
+.karate .meta {
+  color: #615a51;
+}
+.karate .meta i {
+  background: rgba(17, 16, 15, 0.25);
+}
 
 .karateRule {
   position: absolute;
@@ -276,7 +286,7 @@
 }
 
 .ratings dt {
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.66rem, 0.8vw, 0.82rem);
   letter-spacing: 0.16em;
   color: #968b7c;
@@ -359,7 +369,7 @@
   z-index: 1;
   height: 1px;
   background: rgba(229, 218, 199, 0.55);
-  opacity: calc((1 - var(--speaking-silence, 0)) * var(--speaking-build, 0));
+  opacity: calc((1 - var(--speaking-speeches-out, 0)) * var(--speaking-build, 0));
   transform: scaleX(var(--speaking-build, 0));
 }
 
@@ -421,11 +431,23 @@
   left: auto;
 }
 
+.static .audience strong {
+  font-size: 25vw;
+}
+
 @media (orientation: portrait) {
-  .panel { height: 142svh; }
-  .karate { height: 132svh; }
-  .chess { height: 166svh; }
-  .public-speaking { height: 205svh; }
+  .panel {
+    height: 142svh;
+  }
+  .karate {
+    height: 132svh;
+  }
+  .chess {
+    height: 166svh;
+  }
+  .public-speaking {
+    height: 205svh;
+  }
 
   .inheritedRule {
     right: 1.25rem;
@@ -438,9 +460,13 @@
     left: 1.25rem;
   }
 
-  .meta span:last-child { display: none; }
+  .meta span:last-child {
+    display: none;
+  }
 
-  .tableTrajectory i { width: calc(100vw - 2.5rem); }
+  .tableTrajectory i {
+    width: calc(100vw - 2.5rem);
+  }
 
   .tableStatement {
     right: 1.25rem;
@@ -476,7 +502,13 @@
     display: block;
   }
 
-  .karateStatement h3 span:last-child { text-align: right; }
+  .karateStatement h3 span:last-child {
+    text-align: right;
+  }
+
+  .karateRule {
+    top: 52%;
+  }
 
   .karateClaim {
     display: block;
@@ -498,7 +530,9 @@
     text-align: right;
   }
 
-  .chessGrid { inset: 12vh 1.25rem 8vh; }
+  .chessGrid {
+    inset: 12vh 1.25rem 8vh;
+  }
 
   .chessStatement {
     grid-template-columns: 1fr;
@@ -546,10 +580,13 @@
   }
 
   .audience {
-    transform: translate(-50%, -47%) scale(calc(var(--speaking-scale, 0.52) * 0.4));
+    transform: translate(-50%, -47%) scale(calc(var(--speaking-scale, 0.52) * 0.5));
   }
 
-  .audience p { margin-top: 0.7rem; }
+  .audience p {
+    margin-top: 0.7rem;
+    font-size: 1.2rem;
+  }
 
   .static .panel,
   .static .karate,
@@ -563,6 +600,14 @@
     right: 1.25rem;
     bottom: 8vh;
     transform: none;
+  }
+
+  .static .audience strong {
+    font-size: 21vw;
+  }
+
+  .static .speeches h3 {
+    font-size: 13vw;
   }
 }
 

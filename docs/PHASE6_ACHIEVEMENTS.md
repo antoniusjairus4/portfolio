@@ -13,7 +13,7 @@ The final Skills axis meets a matching two-dimensional rule at the top of Achiev
 - **Table Tennis:** a small DOM ball and one rule translate scroll into a restrained rally path. `2×` and `STATE CHAMPION` resolve as the dominant mass.
 - **Karate:** `BLACK` and `BELT` approach from opposite sides, lock into alignment, and stop. One brief crimson rule marks impact; the resolved composition remains still.
 - **Chess:** a restrained grid appears while Rapid, Blitz, and Bullet ratings move into place through three discrete decisions.
-- **Public Speaking / Leadership:** `15+ SUCCESSFUL SPEECHES` establishes presence before `15,000+ AUDIENCE` expands beyond comfortable boundaries. The composition then subtracts itself into parchment silence.
+- **Public Speaking / Leadership:** `15+ SUCCESSFUL SPEECHES` establishes presence, retires, and gives `15,000+ AUDIENCE` a fully legible resolving moment before it expands toward the portrait edges. The composition then subtracts itself into parchment silence.
 
 ## Typography and rule system
 
@@ -41,11 +41,11 @@ Each discipline owns a normal document section with a local sticky stage. Its st
 
 ## Desktop and portrait composition
 
-Desktop uses edge contact, controlled crop, wide directional movement, and deliberate negative space. Portrait changes line breaks and rhythm: Table Tennis stacks its achievement, Karate separates vertically, Chess ratings stack beneath the heading, and the audience number receives a narrower controlled crop. The document never scrolls horizontally.
+Desktop uses edge contact, controlled crop, wide directional movement, and deliberate negative space. Portrait changes line breaks and rhythm: Table Tennis stacks its achievement, Karate separates vertically with the impact rule below both words, Chess ratings stack beneath the heading, and the audience number resolves in full before approaching the viewport edges. The document never scrolls horizontally.
 
 ## Reduced motion and no WebGL
 
-Reduced motion removes long scroll travel and renders four static editorial compositions with the same semantic claims. Achievements has no canvas or renderer dependency. Forced WebGL failure in earlier chapters leaves it fully operational.
+Reduced motion removes long scroll travel and renders four static editorial compositions with the same semantic claims. The audience count is sized to remain fully legible in the static desktop and portrait layouts. Achievements has no canvas or renderer dependency. Forced WebGL failure in earlier chapters leaves it fully operational.
 
 ## Accessibility
 
