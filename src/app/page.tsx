@@ -1,6 +1,6 @@
 'use client';
 
-import { DisciplinesScrollSection } from '@/components/disciplines-scroll/DisciplinesScrollSection';
+import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
 import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { NeuroShieldChapter } from '@/components/neuroshield/NeuroShieldChapter';
@@ -39,8 +39,8 @@ export default function Home() {
         <SkillsChapter />
       </ProjectExperienceProvider>
 
-      {/* Page 2 Achievements Spatial Scroll-Driven Section */}
-      <DisciplinesScrollSection />
+      {/* Phase 6: kinetic editorial achievements sequence */}
+      <AchievementsChapter />
     </main>
   );
 }

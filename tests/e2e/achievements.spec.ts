@@ -1,111 +1,129 @@
-import { test, expect } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 
-test.describe('Data-Driven Achievements Template E2E Suite', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:3000');
-
-    const skipBtn = page.getByRole('button', { name: 'Skip' });
-    if (await skipBtn.isVisible()) {
-      await skipBtn.click();
-      await page.waitForTimeout(500);
-    }
-
-    const section = page.locator('#achievements-section');
-    await section.scrollIntoViewIfNeeded();
-    await page.waitForTimeout(300);
+async function enterSite(page: Page) {
+  await page.addInitScript(() => {
+    sessionStorage.setItem('jairus_portfolio_visited', 'true');
   });
-
-  test('clicking each node opens the data-driven template with correct title and index label', async ({ page }) => {
-    const disciplines = [
-      { name: 'Speaking', index: '01 / 05' },
-      { name: 'Table Tennis', index: '02 / 05' },
-      { name: 'Karate', index: '03 / 05' },
-      { name: 'Chess', index: '04 / 05' },
-      { name: 'Music', index: '05 / 05' },
-    ];
-
-    for (const item of disciplines) {
-      const node = page.locator('h3', { hasText: item.name });
-      await expect(node).toBeVisible();
-
-      await node.click({ force: true });
-      const dialog = page.locator('div[role="dialog"]');
-      await expect(dialog).toBeVisible();
-
-      // Heading matching discipline title
-      const heading = dialog.locator('h2');
-      await expect(heading).toHaveText(item.name);
-
-      // Verify header index tracking label
-      const indexLabel = dialog.locator('text=' + item.index);
-      await expect(indexLabel).toBeVisible();
-
-      // Close modal
-      const closeBtn = dialog.getByRole('button', { name: 'Close detail view' });
-      await closeBtn.click();
-      await expect(dialog).not.toBeVisible();
-    }
+  await page.goto('/');
+  await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden({
+    timeout: 12000,
   });
+}
 
-  test('speaking discipline renders count-up stats and single line', async ({ page }) => {
-    const speakingNode = page.locator('h3', { hasText: 'Speaking' });
-    await speakingNode.click({ force: true });
+async function setPanelProgress(page: Page, discipline: string, progress: number) {
+  await page
+    .locator(`[data-achievement-discipline="${discipline}"]`)
+    .evaluate((element, nextProgress) => {
+      const bounds = element.getBoundingClientRect();
+      const top = bounds.top + window.scrollY;
+      const distance = bounds.height - window.innerHeight;
+      window.scrollTo({ top: top + distance * nextProgress, behavior: 'instant' });
+    }, progress);
+}
 
-    const dialog = page.locator('div[role="dialog"]');
-    await expect(dialog).toBeVisible();
+test('renders four semantic disciplines with conservative claims', async ({ page }) => {
+  await enterSite(page);
+  const chapter = page.locator('#achievements-section');
+  await expect(page.getByRole('heading', { level: 2, name: 'Achievements' })).toHaveCount(1);
+  for (const title of ['STATE CHAMPION', 'BLACK BELT', 'PEAK RATINGS', 'SUCCESSFUL SPEECHES']) {
+    await expect(chapter.getByRole('heading', { level: 3, name: title })).toHaveCount(1);
+  }
+  await expect(chapter).toContainText('2×');
+  await expect(chapter).toContainText('3×');
+  await expect(chapter).toContainText('1984');
+  await expect(chapter).toContainText('2010');
+  await expect(chapter).toContainText('2198');
+  await expect(chapter).toContainText('15,000+');
+  await expect(chapter).not.toContainText('4×');
+  await expect(chapter).not.toContainText(/Sivakarthikeyan|Sid Ahmed|events organised/i);
+});
 
-    // Verify stats appear
-    const statLabel1 = dialog.locator('text=people addressed');
-    await expect(statLabel1).toBeVisible();
+test('four motion languages reconstruct through forward, reverse, and direct jumps', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterSite(page);
+  for (const [discipline, progress, beat] of [
+    ['table-tennis', 0.3, 'trajectory'],
+    ['karate', 0.3, 'impact'],
+    ['chess', 0.65, 'ratings'],
+    ['public-speaking', 0.62, 'audience'],
+    ['karate', 0.72, 'stillness'],
+    ['table-tennis', 0.58, 'peak'],
+  ] as const) {
+    await setPanelProgress(page, discipline, progress);
+    await expect(page.locator(`[data-achievement-discipline="${discipline}"]`)).toHaveAttribute(
+      'data-achievement-beat',
+      beat,
+    );
+  }
+});
 
-    const statLabel2 = dialog.locator('text=events organised');
-    await expect(statLabel2).toBeVisible();
+test('Skills hands off with every WebGL renderer released', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterSite(page);
+  await setPanelProgress(page, 'table-tennis', 0.12);
+  await expect(page.locator('#achievements-section')).toHaveAttribute(
+    'data-achievements-mode',
+    'kinetic',
+  );
+  await expect(page.locator('[data-experience-renderer="shared"]')).toHaveCount(0);
+  await expect(page.locator('#achievements-section canvas')).toHaveCount(0);
+  await expect(page.locator('canvas')).toHaveCount(0);
+});
+
+test('portrait choreography has no horizontal overflow', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await enterSite(page);
+  for (const discipline of ['table-tennis', 'karate', 'chess', 'public-speaking']) {
+    await setPanelProgress(page, discipline, 0.62);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
+      390,
+    );
+  }
+});
+
+test('reduced motion presents a complete static editorial sequence', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await enterSite(page);
+  const chapter = page.locator('#achievements-section');
+  await chapter.scrollIntoViewIfNeeded();
+  await expect(chapter).toHaveAttribute('data-achievements-mode', 'static');
+  await expect(chapter.locator('[data-achievement-beat="static"]')).toHaveCount(4);
+  await expect(chapter).toContainText('15,000+');
+  await expect(chapter.locator('canvas')).toHaveCount(0);
+});
+
+test('forced WebGL failure upstream does not affect Achievements', async ({ page }) => {
+  await page.addInitScript(() => {
+    const original = HTMLCanvasElement.prototype.getContext;
+    HTMLCanvasElement.prototype.getContext = function getContext(type, ...args) {
+      if (String(type).startsWith('webgl')) return null;
+      return original.call(this, type, ...args);
+    } as typeof HTMLCanvasElement.prototype.getContext;
   });
+  await enterSite(page);
+  await setPanelProgress(page, 'chess', 0.65);
+  await expect(page.locator('[data-achievement-discipline="chess"]')).toHaveAttribute(
+    'data-achievement-beat',
+    'ratings',
+  );
+  await expect(page.locator('#achievements-section')).toContainText('2198');
+});
 
-  test('navigation arrows and progress dashes cycle photos', async ({ page }) => {
-    const speakingNode = page.locator('h3', { hasText: 'Speaking' });
-    await speakingNode.click({ force: true });
+test('the final state subtracts spectacle for the Contact boundary', async ({ page }) => {
+  await enterSite(page);
+  await setPanelProgress(page, 'public-speaking', 0.94);
+  await expect(page.locator('[data-achievement-discipline="public-speaking"]')).toHaveAttribute(
+    'data-achievement-beat',
+    'silence',
+  );
+  await expect(page.locator('[data-experience-renderer="shared"]')).toHaveCount(0);
+});
 
-    const dialog = page.locator('div[role="dialog"]');
-    await expect(dialog).toBeVisible();
-
-    const nextBtn = dialog.getByRole('button', { name: 'Next photo' });
-    if (await nextBtn.isVisible()) {
-      await nextBtn.click();
-      await page.waitForTimeout(300);
-
-      const prevBtn = dialog.getByRole('button', { name: 'Previous photo' });
-      await expect(prevBtn).toBeVisible();
-    }
-  });
-
-  test('empty photo disciplines display intentional text & stats layout', async ({ page }) => {
-    const chessNode = page.locator('h3', { hasText: 'Chess' });
-    await chessNode.click({ force: true });
-
-    const dialog = page.locator('div[role="dialog"]');
-    await expect(dialog).toBeVisible();
-
-    // Verify stats exist
-    const bulletStat = dialog.locator('text=Peak bullet');
-    await expect(bulletStat).toBeVisible();
-
-    // Verify archive emblem badge
-    const badge = dialog.locator('text=ARCHIVE RECORD');
-    await expect(badge).toBeVisible();
-  });
-
-  test('390px mobile layout has no horizontal overflow', async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    const node = page.locator('h3', { hasText: 'Speaking' });
-    await node.click({ force: true });
-
-    const dialog = page.locator('div[role="dialog"]');
-    await expect(dialog).toBeVisible();
-
-    const hasOverflow = await page.evaluate(() => {
-      return document.documentElement.scrollWidth > window.innerWidth;
-    });
-    expect(hasOverflow).toBe(false);
-  });
+test('decorative motion geometry is hidden from assistive technology', async ({ page }) => {
+  await enterSite(page);
+  const chapter = page.locator('#achievements-section');
+  await expect(chapter.locator('[aria-hidden="true"]')).toHaveCount(10);
+  await expect(chapter.getByRole('list')).toHaveCount(0);
 });
