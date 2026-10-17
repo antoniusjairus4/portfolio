@@ -1,0 +1,135 @@
+{
+  "action": "KF_Athlete_Forehand",
+  "armatures": 1,
+  "bad_weight_vertices": 0,
+  "blender": "5.0.1",
+  "body_triangles_evaluated": 19856,
+  "bones": 20,
+  "deformation_z_extents_m": {
+    "FOLLOW_THROUGH": [
+      -0.018856462091207504,
+      1.7205944061279297
+    ],
+    "IMPACT": [
+      -0.01855950430035591,
+      1.7054741382598877
+    ],
+    "LOAD": [
+      -0.017091134563088417,
+      1.699813961982727
+    ],
+    "READY": [
+      -0.017680061981081963,
+      1.7098119258880615
+    ]
+  },
+  "fps": 30,
+  "frame_range": [
+    1,
+    36
+  ],
+  "framing_with_6cm_reserve": {
+    "desktop": {
+      "IMPACT": {
+        "bounds_ndc": [
+          -0.38803,
+          0.0113,
+          -0.87548,
+          0.43251
+        ],
+        "margin_ndc": 0.12452
+      },
+      "RECOGNITION": {
+        "bounds_ndc": [
+          -0.67551,
+          -0.32403,
+          -0.66101,
+          0.38768
+        ],
+        "margin_ndc": 0.32449
+      },
+      "RELEASE": {
+        "bounds_ndc": [
+          -0.67167,
+          -0.32756,
+          -0.67276,
+          0.29184
+        ],
+        "margin_ndc": 0.32724
+      }
+    },
+    "portrait": {
+      "IMPACT": {
+        "bounds_ndc": [
+          -0.85038,
+          -0.09315,
+          -0.4791,
+          0.2176
+        ],
+        "margin_ndc": 0.14962
+      },
+      "RECOGNITION": {
+        "bounds_ndc": [
+          -0.87211,
+          -0.42024,
+          -0.23789,
+          0.15925
+        ],
+        "margin_ndc": 0.12789
+      },
+      "RELEASE": {
+        "bounds_ndc": [
+          -0.86707,
+          -0.43112,
+          -0.26566,
+          0.10993
+        ],
+        "margin_ndc": 0.13293
+      }
+    }
+  },
+  "impact_blade_center_source_m": [
+    0.685704,
+    0.289021,
+    1.287499
+  ],
+  "impact_blade_center_three_m": [
+    -1.276402,
+    1.312499,
+    0.063789
+  ],
+  "impact_contact_delta_m": 1.119147889692973e-05,
+  "materials": [
+    "KF_Cloth",
+    "KF_HairShoes",
+    "KF_InspectionFloor",
+    "KF_Skin",
+    "KF_TEMP_Paddle"
+  ],
+  "meshes": 4,
+  "objects": 15,
+  "paddle_grip_offset_m": 0.0,
+  "reverse_sample_max_delta": 0.0,
+  "review_render_directory": "/home/jairus/Antonius Jairus/Projects/Portfolio/docs/review/kf-athlete-r4",
+  "source_bounds_m": {
+    "maximum": [
+      0.576979,
+      0.466015,
+      1.710381
+    ],
+    "minimum": [
+      -0.161625,
+      -0.559649,
+      -0.01856
+    ]
+  },
+  "table_prism_collisions": {
+    "IMPACT": 0,
+    "READY": 0,
+    "RECOVERY": 0
+  },
+  "temporary_validation_glb": "/tmp/KF_Athlete_R4_validation.glb",
+  "temporary_validation_glb_bytes": 651868,
+  "triangles_excluding_floor": 20064,
+  "warnings": []
+}

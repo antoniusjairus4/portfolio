@@ -1,4 +1,4 @@
-"""Build the KF_Athlete R3 production-refinement study in Blender 5.0.1.
+"""Build the KF_Athlete R4 surgical visual-refinement study in Blender 5.0.1.
 
 Run from Blender's Scripting workspace. This script never saves or exports.
 It owns only the KF_Athlete collection tree. If that tree contains an object
@@ -144,7 +144,8 @@ class Surface:
         self.faces.append(tuple(indices))
         self.material_ids.append(material_id)
 
-    def loft(self, rings, material_id, weight_fn, sides=12):
+    def loft(self, rings, material_id, weight_fn, sides=12,
+             cap_start=True, cap_end=True):
         """Horizontal elliptical rings: (x, y, z, x_radius, y_radius)."""
         indices = []
         for ring_index, (cx, cy, z, rx, ry) in enumerate(rings):
@@ -153,12 +154,14 @@ class Surface:
                 angle = side * 2 * math.pi / sides
                 row.append(self.vertex((cx + rx * math.cos(angle), cy + ry * math.sin(angle), z), weight_fn(ring_index)))
             indices.append(row)
-        self.face(tuple(reversed(indices[0])), material_id)
+        if cap_start:
+            self.face(tuple(reversed(indices[0])), material_id)
         for lower, upper in zip(indices, indices[1:]):
             for side in range(sides):
                 next_side = (side + 1) % sides
                 self.face((lower[side], lower[next_side], upper[next_side], upper[side]), material_id)
-        self.face(indices[-1], material_id)
+        if cap_end:
+            self.face(indices[-1], material_id)
 
     def segment(self, start, end, radii, material_id, bone, sides=10,
                 cap_start=True, cap_end=True):
@@ -190,7 +193,8 @@ class Surface:
             self.face(rows[-1], material_id)
 
     def limb_chain(self, start, joint, end, profiles, material_id,
-                   proximal_bone, distal_bone, sides=12):
+                   proximal_bone, distal_bone, sides=12,
+                   cap_start=True, cap_end=True):
         """One continuous elbow/knee surface with a narrow two-bone bend zone.
 
         profiles contain (segment 0/1, position 0..1, width, depth,
@@ -223,12 +227,14 @@ class Surface:
                 point = center + side * (width * math.cos(angle)) + depth * (thickness * math.sin(angle))
                 row.append(self.vertex(point, weights))
             rows.append(row)
-        self.face(tuple(reversed(rows[0])), material_id)
+        if cap_start:
+            self.face(tuple(reversed(rows[0])), material_id)
         for first, second in zip(rows, rows[1:]):
             for index in range(sides):
                 next_index = (index + 1) % sides
                 self.face((first[index], first[next_index], second[next_index], second[index]), material_id)
-        self.face(rows[-1], material_id)
+        if cap_end:
+            self.face(rows[-1], material_id)
 
     def court_shoe(self, ankle, toe, material_id, sole_material_id, bone):
         """Low-profile indoor court shoe with a shaped upper and layered sole."""
@@ -236,14 +242,13 @@ class Surface:
         middle_y = (ankle.y + toe.y) / 2
         rings = []
         for x, half_width, lower, upper, crown_shift in (
-            (ankle.x - .050, .048, .018, .080, -.010),
-            (ankle.x - .015, .061, .016, .102, -.006),
-            (ankle.x + .035, .068, .014, .111, 0),
-            (ankle.x + .095, .071, .013, .097, .006),
-            (toe.x - .055, .075, .012, .074, .010),
-            (toe.x - .010, .072, .012, .052, .006),
-            (toe.x + .035, .058, .014, .038, 0),
-            (toe.x + .052, .034, .017, .030, 0),
+            (ankle.x - .035, .045, .020, .074, -.008),
+            (ankle.x, .055, .017, .095, -.004),
+            (ankle.x + .045, .063, .014, .104, .004),
+            (toe.x - .085, .068, .012, .087, .008),
+            (toe.x - .040, .067, .011, .064, .008),
+            (toe.x + .003, .058, .012, .044, .004),
+            (toe.x + .028, .031, .016, .028, 0),
         ):
             # Nine-point sections keep the sole planar while giving the upper
             # a readable heel counter, instep, vamp and asymmetric crown.
@@ -268,9 +273,9 @@ class Surface:
         # The sole follows the upper instead of reading as a rectangular slab.
         sole_rows = []
         for x, width in (
-            (ankle.x - .055, .052), (ankle.x + .030, .071),
-            (toe.x - .045, .078), (toe.x + .038, .061),
-            (toe.x + .058, .036),
+            (ankle.x - .040, .048), (ankle.x + .035, .064),
+            (toe.x - .075, .071), (toe.x - .020, .067),
+            (toe.x + .030, .033),
         ):
             sole_rows.append([
                 self.vertex((x, middle_y - width, z), {bone: 1.0})
@@ -360,12 +365,13 @@ def build_body(collection, root, rig, definitions, materials):
     # trapezius. Extra sections preserve chest/back and oblique transitions
     # after one controlled subdivision level.
     surface.loft([
-        (-.015, 0, .805, .112, .150),
-        (-.012, 0, .835, .133, .166),
-        (-.009, 0, .875, .149, .176),
-        (-.006, 0, .925, .154, .180),
-        (-.004, 0, .965, .151, .176),
-    ], cloth, lambda _: {"KF_pelvis": 1}, sides=20)
+        (-.015, 0, .805, .124, .155),
+        (-.012, 0, .835, .139, .168),
+        (-.009, 0, .875, .151, .177),
+        (-.006, 0, .925, .155, .181),
+        (-.004, 0, .965, .153, .179),
+    ], cloth, lambda _: {"KF_pelvis": 1}, sides=20,
+                 cap_start=False, cap_end=False)
     surface.loft([
         (-.006, 0, .961, .151, .176),
         (-.010, 0, .995, .146, .169),
@@ -395,43 +401,48 @@ def build_body(collection, root, rig, definitions, materials):
         (0, 0, 1.485, .061, .066),
     ], cloth, lambda _: {"KF_chest": 1}, sides=20)
     surface.loft([
-        (-.010, 0, .846, .151, .180),
-        (-.010, 0, .862, .154, .183),
-        (-.008, 0, .880, .150, .178),
-    ], cloth, lambda _: {"KF_pelvis": 1}, sides=20)
+        (-.006, 0, .938, .156, .183),
+        (-.005, 0, .955, .158, .185),
+        (-.004, 0, .974, .154, .180),
+    ], cloth, lambda _: {"KF_pelvis": 1}, sides=20,
+                 cap_start=False, cap_end=False)
 
     # The neck widens into the trapezius and narrows at the throat instead of
     # remaining a straight cylinder.
     surface.loft([
-        (-.010, 0, 1.430, .082, .088),
-        (-.002, 0, 1.458, .071, .074),
-        (.005, 0, 1.487, .059, .058),
-        (.010, 0, 1.520, .051, .053),
-        (.013, 0, 1.551, .052, .055),
-        (.016, 0, 1.580, .058, .060),
-    ], skin, lambda i: {"KF_neck": 1} if i < 3 else
-        {"KF_neck": .45, "KF_head": .55}, sides=16)
+        (-.020, 0, 1.420, .096, .108),
+        (-.010, 0, 1.446, .080, .087),
+        (.001, 0, 1.480, .062, .065),
+        (.008, 0, 1.518, .052, .055),
+        (.012, 0, 1.553, .053, .057),
+        (.015, 0, 1.580, .059, .063),
+    ], skin, lambda i: (
+        {"KF_chest": .55, "KF_neck": .45} if i == 0 else
+        {"KF_chest": .20, "KF_neck": .80} if i == 1 else
+        {"KF_neck": 1} if i < 4 else
+        {"KF_neck": .45, "KF_head": .55}
+    ), sides=18)
 
     # Side-profile shaping supplies the jaw, cheek, brow and cranial vault.
     # +X is the face; there is no protruding facial block or eye/mouth mesh.
     surface.loft([
-        (.033, 0, 1.568, .038, .041),
-        (.044, 0, 1.588, .055, .058),
-        (.048, 0, 1.610, .071, .074),
-        (.045, 0, 1.635, .084, .083),
-        (.034, 0, 1.662, .094, .089),
-        (.025, 0, 1.692, .100, .095),
-        (.014, 0, 1.725, .103, .101),
-        (.004, 0, 1.756, .097, .102),
-        (-.006, 0, 1.782, .079, .086),
-        (-.010, 0, 1.800, .045, .051),
+        (.035, 0, 1.568, .034, .034),
+        (.052, 0, 1.584, .041, .052),
+        (.052, 0, 1.604, .060, .070),
+        (.044, 0, 1.628, .079, .084),
+        (.032, 0, 1.655, .094, .092),
+        (.021, 0, 1.685, .102, .098),
+        (.010, 0, 1.718, .105, .102),
+        (-.001, 0, 1.750, .099, .101),
+        (-.009, 0, 1.778, .082, .088),
+        (-.012, 0, 1.798, .047, .054),
     ], skin, lambda _: {"KF_head": 1}, sides=20)
     # A single shallow nose plane remains legible at medium inspection scale.
     nose = [
-        (.105, -.025, 1.697), (.105, .025, 1.697),
-        (.126, -.021, 1.674), (.126, .021, 1.674),
-        (.143, -.014, 1.650), (.143, .014, 1.650),
-        (.121, -.020, 1.624), (.121, .020, 1.624),
+        (.111, -.021, 1.698), (.111, .021, 1.698),
+        (.128, -.018, 1.676), (.128, .018, 1.676),
+        (.145, -.011, 1.652), (.145, .011, 1.652),
+        (.122, -.017, 1.630), (.122, .017, 1.630),
     ]
     nose_ids = [surface.vertex(point, {"KF_head": 1}) for point in nose]
     for face in ((0, 2, 3, 1), (2, 4, 5, 3), (4, 6, 7, 5),
@@ -440,13 +451,13 @@ def build_body(collection, root, rig, definitions, materials):
     # Small ear forms and a shallow brow wedge make the anonymous head feel
     # intentionally human from front, side and three-quarter views.
     for sign in (-1, 1):
-        surface.ellipsoid((.012, sign * .095, 1.677),
-                          (.022, .013, .034), skin,
+        surface.ellipsoid((.006, sign * .096, 1.678),
+                          (.020, .012, .032), skin,
                           {"KF_head": 1}, steps=6, sides=10)
     brow = [
-        (.112, -.060, 1.704), (.112, .060, 1.704),
-        (.119, -.052, 1.688), (.119, .052, 1.688),
-        (.101, -.055, 1.680), (.101, .055, 1.680),
+        (.108, -.057, 1.705), (.108, .057, 1.705),
+        (.122, -.050, 1.691), (.122, .050, 1.691),
+        (.108, -.053, 1.681), (.108, .053, 1.681),
     ]
     brow_ids = [surface.vertex(point, {"KF_head": 1}) for point in brow]
     for face in ((0, 1, 3, 2), (2, 3, 5, 4), (0, 2, 4), (1, 5, 3)):
@@ -462,22 +473,23 @@ def build_body(collection, root, rig, definitions, materials):
             angle = 2 * math.pi * index / hair_sides
             front = max(0, math.cos(angle))
             back = max(0, -math.cos(angle))
+            clump = .004 * math.sin(angle * 5 + .6) + .003 * math.sin(angle * 3 - .4)
             if row == 0:
-                z = 1.704 + .054 * front + .012 * math.sin(angle * 3)
-                rx = .091 + .018 * back + (.012 if index in (1, 2) else 0)
-                ry = .098 + .009 * back
+                z = 1.714 + .034 * front - .010 * back + .008 * math.sin(angle * 3 + .3)
+                rx = .094 + .012 * back + .005 * math.sin(angle * 4)
+                ry = .099 + .006 * back + clump
             elif row == 1:
-                z = 1.768 + .006 * (index % 4)
-                rx, ry = .092 + .010 * back + .003 * front, .100 + .007 * back
+                z = 1.756 + .007 * math.sin(angle * 4 + .5)
+                rx, ry = .096 + .008 * back + clump, .101 + .006 * back
             elif row == 2:
-                z = 1.790 + .008 * (index % 5)
-                rx, ry = .086 + .004 * math.sin(angle * 2), .090
+                z = 1.784 + .008 * math.sin(angle * 5)
+                rx, ry = .087 + .005 * math.sin(angle * 3), .091 + clump
             elif row == 3:
-                z = 1.812 + .006 * (index % 4)
-                rx, ry = .061, .066
+                z = 1.809 + .006 * math.sin(angle * 4 + .8)
+                rx, ry = .062 + clump, .067
             else:
-                z = 1.830 + .004 * (index % 3)
-                rx, ry = .020, .026
+                z = 1.827 + .004 * math.sin(angle * 3)
+                rx, ry = .025, .031
             ids.append(surface.vertex((-.013 + rx * math.cos(angle) + .008 * front,
                                        ry * math.sin(angle), z), {"KF_head": 1}))
         hair_rows.append(ids)
@@ -504,49 +516,69 @@ def build_body(collection, root, rig, definitions, materials):
         toe = lookup["foot_" + side][1]
         # Sleeve root is buried in the ribcage; the external contour flows
         # out of the trapezius rather than forming a spherical toy shoulder.
-        sleeve_start = clavicle_start.lerp(shoulder, .34)
-        sleeve_end = shoulder.lerp(elbow, .245)
+        sleeve_start = clavicle_start.lerp(shoulder, .12)
+        sleeve_end = shoulder.lerp(elbow, .30)
         surface.segment(sleeve_start, sleeve_end, [
-            (0, .052, .058), (.18, .066, .070),
-            (.42, .076, .076), (.68, .074, .071),
-            (.88, .068, .064), (1, .064, .060),
-        ], cloth, lambda t: ({"KF_chest": 1 - t,
-                              bone("upperArm"): t}), sides=14,
-                        cap_end=False)
+            (0, .048, .055), (.14, .057, .064),
+            (.32, .066, .071), (.52, .071, .073),
+            (.72, .068, .068), (.88, .062, .061),
+            (1, .057, .055),
+        ], cloth, lambda t: ({
+            "KF_chest": (1 - t) * .55,
+            bone("clavicle"): (1 - t) * .45,
+            bone("upperArm"): t,
+        }), sides=16)
         surface.limb_chain(shoulder, elbow, wrist, [
-            (0, 0, .066, .068, 1), (0, .16, .074, .072, 1),
-            (0, .34, .078, .074, 1), (0, .58, .070, .066, 1),
+            (0, 0, .057, .059, 1), (0, .12, .065, .066, 1),
+            (0, .28, .073, .070, 1), (0, .48, .075, .070, 1),
+            (0, .63, .069, .065, 1),
             (0, .76, .061, .058, 1), (0, .89, .054, .052, .84),
             (0, 1, .049, .048, .52), (1, .10, .051, .049, .25),
             (1, .24, .058, .055, .04), (1, .40, .062, .057, 0),
             (1, .62, .054, .050, 0), (1, .80, .044, .041, 0),
             (1, 1, .033, .031, 0),
-        ], skin, bone("upperArm"), bone("forearm"), sides=14)
-        palm_end = hand_end + (hand_end - wrist).normalized() * .040
-        surface.segment(wrist, palm_end, [
-            (0, .035, .031), (.18, .040, .033),
-            (.42, .050, .036), (.66, .050, .034),
-            (.84, .044, .030), (1, .029, .024),
-        ], skin, bone("hand"), sides=12)
+        ], skin, bone("upperArm"), bone("forearm"), sides=16,
+                           cap_start=False, cap_end=False)
+        hand_direction = (hand_end - wrist).normalized()
+        palm_end = hand_end + hand_direction * .030
+        surface.segment(wrist - hand_direction * .022, palm_end, [
+            (0, .032, .029), (.18, .036, .030),
+            (.42, .044, .032), (.66, .046, .031),
+            (.84, .041, .027), (1, .032, .022),
+        ], skin, bone("hand"), sides=14,
+                        cap_start=False)
         palm_mid = wrist.lerp(hand_end, .50)
         if side == "R":
-            # Playing hand: one grouped finger mass wraps the handle and a
-            # separate thumb creates a readable grip without a finger rig.
-            direction = (hand_end - wrist).normalized()
-            # Three compact grouped fingers cross the handle near the socket.
-            # Small offsets prevent the single mitten/lobe silhouette of R2.
-            for offset, lift in ((-.020, -.013), (0, -.007), (.020, -.001)):
-                start = hand_end - direction * .025 + Vector((0, offset, lift))
-                end = hand_end + direction * .018 + Vector((.004, offset, lift - .005))
-                surface.segment(start, end, [
-                    (0, .014, .013), (.55, .017, .015), (1, .012, .011),
-                ], skin, bone("hand"), sides=8)
-            surface.segment(palm_mid + Vector((.004, -.016, .012)),
-                            hand_end + Vector((.010, -.022, .018)), [
-                                (0, .021, .018), (.55, .018, .016),
-                                (1, .012, .011),
+            across = hand_direction.cross(Vector((0, 0, 1)))
+            if across.length < .05:
+                across = hand_direction.cross(Vector((0, 1, 0)))
+            across.normalize()
+            depth = hand_direction.cross(across).normalized()
+            # Three short grouped digits cross the handle axis at successive
+            # positions. Their overlap reads as a wrap, not parallel tubes.
+            for along, depth_offset in ((-.006, -.004), (.016, 0), (.037, .004)):
+                center = hand_end + hand_direction * along + depth * depth_offset
+                surface.segment(center + across * .031 + depth * .008,
+                                center - across * .024 - depth * .007, [
+                                    (0, .010, .009), (.48, .012, .010),
+                                    (1, .008, .007),
+                                ], skin, bone("hand"), sides=8)
+            # The thumb crosses diagonally from the palm toward the first
+            # finger band and remains visibly separate at Impact.
+            surface.segment(palm_mid + across * .020 + depth * .012,
+                            hand_end + hand_direction * .010 - across * .018 + depth * .006, [
+                                (0, .015, .013), (.55, .014, .012),
+                                (1, .009, .008),
                             ], skin, bone("hand"), sides=8)
         else:
+            # A single tapered grouped-finger continuation closes the simpler
+            # non-playing hand without reintroducing the R3 mitten lobe.
+            surface.segment(palm_end - hand_direction * .010,
+                            palm_end + hand_direction * .055, [
+                                (0, .026, .019), (.48, .025, .018),
+                                (1, .013, .010),
+                            ], skin, bone("hand"), sides=10,
+                            cap_start=False)
             surface.segment(palm_mid + Vector((0, .012, .008)),
                             palm_mid + Vector((.041, .019, .017)), [
                                 (0, .015, .013), (.55, .014, .012),
@@ -599,7 +631,7 @@ def build_body(collection, root, rig, definitions, materials):
     subdivision.render_levels = 1
     subdivision.show_only_control_edges = True
     body["kf_source_height_m"] = SOURCE_HEIGHT_M
-    body["kf_revision"] = 3
+    body["kf_revision"] = 4
     return body
 
 
@@ -625,25 +657,30 @@ def socket_and_paddle(socket_collection, reference_collection, rig):
     verts = []
     faces = []
     ids = []
+    blade_sides = 24
     for depth in (-.009, .009):
-        for i in range(16):
-            a = i * 2 * math.pi / 16
-            verts.append((.0775 * math.cos(a), .160 + .0825 * math.sin(a), depth))
-    faces.append(tuple(reversed(range(16))))
+        for i in range(blade_sides):
+            a = i * 2 * math.pi / blade_sides
+            height = math.sin(a)
+            lower_taper = .87 + .13 * ((height + 1) * .5)
+            verts.append((.0775 * lower_taper * math.cos(a),
+                          .160 + .0825 * height, depth))
+    faces.append(tuple(reversed(range(blade_sides))))
     ids.append(0)
-    faces.append(tuple(range(16, 32)))
+    faces.append(tuple(range(blade_sides, blade_sides * 2)))
     ids.append(0)
-    for i in range(16):
-        n = (i + 1) % 16
-        faces.append((i, n, 16 + n, 16 + i))
+    for i in range(blade_sides):
+        n = (i + 1) % blade_sides
+        faces.append((i, n, blade_sides + n, blade_sides + i))
         ids.append(0)
     blade_mat = material("KF_TEMP_Paddle", (.25, .23, .21), .75)
     blade = make_mesh("KF_TEMP_PaddleBlade", verts, faces, ids, [blade_mat], reference_collection)
     blade.parent = holder
     handle_surface = Surface()
-    handle_surface.segment((0, -.006, 0), (0, .100, 0), [
-        (0, .021, .016), (.82, .018, .014), (1, .016, .013),
-    ], 0, "placeholder", sides=8)
+    handle_surface.segment((0, -.008, 0), (0, .102, 0), [
+        (0, .020, .015), (.18, .021, .016), (.55, .019, .015),
+        (.84, .017, .013), (1, .015, .012),
+    ], 0, "placeholder", sides=12)
     handle = make_mesh("KF_TEMP_PaddleHandle", handle_surface.vertices,
                        handle_surface.faces, handle_surface.material_ids,
                        [blade_mat], reference_collection)
@@ -905,7 +942,7 @@ def staging_framing(body, blade):
     return result
 
 
-def render_review_set(output_directory, rig, socket):
+def render_review_set(output_directory, rig, socket, only=None):
     output_directory.mkdir(parents=True, exist_ok=True)
     scene = bpy.context.scene
     camera = bpy.data.objects["KF_InspectionCamera"]
@@ -915,19 +952,16 @@ def render_review_set(output_directory, rig, socket):
     scene.render.film_transparent = False
 
     shots = [
-        ("ready-front-neutral", "READY", (3.8, 0, 1.55), (.08, 0, .93), 2.12, False),
         ("ready-three-quarter-neutral", "READY", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, False),
-        ("ready-side-neutral", "READY", (0, -4.2, 1.48), (.08, 0, .93), 2.12, False),
         ("impact-three-quarter-neutral", "IMPACT", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, False),
         ("impact-near-front-neutral", "IMPACT", (3.8, -1.25, 1.72), (.18, 0, 1.00), 2.20, False),
         ("impact-side-neutral", "IMPACT", (0, -4.2, 1.48), (.15, 0, .96), 2.12, False),
-        ("follow-through-three-quarter-neutral", "FOLLOW_THROUGH", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, False),
-        ("head-close-neutral", "READY", (1.8, -1.35, 1.82), (.02, 0, 1.69), .52, False),
-        ("playing-hand-grip-close-neutral", "IMPACT", None, None, .48, False),
+        ("head-neck-close-neutral", "READY", (1.8, -1.35, 1.75), (.01, 0, 1.62), .70, False),
+        ("playing-hand-grip-close-neutral", "IMPACT", None, None, .40, False),
+        ("shoulder-arm-impact-close-neutral", "IMPACT", None, None, 1.02, False),
+        ("hip-shorts-close-neutral", "IMPACT", None, None, .82, False),
         ("shoe-close-neutral", "READY", (1.7, -2.4, .56), (.18, .05, .095), .64, False),
-        ("ready-three-quarter-silhouette", "READY", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, True),
         ("impact-three-quarter-silhouette", "IMPACT", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, True),
-        ("follow-through-three-quarter-silhouette", "FOLLOW_THROUGH", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.20, True),
     ]
     body = bpy.data.objects["KF_AthleteBody_L0"]
     paddle_parts = [bpy.data.objects[name] for name in
@@ -936,10 +970,20 @@ def render_review_set(output_directory, rig, socket):
                  for obj in [body, *paddle_parts]]
     silhouette = material("KF_SilhouetteReview", (.008, .008, .008), 1.0)
     for filename, pose, location, target, scale, use_silhouette in shots:
+        if only and filename not in only:
+            continue
         scene.frame_set(POSE_FRAMES[pose])
         if filename == "playing-hand-grip-close-neutral":
             target_vector = socket.matrix_world.translation + Vector((.065, 0, .015))
-            location_vector = target_vector + Vector((1.10, -1.35, .62))
+            location_vector = target_vector + Vector((1.10, -1.35, .42))
+        elif filename == "shoulder-arm-impact-close-neutral":
+            upper_arm = rig.pose.bones["KF_upperArm_R"]
+            target_vector = rig.matrix_world @ upper_arm.head.lerp(upper_arm.tail, .34)
+            location_vector = target_vector + Vector((1.35, 1.50, .50))
+        elif filename == "hip-shorts-close-neutral":
+            pelvis = rig.pose.bones["KF_pelvis"]
+            target_vector = rig.matrix_world @ pelvis.head.lerp(pelvis.tail, .36)
+            location_vector = target_vector + Vector((1.70, -2.00, .55))
         else:
             target_vector = Vector(target)
             location_vector = Vector(location)
@@ -1117,7 +1161,7 @@ def validate(root, body, rig, socket):
     if any(collision_samples.values()):
         warnings.append("Refined athlete enters the locked table prism")
 
-    print("\n=== KF_ATHLETE R3 VALIDATION ===")
+    print("\n=== KF_ATHLETE R4 VALIDATION ===")
     print("Blender:", bpy.app.version_string)
     print("Objects:", ", ".join(sorted(obj.name for obj in objects)))
     print("Meshes:", len(meshes), "Armatures:", len(armatures),
@@ -1148,7 +1192,7 @@ def validate(root, body, rig, socket):
         print("WARNING:", warning)
     print("No .blend or production asset was saved.\n")
     if warnings:
-        raise RuntimeError("KF_Athlete R3 validation found issues; see console.")
+        raise RuntimeError("KF_Athlete R4 validation found issues; see console.")
     return {
         "blender": bpy.app.version_string,
         "objects": len(objects),
@@ -1179,8 +1223,10 @@ def validate(root, body, rig, socket):
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description="Build and validate KF_Athlete R3")
+    parser = argparse.ArgumentParser(description="Build and validate KF_Athlete R4")
     parser.add_argument("--render-dir", type=Path)
+    parser.add_argument("--render-only", type=str,
+                        help="Comma-separated review-render names")
     parser.add_argument("--validation-glb", type=Path)
     parser.add_argument("--report", type=Path)
     arguments = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
@@ -1230,7 +1276,9 @@ def main():
     add_inspection(inspection)
     report = validate(root_collection, body, rig, socket)
     if args.render_dir:
-        render_review_set(args.render_dir.resolve(), rig, socket)
+        render_only = ({name.strip() for name in args.render_only.split(",")}
+                       if args.render_only else None)
+        render_review_set(args.render_dir.resolve(), rig, socket, render_only)
         report["review_render_directory"] = str(args.render_dir.resolve())
     if args.validation_glb:
         args.validation_glb.parent.mkdir(parents=True, exist_ok=True)
