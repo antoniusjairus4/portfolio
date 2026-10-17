@@ -1,0 +1,228 @@
+{
+  "action": "KF_Athlete_Forehand",
+  "base_file": "/home/jairus/Downloads/human-base-meshes/human-base-meshes-bundle-v1.4.1/human_base_meshes_bundle.blend",
+  "base_mesh": {
+    "native_height_m": 1.6899610231630504,
+    "normalization_scale": 1.0651133223362708,
+    "object": "GEO-body_male_realistic",
+    "source_triangles": 21160,
+    "source_vertices": 10582
+  },
+  "base_sha256": "3c121505651140ceb4d69fd1d8923f7788ffadd81672f5be14845a5f2c75c137",
+  "blender": "5.0.1",
+  "bones": 20,
+  "declared_source_height_m": 1.8,
+  "deformation_validation": {
+    "FOLLOW_THROUGH": {
+      "finite": true,
+      "maximum_m": [
+        0.4469589591026306,
+        0.3749058246612549,
+        1.7260674238204956
+      ],
+      "minimum_m": [
+        -0.35018229484558105,
+        -0.703332781791687,
+        -0.03400213643908501
+      ]
+    },
+    "IMPACT": {
+      "finite": true,
+      "maximum_m": [
+        0.5870218873023987,
+        0.4008113443851471,
+        1.7108627557754517
+      ],
+      "minimum_m": [
+        -0.3582814335823059,
+        -0.6785071492195129,
+        -0.04869404435157776
+      ]
+    },
+    "LOAD": {
+      "finite": true,
+      "maximum_m": [
+        0.5012165904045105,
+        0.6474704146385193,
+        1.70490300655365
+      ],
+      "minimum_m": [
+        -0.3527652323246002,
+        -0.5149582624435425,
+        -0.05338653549551964
+      ]
+    },
+    "READY": {
+      "finite": true,
+      "maximum_m": [
+        0.5856835842132568,
+        0.4953785836696625,
+        1.715100884437561
+      ],
+      "minimum_m": [
+        -0.3692159056663513,
+        -0.6049247980117798,
+        -0.04290604591369629
+      ]
+    }
+  },
+  "fps": 30,
+  "frame_range": [
+    1,
+    36
+  ],
+  "framing_with_6cm_reserve": {
+    "desktop": {
+      "IMPACT": {
+        "bounds_ndc": [
+          -0.45921,
+          0.0113,
+          -0.85164,
+          0.43638
+        ],
+        "margin_ndc": 0.14836
+      },
+      "RECOGNITION": {
+        "bounds_ndc": [
+          -0.71251,
+          -0.32403,
+          -0.63913,
+          0.39109
+        ],
+        "margin_ndc": 0.28749
+      },
+      "RELEASE": {
+        "bounds_ndc": [
+          -0.68618,
+          -0.32756,
+          -0.64197,
+          0.29636
+        ],
+        "margin_ndc": 0.31382
+      }
+    },
+    "portrait": {
+      "IMPACT": {
+        "bounds_ndc": [
+          -0.98633,
+          -0.09315,
+          -0.46906,
+          0.22007
+        ],
+        "margin_ndc": 0.01367
+      },
+      "RECOGNITION": {
+        "bounds_ndc": [
+          -0.94761,
+          -0.42024,
+          -0.23258,
+          0.16073
+        ],
+        "margin_ndc": 0.05239
+      },
+      "RELEASE": {
+        "bounds_ndc": [
+          -0.93762,
+          -0.43112,
+          -0.25945,
+          0.11143
+        ],
+        "margin_ndc": 0.06238
+      }
+    }
+  },
+  "grip_surface_distance_m": 0.0016077750296784757,
+  "impact_blade_center_source_m": [
+    0.6857039332389832,
+    0.28902116417884827,
+    1.2874985933303833
+  ],
+  "impact_blade_center_three_m": [
+    -1.2764023542404175,
+    1.3124985694885254,
+    0.06378915905952454
+  ],
+  "impact_contact_delta_m": 1.119147889692973e-05,
+  "locked_staging": {
+    "root_three_m": [
+      -1.9500000476837158,
+      0.02500000037252903,
+      0.3799999952316284
+    ],
+    "scale": 1.0,
+    "yaw_rad": 0.04
+  },
+  "measured_raw_body_height_m": 1.8000000715255737,
+  "pose_markers": {
+    "ACCELERATION": 13,
+    "FOLLOW_THROUGH": 25,
+    "IMPACT": 18,
+    "LOAD": 7,
+    "READY": 1,
+    "RECOVERY": 36
+  },
+  "production_scale": 1.0,
+  "reverse_sample_max_delta": 0.0,
+  "review_render_directory": "docs/review/kf-athlete-base-mesh",
+  "source_bounds_ready_m": {
+    "maximum": [
+      0.5856835842132568,
+      0.4953785836696625,
+      1.680108666419983
+    ],
+    "minimum": [
+      -0.15570510923862457,
+      -0.6049247980117798,
+      -0.003608390688896179
+    ]
+  },
+  "table_prism_collisions": {
+    "IMPACT": 0,
+    "READY": 0,
+    "RECOVERY": 0
+  },
+  "temporary_validation_glb": "/tmp/KF_Athlete_BaseMesh_validation.glb",
+  "temporary_validation_glb_bytes": 810144,
+  "temporary_validation_glb_inspection": {
+    "animations": [
+      {
+        "channels": 57,
+        "name": "KF_Athlete_Forehand",
+        "samplers": 57
+      }
+    ],
+    "bytes": 810144,
+    "extensions_required": [],
+    "external_buffer_uris": [],
+    "images": 0,
+    "magic": "glTF",
+    "materials": [
+      "KF_Skin",
+      "KF_TEMP_Paddle",
+      "KF_Cloth",
+      "KF_HairShoes",
+      "KF_EyeNeutral"
+    ],
+    "meshes": 9,
+    "nodes": 32,
+    "scenes": 1,
+    "skin_joints": [
+      19
+    ],
+    "skins": 1,
+    "textures": 0,
+    "version": 2
+  },
+  "visible_triangle_counts": {
+    "KF_AthleteBody_L0": 21160,
+    "KF_AthleticShorts_L0": 560,
+    "KF_CompetitionShirt_L0": 2580,
+    "KF_CourtShoes_L0": 752,
+    "KF_Eye_L": 1088,
+    "KF_Eye_R": 1088,
+    "KF_SculpturalHair_L0": 284
+  },
+  "visible_triangles_total": 27512,
+  "warnings": [],
+  "working_blend": "/home/jairus/Antonius Jairus/Projects/Portfolio/assets-source/kaiforge/KF_Athlete.blend"
+}

@@ -12,6 +12,7 @@ import hashlib
 import importlib.util
 import json
 import math
+import struct
 import sys
 from pathlib import Path
 
@@ -157,6 +158,13 @@ def copy_weighted_shell(name, body, collection, material, predicate,
     vertices = [tuple(source_mesh.vertices[index].co) for index in used]
     faces = [tuple(remap[index] for index in face) for face in accepted]
     shell = make_mesh(name, vertices, faces, material, collection)
+    # A normal-offset shell stays visibly separate from the skin without the
+    # non-manifold rim artifacts that Solidify can produce on extracted body
+    # patches. Garment thickness is deferred until an artist-authored export
+    # copy; this review source prioritizes clean deformation and silhouette.
+    for vertex in shell.data.vertices:
+        vertex.co += vertex.normal * thickness * offset
+    shell.data.update()
     group_map = {}
     for source_group in body.vertex_groups:
         group_map[source_group.index] = shell.vertex_groups.new(name=source_group.name)
@@ -166,11 +174,6 @@ def copy_weighted_shell(name, body, collection, material, predicate,
     shell.parent = rig_for(body)
     armature = shell.modifiers.new("KF_ArmatureDeform", "ARMATURE")
     armature.object = rig_for(body)
-    solidify = shell.modifiers.new("KF_GarmentThickness", "SOLIDIFY")
-    solidify.thickness = thickness
-    solidify.offset = offset
-    solidify.use_even_offset = True
-    solidify.use_quality_normals = True
     return shell
 
 
@@ -195,14 +198,53 @@ def add_eyes(meshes, geo, material, rig):
     return eyes
 
 
-def add_shoes(collection, rig, definitions, material):
-    lookup = {short: (Vector(head), Vector(tail))
-              for short, head, tail, _, _ in definitions}
+def align_playing_hand_to_socket(body, rig, socket):
+    """Move the anatomical palm onto the locked socket without moving contact."""
+    scene = bpy.context.scene
+    scene.frame_set(r4.POSE_FRAMES["IMPACT"])
+    group_index = body.vertex_groups["KF_hand_R"].index
+    candidates = [
+        vertex.index for vertex in body.data.vertices
+        if any(assignment.group == group_index and assignment.weight > .25
+               for assignment in vertex.groups)
+    ]
+    if not candidates:
+        raise RuntimeError("No anatomical playing-hand vertices were weighted")
+    desired = socket.matrix_world.translation
+    pose_bone = rig.pose.bones["KF_hand_R"]
+    deform = pose_bone.matrix @ pose_bone.bone.matrix_local.inverted()
+    for _ in range(4):
+        evaluated = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
+        mesh = evaluated.to_mesh()
+        points = [evaluated.matrix_world @ mesh.vertices[index].co
+                  for index in candidates]
+        evaluated.to_mesh_clear()
+        palm_center = sum(points, Vector()) / len(points)
+        rest_delta = deform.to_3x3().inverted() @ (desired - palm_center)
+        for vertex in body.data.vertices:
+            weight = next((assignment.weight for assignment in vertex.groups
+                           if assignment.group == group_index), 0.0)
+            if weight:
+                vertex.co += rest_delta * weight
+        body.data.update()
+        bpy.context.view_layer.update()
+    scene.frame_set(r4.POSE_FRAMES["IMPACT"])
+
+
+def add_court_shoes(collection, rig, material):
     surface = r4.Surface()
-    for side in ("R", "L"):
-        ankle = lookup["shin_" + side][1]
-        toe = lookup["foot_" + side][1]
-        surface.court_shoe(ankle, toe, 0, 0, "KF_foot_" + side)
+    for side, sign in (("R", 1), ("L", -1)):
+        bone = "KF_foot_" + side
+        center_y = sign * .220
+        surface.segment((-.158, center_y, .058), (.135, center_y, .052), [
+            (0, .052, .050), (.10, .068, .061), (.28, .076, .070),
+            (.52, .079, .069), (.72, .077, .059), (.88, .067, .045),
+            (1, .034, .025),
+        ], 0, bone, sides=16)
+        surface.segment((-.150, center_y, .018), (.140, center_y, .017), [
+            (0, .056, .012), (.12, .073, .013), (.50, .083, .014),
+            (.82, .076, .012), (1, .038, .010),
+        ], 0, bone, sides=16)
     shoes = r4.make_mesh(
         "KF_CourtShoes_L0", surface.vertices, surface.faces,
         surface.material_ids, [material], collection,
@@ -221,13 +263,37 @@ def add_shoes(collection, rig, definitions, material):
     return shoes
 
 
-def prepare_visible_meshes(body, geo, materials, rig, definitions, source_meshes):
+def add_sculptural_hair(collection, rig, material):
+    surface = r4.Surface()
+    surface.loft([
+        (-.025, 0, 1.655, .100, .096),
+        (-.022, 0, 1.685, .110, .104),
+        (-.018, .003, 1.725, .112, .108),
+        (-.012, .006, 1.765, .101, .102),
+        (-.008, .008, 1.802, .077, .080),
+        (-.004, .010, 1.829, .038, .043),
+    ], 0, lambda _: {"KF_head": 1.0}, sides=24)
+    hair = r4.make_mesh(
+        "KF_SculpturalHair_L0", surface.vertices, surface.faces,
+        surface.material_ids, [material], collection,
+    )
+    group = hair.vertex_groups.new(name="KF_head")
+    group.add(list(range(len(hair.data.vertices))), 1.0, "REPLACE")
+    hair.parent = rig
+    modifier = hair.modifiers.new("KF_ArmatureDeform", "ARMATURE")
+    modifier.object = rig
+    return hair
+
+
+def prepare_visible_meshes(body, geo, materials, rig, source_meshes):
     skin, cloth, hair_shoes, eye_material = materials
 
     def shirt(points):
         def inside(point):
-            torso = .945 <= point.z <= 1.475 and abs(point.y) <= .255
-            sleeves = 1.205 <= point.z <= 1.465 and abs(point.y) <= .365
+            neck_radius = math.hypot(point.x + .018, point.y)
+            torso = (.945 <= point.z <= 1.505 and abs(point.y) <= .265
+                     and (point.z <= 1.385 or neck_radius >= .105))
+            sleeves = 1.185 <= point.z <= 1.475 and abs(point.y) <= .380
             return torso or sleeves
         return all(inside(point) for point in points)
 
@@ -235,23 +301,15 @@ def prepare_visible_meshes(body, geo, materials, rig, definitions, source_meshes
         return all(.705 <= point.z <= 1.005 and abs(point.y) <= .215
                    for point in points)
 
-    def hair(points):
-        def inside(point):
-            return (point.z >= 1.62 and
-                    (point.x <= .035 or point.z >= 1.705 or abs(point.y) >= .062))
-        return all(inside(point) for point in points)
-
     shirt_obj = copy_weighted_shell(
         "KF_CompetitionShirt_L0", body, geo, cloth, shirt, .0085,
     )
     shorts_obj = copy_weighted_shell(
         "KF_AthleticShorts_L0", body, geo, cloth, shorts, .010,
     )
-    hair_obj = copy_weighted_shell(
-        "KF_SculpturalHair_L0", body, geo, hair_shoes, hair, .015,
-    )
+    hair_obj = add_sculptural_hair(geo, rig, hair_shoes)
+    shoes = add_court_shoes(geo, rig, hair_shoes)
     eyes = add_eyes(source_meshes, geo, eye_material, rig)
-    shoes = add_shoes(geo, rig, definitions, hair_shoes)
     return [body, shirt_obj, shorts_obj, hair_obj, shoes, *eyes]
 
 
@@ -344,6 +402,10 @@ def validate(source_info, visible, body, rig, socket):
         warnings.append(f"Expected 20 bones, found {len(rig.data.bones)}")
     if any(abs(value - 1) > 1e-6 for value in body.scale):
         warnings.append("Production body scale is not 1.0")
+    raw_height = (max(vertex.co.z for vertex in body.data.vertices) -
+                  min(vertex.co.z for vertex in body.data.vertices))
+    if abs(raw_height - SOURCE_HEIGHT_M) > 1e-4:
+        warnings.append("Normalized source body is not 1.80 m")
     for obj in visible:
         if obj.type != "MESH":
             continue
@@ -381,6 +443,43 @@ def validate(source_info, visible, body, rig, socket):
     if contact_delta > .03:
         warnings.append("Impact contact missed locked target")
 
+    hand_group = body.vertex_groups["KF_hand_R"].index
+    evaluated_body = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    body_mesh = evaluated_body.to_mesh()
+    hand_points = [
+        evaluated_body.matrix_world @ body_mesh.vertices[vertex.index].co
+        for vertex in body.data.vertices
+        if any(assignment.group == hand_group and assignment.weight > .15
+               for assignment in vertex.groups)
+    ]
+    handle = bpy.data.objects["KF_TEMP_PaddleHandle"]
+    evaluated_handle = handle.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    handle_mesh = evaluated_handle.to_mesh()
+    handle_points = [evaluated_handle.matrix_world @ vertex.co
+                     for vertex in handle_mesh.vertices]
+    grip_surface_distance = min((hand - point).length
+                                for hand in hand_points
+                                for point in handle_points)
+    evaluated_body.to_mesh_clear()
+    evaluated_handle.to_mesh_clear()
+    if grip_surface_distance > .02:
+        warnings.append("Playing hand does not enclose the temporary handle")
+
+    deformation = {}
+    for pose_name in ("READY", "LOAD", "IMPACT", "FOLLOW_THROUGH"):
+        scene.frame_set(r4.POSE_FRAMES[pose_name])
+        points = visible_vertices(visible)
+        finite = all(all(math.isfinite(axis) for axis in point) for point in points)
+        deformation[pose_name] = {
+            "finite": finite,
+            "minimum_m": [min(point[axis] for point in points)
+                          for axis in range(3)],
+            "maximum_m": [max(point[axis] for point in points)
+                          for axis in range(3)],
+        }
+        if not finite:
+            warnings.append(pose_name + ": nonfinite deformation")
+
     collisions = {}
     for pose_name in ("READY", "IMPACT", "RECOVERY"):
         scene.frame_set(r4.POSE_FRAMES[pose_name])
@@ -408,7 +507,13 @@ def validate(source_info, visible, body, rig, socket):
         "blender": bpy.app.version_string,
         "base_mesh": source_info,
         "declared_source_height_m": SOURCE_HEIGHT_M,
+        "measured_raw_body_height_m": raw_height,
         "production_scale": 1.0,
+        "locked_staging": {
+            "scale": r4.STAGING_SCALE,
+            "root_three_m": list(r4.STAGING_ROOT_THREE),
+            "yaw_rad": r4.STAGING_YAW_RAD,
+        },
         "source_bounds_ready_m": source_bounds,
         "visible_triangle_counts": counts,
         "visible_triangles_total": total_triangles,
@@ -421,6 +526,8 @@ def validate(source_info, visible, body, rig, socket):
         "impact_blade_center_source_m": list(source_contact),
         "impact_blade_center_three_m": list(staged_contact),
         "impact_contact_delta_m": contact_delta,
+        "grip_surface_distance_m": grip_surface_distance,
+        "deformation_validation": deformation,
         "table_prism_collisions": collisions,
         "framing_with_6cm_reserve": framing,
         "warnings": warnings,
@@ -430,7 +537,7 @@ def validate(source_info, visible, body, rig, socket):
     return report
 
 
-def render_review_set(output_directory, visible, rig, socket):
+def render_review_set(output_directory, visible, rig, socket, only=None):
     output_directory.mkdir(parents=True, exist_ok=True)
     scene = bpy.context.scene
     camera = bpy.data.objects["KF_InspectionCamera"]
@@ -457,6 +564,8 @@ def render_review_set(output_directory, visible, rig, socket):
     originals = [[slot.material for slot in obj.material_slots] for obj in rendered]
     silhouette = r4.material("KF_SilhouetteReview", (.006, .006, .006), 1.0)
     for filename, pose, location, target, scale, use_silhouette in shots:
+        if only and filename not in only:
+            continue
         scene.frame_set(r4.POSE_FRAMES[pose])
         if filename == "playing-hand-grip-close-neutral":
             target_vector = socket.matrix_world.translation + Vector((.06, 0, .015))
@@ -490,11 +599,19 @@ def render_review_set(output_directory, visible, rig, socket):
     scene.frame_set(r4.POSE_FRAMES["IMPACT"])
 
 
-def export_validation_glb(path, export_collection):
+def export_validation_glb(path, root_collection):
     bpy.ops.object.select_all(action="DESELECT")
+    export_collection = bpy.data.collections["KF_EXPORT"]
     objects = [obj for collection in r4.owned_collections(export_collection)
                for obj in collection.objects
                if obj.type in {"MESH", "ARMATURE", "EMPTY"}]
+    objects.extend(
+        bpy.data.objects[name] for name in (
+            "KF_TEMP_PaddleBlockout_Only",
+            "KF_TEMP_PaddleBlade",
+            "KF_TEMP_PaddleHandle",
+        )
+    )
     for obj in objects:
         obj.select_set(True)
     bpy.context.view_layer.objects.active = next(
@@ -507,6 +624,40 @@ def export_validation_glb(path, export_collection):
         export_skins=True, export_def_bones=True, export_apply=True,
         export_draco_mesh_compression_enable=False,
     )
+
+
+def inspect_glb(path):
+    payload = path.read_bytes()
+    magic, version, total_bytes = struct.unpack_from("<4sII", payload, 0)
+    json_length, _ = struct.unpack_from("<II", payload, 12)
+    document = json.loads(payload[20:20 + json_length].decode().rstrip(" \x00"))
+    return {
+        "magic": magic.decode(),
+        "version": version,
+        "bytes": total_bytes,
+        "scenes": len(document.get("scenes", [])),
+        "nodes": len(document.get("nodes", [])),
+        "meshes": len(document.get("meshes", [])),
+        "skins": len(document.get("skins", [])),
+        "skin_joints": [len(skin.get("joints", []))
+                        for skin in document.get("skins", [])],
+        "animations": [
+            {
+                "name": animation.get("name"),
+                "channels": len(animation.get("channels", [])),
+                "samplers": len(animation.get("samplers", [])),
+            }
+            for animation in document.get("animations", [])
+        ],
+        "materials": [material.get("name")
+                      for material in document.get("materials", [])],
+        "images": len(document.get("images", [])),
+        "textures": len(document.get("textures", [])),
+        "external_buffer_uris": [buffer.get("uri")
+                                 for buffer in document.get("buffers", [])
+                                 if buffer.get("uri")],
+        "extensions_required": document.get("extensionsRequired", []),
+    }
 
 
 def build(args):
@@ -545,13 +696,14 @@ def build(args):
     body_vertices, body_faces = source_meshes[BASE_BODY_NAME]
     body = make_mesh("KF_AthleteBody_L0", body_vertices, body_faces, skin, geo)
     add_armature_weights(body, rig)
+    socket = r4.socket_and_paddle(sockets, reference, rig)
+    r4.make_action(rig)
+    align_playing_hand_to_socket(body, rig, socket)
     visible = prepare_visible_meshes(
         body, geo, [skin, cloth, hair_shoes, eye_material],
-        rig, definitions, source_meshes,
+        rig, source_meshes,
     )
-    socket = r4.socket_and_paddle(sockets, reference, rig)
     r4.add_reference_markers(reference)
-    r4.make_action(rig)
     r4.add_inspection(inspection)
     report = validate(source_info, visible, body, rig, socket)
     report["base_file"] = str(args.base_file)
@@ -564,13 +716,16 @@ def build(args):
         raise RuntimeError("Downloaded source changed during migration")
 
     if args.render_dir:
-        render_review_set(args.render_dir, visible, rig, socket)
+        render_only = ({name.strip() for name in args.render_only.split(",")}
+                       if args.render_only else None)
+        render_review_set(args.render_dir, visible, rig, socket, render_only)
         report["review_render_directory"] = str(args.render_dir)
     if args.validation_glb:
         args.validation_glb.parent.mkdir(parents=True, exist_ok=True)
-        export_validation_glb(args.validation_glb, export)
+        export_validation_glb(args.validation_glb, root_collection)
         report["temporary_validation_glb"] = str(args.validation_glb)
         report["temporary_validation_glb_bytes"] = args.validation_glb.stat().st_size
+        report["temporary_validation_glb_inspection"] = inspect_glb(args.validation_glb)
     if args.report:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
@@ -582,6 +737,7 @@ def parse_arguments():
     parser.add_argument("--base-file", type=Path, default=DEFAULT_BASE_FILE)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--render-dir", type=Path)
+    parser.add_argument("--render-only", type=str)
     parser.add_argument("--validation-glb", type=Path)
     parser.add_argument("--report", type=Path)
     values = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
