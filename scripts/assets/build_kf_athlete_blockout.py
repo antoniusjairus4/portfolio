@@ -558,17 +558,17 @@ def build_body(collection, root, rig, definitions, materials):
             # positions. Their overlap reads as a wrap, not parallel tubes.
             for along, depth_offset in ((-.006, -.004), (.016, 0), (.037, .004)):
                 center = hand_end + hand_direction * along + depth * depth_offset
-                surface.segment(center + across * .031 + depth * .008,
-                                center - across * .024 - depth * .007, [
-                                    (0, .010, .009), (.48, .012, .010),
-                                    (1, .008, .007),
+                surface.segment(center + across * .036 + depth * .008,
+                                center - across * .040 - depth * .007, [
+                                    (0, .011, .010), (.48, .013, .011),
+                                    (1, .009, .008),
                                 ], skin, bone("hand"), sides=8)
             # The thumb crosses diagonally from the palm toward the first
             # finger band and remains visibly separate at Impact.
             surface.segment(palm_mid + across * .020 + depth * .012,
                             hand_end + hand_direction * .010 - across * .018 + depth * .006, [
-                                (0, .015, .013), (.55, .014, .012),
-                                (1, .009, .008),
+                                (0, .018, .015), (.55, .016, .014),
+                                (1, .010, .009),
                             ], skin, bone("hand"), sides=8)
         else:
             # A single tapered grouped-finger continuation closes the simpler
