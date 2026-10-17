@@ -50,7 +50,10 @@ Unit tests use an in-memory driver to prove the complete transition through GPU-
 - Production Biome: passed with the same 13 accepted warnings in existing CSS/collapse files; zero new warnings.
 - Lifecycle unit proof: 8 passed.
 - Focused lifecycle browser proof: 4 passed in installed Chrome.
-- Full unit, active journey browser regression, production build and final desktop/mobile visual sanity: recorded after the final validation run for this phase.
+- Full unit suite: 13 files, 41 tests passed.
+- Full active browser regression: 73 tests passed in installed Chrome, including the complete journey, reverse traversal, rapid/direct jumps, reduced motion, no-WebGL, Back to Top, Contact zero-canvas and horizontal-overflow coverage.
+- Production build: passed with Next.js 16.3.7 using the repository's webpack build path; TypeScript compilation and all three static pages completed.
+- Final visual sanity: passed at 1440×900 and 390×844. The locked first-frame portrait composition remains unchanged on desktop and portrait; the infrastructure adds no visible production output.
 
 ## Remaining first-GLB work
 
