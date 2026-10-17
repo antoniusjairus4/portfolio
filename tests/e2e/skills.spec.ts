@@ -125,7 +125,7 @@ test('reduced motion shows all categories as static editorial content', async ({
 test('no-WebGL fallback remains complete and never revives the old terminal', async ({ page }) => {
   await page.addInitScript(() => {
     const original = HTMLCanvasElement.prototype.getContext;
-    HTMLCanvasElement.prototype.getContext = function getContext(type, ...args) {
+    HTMLCanvasElement.prototype.getContext = function getContext(this: any, type, ...args) {
       if (String(type).startsWith('webgl')) return null;
       return original.call(this, type, ...args);
     } as typeof HTMLCanvasElement.prototype.getContext;
