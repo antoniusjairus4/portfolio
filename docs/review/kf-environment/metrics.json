@@ -1,0 +1,59 @@
+{
+  "samples": [
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "recognition",
+      "metrics": "{\"calls\":21,\"visibleTriangles\":1372,\"shadowCasters\":6,\"materials\":5,\"dpr\":1,\"triangles\":2260,\"geometries\":15,\"textures\":3,\"progress\":0.07989417989417989,\"camera\":[-0.3616673380959935,2.403555376507735,5.510666129523205]}"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "approach",
+      "metrics": "{\"calls\":21,\"visibleTriangles\":1372,\"shadowCasters\":6,\"materials\":5,\"dpr\":1,\"triangles\":2260,\"geometries\":15,\"textures\":3,\"progress\":0.2798941798941799,\"camera\":[-1.505921432726203,2.0921047563650625,4.6]}"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "impact",
+      "metrics": "{\"calls\":22,\"visibleTriangles\":1384,\"shadowCasters\":6,\"materials\":6,\"dpr\":1,\"triangles\":2272,\"geometries\":16,\"textures\":3,\"progress\":0.455026455026455,\"camera\":[-1.637183653917508,1.9170884614433226,4.6]}"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "understanding",
+      "metrics": "{\"calls\":25,\"visibleTriangles\":3356,\"shadowCasters\":6,\"materials\":7,\"dpr\":1,\"triangles\":4244,\"geometries\":17,\"textures\":3,\"progress\":0.6701058201058201,\"camera\":[0.8922762782522811,2.5071107530154704,4.675888844126934]}"
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "release",
+      "metrics": "{\"calls\":23,\"visibleTriangles\":2396,\"shadowCasters\":6,\"materials\":7,\"dpr\":1,\"triangles\":3284,\"geometries\":17,\"textures\":3,\"progress\":0.91005291005291,\"camera\":[0.501832292566035,3.1581229469600456,5.334324080406216]}"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "recognition",
+      "metrics": "{\"calls\":17,\"visibleTriangles\":1386,\"shadowCasters\":6,\"materials\":6,\"dpr\":1,\"triangles\":1386,\"geometries\":17,\"textures\":1,\"progress\":0.07989167230873392,\"camera\":[-0.32548293774907744,3.658901527593276,11.463276568651086]}"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "impact",
+      "metrics": "{\"calls\":18,\"visibleTriangles\":1398,\"shadowCasters\":6,\"materials\":7,\"dpr\":1,\"triangles\":1398,\"geometries\":18,\"textures\":1,\"progress\":0.4549763033175355,\"camera\":[-1.532876007924691,2.4428099801882723,6.919867944527163]}"
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "release",
+      "metrics": "{\"calls\":19,\"visibleTriangles\":2410,\"shadowCasters\":6,\"materials\":8,\"dpr\":1,\"triangles\":2410,\"geometries\":19,\"textures\":1,\"progress\":0.909952606635071,\"camera\":[0.32532510617759514,4.063399922779931,11.764874662162198]}"
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "name": "impact",
+      "metrics": "{\"calls\":22,\"visibleTriangles\":1384,\"shadowCasters\":6,\"materials\":6,\"dpr\":1,\"triangles\":2272,\"geometries\":17,\"textures\":3,\"progress\":0.455026455026455,\"camera\":[-1.637183653917508,1.9170884614433226,4.6]}"
+    }
+  ],
+  "errors": []
+}

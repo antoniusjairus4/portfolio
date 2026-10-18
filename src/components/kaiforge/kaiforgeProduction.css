@@ -1,0 +1,173 @@
+/* Only KaiForge: legibility over the new physical parchment architecture. */
+.kaiforge-chapter .kaiforge-sticky {
+  background: none;
+}
+
+.kaiforge-chapter .kaiforge-sticky::after {
+  /* Keep the footer legible, without darkening the physical world. */
+  background: linear-gradient(0deg, rgba(25, 27, 25, 0.85), transparent 22%);
+}
+
+.kaiforge-chapter .kaiforge-semantic-header {
+  top: 7vh;
+}
+
+.kaiforge-chapter .kaiforge-semantic-header h2 {
+  font-size: clamp(5rem, 8.5vw, 10rem);
+}
+
+.kaiforge-chapter .kaiforge-semantic-header > p,
+.kaiforge-chapter .kaiforge-beat > span,
+.kaiforge-chapter .kaiforge-beat small {
+  width: fit-content;
+  padding: 0.25em 0.5em;
+  color: #e9dfce;
+  background: #242522;
+}
+
+.kaiforge-chapter .kaiforge-semantic-header > p:nth-of-type(2) {
+  margin-top: 1rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
+}
+
+.kaiforge-chapter .beat-understanding strong {
+  font-size: clamp(3.5rem, 5vw, 6rem);
+}
+
+.kaiforge-chapter .beat-recognition > span,
+.kaiforge-chapter .beat-approach > span,
+.kaiforge-chapter .beat-release > span {
+  margin-left: auto;
+}
+
+.kaiforge-chapter .beat-impact > span {
+  margin-inline: auto;
+}
+
+.kaiforge-chapter .kaiforge-beat strong {
+  text-shadow: 0 1px 2px rgba(25, 27, 25, 0.3);
+}
+
+/* An architectural static composition, never a frozen or simulated WebGL claim. */
+.kaiforge-chapter .kaiforge-fallback {
+  background: #242522;
+}
+
+.kaiforge-chapter .kaiforge-fallback::before {
+  position: absolute;
+  content: "";
+  inset: 40% -12% 15%;
+  background: #e9dfce;
+  transform: skewY(-8deg);
+}
+
+.kaiforge-chapter .kaiforge-fallback::after {
+  position: absolute;
+  content: "";
+  right: 8%;
+  top: 8%;
+  width: 12%;
+  height: 36%;
+  background: #c5bbaa;
+}
+
+.kaiforge-chapter .kaiforge-fallback-stage,
+.kaiforge-chapter .kaiforge-fallback-copy {
+  z-index: 1;
+}
+
+.kaiforge-chapter .kaiforge-fallback-ball {
+  background: #242522;
+  box-shadow: none;
+}
+
+.kaiforge-chapter .kaiforge-fallback-trace {
+  border-color: #746f62;
+}
+
+@media (orientation: portrait) {
+  .kaiforge-chapter .kaiforge-semantic-header {
+    top: 8svh;
+  }
+
+  .kaiforge-chapter .kaiforge-semantic-header h2 {
+    font-size: clamp(3rem, 16.5vw, 7rem);
+  }
+
+  .kaiforge-chapter .beat-understanding strong {
+    font-size: clamp(2.35rem, 12vw, 4.6rem);
+  }
+
+  .kaiforge-chapter .beat-impact > span {
+    margin-inline: 0;
+  }
+}
+
+/* Opaque editorial type furniture keeps contrast stable as physical planes pass. */
+.kaiforge-chapter .kaiforge-semantic-header h2 {
+  width: fit-content;
+  padding: 0.03em 0.06em 0.1em;
+  background: #242522;
+}
+
+.kaiforge-chapter .kaiforge-beat strong {
+  display: table;
+  padding: 0.08em 0.12em;
+  color: #242522;
+  background: #e9dfce;
+  text-shadow: none;
+  font-size: clamp(2.8rem, 4.5vw, 5.5rem);
+}
+
+.kaiforge-chapter .beat-recognition strong,
+.kaiforge-chapter .beat-approach strong,
+.kaiforge-chapter .beat-release strong {
+  margin-left: auto;
+}
+
+.kaiforge-chapter .beat-impact strong {
+  margin-inline: auto;
+}
+
+.kaiforge-chapter .beat-understanding {
+  top: 7vh;
+}
+
+@media (orientation: landscape) {
+  .kaiforge-chapter .kaiforge-semantic-header {
+    top: 4vh;
+  }
+}
+
+@media (orientation: portrait) {
+  .kaiforge-chapter .kaiforge-beat strong {
+    font-size: clamp(2rem, 10vw, 4rem);
+  }
+
+  .kaiforge-chapter .beat-impact strong {
+    margin-inline: 0;
+  }
+
+  .kaiforge-chapter .beat-understanding {
+    top: 10svh;
+  }
+}
+
+.kaiforge-chapter .kaiforge-fallback-copy {
+  padding: 0.6rem;
+  background: #242522;
+}
+
+.kaiforge-chapter .kaiforge-fallback-copy > p,
+.kaiforge-chapter .kaiforge-fallback-copy > span {
+  color: #e9dfce;
+}
+
+.kaiforge-chapter .kaiforge-fallback-ball {
+  background: #e9dfce;
+  border: 1px solid #242522;
+}
+
+.kaiforge-chapter .kaiforge-fallback-stage {
+  top: 57%;
+}

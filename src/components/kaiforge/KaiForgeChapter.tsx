@@ -1,5 +1,7 @@
 'use client';
 
+import './kaiforgeProduction.css';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { KaiForgeFallback } from '@/components/kaiforge/KaiForgeFallback';
 import { getBeatOpacity, getKaiForgeBeat } from '@/components/kaiforge/kaiforgeChoreography';
@@ -42,7 +44,7 @@ export function KaiForgeChapter() {
             activity,
             enabled: rendererActive,
             portrait: portraitComposition,
-            dprCap,
+            dprCap: Math.min(dprCap, portraitComposition ? 1.25 : 1.75),
           }
         : null,
     [activity, controller, dprCap, portraitComposition, rendererActive],
