@@ -1,0 +1,328 @@
+{
+  "paddle_triangles": 1288,
+  "athlete_triangles": 26592,
+  "complete_assembly_triangles": 27880,
+  "floor": {
+    "clearance_m": 0.002058645710349083,
+    "frame": 11.5,
+    "object": "KF_CourtShoes_L0",
+    "vertex": 655,
+    "table_prism_collision_samples": 0,
+    "table_collision_frames": []
+  },
+  "full_path_framing": {
+    "desktop": {
+      "min_margin_ndc": 0.13244,
+      "progress": 0.26,
+      "frame": 10.1,
+      "bounds_ndc": [
+        -0.62785,
+        -0.31348,
+        -0.86756,
+        0.44659
+      ]
+    },
+    "portrait": {
+      "min_margin_ndc": 0.07678,
+      "progress": 0.72,
+      "frame": 26.2,
+      "bounds_ndc": [
+        -0.92322,
+        -0.37628,
+        -0.2977,
+        0.17963
+      ]
+    }
+  },
+  "technical": {
+    "source_body_height_m": 1.8000000715255737,
+    "body_scale": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "rig_bones": 20,
+    "action": "KF_Athlete_Forehand",
+    "frame_range": [
+      1,
+      36
+    ],
+    "fps": 30,
+    "pose_markers": {
+      "KF_READY": 1,
+      "KF_LOAD": 7,
+      "KF_ACCELERATION": 13,
+      "KF_IMPACT": 18,
+      "KF_FOLLOW_THROUGH": 25,
+      "KF_RECOVERY": 36
+    },
+    "reverse_max_bone_matrix_delta": 0.0,
+    "impact_blade_center_three_m": [
+      -1.2764023542404175,
+      1.3124985694885254,
+      0.06378915905952454
+    ],
+    "impact_contact_error_m": 1.119147889692973e-05,
+    "playing_fingertip_to_handle_vertex_m": {
+      "index": 0.00714083500937895,
+      "middle": 0.0009999813770154662,
+      "ring": 0.0025787664928174792,
+      "little": 0.0054452289992612864,
+      "thumb": 0.00878609609918515
+    },
+    "staging_root_three_m": [
+      -1.9500000476837158,
+      0.02500000037252903,
+      0.3799999952316284
+    ],
+    "staging_yaw_rad": 0.04,
+    "staging_scale": 1.0,
+    "failures": []
+  },
+  "grip_validation": {
+    "frames_checked": 36,
+    "nearest_surface_m": {
+      "index": {
+        "closest_m": 1.189112663269043e-05,
+        "worst_nearest_m": 0.00042859703535214067,
+        "worst_median_m": 0.008638656698167324
+      },
+      "middle": {
+        "closest_m": 8.9361346908845e-06,
+        "worst_nearest_m": 9.233372111339122e-06,
+        "worst_median_m": 0.006575294304639101
+      },
+      "ring": {
+        "closest_m": 4.405047548061702e-06,
+        "worst_nearest_m": 0.0002431520406389609,
+        "worst_median_m": 0.004979937337338924
+      },
+      "little": {
+        "closest_m": 2.5832530354819028e-06,
+        "worst_nearest_m": 0.0004965817206539214,
+        "worst_median_m": 0.004603418055921793
+      },
+      "thumb": {
+        "closest_m": 5.961192073300481e-07,
+        "worst_nearest_m": 0.003788638161495328,
+        "worst_median_m": 0.015952730551362038
+      },
+      "palm": {
+        "closest_m": 5.2332711675262544e-06,
+        "worst_nearest_m": 0.048427730798721313,
+        "worst_median_m": 0.05560121685266495
+      }
+    },
+    "six_pose_nearest_m": {
+      "1": {
+        "index": {
+          "closest_m": 1.2e-05,
+          "median_m": 0.008201
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.006434
+        },
+        "ring": {
+          "closest_m": 4e-06,
+          "median_m": 0.004319
+        },
+        "little": {
+          "closest_m": 0.000168,
+          "median_m": 0.004587
+        },
+        "thumb": {
+          "closest_m": 0.000405,
+          "median_m": 0.00418
+        },
+        "palm": {
+          "closest_m": 6.7e-05,
+          "median_m": 0.009218
+        }
+      },
+      "7": {
+        "index": {
+          "closest_m": 6.2e-05,
+          "median_m": 0.004166
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.00523
+        },
+        "ring": {
+          "closest_m": 5.4e-05,
+          "median_m": 0.004552
+        },
+        "little": {
+          "closest_m": 4.7e-05,
+          "median_m": 0.002531
+        },
+        "thumb": {
+          "closest_m": 0.003337,
+          "median_m": 0.012232
+        }
+      },
+      "13": {
+        "index": {
+          "closest_m": 4.7e-05,
+          "median_m": 0.008639
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.006452
+        },
+        "ring": {
+          "closest_m": 0.000124,
+          "median_m": 0.004978
+        },
+        "little": {
+          "closest_m": 0.000497,
+          "median_m": 0.004572
+        },
+        "thumb": {
+          "closest_m": 0.000156,
+          "median_m": 0.004139
+        },
+        "palm": {
+          "closest_m": 6e-06,
+          "median_m": 0.010274
+        }
+      },
+      "18": {
+        "index": {
+          "closest_m": 0.000259,
+          "median_m": 0.007719
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.005881
+        },
+        "ring": {
+          "closest_m": 0.000178,
+          "median_m": 0.00498
+        },
+        "little": {
+          "closest_m": 0.000387,
+          "median_m": 0.003795
+        },
+        "thumb": {
+          "closest_m": 0.000423,
+          "median_m": 0.004492
+        },
+        "palm": {
+          "closest_m": 0.000313,
+          "median_m": 0.009688
+        }
+      },
+      "25": {
+        "index": {
+          "closest_m": 2e-05,
+          "median_m": 0.003883
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.005116
+        },
+        "ring": {
+          "closest_m": 8.2e-05,
+          "median_m": 0.003977
+        },
+        "little": {
+          "closest_m": 2.5e-05,
+          "median_m": 0.002991
+        },
+        "thumb": {
+          "closest_m": 0.000159,
+          "median_m": 0.007066
+        },
+        "palm": {
+          "closest_m": 0.011193,
+          "median_m": 0.029944
+        }
+      },
+      "36": {
+        "index": {
+          "closest_m": 2.5e-05,
+          "median_m": 0.008282
+        },
+        "middle": {
+          "closest_m": 9e-06,
+          "median_m": 0.006416
+        },
+        "ring": {
+          "closest_m": 5e-06,
+          "median_m": 0.004357
+        },
+        "little": {
+          "closest_m": 0.000155,
+          "median_m": 0.004587
+        },
+        "thumb": {
+          "closest_m": 0.000411,
+          "median_m": 0.004327
+        },
+        "palm": {
+          "closest_m": 0.000259,
+          "median_m": 0.00928
+        }
+      }
+    },
+    "max_body_handle_triangle_pairs": 253,
+    "max_body_blade_triangle_pairs": 45,
+    "max_handle_vertices_deeper_than_3mm": 66,
+    "max_deep_handle_vertices_by_region": {
+      "index": 11,
+      "middle": 29,
+      "ring": 29,
+      "little": 23,
+      "thumb": 11,
+      "palm": 26
+    },
+    "max_paddle_to_hand_matrix_delta": 2.942979335784912e-07,
+    "surface_pair_counts_include_intended_contact": true
+  },
+  "covered_foot_vertices_tucked": 2264,
+  "playing_hand_grip_deformation": {
+    "vertices": 499,
+    "max_shift_m": 0.01919763065650478
+  },
+  "source_blend": "/home/jairus/Antonius Jairus/Projects/Portfolio/assets-source/kaiforge/KF_Athlete.blend",
+  "assembled_blend": "/home/jairus/Antonius Jairus/Projects/Portfolio/assets-source/kaiforge/KF_Athlete_Assembly.blend",
+  "paddle_blend": "/home/jairus/Antonius Jairus/Projects/Portfolio/assets-source/kaiforge/KF_Paddle.blend",
+  "validation_glb": "/tmp/KF_Athlete_Assembly_validation.glb",
+  "glb": {
+    "magic": "glTF",
+    "version": 2,
+    "bytes": 811992,
+    "scenes": 1,
+    "nodes": 29,
+    "meshes": 7,
+    "skins": 1,
+    "skin_joints": [
+      19
+    ],
+    "animations": [
+      {
+        "name": "KF_Athlete_Forehand",
+        "channels": 57,
+        "samplers": 57
+      }
+    ],
+    "materials": [
+      "KF_Skin",
+      "KF_Rubber",
+      "KF_Wood",
+      "KF_Cloth",
+      "KF_HairShoes"
+    ],
+    "images": 0,
+    "textures": 0,
+    "external_buffer_uris": [],
+    "extensions_required": []
+  },
+  "glb_reimport": {
+    "objects": 11,
+    "meshes": 8,
+    "armatures": 1
+  }
+}
