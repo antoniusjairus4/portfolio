@@ -9,6 +9,7 @@ the repository's documented authoring path and is never integrated at runtime.
 
 import argparse
 import hashlib
+import heapq
 import importlib.util
 import json
 import math
@@ -146,7 +147,7 @@ def prune_weights(obj):
 
 
 def copy_weighted_shell(name, body, collection, material, predicate,
-                        thickness, offset=1.0):
+                        thickness):
     source_mesh = body.data
     accepted = []
     for polygon in source_mesh.polygons:
@@ -155,20 +156,50 @@ def copy_weighted_shell(name, body, collection, material, predicate,
             accepted.append(tuple(polygon.vertices))
     used = sorted({index for face in accepted for index in face})
     remap = {old: new for new, old in enumerate(used)}
-    vertices = [tuple(source_mesh.vertices[index].co) for index in used]
+    edge_counts = {}
+    for face in accepted:
+        for first, second in zip(face, (*face[1:], face[0])):
+            edge = tuple(sorted((first, second)))
+            edge_counts[edge] = edge_counts.get(edge, 0) + 1
+    boundary_edges = [edge for edge, count in edge_counts.items() if count == 1]
+    boundary_vertices = {index for edge in boundary_edges for index in edge}
+    boundary_neighbors = {index: [] for index in boundary_vertices}
+    for first, second in boundary_edges:
+        boundary_neighbors[first].append(second)
+        boundary_neighbors[second].append(first)
+    outer = {
+        index: source_mesh.vertices[index].co.copy() +
+        source_mesh.vertices[index].normal * thickness
+        for index in used
+    }
+    for _ in range(5):
+        smoothed = {index: point.copy() for index, point in outer.items()}
+        for index, neighbors in boundary_neighbors.items():
+            if len(neighbors) != 2:
+                continue
+            average = (outer[neighbors[0]] + outer[neighbors[1]]) * .5
+            smoothed[index] = outer[index].lerp(average, .42)
+        outer = smoothed
+    vertices = []
+    for index in used:
+        vertices.append(tuple(outer[index]))
     faces = [tuple(remap[index] for index in face) for face in accepted]
+    inner = {}
+    for index in sorted(boundary_vertices):
+        source = source_mesh.vertices[index]
+        point = outer[index] - source.normal * (thickness - .001)
+        inner[index] = len(vertices)
+        vertices.append(tuple(point))
+    for first, second in boundary_edges:
+        faces.append((remap[first], remap[second], inner[second], inner[first]))
     shell = make_mesh(name, vertices, faces, material, collection)
-    # A normal-offset shell stays visibly separate from the skin without the
-    # non-manifold rim artifacts that Solidify can produce on extracted body
-    # patches. Garment thickness is deferred until an artist-authored export
-    # copy; this review source prioritizes clean deformation and silhouette.
-    for vertex in shell.data.vertices:
-        vertex.co += vertex.normal * thickness * offset
-    shell.data.update()
     group_map = {}
     for source_group in body.vertex_groups:
         group_map[source_group.index] = shell.vertex_groups.new(name=source_group.name)
     for new_index, old_index in enumerate(used):
+        for assignment in source_mesh.vertices[old_index].groups:
+            group_map[assignment.group].add([new_index], assignment.weight, "REPLACE")
+    for old_index, new_index in inner.items():
         for assignment in source_mesh.vertices[old_index].groups:
             group_map[assignment.group].add([new_index], assignment.weight, "REPLACE")
     shell.parent = rig_for(body)
@@ -198,7 +229,7 @@ def add_eyes(meshes, geo, material, rig):
     return eyes
 
 
-def align_playing_hand_to_socket(body, rig, socket):
+def align_playing_hand_to_socket(body, rig, socket, handle=None):
     """Move the anatomical palm onto the locked socket without moving contact."""
     scene = bpy.context.scene
     scene.frame_set(r4.POSE_FRAMES["IMPACT"])
@@ -210,7 +241,8 @@ def align_playing_hand_to_socket(body, rig, socket):
     ]
     if not candidates:
         raise RuntimeError("No anatomical playing-hand vertices were weighted")
-    desired = socket.matrix_world.translation
+    desired = (handle.matrix_world @ Vector((0, .028, 0))
+               if handle else socket.matrix_world.translation)
     pose_bone = rig.pose.bones["KF_hand_R"]
     deform = pose_bone.matrix @ pose_bone.bone.matrix_local.inverted()
     for _ in range(4):
@@ -231,20 +263,244 @@ def align_playing_hand_to_socket(body, rig, socket):
     scene.frame_set(r4.POSE_FRAMES["IMPACT"])
 
 
+def hand_candidates(body, group_name):
+    group_index = body.vertex_groups[group_name].index
+    return {
+        vertex.index
+        for vertex in body.data.vertices
+        if any(assignment.group == group_index and assignment.weight > .25
+               for assignment in vertex.groups)
+    }
+
+
+def hand_graph(body, candidates):
+    graph = {index: [] for index in candidates}
+    for edge in body.data.edges:
+        first, second = edge.vertices
+        if first in candidates and second in candidates:
+            length = (body.data.vertices[first].co -
+                      body.data.vertices[second].co).length
+            graph[first].append((second, length))
+            graph[second].append((first, length))
+    return graph
+
+
+def geodesic_distances(graph, source):
+    distances = {index: float("inf") for index in graph}
+    distances[source] = 0.0
+    queue = [(0.0, source)]
+    while queue:
+        distance, index = heapq.heappop(queue)
+        if distance != distances[index]:
+            continue
+        for neighbor, length in graph[index]:
+            candidate = distance + length
+            if candidate < distances[neighbor]:
+                distances[neighbor] = candidate
+                heapq.heappush(queue, (candidate, neighbor))
+    return distances
+
+
+PLAYING_FINGERS = {
+    # Stable vertex tips in Blender Human Base Meshes v1.4.1 realistic male.
+    # The source topology remains untouched; only these anatomical branches
+    # receive a controlled grip corrective.
+    "index": (9871, .115, (-.010, .118, .012)),
+    "middle": (9888, .115, (-.010, .064, .013)),
+    "ring": (9682, .100, (0, .034, .014)),
+    "little": (9901, .090, (.008, .008, .013)),
+    "thumb": (9909, .095, (.012, .076, -.010)),
+}
+
+
+def sculpt_playing_hand_grip(body, rig, handle):
+    """Pose the existing anatomical fingers into a restrained shakehand grip."""
+    scene = bpy.context.scene
+    scene.frame_set(r4.POSE_FRAMES["IMPACT"])
+    candidates = hand_candidates(body, "KF_hand_R")
+    graph = hand_graph(body, candidates)
+    if any(tip not in candidates for tip, _, _ in PLAYING_FINGERS.values()):
+        raise RuntimeError("Playing-hand topology no longer matches the locked base mesh")
+    distances = {
+        name: geodesic_distances(graph, tip)
+        for name, (tip, _, _) in PLAYING_FINGERS.items()
+    }
+    assignments = {}
+    for index in candidates:
+        name = min(PLAYING_FINGERS, key=lambda item: distances[item][index])
+        tip, reach, target = PLAYING_FINGERS[name]
+        distance = distances[name][index]
+        if distance >= reach:
+            continue
+        influence = 1.0 - distance / reach
+        influence = influence * influence * (3.0 - 2.0 * influence)
+        assignments[index] = (name, influence)
+
+    group_index = body.vertex_groups["KF_hand_R"].index
+    hand_group = body.vertex_groups["KF_hand_R"]
+    for index, (_, influence) in assignments.items():
+        weights = {
+            assignment.group: assignment.weight
+            for assignment in body.data.vertices[index].groups
+        }
+        old_hand = weights.get(group_index, 0.0)
+        new_hand = old_hand + (1.0 - old_hand) * influence
+        remaining_old = max(1e-8, 1.0 - old_hand)
+        remaining_new = 1.0 - new_hand
+        for candidate_group, old_weight in weights.items():
+            group = body.vertex_groups[candidate_group]
+            if candidate_group == group_index:
+                group.add([index], new_hand, "REPLACE")
+            else:
+                group.add(
+                    [index], old_weight / remaining_old * remaining_new,
+                    "REPLACE",
+                )
+    body.data.update()
+    bpy.context.view_layer.update()
+
+    evaluated = body.evaluated_get(bpy.context.evaluated_depsgraph_get())
+    mesh = evaluated.to_mesh()
+    inverse_handle = handle.matrix_world.inverted()
+    current_local = {
+        index: inverse_handle @ (evaluated.matrix_world @ mesh.vertices[index].co)
+        for index in assignments
+    }
+    evaluated.to_mesh_clear()
+    corrections = {}
+    labels = {}
+    for index, (name, influence) in assignments.items():
+        tip, _, target = PLAYING_FINGERS[name]
+        delta = Vector(target) - current_local[tip]
+        desired = current_local[index] + delta * influence
+        # A small mid-arc keeps the curled digits rounded around the handle
+        # instead of translating them as straight, rigid branches.
+        if name in {"middle", "ring", "little"}:
+            desired.x -= math.sin(math.pi * influence) * .006
+            desired.z += math.sin(math.pi * influence) * .005
+        current_world = handle.matrix_world @ current_local[index]
+        target_world = handle.matrix_world @ desired
+        corrections[index] = target_world - current_world
+        labels[index] = name
+
+    pose_bone = rig.pose.bones["KF_hand_R"]
+    deform = pose_bone.matrix @ pose_bone.bone.matrix_local.inverted()
+    inverse_deform = deform.to_3x3().inverted()
+    for index, world_delta in corrections.items():
+        correction = inverse_deform @ world_delta
+        if correction.length > .125:
+            correction.normalize()
+            correction *= .125
+        body.data.vertices[index].co += correction
+    body.data.update()
+    bpy.context.view_layer.update()
+    body["kf_playing_hand_corrective"] = "shakehand_existing_anatomy"
+    body["kf_playing_hand_digit_vertices"] = len(corrections)
+    scene.frame_set(r4.POSE_FRAMES["IMPACT"])
+    return labels
+
+
+def relax_non_playing_hand(body, rig):
+    """Reduce the base mesh finger splay without adding a second hand rig."""
+    right = hand_candidates(body, "KF_hand_R")
+    left = hand_candidates(body, "KF_hand_L")
+    right_tips = [value[0] for value in PLAYING_FINGERS.values()]
+    left_tips = []
+    for tip in right_tips:
+        mirrored = body.data.vertices[tip].co.copy()
+        mirrored.y *= -1
+        left_tips.append(min(left, key=lambda index: (
+            body.data.vertices[index].co - mirrored
+        ).length))
+    graph = hand_graph(body, left)
+    distances = [geodesic_distances(graph, tip) for tip in left_tips]
+    palm = rig.data.bones["KF_hand_L"].tail_local.copy()
+    relatives = [body.data.vertices[tip].co - palm for tip in left_tips]
+    center_direction = sum(
+        (relative.normalized() for relative in relatives[:4]), Vector()
+    ).normalized()
+    tip_targets = []
+    for branch, relative in enumerate(relatives):
+        if branch == 4:
+            direction = relative.normalized().lerp(center_direction, .10).normalized()
+            tip_targets.append(palm + direction * relative.length)
+        else:
+            direction = relative.normalized().lerp(center_direction, .30).normalized()
+            tip_targets.append(palm + direction * relative.length * 1.08)
+    for index in left:
+        branch = min(range(len(left_tips)), key=lambda item: distances[item][index])
+        distance = distances[branch][index]
+        if distance >= .095:
+            continue
+        influence = 1.0 - distance / .095
+        influence = influence * influence * (3.0 - 2.0 * influence)
+        tip = body.data.vertices[left_tips[branch]].co
+        body.data.vertices[index].co += (
+            tip_targets[branch] - tip
+        ) * influence * .60
+    body.data.update()
+    body["kf_non_playing_hand_corrective"] = "relaxed_existing_anatomy"
+
+
+def replace_mesh_geometry(obj, vertices, faces):
+    previous = obj.data
+    mesh = r4.mark(bpy.data.meshes.new(obj.name + "_Mesh_L0_Refined"))
+    mesh.from_pydata(vertices, [], faces)
+    mesh.update()
+    for polygon in mesh.polygons:
+        polygon.use_smooth = True
+    for material in previous.materials:
+        mesh.materials.append(material)
+    obj.data = mesh
+    if previous.users == 0:
+        bpy.data.meshes.remove(previous)
+
+
+def refine_temporary_paddle():
+    """Give the inspection paddle credible proportions without moving contact."""
+    blade = bpy.data.objects["KF_TEMP_PaddleBlade"]
+    handle = bpy.data.objects["KF_TEMP_PaddleHandle"]
+    vertices = []
+    faces = []
+    sides = 32
+    for depth in (-.004, .004):
+        for index in range(sides):
+            angle = index * 2 * math.pi / sides
+            vertical = math.sin(angle)
+            lower_taper = 1.0 - .10 * max(0.0, -vertical)
+            vertices.append((.076 * math.cos(angle) * lower_taper,
+                             .160 + .080 * vertical, depth))
+    faces.append(tuple(reversed(range(sides))))
+    faces.append(tuple(range(sides, sides * 2)))
+    for index in range(sides):
+        nxt = (index + 1) % sides
+        faces.append((index, nxt, sides + nxt, sides + index))
+    replace_mesh_geometry(blade, vertices, faces)
+
+    surface = r4.Surface()
+    surface.segment((0, -.018, 0), (0, .108, 0), [
+        (0, .017, .012), (.16, .0215, .0145), (.48, .0205, .014),
+        (.78, .0185, .0125), (1, .0155, .0105),
+    ], 0, "placeholder", sides=20)
+    replace_mesh_geometry(handle, surface.vertices, surface.faces)
+    blade["kf_review_paddle"] = "temporary_refined_not_final"
+    handle["kf_review_paddle"] = "temporary_refined_not_final"
+    return handle
+
+
 def add_court_shoes(collection, rig, material):
     surface = r4.Surface()
     for side, sign in (("R", 1), ("L", -1)):
         bone = "KF_foot_" + side
         center_y = sign * .220
-        surface.segment((-.158, center_y, .058), (.135, center_y, .052), [
-            (0, .052, .050), (.10, .068, .061), (.28, .076, .070),
-            (.52, .079, .069), (.72, .077, .059), (.88, .067, .045),
-            (1, .034, .025),
-        ], 0, bone, sides=16)
-        surface.segment((-.150, center_y, .018), (.140, center_y, .017), [
-            (0, .056, .012), (.12, .073, .013), (.50, .083, .014),
-            (.82, .076, .012), (1, .038, .010),
-        ], 0, bone, sides=16)
+        surface.segment((-.135, center_y, .052), (.145, center_y, .044), [
+            (0, .044, .052), (.12, .048, .059), (.35, .052, .061),
+            (.62, .058, .056), (.82, .061, .046), (1, .046, .025),
+        ], 0, bone, sides=18)
+        surface.segment((-.140, center_y, .014), (.150, center_y, .013), [
+            (0, .048, .009), (.16, .052, .010), (.50, .060, .010),
+            (.82, .064, .009), (1, .049, .008),
+        ], 0, bone, sides=18)
     shoes = r4.make_mesh(
         "KF_CourtShoes_L0", surface.vertices, surface.faces,
         surface.material_ids, [material], collection,
@@ -266,13 +522,22 @@ def add_court_shoes(collection, rig, material):
 def add_sculptural_hair(collection, rig, material):
     surface = r4.Surface()
     surface.loft([
-        (-.025, 0, 1.655, .100, .096),
-        (-.022, 0, 1.685, .110, .104),
-        (-.018, .003, 1.725, .112, .108),
-        (-.012, .006, 1.765, .101, .102),
-        (-.008, .008, 1.802, .077, .080),
-        (-.004, .010, 1.829, .038, .043),
-    ], 0, lambda _: {"KF_head": 1.0}, sides=24)
+        (-.030, 0, 1.665, .092, .087),
+        (-.025, 0, 1.705, .104, .098),
+        (-.020, .002, 1.750, .101, .097),
+        (-.015, .004, 1.790, .080, .077),
+        (-.010, .005, 1.818, .042, .043),
+    ], 0, lambda _: {"KF_head": 1.0}, sides=28)
+    for center, scale in (
+        ((.028, -.052, 1.758), (.061, .044, .057)),
+        ((.040, .000, 1.770), (.064, .049, .060)),
+        ((.025, .052, 1.758), (.060, .044, .056)),
+        ((-.025, -.040, 1.796), (.067, .045, .042)),
+        ((-.028, .038, 1.798), (.068, .045, .043)),
+        ((-.074, 0, 1.750), (.054, .070, .067)),
+    ):
+        surface.ellipsoid(center, scale, 0, {"KF_head": 1.0},
+                          steps=6, sides=12)
     hair = r4.make_mesh(
         "KF_SculpturalHair_L0", surface.vertices, surface.faces,
         surface.material_ids, [material], collection,
@@ -460,13 +725,27 @@ def validate(source_info, visible, body, rig, socket):
     grip_surface_distance = min((hand - point).length
                                 for hand in hand_points
                                 for point in handle_points)
+    fingertip_handle_distances = {
+        name: min(
+            (evaluated_body.matrix_world @ body_mesh.vertices[tip].co - point).length
+            for point in handle_points
+        )
+        for name, (tip, _, _) in PLAYING_FINGERS.items()
+    }
+    handle_proximity_vertices = sum(
+        1 for hand in hand_points
+        if min((hand - point).length for point in handle_points) <= .012
+    )
     evaluated_body.to_mesh_clear()
     evaluated_handle.to_mesh_clear()
     if grip_surface_distance > .02:
-        warnings.append("Playing hand does not enclose the temporary handle")
+        warnings.append(
+            "Playing hand does not enclose the temporary handle "
+            f"({grip_surface_distance:.6f} m)"
+        )
 
     deformation = {}
-    for pose_name in ("READY", "LOAD", "IMPACT", "FOLLOW_THROUGH"):
+    for pose_name in r4.POSE_FRAMES:
         scene.frame_set(r4.POSE_FRAMES[pose_name])
         points = visible_vertices(visible)
         finite = all(all(math.isfinite(axis) for axis in point) for point in points)
@@ -481,7 +760,7 @@ def validate(source_info, visible, body, rig, socket):
             warnings.append(pose_name + ": nonfinite deformation")
 
     collisions = {}
-    for pose_name in ("READY", "IMPACT", "RECOVERY"):
+    for pose_name in r4.POSE_FRAMES:
         scene.frame_set(r4.POSE_FRAMES[pose_name])
         staged = [r4.staging_point(point) for point in visible_vertices(visible)]
         collisions[pose_name] = sum(
@@ -527,6 +806,23 @@ def validate(source_info, visible, body, rig, socket):
         "impact_blade_center_three_m": list(staged_contact),
         "impact_contact_delta_m": contact_delta,
         "grip_surface_distance_m": grip_surface_distance,
+        "playing_fingertip_to_handle_vertex_distance_m":
+            fingertip_handle_distances,
+        "playing_hand_handle_proximity_vertices": handle_proximity_vertices,
+        "temporary_paddle_local_bounds_m": {
+            "blade": {
+                "minimum": [min(vertex.co[axis] for vertex in blade.data.vertices)
+                            for axis in range(3)],
+                "maximum": [max(vertex.co[axis] for vertex in blade.data.vertices)
+                            for axis in range(3)],
+            },
+            "handle": {
+                "minimum": [min(vertex.co[axis] for vertex in handle.data.vertices)
+                            for axis in range(3)],
+                "maximum": [max(vertex.co[axis] for vertex in handle.data.vertices)
+                            for axis in range(3)],
+            },
+        },
         "deformation_validation": deformation,
         "table_prism_collisions": collisions,
         "framing_with_6cm_reserve": framing,
@@ -546,16 +842,15 @@ def render_review_set(output_directory, visible, rig, socket, only=None):
     scene.render.resolution_percentage = 100
     scene.render.film_transparent = False
     shots = [
-        ("ready-three-quarter-neutral", "READY", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.22, False),
-        ("ready-side-neutral", "READY", (0, -4.2, 1.48), (.15, 0, .96), 2.14, False),
+        ("grip-extreme-palm-side", "IMPACT", None, None, .31, False),
+        ("grip-close-blade-index-side", "IMPACT", None, None, .34, False),
         ("impact-three-quarter-neutral", "IMPACT", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.22, False),
         ("impact-near-front-neutral", "IMPACT", (3.8, -1.25, 1.72), (.18, 0, 1.00), 2.22, False),
         ("impact-side-neutral", "IMPACT", (0, -4.2, 1.48), (.15, 0, .96), 2.14, False),
-        ("follow-through-three-quarter-neutral", "FOLLOW_THROUGH", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.22, False),
-        ("head-neck-close-neutral", "READY", (1.8, -1.35, 1.75), (.01, 0, 1.63), .68, False),
-        ("playing-hand-grip-close-neutral", "IMPACT", None, None, .48, False),
-        ("shoulder-arm-close-neutral", "IMPACT", None, None, 1.02, False),
+        ("non-playing-hand-close-neutral", "IMPACT", None, None, .43, False),
+        ("shirt-neckline-shoulder-close-neutral", "IMPACT", None, None, .82, False),
         ("shoe-close-neutral", "READY", (1.7, -2.4, .56), (.18, .05, .095), .64, False),
+        ("head-hair-close-neutral", "READY", (1.8, -1.35, 1.75), (.01, 0, 1.63), .68, False),
         ("impact-silhouette", "IMPACT", (2.8, -3.6, 2.15), (.18, 0, 1.00), 2.22, True),
     ]
     paddle = [bpy.data.objects[name] for name in
@@ -567,20 +862,30 @@ def render_review_set(output_directory, visible, rig, socket, only=None):
         if only and filename not in only:
             continue
         scene.frame_set(r4.POSE_FRAMES[pose])
-        if filename == "playing-hand-grip-close-neutral":
+        if filename == "grip-extreme-palm-side":
             target_vector = socket.matrix_world.translation + Vector((.06, 0, .015))
-            location_vector = target_vector + Vector((1.05, -1.35, .38))
-        elif filename == "shoulder-arm-close-neutral":
-            upper_arm = rig.pose.bones["KF_upperArm_R"]
-            target_vector = rig.matrix_world @ upper_arm.head.lerp(upper_arm.tail, .38)
-            location_vector = target_vector + Vector((1.35, 1.50, .50))
+            location_vector = target_vector + Vector((.92, -1.12, .30))
+        elif filename == "grip-close-blade-index-side":
+            target_vector = socket.matrix_world.translation + Vector((.07, 0, .035))
+            location_vector = target_vector + Vector((-.82, .98, .22))
+        elif filename == "non-playing-hand-close-neutral":
+            hand = rig.pose.bones["KF_hand_L"]
+            target_vector = rig.matrix_world @ hand.head.lerp(hand.tail, .60)
+            location_vector = target_vector + Vector((1.02, -1.20, .28))
+        elif filename == "shirt-neckline-shoulder-close-neutral":
+            neck = rig.pose.bones["KF_neck"]
+            shoulder = rig.pose.bones["KF_clavicle_R"]
+            target_vector = (rig.matrix_world @ neck.head).lerp(
+                rig.matrix_world @ shoulder.tail, .48
+            )
+            location_vector = target_vector + Vector((1.55, -1.55, .54))
         else:
             target_vector = Vector(target)
             location_vector = Vector(location)
         camera.location = location_vector
         r4.point_camera(camera, target_vector)
         camera.data.ortho_scale = scale
-        close = "close" in filename
+        close = "close" in filename or "grip-extreme" in filename
         scene.render.resolution_x = 1400 if close else 1200
         scene.render.resolution_y = 1200 if close else 1400
         if use_silhouette:
@@ -697,8 +1002,11 @@ def build(args):
     body = make_mesh("KF_AthleteBody_L0", body_vertices, body_faces, skin, geo)
     add_armature_weights(body, rig)
     socket = r4.socket_and_paddle(sockets, reference, rig)
+    handle = refine_temporary_paddle()
     r4.make_action(rig)
-    align_playing_hand_to_socket(body, rig, socket)
+    relax_non_playing_hand(body, rig)
+    align_playing_hand_to_socket(body, rig, socket, handle)
+    sculpt_playing_hand_grip(body, rig, handle)
     visible = prepare_visible_meshes(
         body, geo, [skin, cloth, hair_shoes, eye_material],
         rig, source_meshes,
