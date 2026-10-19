@@ -15,7 +15,11 @@ test('full identity and handoff contract are available in semantic HTML', async 
   await expect(page.locator('#hero')).toHaveAttribute('data-hero-handoff', 'center-seam');
   await expect(page.locator('[data-hero-surface="editorial"]')).toHaveCount(1);
   await expect(page.locator('.hero-editorial-accent')).toHaveCount(0);
-  await expect(page.locator('.hero-crimson-rupture')).toHaveCount(1);
+  await expect(page.locator('.hero-crimson-rupture, .hero-horizontal-rupture')).toHaveCount(0);
+  await expect(page.locator('.hero-editorial-crossbar')).toHaveCSS(
+    'background-color',
+    'rgb(121, 31, 43)',
+  );
   await expect(page.locator('#hero img[src*="after_split"]')).toHaveCount(0);
 });
 
@@ -70,20 +74,24 @@ test('Hero reveal and KaiForge chapter share one continuous Recognition frame', 
   await enterSite(page);
   const hero = page.locator('#hero');
   const chapter = page.locator('#kaiforge');
-  const axis = page.locator('.hero-crimson-rupture');
   const renderer = page.locator('[data-experience-renderer="shared"]');
   const heroDistance = 900 * 4.2;
 
-  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.7);
-  await expect(axis).toHaveCSS('opacity', '1');
-
-  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.94);
-  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
-  await expect(axis).toHaveCSS('opacity', '0');
-  await expect(renderer).toHaveCount(1);
+  // A cold visit must prepare the actual scene while the Hero still covers it.
+  await expect(page.locator('canvas[data-kf-metrics]')).toHaveAttribute(
+    'data-kf-metrics',
+    /"robotInstances":1/,
+  );
   await renderer.evaluate((canvas) => {
     canvas.dataset.handoffIdentity = 'same-renderer';
   });
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.5);
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
+
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.78);
+  await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
+  await expect(page.locator('.hero-editorial-ornament')).toHaveCSS('opacity', '0');
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
 
   const chapterTop = await chapter.evaluate((element) =>
     Math.round(element.getBoundingClientRect().top + window.scrollY),
@@ -92,7 +100,6 @@ test('Hero reveal and KaiForge chapter share one continuous Recognition frame', 
   await expect(hero).toHaveAttribute('data-hero-depth', 'inactive');
   await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
   await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
-  await expect(axis).toHaveCSS('opacity', '0');
 
   await chapter.evaluate((element) => {
     const top = element.getBoundingClientRect().top + window.scrollY;
@@ -105,7 +112,9 @@ test('Hero reveal and KaiForge chapter share one continuous Recognition frame', 
   await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.94);
   await expect(chapter).toHaveAttribute('data-kaiforge-beat', 'recognition');
   await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
-  await expect(axis).toHaveCSS('opacity', '0');
+  await page.evaluate((position) => window.scrollTo(0, position), heroDistance * 0.5);
+  await expect(page.locator('[data-handoff-identity="same-renderer"]')).toHaveCount(1);
+  await expect(page.locator('.hero-editorial-ornament')).toHaveCSS('opacity', '1');
 });
 
 for (const viewport of [

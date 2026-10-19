@@ -1,0 +1,21 @@
+{
+  "samples": [
+    {
+      "width": 1440,
+      "height": 900,
+      "preparationMs": 27,
+      "preparedBeforeScroll": true,
+      "sameCanvasAcrossHandoffAndReverse": true,
+      "contactError": 4.996003610813204e-16
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "preparationMs": 25,
+      "preparedBeforeScroll": true,
+      "sameCanvasAcrossHandoffAndReverse": true,
+      "contactError": 4.996003610813204e-16
+    }
+  ],
+  "errors": []
+}

@@ -144,6 +144,7 @@ body {
 
 /* Hero identity surface: flat editorial fields, with no image or shader atmosphere. */
 .hero-editorial-composition {
+  --hero-opening: 0;
   --hero-ink: #11100f;
   --hero-charcoal: #27231f;
   --hero-parchment: #eadfcd;
@@ -185,7 +186,8 @@ body {
 }
 
 .hero-editorial-ornament {
-  opacity: clamp(0, calc(1 - var(--hero-opening) * 2.4), 1);
+  /* Retire the identity furniture before the opening exposes the physical scene. */
+  opacity: clamp(0, calc(1 - var(--hero-opening) * 12), 1);
 }
 
 .hero-editorial-spine {
@@ -216,7 +218,7 @@ body {
   left: clamp(4.75rem, 7vw, 8.5rem);
   width: clamp(7rem, 14vw, 17rem);
   height: clamp(0.3rem, 0.45vw, 0.5rem);
-  background: var(--hero-charcoal);
+  background: var(--hero-crimson);
 }
 
 .hero-editorial-counterweight {
@@ -226,30 +228,6 @@ body {
   width: clamp(15rem, 29vw, 34rem);
   height: clamp(2.25rem, 5.5vh, 4rem);
   background: var(--hero-charcoal);
-}
-
-.hero-crimson-rupture {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: calc(var(--hero-seam-x) * 100%);
-  width: clamp(0.18rem, 0.28vw, 0.34rem);
-  background: var(--hero-crimson);
-  opacity: var(--hero-crimson-axis, 0);
-  transform: translateX(-50%) scaleY(var(--hero-crimson-axis, 0));
-  transform-origin: center;
-}
-
-.hero-horizontal-rupture {
-  position: absolute;
-  top: var(--hero-rupture-y);
-  left: 50%;
-  width: min(78vw, 88rem);
-  height: clamp(0.12rem, 0.18vw, 0.22rem);
-  background: var(--hero-ink);
-  transform: translate3d(-50%, -50%, 0) scaleX(var(--hero-rupture));
-  transform-origin: center;
-  will-change: transform;
 }
 
 .hero-name-line {

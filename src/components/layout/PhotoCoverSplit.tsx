@@ -111,22 +111,13 @@ export const PhotoCoverSplit: React.FC = () => {
     const setHeroState = (progress: number) => {
       const state = getHeroChoreographyState(progress);
       const { holdEnd, collapseEnd } = SCROLL_STORY.beats;
-      const ruptureProgress = Math.min(Math.max((progress - (holdEnd - 0.04)) / 0.08, 0), 1);
       const openingStart = holdEnd + 0.04;
       const openingProgress = Math.min(
         Math.max((progress - openingStart) / (collapseEnd - openingStart), 0),
         1,
       );
-      const crimsonRetireEnd = collapseEnd - 0.04;
-      const crimsonRetireProgress = Math.min(
-        Math.max((progress - openingStart) / (crimsonRetireEnd - openingStart), 0),
-        1,
-      );
-      const crimsonAxisProgress = ruptureProgress * (1 - crimsonRetireProgress);
       container.style.setProperty('--hero-progress', progress.toFixed(4));
-      container.style.setProperty('--hero-rupture', ruptureProgress.toFixed(4));
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
-      container.style.setProperty('--hero-crimson-axis', crimsonAxisProgress.toFixed(4));
       container.dataset.heroDepth =
         !reducedMotion && openingProgress > 0.04 && progress < 1 ? 'active' : 'inactive';
       if (lastStateRef.current !== state) {
@@ -287,9 +278,7 @@ export const PhotoCoverSplit: React.FC = () => {
       delete container.dataset.heroDepth;
       delete container.dataset.reducedMotion;
       container.style.removeProperty('--hero-progress');
-      container.style.removeProperty('--hero-rupture');
       container.style.removeProperty('--hero-opening');
-      container.style.removeProperty('--hero-crimson-axis');
     };
   }, [debugEnabled, ready, reducedMotion]);
 
@@ -329,8 +318,6 @@ export const PhotoCoverSplit: React.FC = () => {
           <div className="hero-editorial-crossbar" />
           <div className="hero-editorial-counterweight" />
         </div>
-        <div className="hero-horizontal-rupture" />
-        <div className="hero-crimson-rupture" />
       </div>
 
       <div

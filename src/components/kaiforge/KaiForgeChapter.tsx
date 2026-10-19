@@ -42,12 +42,14 @@ export function KaiForgeChapter() {
             controller,
             sectionRef,
             activity,
-            enabled: rendererActive,
+            // Eligibility is separate from viewport activity so the shared renderer can
+            // prepare Recognition behind the opaque Hero before its curtains open.
+            enabled: renderWebGL,
             portrait: portraitComposition,
             dprCap: Math.min(dprCap, portraitComposition ? 1.25 : 1.75),
           }
         : null,
-    [activity, controller, dprCap, portraitComposition, rendererActive],
+    [activity, controller, dprCap, portraitComposition, renderWebGL],
   );
   useProjectSceneRegistration('kaiforge', sceneRegistration);
 

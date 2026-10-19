@@ -136,6 +136,11 @@ export function ProjectExperienceProvider({
       const palindromeTop = palindrome?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
       const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
+      // The Hero exposes Recognition before the chapter enters the viewport.
+      // Prepare its first frame after critical content is ready, while the Hero
+      // still covers it. Demand rendering keeps this idle preparation to one frame.
+      const heroBottom = document.getElementById('hero')?.getBoundingClientRect().bottom;
+      const prepareKaiForge = criticalReady && heroBottom !== undefined && heroBottom > 0;
       const chapterSignals = Object.fromEntries(
         (['kaiforge', 'palindrome', 'neuroshield', 'skills'] as const).flatMap((key) => {
           const registration = registrations[key];
@@ -185,7 +190,7 @@ export function ProjectExperienceProvider({
           ? 'neuroshield'
           : palindromeOwnsFrame
             ? 'palindrome'
-            : kaiForge?.enabled && kaiForge.activity !== 'inactive'
+            : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
               ? 'kaiforge'
               : palindrome?.enabled && palindrome.activity !== 'inactive'
                 ? 'palindrome'
