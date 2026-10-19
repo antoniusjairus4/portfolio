@@ -158,6 +158,12 @@ export function PalindromeChapter() {
           <span>PL</span>
         </div>
 
+        <p className="palindrome-demo-note">
+          DEMO INSIGHTS
+          <br />
+          NO CONNECTED ACCOUNT
+        </p>
+
         <div className="palindrome-disclosure">
           <p>{palindromeContent.disclosure}</p>
           <a href={palindromeContent.destination} target="_blank" rel="noopener noreferrer">

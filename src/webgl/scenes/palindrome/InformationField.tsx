@@ -1,15 +1,6 @@
-import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useRef, type MutableRefObject } from 'react';
-import {
-  CanvasTexture,
-  Color,
-  MathUtils,
-  SRGBColorSpace,
-  Vector3,
-  type Group,
-  type Mesh,
-  type MeshBasicMaterial,
-} from 'three';
+import { useFrame } from '@react-three/fiber';
+import { useRef, type MutableRefObject } from 'react';
+import { MathUtils, Vector3, type Group, type Mesh, type MeshBasicMaterial } from 'three';
 import {
   getControlProgress,
   getFragmentationProgress,
@@ -19,165 +10,107 @@ import {
   smoothstep,
 } from '@/components/palindrome/palindromeChoreography';
 import { ROOM_PALETTE } from './DomesticRoom';
+import { SpatialType } from './SpatialType';
+import { DOMESTIC_SOURCES, type DomesticSource } from './sources';
 
 type Point = readonly [number, number, number];
 type Fragment = {
   text: string;
-  source: Point;
+  ordinary: string;
+  source: DomesticSource;
+  offset: Point;
   scattered: Point;
-  grouped: Point;
-  portrait: Point;
-  keep?: boolean;
-  insight?: boolean;
-  change?: boolean;
+  flat?: boolean;
+  lightPrint?: boolean;
+  scale: number;
 };
 
-// One illustrative shop: 62 + 48 = 110. The same milk previously cost 58.
-// These are physical receipt lines, not a product interface or live account data.
+// Authored demo observations; these are never populated from banking/account data.
+// Adjacent pairs are meaningful clauses that assemble into one editorial insight.
 const FRAGMENTS: readonly Fragment[] = [
   {
-    text: 'MILK',
-    source: [-1.48, 1.155, -0.15],
-    scattered: [-2.65, 3.08, 0.18],
-    grouped: [-2.05, 2.85, 0.15],
-    portrait: [-0.95, 3.35, 0.2],
+    text: 'MILK COSTS MORE',
+    ordinary: 'MILK',
+    source: 'milk',
+    offset: [0, 0.3, 0.151],
+    scattered: [-2.05, 3.08, 0.18],
+    scale: 0.48,
   },
   {
-    text: '62.00',
-    source: [-0.92, 1.155, -0.15],
+    text: 'THAN LAST WEEK',
+    ordinary: 'LAST WEEK',
+    source: 'previousReceipt',
+    offset: [0, 0.008, 0.08],
     scattered: [0.04, 2.93, 0.7],
-    grouped: [-0.9, 2.85, 0.15],
-    portrait: [0.8, 3.35, 0.2],
-    keep: true,
+    flat: true,
+    scale: 0.5,
   },
   {
-    text: 'BREAD',
-    source: [-1.48, 1.155, 0],
+    text: 'GROCERY SPENDING',
+    ordinary: 'GROCERIES',
+    source: 'bag',
+    offset: [0, 0.34, 0.224],
+    scattered: [2.08, 2.55, 0.65],
+    scale: 0.5,
+  },
+  {
+    text: 'IS HIGHER THIS WEEK',
+    ordinary: 'THIS SHOP',
+    source: 'receipt',
+    offset: [0, 0.008, 0.23],
     scattered: [-1.98, 1.9, 0.55],
-    grouped: [-2.05, 2.37, 0.15],
-    portrait: [-0.95, 2.94, 0.2],
+    flat: true,
+    scale: 0.55,
   },
   {
-    text: '48.00',
-    source: [-0.92, 1.155, 0],
-    scattered: [1.18, 3.27, -0.1],
-    grouped: [-0.9, 2.37, 0.15],
-    portrait: [0.8, 2.94, 0.2],
-  },
-  {
-    text: 'GROCERIES',
-    source: [-1.21, 1.155, 0.16],
-    scattered: [2.38, 2.55, 0.65],
-    grouped: [0.6, 2.62, 0.15],
-    portrait: [-0.95, 2.53, 0.2],
-    keep: true,
-  },
-  {
-    text: 'TOTAL 110.00',
-    source: [-1.21, 1.155, 0.31],
-    scattered: [-0.8, 2.25, 0.95],
-    grouped: [2.13, 2.62, 0.15],
-    portrait: [0.8, 2.53, 0.2],
-    keep: true,
-  },
-  {
-    text: 'MILK / PREVIOUS',
-    source: [-2.15, 1.155, 0.1],
+    text: 'COFFEE STOPS',
+    ordinary: 'COFFEE',
+    source: 'coffee',
+    offset: [0, 0.17, 0.136],
     scattered: [-1.23, 3.5, -0.3],
-    grouped: [-1.9, 1.83, 0.24],
-    portrait: [-0.95, 2.12, 0.2],
+    scale: 0.36,
   },
   {
-    text: '58.00',
-    source: [-2.15, 1.155, 0.27],
+    text: 'ADD UP THIS WEEK',
+    ordinary: 'DAILY ROUTINE',
+    source: 'receipt',
+    offset: [0, 0.008, 0.08],
+    scattered: [1.5, 3.27, -0.1],
+    flat: true,
+    scale: 0.48,
+  },
+  {
+    text: '₹420 LEFT',
+    ordinary: 'HOUSEHOLD',
+    source: 'household',
+    offset: [0, 0.26, 0.217],
     scattered: [1.5, 1.8, 0.88],
-    grouped: [-0.5, 1.83, 0.24],
-    portrait: [0.8, 2.12, 0.2],
+    scale: 0.65,
   },
   {
-    text: '+4.00 / MILK',
-    source: [0.7, 2.03, 0.3],
-    scattered: [2.15, 2.04, 0.4],
-    grouped: [1.25, 1.83, 0.24],
-    portrait: [0.8, 1.71, 0.2],
-    insight: true,
-    change: true,
-    keep: true,
-  },
-  {
-    text: 'WEEKLY SHOP',
-    source: [0.5, 3.2, -0.1],
-    scattered: [0.5, 3.2, -0.1],
-    grouped: [0.7, 3.18, 0.15],
-    portrait: [-0.95, 1.71, 0.2],
-    insight: true,
+    text: 'IN YOUR WEEKLY BUDGET',
+    ordinary: 'THIS WEEK',
+    source: 'notebook',
+    offset: [0, 0.061, 0],
+    scattered: [-0.8, 2.25, 0.95],
+    flat: true,
+    lightPrint: true,
+    scale: 0.48,
   },
 ];
 
-// Actual semantic edges, revealed in reading order. Only the price-change edge is crimson.
+// Four object tethers and four purchase/context relationships, staggered in scroll.
 const RELATIONS = [
-  { from: 0, to: 1, start: 0.0, keep: false },
-  { from: 2, to: 3, start: 0.14, keep: false },
-  { from: 4, to: 5, start: 0.28, keep: true },
-  { from: 7, to: 1, start: 0.42, keep: false },
-  { from: 1, to: 8, start: 0.6, keep: true, change: true },
-  { from: 0, to: 4, start: 0.72, keep: false },
+  { object: true, from: 0, to: 0, start: 0, change: false },
+  { object: false, from: 0, to: 1, start: 0.12, change: true },
+  { object: true, from: 2, to: 2, start: 0.23, change: false },
+  { object: false, from: 2, to: 3, start: 0.34, change: false },
+  { object: true, from: 4, to: 4, start: 0.45, change: false },
+  { object: false, from: 4, to: 5, start: 0.56, change: false },
+  { object: true, from: 6, to: 6, start: 0.67, change: false },
+  { object: false, from: 6, to: 7, start: 0.78, change: false },
 ] as const;
-
-const ink = new Color(ROOM_PALETTE.ink);
-const parchment = new Color(ROOM_PALETTE.parchment);
-const crimson = new Color(ROOM_PALETTE.crimson);
 const up = new Vector3(0, 1, 0);
-
-function ReceiptType({
-  text,
-  materialRef,
-}: {
-  text: string;
-  materialRef: (material: MeshBasicMaterial | null) => void;
-}) {
-  const material = useRef<MeshBasicMaterial>(null);
-  const invalidate = useThree((state) => state.invalidate);
-  useEffect(() => {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1024;
-    canvas.height = 96;
-    const context = canvas.getContext('2d');
-    if (!context || !material.current) return;
-    context.font = '500 60px monospace';
-    const width = Math.ceil(context.measureText(text).width + 20);
-    canvas.width = width;
-    context.font = '500 60px monospace';
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillStyle = '#ffffff';
-    context.fillText(text, width / 2, 48);
-    const texture = new CanvasTexture(canvas);
-    texture.colorSpace = SRGBColorSpace;
-    material.current.map = texture;
-    material.current.needsUpdate = true;
-    invalidate();
-    return () => {
-      texture.dispose();
-    };
-  }, [text, invalidate]);
-
-  return (
-    <mesh>
-      <planeGeometry args={[text.length * 0.084 + 0.047, 0.224]} />
-      <meshBasicMaterial
-        ref={(node) => {
-          material.current = node;
-          materialRef(node);
-        }}
-        transparent
-        opacity={0}
-        depthWrite={false}
-        toneMapped={false}
-      />
-    </mesh>
-  );
-}
 
 export function InformationField({
   progress,
@@ -188,6 +121,7 @@ export function InformationField({
 }) {
   const fragments = useRef<(Group | null)[]>([]);
   const materials = useRef<(MeshBasicMaterial | null)[]>([]);
+  const sourceMaterials = useRef<(MeshBasicMaterial | null)[]>([]);
   const lines = useRef<(Mesh | null)[]>([]);
   const scratch = useRef({ a: new Vector3(), b: new Vector3(), direction: new Vector3() });
 
@@ -197,51 +131,48 @@ export function InformationField({
     const related = getRelationshipProgress(p);
     const organized = getOrganizationProgress(p);
     const control = getControlProgress(p);
+    const sourceX = portrait ? 0.76 : 1;
+    const alignment = related * 0.36 + organized * 0.64;
+    const reading = smoothstep(rangeProgress(fragmented, 0.12, 0.65));
 
     FRAGMENTS.forEach((data, index) => {
       const fragment = fragments.current[index];
       const material = materials.current[index];
-      if (!fragment || !material) return;
-      const group = portrait ? data.portrait : data.grouped;
-      const spreadX = portrait ? 0.62 : 1;
-      const sourceX = portrait ? 0.76 : 1;
-      const alignment = related * 0.36 + organized * 0.64;
-      const x = MathUtils.lerp(data.source[0] * sourceX, data.scattered[0] * spreadX, fragmented);
-      const y = MathUtils.lerp(data.source[1], data.scattered[1], fragmented);
-      const z = MathUtils.lerp(data.source[2], data.scattered[2], fragmented);
-      fragment.position.set(
-        MathUtils.lerp(x, group[0], alignment),
-        MathUtils.lerp(y, group[1], alignment),
-        MathUtils.lerp(z, group[2], alignment),
+      const sourceMaterial = sourceMaterials.current[index];
+      if (!fragment || !material || !sourceMaterial) return;
+      const source = DOMESTIC_SOURCES[data.source];
+      const pair = Math.floor(index / 2);
+      const secondLine = index % 2;
+      const groupX = portrait ? 0 : pair % 2 === 0 ? -1.35 : 1.35;
+      const groupY = portrait
+        ? 3.68 - pair * 0.56 - secondLine * 0.21
+        : 3.03 - Math.floor(pair / 2) * 0.99 - secondLine * 0.24;
+      const x = MathUtils.lerp(
+        (source[0] + data.offset[0]) * sourceX,
+        data.scattered[0] * (portrait ? 0.62 : 1),
+        fragmented,
       );
-      // The four surviving lines become two compact, legible relationships.
-      if (data.keep) {
-        const final: Point =
-          index === 4
-            ? [-0.95, 2.76, 0.08]
-            : index === 5
-              ? [0.85, 2.76, 0.08]
-              : index === 1
-                ? [-0.95, 2.15, 0.08]
-                : [0.85, 2.15, 0.08];
-        fragment.position.lerp(scratch.current.a.set(final[0], final[1], final[2]), control);
+      const y = MathUtils.lerp(source[1] + data.offset[1], data.scattered[1], fragmented);
+      const z = MathUtils.lerp(source[2] + data.offset[2], data.scattered[2], fragmented);
+      fragment.position.set(
+        MathUtils.lerp(x, groupX, alignment),
+        MathUtils.lerp(y, groupY, alignment),
+        MathUtils.lerp(z, 0.2, alignment),
+      );
+      const keep = pair === 0 || pair === 3;
+      if (keep) {
+        scratch.current.a.set(0, (pair === 0 ? 2.9 : 2.12) - secondLine * 0.24, 0.08);
+        fragment.position.lerp(scratch.current.a, control);
       }
       fragment.rotation.set(
-        data.insight ? 0 : MathUtils.lerp(-Math.PI / 2, 0, fragmented),
-        ((index % 3) - 1) * 0.18 * fragmented * (1 - alignment),
-        ((index % 5) - 2) * 0.105 * fragmented * (1 - alignment),
+        data.flat ? MathUtils.lerp(-Math.PI / 2, 0, fragmented) : 0,
+        ((index % 3) - 1) * 0.22 * fragmented * (1 - alignment),
+        ((index % 5) - 2) * 0.09 * fragmented * (1 - alignment),
       );
-      fragment.scale.setScalar(
-        data.insight ? 1 : MathUtils.lerp(index === 6 ? 0.42 : 0.63, 1, fragmented),
-      );
-      const insightReveal = data.insight
-        ? smoothstep(rangeProgress(related, index === 8 ? 0.65 : 0.8, 1))
-        : 1;
-      material.opacity = insightReveal * (data.keep ? 1 : 1 - control);
-      material.color
-        .copy(data.change ? crimson : ink)
-        .lerp(data.change ? crimson : parchment, fragmented);
-      fragment.visible = material.map !== null && material.opacity > 0.001;
+      fragment.scale.setScalar(MathUtils.lerp(data.scale, 1, fragmented));
+      material.opacity = reading * (keep ? 1 : 1 - control);
+      sourceMaterial.opacity = 1 - reading;
+      fragment.visible = material.map !== null && material.opacity + sourceMaterial.opacity > 0.001;
     });
 
     RELATIONS.forEach((relation, index) => {
@@ -250,28 +181,33 @@ export function InformationField({
       const to = fragments.current[relation.to];
       if (!line || !from || !to) return;
       const reveal = smoothstep(
-        rangeProgress(related, relation.start, Math.min(1, relation.start + 0.24)),
+        rangeProgress(related, relation.start, Math.min(1, relation.start + 0.2)),
       );
-      const opacity =
-        reveal *
-        (relation.keep ? 1 : 1 - control) *
-        Math.min(
-          materials.current[relation.from]?.opacity ?? 0,
-          materials.current[relation.to]?.opacity ?? 0,
-        );
+      const fade = (1 - organized * (relation.object ? 0.8 : 1)) * (1 - control);
       const { a, b, direction } = scratch.current;
-      // Lines run below the printed baselines, never through the letterforms.
-      a.copy(from.position);
-      a.y -= 0.14;
+      if (relation.object) {
+        const data = FRAGMENTS[relation.from];
+        const source = DOMESTIC_SOURCES[data.source];
+        a.set(
+          (source[0] + data.offset[0]) * sourceX,
+          source[1] + data.offset[1],
+          source[2] + data.offset[2],
+        );
+      } else {
+        a.copy(from.position);
+        a.y -= 0.15;
+      }
       b.copy(to.position);
-      b.y -= 0.14;
+      b.y -= 0.15;
       b.lerpVectors(a, b, reveal);
       direction.subVectors(b, a);
+      const length = direction.length();
       line.position.copy(a).add(b).multiplyScalar(0.5);
-      line.scale.set(1, Math.max(0.001, direction.length()), 1);
-      line.quaternion.setFromUnitVectors(up, direction.normalize());
-      (line.material as MeshBasicMaterial).opacity = opacity * ('change' in relation ? 0.85 : 0.38);
-      line.visible = opacity > 0.001;
+      line.scale.set(1, Math.max(0.001, length), 1);
+      if (length > 0.0001) line.quaternion.setFromUnitVectors(up, direction.normalize());
+      (line.material as MeshBasicMaterial).opacity =
+        reveal * fade * (relation.change ? 0.85 : relation.object ? 0.26 : 0.34);
+      line.visible = reveal * fade > 0.001;
     });
   });
 
@@ -284,8 +220,16 @@ export function InformationField({
             fragments.current[index] = node;
           }}
         >
-          <ReceiptType
+          <SpatialType
+            text={data.ordinary}
+            color={data.lightPrint ? ROOM_PALETTE.parchment : ROOM_PALETTE.ink}
+            materialRef={(node) => {
+              sourceMaterials.current[index] = node;
+            }}
+          />
+          <SpatialType
             text={data.text}
+            color={ROOM_PALETTE.parchment}
             materialRef={(node) => {
               materials.current[index] = node;
             }}
@@ -294,15 +238,17 @@ export function InformationField({
       ))}
       {RELATIONS.map((relation, index) => (
         <mesh
-          key={`${relation.from}:${relation.to}`}
+          key={`${relation.object}:${relation.from}:${relation.to}`}
           ref={(node) => {
             lines.current[index] = node;
           }}
           visible={false}
         >
-          <cylinderGeometry args={[0.004, 0.004, 1, 6]} />
+          <cylinderGeometry
+            args={[relation.object ? 0.003 : 0.004, relation.object ? 0.003 : 0.004, 1, 6]}
+          />
           <meshBasicMaterial
-            color={'change' in relation ? ROOM_PALETTE.crimson : ROOM_PALETTE.parchment}
+            color={relation.change ? ROOM_PALETTE.crimson : ROOM_PALETTE.parchment}
             transparent
             opacity={0}
             depthWrite={false}

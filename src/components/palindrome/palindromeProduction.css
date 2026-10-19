@@ -21,6 +21,20 @@
   color: #b3aa98;
 }
 
+.palindrome-demo-note {
+  position: absolute;
+  z-index: 5;
+  left: clamp(1.5rem, 3vw, 3rem);
+  bottom: 1.5rem;
+  margin: 0;
+  color: #b3aa98;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: 0.58rem;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  pointer-events: none;
+}
+
 .palindrome-static .palindrome-sticky {
   background: #111111;
 }
@@ -91,17 +105,16 @@
   left: 32%;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  width: 8.5rem;
-  padding: 0.6rem;
-  background: #f2e8d5;
-  color: #111111;
-  font: 0.55rem / 1.5 monospace;
+  gap: 0.8rem;
+  width: 13rem;
+  padding: 0;
+  background: none;
+  color: #f2e8d5;
+  font: 600 0.65rem / 1.5 sans-serif;
 }
 
 .palindrome-fallback-information span {
-  display: flex;
-  justify-content: space-between;
+  display: block;
   height: auto;
   border: 0;
   background: none;
@@ -113,11 +126,17 @@
 }
 
 @media (orientation: portrait) {
+  .palindrome-demo-note {
+    left: 1.25rem;
+    bottom: 1rem;
+    font-size: 0.5rem;
+  }
+
   .palindrome-fallback-information {
     top: auto;
     bottom: 24%;
     left: 24%;
-    gap: 0.2rem;
-    width: 7.2rem;
+    gap: 0.7rem;
+    width: 11rem;
   }
 }

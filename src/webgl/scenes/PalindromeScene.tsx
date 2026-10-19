@@ -43,11 +43,11 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
   return (
     <>
       <color attach="background" args={[ROOM_PALETTE.ink]} />
-      <ambientLight intensity={0.45} color={ROOM_PALETTE.parchment} />
-      <hemisphereLight args={[ROOM_PALETTE.parchment, '#625B4E', 0.8]} />
+      <ambientLight intensity={0.24} color={ROOM_PALETTE.parchment} />
+      <hemisphereLight args={[ROOM_PALETTE.parchment, '#625B4E', 0.58]} />
       <directionalLight
-        position={[-3.8, 5.1, 2.5]}
-        intensity={2.1}
+        position={[-3.8, 4.2, 1.5]}
+        intensity={1.75}
         color={ROOM_PALETTE.parchment}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
@@ -57,13 +57,13 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
         shadow-camera-bottom={-3}
         shadow-camera-near={0.5}
         shadow-camera-far={16}
-        shadow-normalBias={0.035}
+        shadow-normalBias={0.018}
         shadow-bias={-0.0001}
-        shadow-radius={4}
+        shadow-radius={5}
       />
       <pointLight
-        position={[2.1, 2.6, 0.7]}
-        intensity={3}
+        position={[1.3, 1.8, 1.1]}
+        intensity={1.2}
         color={ROOM_PALETTE.parchment}
         distance={6}
         decay={2}

@@ -21,13 +21,14 @@ export function PalindromeFallback({ reason }: PalindromeFallbackProps) {
         </div>
         <div className="palindrome-fallback-information">
           <span>
-            MILK <b>62.00</b>
+            MILK COSTS MORE
+            <br />
+            THAN LAST WEEK
           </span>
           <span>
-            BREAD <b>48.00</b>
-          </span>
-          <span>
-            GROCERIES <b>110.00</b>
+            ₹420 LEFT
+            <br />
+            IN YOUR WEEKLY BUDGET
           </span>
         </div>
         <p>THE SAME ROOM. CLEARER RELATIONSHIPS.</p>
