@@ -10,6 +10,7 @@ function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') 
   const positions = geometry.getAttribute('position');
   const normals = geometry.getAttribute('normal');
   const colors: number[] = [];
+  const surfaceUVs: number[] = [];
   for (let i = 0; i < positions.count; i++) {
     const nx = normals.getX(i);
     const ny = normals.getY(i);
@@ -17,12 +18,21 @@ function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') 
     const depth = Math.min(1, Math.max(0, (-positions.getZ(i) - 1) / 9));
     const height = Math.min(1, Math.max(0, positions.getY(i) / 7));
     const face = ny > 0.5 ? 1.06 : nx < -0.5 ? 0.79 : nx > 0.5 ? 0.91 : nz > 0.5 ? 1 : 0.75;
-    const distance = 1 - depth * (kind === 'ground' ? 0.08 : 0.17);
-    const vertical = kind === 'ground' ? 1 : 0.94 + height * 0.07;
+    const distance = 1 - depth * (kind === 'ground' ? 0.24 : 0.52);
+    const vertical = kind === 'ground' ? 1 : 0.89 + height * 0.11;
     const shade = face * distance * vertical;
-    colors.push(shade, shade * (kind === 'wall' ? 0.99 : 1), shade * 0.97);
+    colors.push(shade, shade * 0.995, shade * 0.985);
+    // Face-projected material coordinates keep the grain at a consistent metre
+    // scale on the approved slabs, instead of stretching it across each box.
+    const x = positions.getX(i),
+      y = positions.getY(i),
+      z = positions.getZ(i);
+    if (Math.abs(ny) > 0.5) surfaceUVs.push(x * 1.25, z * 1.25);
+    else if (Math.abs(nx) > 0.5) surfaceUVs.push(z * 1.25, y * 1.25);
+    else surfaceUVs.push(x * 1.25, y * 1.25);
   }
   geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+  geometry.setAttribute('uv', new Float32BufferAttribute(surfaceUVs, 2));
   return geometry;
 }
 

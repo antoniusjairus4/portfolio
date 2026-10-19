@@ -1,13 +1,18 @@
-import { useKaiForgeMaterials } from './Materials';
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
-import { type Group, type Mesh, TubeGeometry } from 'three';
+import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
+import { Color, type Mesh } from 'three';
+import { rangeProgress, smoothstep } from '@/components/kaiforge/kaiforgeChoreography';
 import {
-  rangeProgress,
-  smoothstep,
-  getUnderstandingProgress,
-} from '@/components/kaiforge/kaiforgeChoreography';
-import { CONTACT, createTrajectory, releaseProgress, impactPulse } from './staging';
+  BALL_TIMING,
+  getOutgoingProgress,
+  sampleBallPosition,
+  sampleOutgoingPosition,
+} from './ballSequence';
+import { sampleColorDirection } from './colorDirection';
+import { useKaiForgeMaterials } from './Materials';
+import { createMotionTrail } from './motionTrail';
+import { CONTACT, PALETTE, releaseProgress } from './staging';
+
 export function Trajectory({
   progress,
   portrait,
@@ -16,58 +21,99 @@ export function Trajectory({
   portrait: boolean;
 }) {
   const materials = useKaiForgeMaterials();
-  const ball = useRef<Mesh>(null),
-    main = useRef<Mesh>(null),
-    echoes = useRef<Group>(null),
-    rupture = useRef<Mesh>(null);
-  const curve = useMemo(createTrajectory, []);
-  const geometry = useMemo(() => new TubeGeometry(curve, 64, 0.005, 4, false), [curve]);
-  useEffect(() => () => geometry.dispose(), [geometry]);
+  const ball = useRef<Mesh>(null);
+  const rupture = useRef<Mesh>(null);
+  const trails = useMemo(
+    () => ({
+      incoming: createMotionTrail(20, 0.003, PALETTE.parchment),
+      current: createMotionTrail(portrait ? 48 : 64, 0.0045, PALETTE.crimson),
+      history: [
+        createMotionTrail(portrait ? 24 : 32, 0.0016, '#b4aa98'),
+        createMotionTrail(portrait ? 24 : 32, 0.0014, '#b4aa98'),
+      ],
+      neutral: new Color('#aba18e'),
+      crimson: new Color(PALETTE.crimson),
+    }),
+    [portrait],
+  );
+  useEffect(
+    () => () => {
+      trails.incoming.dispose();
+      trails.current.dispose();
+      for (const trail of trails.history) trail.dispose();
+    },
+    [trails],
+  );
+
   useFrame(() => {
-    const p = progress.current,
-      route = smoothstep(rangeProgress(p, 0.49, 0.69)),
-      understanding = getUnderstandingProgress(p),
-      release = releaseProgress(p);
-    geometry.setDrawRange(0, Math.floor(64 * route) * 4 * 6);
-    if (main.current) main.current.visible = route > 0 && release < 0.99;
-    if (ball.current) curve.getPoint(route, ball.current.position);
+    const p = progress.current;
+    const release = releaseProgress(p);
+    const color = sampleColorDirection(p);
+    if (ball.current) sampleBallPosition(p, ball.current.position);
+
+    // A short moving window, never a full incoming cable. No trail in Recognition.
+    const approach = smoothstep(rangeProgress(p, BALL_TIMING.loadStart, 0.22));
+    const incomingFade =
+      1 - smoothstep(rangeProgress(p, BALL_TIMING.contact, BALL_TIMING.outgoing));
+    const incomingHead = Math.min(p, BALL_TIMING.contact);
+    trails.incoming.update(
+      sampleBallPosition,
+      Math.max(0, incomingHead - 0.035),
+      incomingHead,
+      0.65 * approach * incomingFade,
+    );
+
+    trails.current.tint(trails.neutral, trails.crimson, color.selectedPath);
+    const outgoing = getOutgoingProgress(p);
+    const floorTrailFade = 1 - smoothstep(rangeProgress(
+      p, BALL_TIMING.firstFloorContact, BALL_TIMING.rollStart,
+    ));
+    trails.current.update(
+      sampleOutgoingPosition,
+      0,
+      outgoing,
+      (0.8 - release * 0.64) * smoothstep(rangeProgress(p, BALL_TIMING.outgoing, 0.51)) * floorTrailFade,
+      0.12 + release * 0.12,
+    );
+
+    // Actual previous flights: net-to-bounce, then bounce-to-contact. No translated clones.
+    const windows = [
+      [BALL_TIMING.loadStart, BALL_TIMING.incomingBounce, 0.58, 0.65],
+      [BALL_TIMING.incomingBounce, BALL_TIMING.contact, 0.68, 0.75],
+    ] as const;
+    windows.forEach(([start, end, revealStart, revealEnd], index) => {
+      const reveal = smoothstep(rangeProgress(p, revealStart, revealEnd));
+      const dissolve = 1 - smoothstep(rangeProgress(p, 0.82 + index * 0.025, 0.94 + index * 0.02));
+      trails.history[index].update(
+        sampleBallPosition,
+        start,
+        start + (end - start) * reveal,
+        (0.27 - index * 0.05) * reveal * dissolve,
+        0.06,
+      );
+    });
+
     if (rupture.current) {
-      const pulse = impactPulse(p);
-      rupture.current.visible = pulse > 0.001;
-      const length = 0.15 + pulse * 0.85;
-      rupture.current.scale.set(length, 1, 1);
-      rupture.current.position.copy(CONTACT);
-      rupture.current.position.x += length * 0.5;
-      rupture.current.position.y += length * 0.08;
-    }
-    if (echoes.current) {
-      echoes.current.visible = understanding > 0.05 && release < 0.9;
-      echoes.current.children.forEach((child, index) => {
-        child.visible = understanding > (index + 1) * 0.22 && release < 0.7 - index * 0.2;
-        child.position.set(0, 0.07 * (index + 1), -0.14 * (index + 1));
-      });
+      rupture.current.visible = p >= BALL_TIMING.contact && color.contact > 0.001;
+      rupture.current.scale.setScalar(0.6 + color.contact * 0.4);
     }
   });
+
   return (
     <group name="KF_ConceptualTrajectory">
-      <mesh ref={ball} position={CONTACT}>
+      <mesh ref={ball} position={[1.15, 1.12, -0.18]}>
         <sphereGeometry args={[0.02, 12, 8]} />
-        <primitive attach="material" object={materials.parchment} />
+        <primitive attach="material" object={materials.ball} />
       </mesh>
-      <mesh ref={main} geometry={geometry}>
-        <primitive attach="material" object={materials.trace} />
-      </mesh>
-      <mesh ref={rupture} position={CONTACT} rotation={[0, 0, 0.16]}>
-        <boxGeometry args={[1, 0.012, 0.008]} />
+      <mesh geometry={trails.incoming.geometry} material={trails.incoming.material} />
+      <mesh geometry={trails.current.geometry} material={trails.current.material} />
+      {trails.history.map((trail, index) => (
+        <mesh key={index} geometry={trail.geometry} material={trail.material} />
+      ))}
+      <mesh ref={rupture} position={CONTACT} rotation={[0, 0, 0.16]} visible={false}>
+        <boxGeometry args={[0.11, 0.008, 0.008]} />
         <primitive attach="material" object={materials.crimson} />
       </mesh>
-      <group ref={echoes}>
-        {(portrait ? ['near'] : ['near', 'middle', 'far']).map((id) => (
-          <mesh key={id} geometry={geometry}>
-            <primitive attach="material" object={materials.echo} />
-          </mesh>
-        ))}
-      </group>
     </group>
   );
 }

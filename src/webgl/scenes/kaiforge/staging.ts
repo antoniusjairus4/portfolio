@@ -2,10 +2,10 @@ import { CatmullRomCurve3, Vector3 } from 'three';
 import { smoothstep, rangeProgress } from '@/components/kaiforge/kaiforgeChoreography';
 
 export const PALETTE = {
-  ink: '#242522',
-  parchment: '#e9dfce',
+  ink: '#111111',
+  parchment: '#F2E8D5',
   mineral: '#c5bbaa',
-  crimson: '#872d32',
+  crimson: '#8B1E2D',
 };
 export const CONTACT = new Vector3(-1.2514, 1.3125, 0.0638);
 export const BLADE = new Vector3(-1.2764, 1.3125, 0.0638);

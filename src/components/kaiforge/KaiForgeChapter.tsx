@@ -16,11 +16,11 @@ import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvi
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
 const BEAT_PRESENTATION = [
-  { center: 0.08, width: 0.16 },
-  { center: 0.28, width: 0.15 },
-  { center: 0.455, width: 0.12 },
-  { center: 0.67, width: 0.19 },
-  { center: 0.91, width: 0.14 },
+  { center: 0.08, width: 0.16, hold: 0.055 },
+  { center: 0.28, width: 0.15, hold: 0.025 },
+  { center: 0.455, width: 0.12, hold: 0.04 },
+  { center: 0.67, width: 0.19, hold: 0.035 },
+  { center: 0.91, width: 0.14, hold: 0.03 },
 ] as const;
 
 export function KaiForgeChapter() {
@@ -66,14 +66,19 @@ export function KaiForgeChapter() {
       if (headerRef.current && !reducedMotion && quality !== 'fallback') {
         const headerOpacity = Math.max(0, Math.min(1, (0.24 - progress) / 0.09));
         headerRef.current.style.opacity = headerOpacity.toFixed(3);
-        headerRef.current.style.transform = `translate3d(0, ${progress * -32}px, 0)`;
+        headerRef.current.style.removeProperty('transform');
       }
       beatRefs.current.forEach((element, index) => {
         if (!element) return;
         const presentation = BEAT_PRESENTATION[index];
-        const opacity = getBeatOpacity(progress, presentation.center, presentation.width);
+        const opacity = getBeatOpacity(
+          progress,
+          presentation.center,
+          presentation.width,
+          presentation.hold,
+        );
         element.style.opacity = opacity.toFixed(3);
-        element.style.transform = `translate3d(0, ${(1 - opacity) * 22}px, 0)`;
+        element.style.removeProperty('transform');
         element.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
       });
     };

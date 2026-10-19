@@ -5,6 +5,7 @@ import { useLayoutEffect, useMemo } from 'react';
 import { Frustum, Matrix4, Mesh, Vector3 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { Architecture } from './kaiforge/Architecture';
+import { ArenaLighting } from './kaiforge/ArenaLighting';
 import { Equipment } from './kaiforge/Equipment';
 import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
@@ -110,31 +111,13 @@ function ProductionScene({
   }, [scene, gl, controller, camera]);
   return (
     <>
-      <color attach="background" args={['#191b19']} />
-      <hemisphereLight args={['#eee2ce', '#777168', 0.78]} />
-      <directionalLight
-        position={[-3.8, 5.8, 3.2]}
-        intensity={2.25}
-        color="#fff0d9"
-        castShadow={!portrait}
-        shadow-mapSize-width={1024}
-        shadow-mapSize-height={1024}
-        shadow-camera-left={-3.5}
-        shadow-camera-right={3.5}
-        shadow-camera-top={3.5}
-        shadow-camera-bottom={-3.5}
-        shadow-camera-near={0.1}
-        shadow-camera-far={15}
-        shadow-radius={5}
-        shadow-normalBias={0.008}
-        shadow-bias={-0.0002}
-      />
-      <directionalLight position={[2.8, 3.6, -3.5]} intensity={1.6} color="#e2e8df" />
+      <color attach="background" args={['#111111']} />
+      <ArenaLighting portrait={portrait} progress={controller.progress} />
       <Architecture progress={controller.progress} portrait={portrait} />
       <Equipment />
       <ProceduralRobot progress={controller.progress} />
       <Trajectory progress={controller.progress} portrait={portrait} />
-      {/* Low-tier contact impression; no shadow renderer or transparent floor layers. */}
+      {/* Subtle low-tier contact impressions; no extra shadow renderer. */}
       {portrait && (
         <group>
           <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>

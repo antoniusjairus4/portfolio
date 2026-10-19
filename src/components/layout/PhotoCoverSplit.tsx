@@ -45,8 +45,6 @@ function getLayoutBox(element: HTMLElement): Pick<LetterBox, 'x' | 'y' | 'width'
 
 export const PhotoCoverSplit: React.FC = () => {
   const containerRef = useRef<HTMLElement>(null);
-  const leftHalfRef = useRef<HTMLDivElement>(null);
-  const rightHalfRef = useRef<HTMLDivElement>(null);
   const contentWrapperRef = useRef<HTMLDivElement>(null);
   const pageBgRef = useRef<HTMLDivElement>(null);
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
@@ -91,11 +89,9 @@ export const PhotoCoverSplit: React.FC = () => {
 
   useEffect(() => {
     const container = containerRef.current;
-    const leftHalf = leftHalfRef.current;
-    const rightHalf = rightHalfRef.current;
     const contentWrapper = contentWrapperRef.current;
     const pageBackground = pageBgRef.current;
-    if (!container || !leftHalf || !rightHalf || !contentWrapper || !pageBackground || !ready) {
+    if (!container || !contentWrapper || !pageBackground || !ready) {
       return;
     }
 
@@ -116,8 +112,24 @@ export const PhotoCoverSplit: React.FC = () => {
         Math.max((progress - openingStart) / (collapseEnd - openingStart), 0),
         1,
       );
+      const accentTravel = reducedMotion ? 0 : Math.min(
+        Math.max((progress - (holdEnd - 0.02)) / 0.06, 0),
+        1,
+      );
       container.style.setProperty('--hero-progress', progress.toFixed(4));
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
+      // Let the existing name rupture clear a central aperture before exposing
+      // any portrait pixels. Both image reveal and retirement use that same clock.
+      const ease = (value: number) => {
+        const t = Math.min(1, Math.max(0, value));
+        return t * t * (3 - 2 * t);
+      };
+      const portraitReveal = reducedMotion ? 0 : ease((openingProgress - 0.35) / 0.4);
+      const portraitOpacity = portraitReveal * (1 - ease((openingProgress - 0.8) / 0.2));
+      container.style.setProperty('--hero-portrait-reveal', portraitReveal.toFixed(4));
+      container.style.setProperty('--hero-portrait-opacity', portraitOpacity.toFixed(4));
+      container.style.setProperty('--hero-accent-feed',
+        (accentTravel * accentTravel * (3 - 2 * accentTravel)).toFixed(4));
       container.dataset.heroDepth =
         !reducedMotion && openingProgress > 0.04 && progress < 1 ? 'active' : 'inactive';
       if (lastStateRef.current !== state) {
@@ -127,6 +139,7 @@ export const PhotoCoverSplit: React.FC = () => {
     };
 
     const bakePhysics = () => {
+      container.style.setProperty('--hero-copy-half-height', `${contentWrapper.offsetHeight / 2}px`);
       if (reducedMotion) return;
       const boxes: LetterBox[] = [];
       const elements = new Map<string, HTMLElement>();
@@ -165,24 +178,20 @@ export const PhotoCoverSplit: React.FC = () => {
       bakePhysics();
 
       context = gsap.context(() => {
-        gsap.set([leftHalf, rightHalf, contentWrapper], { force3D: !reducedMotion });
+        gsap.set(contentWrapper, { force3D: !reducedMotion });
+        // The initial and reverse-scroll resting frame is the complete identity.
+        gsap.set(nameLetters, { opacity: 1, yPercent: 0 });
+        gsap.set(roleLetters, { opacity: 1, yPercent: 0 });
+        gsap.set(pageBackground, { opacity: 1 });
         setHeroState(0);
 
         if (reducedMotion) {
           container.dataset.heroState = 'identity';
           container.dataset.reducedMotion = 'true';
-          gsap.set(nameLetters, { opacity: 1, yPercent: 0 });
-          gsap.set(roleLetters, { opacity: 1, yPercent: 0 });
-          gsap.set([leftHalf, rightHalf], { opacity: 0.46, xPercent: 0 });
-          gsap.set(pageBackground, { opacity: 0.55 });
           return;
         }
 
         delete container.dataset.reducedMotion;
-        gsap.set(nameLetters, { opacity: 0, yPercent: 120 });
-        gsap.set(roleLetters, { opacity: 0, yPercent: 60 });
-        gsap.set([leftHalf, rightHalf], { opacity: 1, xPercent: 0 });
-        gsap.set(pageBackground, { opacity: 1 });
 
         const timeline = gsap.timeline({
           defaults: { overwrite: 'auto' },
@@ -219,35 +228,8 @@ export const PhotoCoverSplit: React.FC = () => {
           },
         });
 
-        timeline
-          .to(leftHalf, { xPercent: -52, ease: 'power2.inOut', duration: 0.24 }, 0)
-          .to(rightHalf, { xPercent: 52, ease: 'power2.inOut', duration: 0.24 }, 0)
-          .to(
-            nameLetters,
-            {
-              opacity: 1,
-              yPercent: 0,
-              stagger: { each: 0.008, from: 'center' },
-              ease: 'power3.out',
-              duration: 0.17,
-            },
-            0.04,
-          )
-          .to(
-            roleLetters,
-            {
-              opacity: 1,
-              yPercent: 0,
-              stagger: 0.004,
-              ease: 'power2.out',
-              duration: 0.13,
-            },
-            0.09,
-          )
-          .to([leftHalf, rightHalf], { duration: 0.18 }, 0.24)
-          .to(leftHalf, { xPercent: -100, ease: 'power2.inOut', duration: 0.2 }, 0.42)
-          .to(rightHalf, { xPercent: 100, ease: 'power2.inOut', duration: 0.2 }, 0.42)
-          .to(contentWrapper, { duration: 0.38 }, 0.62);
+        // Retain the chapter's duration and existing rupture/curtain choreography.
+        timeline.to(contentWrapper, { duration: 1 }, 0);
       }, container);
 
       requestAnimationFrame(() => ScrollTrigger.refresh());
@@ -279,6 +261,10 @@ export const PhotoCoverSplit: React.FC = () => {
       delete container.dataset.reducedMotion;
       container.style.removeProperty('--hero-progress');
       container.style.removeProperty('--hero-opening');
+      container.style.removeProperty('--hero-portrait-reveal');
+      container.style.removeProperty('--hero-portrait-opacity');
+      container.style.removeProperty('--hero-accent-feed');
+      container.style.removeProperty('--hero-copy-half-height');
     };
   }, [debugEnabled, ready, reducedMotion]);
 
@@ -315,9 +301,9 @@ export const PhotoCoverSplit: React.FC = () => {
             <span>01</span>
             <span>IDENTITY</span>
           </div>
-          <div className="hero-editorial-crossbar" />
           <div className="hero-editorial-counterweight" />
         </div>
+        <div className="hero-editorial-crossbar" />
       </div>
 
       <div
@@ -380,10 +366,11 @@ export const PhotoCoverSplit: React.FC = () => {
         </div>
       </div>
 
+      {/* Outside the text's difference blend so the accent remains true Deep Crimson. */}
+      <span className="hero-role-accent" aria-hidden="true" />
+
       <div
-        ref={leftHalfRef}
-        className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-hidden"
-        style={{ clipPath: 'inset(0 50% 0 0)', willChange: reducedMotion ? 'auto' : 'transform' }}
+        className="hero-portrait-reveal pointer-events-none absolute inset-0 z-[5] h-full w-full overflow-hidden"
       >
         <picture>
           <source
@@ -405,29 +392,6 @@ export const PhotoCoverSplit: React.FC = () => {
         </picture>
       </div>
 
-      <div
-        ref={rightHalfRef}
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-20 h-full w-full overflow-hidden"
-        style={{ clipPath: 'inset(0 0 0 50%)', willChange: reducedMotion ? 'auto' : 'transform' }}
-      >
-        <picture>
-          <source
-            srcSet="/images/cover-1536.avif 1536w, /images/cover-1280.avif 1280w"
-            type="image/avif"
-          />
-          <source
-            srcSet="/images/cover-1536.webp 1536w, /images/cover-1280.webp 1280w"
-            type="image/webp"
-          />
-          <img
-            src="/images/cover-1536.jpeg"
-            alt=""
-            className="h-full w-full object-cover portrait:object-[47.6%_50%] landscape:object-[51.5%_50%]"
-            loading="eager"
-          />
-        </picture>
-      </div>
     </section>
   );
 };

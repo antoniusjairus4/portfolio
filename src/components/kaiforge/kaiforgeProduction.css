@@ -1,4 +1,9 @@
 /* Only KaiForge: legibility over the new physical parchment architecture. */
+.kaiforge-chapter:not(.kaiforge-static) {
+  /* One viewport remains pinned; the scrub distance grows from 420 to 756svh. */
+  height: 856svh;
+}
+
 .kaiforge-chapter .kaiforge-sticky {
   background: none;
 }
@@ -10,6 +15,8 @@
 
 .kaiforge-chapter .kaiforge-semantic-header {
   top: 7vh;
+  will-change: opacity;
+  transform: none;
 }
 
 .kaiforge-chapter .kaiforge-semantic-header h2 {
@@ -21,7 +28,7 @@
 .kaiforge-chapter .kaiforge-beat small {
   width: fit-content;
   padding: 0.25em 0.5em;
-  color: #e9dfce;
+  color: #e2d8c5;
   background: #242522;
 }
 
@@ -42,10 +49,6 @@
 
 .kaiforge-chapter .beat-impact > span {
   margin-inline: auto;
-}
-
-.kaiforge-chapter .kaiforge-beat strong {
-  text-shadow: 0 1px 2px rgba(25, 27, 25, 0.3);
 }
 
 /* An architectural static composition, never a frozen or simulated WebGL claim. */
@@ -103,20 +106,43 @@
   }
 }
 
-/* Opaque editorial type furniture keeps contrast stable as physical planes pass. */
+/* Type sits directly on the existing surfaces; labels keep their small tabs. */
 .kaiforge-chapter .kaiforge-semantic-header h2 {
   width: fit-content;
-  padding: 0.03em 0.06em 0.1em;
-  background: #242522;
 }
 
 .kaiforge-chapter .kaiforge-beat strong {
   display: table;
-  padding: 0.08em 0.12em;
-  color: #242522;
-  background: #e9dfce;
-  text-shadow: none;
+  color: #111111;
   font-size: clamp(2.8rem, 4.5vw, 5.5rem);
+}
+
+.kaiforge-chapter .kaiforge-semantic-header h2,
+.kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
+.kaiforge-chapter .kaiforge-beat strong,
+.kaiforge-chapter .kaiforge-beat small {
+  padding: 0;
+  background: none;
+  border: 0;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.kaiforge-chapter .kaiforge-semantic-header h2,
+.kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
+.kaiforge-chapter .beat-understanding strong,
+.kaiforge-chapter .beat-understanding small {
+  color: #F2E8D5;
+}
+
+/* Upper copy sits against the arena recess; lower beat copy sits over lit stone. */
+.kaiforge-chapter .beat-approach strong {
+  color: #F2E8D5;
+}
+
+.kaiforge-chapter .kaiforge-beat {
+  transform: none;
+  will-change: opacity;
 }
 
 .kaiforge-chapter .beat-recognition strong,
@@ -140,6 +166,19 @@
 }
 
 @media (orientation: portrait) {
+  .kaiforge-chapter:not(.kaiforge-static) {
+    /* Portrait scrub distance: 350 × 1.8 = 630svh. */
+    height: 730svh;
+  }
+
+  /* The narrower framing places the upper typography against the Ink recess. */
+  .kaiforge-chapter .kaiforge-semantic-header h2,
+  .kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
+  .kaiforge-chapter .beat-understanding strong,
+  .kaiforge-chapter .beat-understanding small {
+    color: #F2E8D5;
+  }
+
   .kaiforge-chapter .kaiforge-beat strong {
     font-size: clamp(2rem, 10vw, 4rem);
   }

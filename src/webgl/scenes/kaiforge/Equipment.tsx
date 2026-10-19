@@ -1,10 +1,22 @@
 import { useKaiForgeMaterials } from './Materials';
 import { useEffect, useMemo } from 'react';
-import { BufferGeometry, Float32BufferAttribute } from 'three';
+import { BoxGeometry, BufferGeometry, Float32BufferAttribute } from 'three';
 import { boxes, type Box } from './geometry';
 
 export function Equipment() {
   const materials = useKaiForgeMaterials();
+  const tabletop = useMemo(() => {
+    const geometry = new BoxGeometry(2.74, 0.04, 1.525);
+    const normals = geometry.getAttribute('normal');
+    const colors: number[] = [];
+    for (let i = 0; i < normals.count; i++) {
+      // The same regulation slab: a dark edge finish, matte competition-green top.
+      const value = normals.getY(i) > 0.5 ? 1 : 0.32;
+      colors.push(value, value, value);
+    }
+    geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+    return geometry;
+  }, []);
   const supports = useMemo(
     () =>
       boxes([
@@ -90,20 +102,20 @@ export function Equipment() {
       supports.dispose();
       markings.dispose();
       weave.dispose();
+      tabletop.dispose();
     },
-    [supports, markings, weave],
+    [supports, markings, weave, tabletop],
   );
   return (
     <group name="KF_RegulationTable">
-      <mesh position={[0, 0.74, 0]} receiveShadow castShadow>
-        <boxGeometry args={[2.74, 0.04, 1.525]} />
+      <mesh geometry={tabletop} position={[0, 0.74, 0]} receiveShadow castShadow>
         <primitive attach="material" object={materials.table} />
       </mesh>
       <mesh geometry={supports} castShadow>
         <primitive attach="material" object={materials.ink} />
       </mesh>
       <mesh geometry={markings}>
-        <primitive attach="material" object={materials.parchment} />
+        <primitive attach="material" object={materials.markings} />
       </mesh>
       <lineSegments geometry={weave}>
         <primitive attach="material" object={materials.net} />

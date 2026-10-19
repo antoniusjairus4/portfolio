@@ -148,7 +148,12 @@ body {
   --hero-ink: #11100f;
   --hero-charcoal: #27231f;
   --hero-parchment: #eadfcd;
-  --hero-crimson: #791f2b;
+  --hero-crimson: #8B1E2D;
+  --hero-accent-feed: 0;
+  --hero-rule-top: clamp(4.5rem, 13vh, 8.5rem);
+  --hero-rule-left: clamp(4.75rem, 7vw, 8.5rem);
+  --hero-rule-width: clamp(7rem, 14vw, 17rem);
+  --hero-rule-height: clamp(0.3rem, 0.45vw, 0.5rem);
   --hero-rupture-y: 44%;
   z-index: 3;
   background: transparent;
@@ -157,6 +162,18 @@ body {
 .hero-editorial-surface {
   perspective: 1200px;
   background: transparent;
+}
+
+.hero-portrait-reveal {
+  /* One continuous image, contained inside the already-open typographic seam.
+     Hidden in server HTML and at rest; never a pair of covering 50% panels. */
+  opacity: var(--hero-portrait-opacity, 0);
+  clip-path: inset(
+    max(0%, calc(var(--hero-rupture-y) - var(--hero-opening) * 60% + 1.5%))
+    calc(50% * (1 - var(--hero-portrait-reveal, 0)))
+    max(0%, calc(100% - var(--hero-rupture-y) - var(--hero-opening) * 60% + 1.5%))
+    calc(50% * (1 - var(--hero-portrait-reveal, 0)))
+  );
 }
 
 .hero-depth-curtain {
@@ -212,13 +229,33 @@ body {
   writing-mode: vertical-rl;
 }
 
+.hero-editorial-spine > span:first-child {
+  color: var(--hero-crimson);
+}
+
 .hero-editorial-crossbar {
   position: absolute;
-  top: clamp(4.5rem, 13vh, 8.5rem);
-  left: clamp(4.75rem, 7vw, 8.5rem);
-  width: clamp(7rem, 14vw, 17rem);
-  height: clamp(0.3rem, 0.45vw, 0.5rem);
+  /* The existing rule becomes a short seam mark, then leaves with the curtain. */
+  top: calc(var(--hero-rule-top) + (var(--hero-rupture-y) - var(--hero-rule-top)) * var(--hero-accent-feed));
+  left: calc(var(--hero-rule-left) + (50% - 18px - var(--hero-rule-left)) * var(--hero-accent-feed));
+  width: calc(var(--hero-rule-width) + (36px - var(--hero-rule-width)) * var(--hero-accent-feed));
+  height: calc(var(--hero-rule-height) + (1.5px - var(--hero-rule-height)) * var(--hero-accent-feed));
+  transform: translate3d(0, calc(var(--hero-opening) * -60vh), 0);
+  opacity: clamp(0, calc(1 - var(--hero-opening) * 6), 1);
   background: var(--hero-crimson);
+}
+
+.hero-role-accent {
+  position: absolute;
+  z-index: 11;
+  top: calc(50% + var(--hero-copy-half-height, 0px) + 0.75rem);
+  left: calc(50% - 11px);
+  width: 22px;
+  height: 1px;
+  pointer-events: none;
+  background: var(--hero-crimson);
+  opacity: clamp(0, calc(1 - var(--hero-opening) * 3), 1);
+  transform: translate3d(0, calc(var(--hero-opening) * 18vh), 0);
 }
 
 .hero-editorial-counterweight {
@@ -292,6 +329,10 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 @media (orientation: portrait) {
   .hero-editorial-composition {
     --hero-rupture-y: 45%;
+    --hero-rule-top: clamp(3rem, 9vh, 5rem);
+    --hero-rule-left: clamp(1rem, 4vw, 1.5rem);
+    --hero-rule-width: clamp(4.5rem, 24vw, 8rem);
+    --hero-rule-height: 0.25rem;
   }
 
   .font-hero-name {
@@ -314,13 +355,6 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
     display: none;
   }
 
-  .hero-editorial-crossbar {
-    top: clamp(3rem, 9vh, 5rem);
-    left: clamp(1rem, 4vw, 1.5rem);
-    width: clamp(4.5rem, 24vw, 8rem);
-    height: 0.25rem;
-  }
-
   .hero-editorial-counterweight {
     width: clamp(8rem, 42vw, 18rem);
     height: clamp(1.25rem, 3.5vh, 2.25rem);
@@ -328,6 +362,10 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-role-accent {
+    opacity: 1;
+  }
+
   .hero-letter {
     will-change: auto;
   }

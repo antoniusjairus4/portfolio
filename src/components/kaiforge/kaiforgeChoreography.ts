@@ -28,9 +28,14 @@ export function getKaiForgeBeat(progress: number): KaiForgeBeat {
   return 'release';
 }
 
-export function getBeatOpacity(progress: number, center: number, halfWidth: number) {
+export function getBeatOpacity(
+  progress: number,
+  center: number,
+  halfWidth: number,
+  holdHalfWidth = 0,
+) {
   const distance = Math.abs(progress - center);
-  return smoothstep(1 - distance / halfWidth);
+  return smoothstep(1 - Math.max(0, distance - holdHalfWidth) / (halfWidth - holdHalfWidth));
 }
 
 export function getImpactProgress(progress: number) {

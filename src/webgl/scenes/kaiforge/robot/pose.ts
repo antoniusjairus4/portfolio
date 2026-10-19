@@ -1,5 +1,6 @@
 import { Euler, Quaternion, Vector3 } from 'three';
-import { smoothstep } from '@/components/kaiforge/kaiforgeChoreography';
+import { rangeProgress, smoothstep } from '@/components/kaiforge/kaiforgeChoreography';
+import { BALL_TIMING, sampleBallPosition } from '../ballSequence';
 import { CONTACT } from '../staging';
 
 export const ROBOT_ROOT = [-1.88, 0, 0.25] as const;
@@ -23,14 +24,14 @@ export function getRobotPose(progress: number) {
   let roll = -0.2;
   let tilt = 0.08;
   let phase = 'ready';
-  if (p > 0.18 && p <= 0.3) {
-    const t = clamp((p - 0.18) / 0.12);
+  if (p > BALL_TIMING.loadStart && p <= BALL_TIMING.loadEnd) {
+    const t = rangeProgress(p, BALL_TIMING.loadStart, BALL_TIMING.loadEnd);
     center.lerp(LOAD, smoothstep(t));
     yaw += (-0.15 - yaw) * smoothstep(t);
     roll += (0.32 - roll) * smoothstep(t * t);
     phase = 'load';
-  } else if (p > 0.3 && p < 0.455) {
-    const t = clamp((p - 0.3) / 0.155);
+  } else if (p > BALL_TIMING.loadEnd && p < BALL_TIMING.contact) {
+    const t = rangeProgress(p, BALL_TIMING.loadEnd, BALL_TIMING.contact);
     center.copy(LOAD).lerp(IMPACT_CENTER, t * t);
     center.y += Math.sin(Math.PI * t) * 0.035;
     // The wrist turns later than the main sweep, then closes precisely on contact.
@@ -39,20 +40,27 @@ export function getRobotPose(progress: number) {
     roll = 0.32 * (1 - wrist);
     tilt = 0.08 * (1 - wrist);
     phase = 'acceleration';
-  } else if (p >= 0.455 && p <= 0.49) {
+  } else if (p >= BALL_TIMING.contact && p <= BALL_TIMING.outgoing) {
     center.copy(IMPACT_CENTER);
     yaw = IMPACT_YAW;
     roll = 0;
     tilt = 0;
     phase = 'impact';
-  } else if (p > 0.49) {
-    const t = clamp((p - 0.49) / 0.15);
+  } else if (p > BALL_TIMING.outgoing) {
+    const t = clamp((p - BALL_TIMING.outgoing) / 0.15);
     center.copy(IMPACT_CENTER).lerp(FOLLOW, 1 - (1 - t) ** 3);
     const wrist = smoothstep(t);
     yaw = IMPACT_YAW + (1.5 - IMPACT_YAW) * wrist;
     roll = 0.48 * wrist;
     tilt = 0.12 * wrist;
     phase = 'follow-through';
+  }
+  if (p < BALL_TIMING.loadEnd) {
+    const incoming = sampleBallPosition(p, new Vector3());
+    const trackingYaw = Math.atan2(incoming.x - center.x, incoming.z - center.z);
+    const tracking =
+      0.12 * (1 - smoothstep(rangeProgress(p, BALL_TIMING.loadStart, BALL_TIMING.loadEnd)));
+    yaw += (trackingYaw - yaw) * tracking;
   }
   const paddleRotation = new Quaternion().setFromEuler(new Euler(tilt, yaw, roll, 'YXZ'));
   const wrist = center

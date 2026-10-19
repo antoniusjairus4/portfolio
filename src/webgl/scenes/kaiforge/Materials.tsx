@@ -2,6 +2,8 @@ import { createContext, type ReactNode, useContext, useEffect, useMemo } from 'r
 import {
   DataTexture,
   LineBasicMaterial,
+  LinearFilter,
+  LinearMipmapLinearFilter,
   MeshBasicMaterial,
   MeshStandardMaterial,
   RepeatWrapping,
@@ -9,6 +11,7 @@ import {
   SRGBColorSpace,
 } from 'three';
 import { PALETTE } from './staging';
+import { withGroundContactShadows } from './groundContactShadows';
 
 function parchmentGrain() {
   const size = 128;
@@ -31,7 +34,7 @@ function parchmentGrain() {
   };
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
-      const value = Math.round(244 + (coarse(x, y) - 0.5) * 14 + (hash(x, y) - 0.5) * 3);
+      const value = Math.round(247 + (coarse(x, y) - 0.5) * 7 + (hash(x, y) - 0.5) * 2);
       const offset = (y * size + x) * 4;
       pixels[offset] = value;
       pixels[offset + 1] = value - 2;
@@ -45,41 +48,102 @@ function parchmentGrain() {
   texture.wrapT = RepeatWrapping;
   texture.repeat.set(2, 2);
   texture.generateMipmaps = true;
+  texture.minFilter = LinearMipmapLinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+/** Shared linear data: red is micro-height, green is roughness. No downloaded maps. */
+function surfaceFinish() {
+  const size = 128;
+  const pixels = new Uint8Array(size * size * 4);
+  let seed = 719;
+  for (let i = 0; i < size * size; i++) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const grain = seed / 4294967296;
+    pixels[i * 4] = Math.round(110 + grain * 36);
+    pixels[i * 4 + 1] = Math.round(228 + grain * 27);
+    pixels[i * 4 + 2] = 255;
+    pixels[i * 4 + 3] = 255;
+  }
+  const texture = new DataTexture(pixels, size, size, RGBAFormat);
+  texture.wrapS = texture.wrapT = RepeatWrapping;
+  texture.minFilter = LinearMipmapLinearFilter;
+  texture.magFilter = LinearFilter;
+  texture.generateMipmaps = true;
   texture.needsUpdate = true;
   return texture;
 }
 
 function createMaterials() {
   const grain = parchmentGrain();
+  const finish = surfaceFinish();
   return {
     grain,
-    parchment: new MeshStandardMaterial({ color: '#e4ddcf', roughness: 0.9 }),
+    finish,
+    parchment: new MeshStandardMaterial({ color: PALETTE.parchment, roughness: 0.86 }),
+    markings: new MeshStandardMaterial({ color: '#f6f3e9', roughness: 0.88 }),
+    ceiling: new MeshStandardMaterial({ color: '#111111', roughness: 0.96 }),
+    reveal: new MeshStandardMaterial({ color: '#a69a83', roughness: 0.94 }),
+    ball: new MeshStandardMaterial({
+      color: '#f8f5eb',
+      roughness: 0.58,
+      metalness: 0,
+      roughnessMap: finish,
+      bumpMap: finish,
+      bumpScale: 0.00008,
+    }),
     architecture: new MeshStandardMaterial({
-      color: '#d9cdbb',
-      roughness: 0.96,
+      color: PALETTE.parchment,
+      roughness: 0.94,
       vertexColors: true,
       map: grain,
+      roughnessMap: finish,
+      bumpMap: finish,
+      bumpScale: 0.012,
     }),
-    ground: new MeshStandardMaterial({
-      color: '#d2c5b2',
-      roughness: 0.99,
-      vertexColors: true,
-      map: grain,
-    }),
+    ground: withGroundContactShadows(
+      new MeshStandardMaterial({
+        color: '#c9bfad',
+        roughness: 0.91,
+        vertexColors: true,
+        map: grain,
+        roughnessMap: finish,
+        bumpMap: finish,
+        bumpScale: 0.006,
+      }),
+    ),
     mineral: new MeshStandardMaterial({
-      color: '#c5b7a2',
-      roughness: 0.97,
+      color: '#b2a895',
+      roughness: 0.88,
       vertexColors: true,
       map: grain,
+      roughnessMap: finish,
+      bumpMap: finish,
+      bumpScale: 0.018,
     }),
-    ink: new MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.85 }),
+    ink: new MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.78, metalness: 0.12 }),
     skin: new MeshStandardMaterial({ color: '#ad9c87', roughness: 0.95 }),
-    table: new MeshStandardMaterial({ color: '#283531', roughness: 0.7 }),
-    net: new LineBasicMaterial({ color: '#56564d' }),
+    table: new MeshStandardMaterial({
+      color: '#183d2b',
+      roughness: 0.87,
+      vertexColors: true,
+      metalness: 0,
+      roughnessMap: finish,
+      bumpMap: finish,
+      bumpScale: 0.00035,
+    }),
+    net: new LineBasicMaterial({ color: '#343530' }),
     trace: new MeshBasicMaterial({ color: '#aba18e' }),
     echo: new MeshBasicMaterial({ color: '#746f62' }),
     crimson: new MeshBasicMaterial({ color: PALETTE.crimson }),
-    contact: new MeshBasicMaterial({ color: '#b4aa98' }),
+    contact: new MeshBasicMaterial({
+      color: PALETTE.ink,
+      transparent: true,
+      opacity: 0.13,
+      depthWrite: false,
+    }),
   };
 }
 const Context = createContext<ReturnType<typeof createMaterials> | null>(null);
