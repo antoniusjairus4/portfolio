@@ -5,6 +5,7 @@ import { useMemo, useRef } from 'react';
 import { Color, type PerspectiveCamera, type PointLight, Vector3 } from 'three';
 import {
   getControlProgress,
+  getFragmentationProgress,
   getOrganizationProgress,
   getRelationshipProgress,
 } from '@/components/palindrome/palindromeChoreography';
@@ -23,7 +24,7 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
   const reflectedFill = useRef<PointLight>(null);
   const fillColors = useMemo(
     () => ({
-      warm: new Color(ROOM_PALETTE.parchment),
+      warm: new Color('#F2EDE3'),
       crimson: new Color(ROOM_PALETTE.crimson),
     }),
     [],
@@ -33,10 +34,11 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
     const p = controller.progress.current;
     const relationships = getRelationshipProgress(p);
     const organization = getOrganizationProgress(p);
-    const attention = relationships * (1 - getControlProgress(p));
+    const attention =
+      (getFragmentationProgress(p) * 0.22 + relationships * 0.78) * (1 - getControlProgress(p));
     // Reuse the local fill: a small reflected warmth shift, never a red wash.
     if (reflectedFill.current) {
-      reflectedFill.current.color.lerpColors(fillColors.warm, fillColors.crimson, attention * 0.18);
+      reflectedFill.current.color.lerpColors(fillColors.warm, fillColors.crimson, attention * 0.1);
       reflectedFill.current.intensity = 1.45 + attention * 0.2;
     }
     const perspectiveCamera = camera as PerspectiveCamera;
@@ -58,8 +60,8 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
   return (
     <>
       <color attach="background" args={[ROOM_PALETTE.ink]} />
-      <ambientLight intensity={0.24} color={ROOM_PALETTE.parchment} />
-      <hemisphereLight args={[ROOM_PALETTE.parchment, '#594632', 0.58]} />
+      <ambientLight intensity={0.24} color="#F3F0E9" />
+      <hemisphereLight args={['#E5EBE7', '#686E64', 0.58]} />
       <directionalLight
         position={[-3.8, 4.2, 1.5]}
         intensity={1.9}

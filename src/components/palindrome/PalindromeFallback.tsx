@@ -21,7 +21,7 @@ export function PalindromeFallback({ reason }: PalindromeFallbackProps) {
         </div>
         <div className="palindrome-fallback-information">
           <span>
-            MILK COSTS MORE
+            MILK COSTS 30% MORE
             <br />
             THAN LAST WEEK
           </span>

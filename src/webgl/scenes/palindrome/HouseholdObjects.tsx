@@ -4,6 +4,7 @@ import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.j
 import { SpatialType } from './SpatialType';
 import { ContactPatch, Surface } from './Surfaces';
 import { DOMESTIC_SOURCES } from './sources';
+import { ROOM_PALETTE } from './palette';
 
 type Point = readonly [number, number, number];
 type Finish = 'wood' | 'paper' | 'ceramic' | 'metal' | 'fabric' | 'plaster';
@@ -75,7 +76,15 @@ const PLATE: [number, number][] = [
   [0, 0.023],
 ];
 
-export function CeramicJar({ position, height = 0.32 }: { position: Point; height?: number }) {
+export function CeramicJar({
+  position,
+  height = 0.32,
+  color = ROOM_PALETTE.parchment,
+}: {
+  position: Point;
+  height?: number;
+  color?: string;
+}) {
   const profile = useMemo<[number, number][]>(
     () => [
       [0, 0.005],
@@ -93,7 +102,7 @@ export function CeramicJar({ position, height = 0.32 }: { position: Point; heigh
   );
   return (
     <group position={[...position]}>
-      <Vessel profile={profile} color="#D9D2BB" />
+      <Vessel profile={profile} color={color} />
       <mesh position={[0, height + 0.012, 0]} castShadow>
         <cylinderGeometry args={[0.132, 0.136, 0.034, 32]} />
         <Surface color="#645B4C" />
@@ -113,7 +122,7 @@ function GroceryBag() {
       <RoundedSolid
         position={[0, 0.32, 0]}
         size={[0.62, 0.64, 0.43]}
-        color="#AF8960"
+        color={ROOM_PALETTE.kraft}
         radius={0.027}
         finish="paper"
       />
@@ -197,12 +206,12 @@ function MilkCarton() {
 function CoffeeCup() {
   return (
     <group position={[...DOMESTIC_SOURCES.coffee]}>
-      <Vessel profile={PLATE} />
+      <Vessel profile={PLATE} color={ROOM_PALETTE.sage} />
       <group position={[0, 0.024, 0]}>
         <Vessel profile={CUP} color="#F2E8D5" />
         <mesh position={[0.145, 0.145, 0]} castShadow>
           <torusGeometry args={[0.082, 0.023, 10, 24]} />
-          <Surface color="#F2E8D5" finish="ceramic" />
+          <Surface color={ROOM_PALETTE.dustyBlue} finish="ceramic" />
         </mesh>
         <mesh position={[0, 0.239, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.116, 32]} />
@@ -269,7 +278,7 @@ export function Book({
       <RoundedSolid
         position={[0.008, height / 2, 0.012]}
         size={[width - 0.018, height - 0.026, 0.3]}
-        color="#CDC2AC"
+        color={ROOM_PALETTE.parchment}
         radius={0.003}
         finish="paper"
       />
@@ -344,7 +353,7 @@ function TableLamp() {
     <group position={[0.56, 1.14, -0.91]}>
       <mesh position={[0, 0.025, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.18, 0.05, 32]} />
-        <Surface color="#414735" finish="metal" />
+        <Surface color={ROOM_PALETTE.forest} finish="metal" />
       </mesh>
       <mesh position={[0, 0.38, 0]} castShadow>
         <cylinderGeometry args={[0.018, 0.021, 0.7, 16]} />
@@ -380,7 +389,7 @@ function TableLamp() {
 }
 
 export function ShelfBowl() {
-  return <Vessel profile={BOWL} color="#BDBDA7" />;
+  return <Vessel profile={BOWL} color={ROOM_PALETTE.terracotta} />;
 }
 
 export function HouseholdObjects() {
@@ -404,7 +413,7 @@ export function HouseholdObjects() {
         <RoundedSolid
           position={[0, 0.11, 0]}
           size={[0.15, 0.21, 0.25]}
-          color="#CDC2AC"
+          color={ROOM_PALETTE.parchment}
           radius={0.025}
           finish="paper"
         />
@@ -414,7 +423,7 @@ export function HouseholdObjects() {
         <RoundedSolid
           position={[0, 0.17, 0]}
           size={[0.23, 0.34, 0.21]}
-          color="#8F9072"
+          color={ROOM_PALETTE.ochre}
           radius={0.009}
           finish="paper"
         />

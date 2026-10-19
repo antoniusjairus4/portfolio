@@ -29,7 +29,7 @@ type Fragment = {
 // Adjacent pairs are meaningful clauses that assemble into one editorial insight.
 const FRAGMENTS: readonly Fragment[] = [
   {
-    text: 'MILK COSTS MORE',
+    text: 'MILK COSTS 30% MORE',
     ordinary: 'MILK',
     source: 'milk',
     offset: [0, 0.3, 0.151],
@@ -136,7 +136,7 @@ export function InformationField({
     const sourceX = portrait ? 0.76 : 1;
     const alignment = related * 0.36 + organized * 0.64;
     const reading = smoothstep(rangeProgress(fragmented, 0.12, 0.65));
-    const attention = related * (1 - control);
+    const attention = (fragmented * 0.22 + related * 0.78) * (1 - control);
 
     FRAGMENTS.forEach((data, index) => {
       const fragment = fragments.current[index];

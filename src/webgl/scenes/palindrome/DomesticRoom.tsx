@@ -6,17 +6,10 @@ import {
   ShelfBowl,
 } from './HouseholdObjects';
 import { ContactPatch, DomesticSurfaces, Surface } from './Surfaces';
+import { ROOM_PALETTE } from './palette';
+import { SeatedFigure } from './SeatedFigure';
 
-export const ROOM_PALETTE = {
-  ink: '#111111',
-  parchment: '#F2E8D5',
-  crimson: '#8B1E2D',
-  plaster: '#2E2B27',
-  floor: '#A89371',
-  timber: '#806047',
-  ceramic: '#E4D7BF',
-  charcoal: '#1F211E',
-};
+export { ROOM_PALETTE } from './palette';
 
 type Point = [number, number, number];
 
@@ -40,7 +33,7 @@ function Block({
 }
 
 function SeatedPresence() {
-  // Deliberately one quiet carved form: no face, fingers, or anatomical rig.
+  // The approved chair and seated anchor stay fixed; only the human is refined.
   return (
     <group position={[0.45, 0, -1.28]} rotation={[0, -0.18, 0]}>
       <Block position={[0, 0.56, 0]} size={[0.65, 0.09, 0.62]} color={ROOM_PALETTE.timber} />
@@ -55,33 +48,7 @@ function SeatedPresence() {
           />
         )),
       )}
-      <mesh position={[0, 1.06, 0.01]} rotation={[0.14, 0, -0.07]} castShadow>
-        <cylinderGeometry args={[0.23, 0.32, 0.89, 12]} />
-        <meshStandardMaterial color="#484840" roughness={1} />
-      </mesh>
-      <mesh position={[-0.04, 1.72, 0.08]} scale={[0.85, 1.1, 0.9]} castShadow>
-        <sphereGeometry args={[0.22, 20, 16]} />
-        <meshStandardMaterial color={ROOM_PALETTE.ceramic} roughness={1} />
-      </mesh>
-      <mesh position={[-0.29, 1.13, 0.17]} rotation={[0, 0, -0.85]} castShadow>
-        <capsuleGeometry args={[0.085, 0.45, 4, 10]} />
-        <meshStandardMaterial color="#484840" roughness={1} />
-      </mesh>
-      {[-0.16, 0.16].map((x) => (
-        <group key={x}>
-          <Block
-            position={[x, 0.63, 0.25]}
-            size={[0.22, 0.22, 0.51]}
-            color={ROOM_PALETTE.charcoal}
-          />
-          <Block
-            position={[x, 0.31, 0.44]}
-            size={[0.17, 0.52, 0.18]}
-            color={ROOM_PALETTE.charcoal}
-          />
-          <Block position={[x, 0.065, 0.52]} size={[0.2, 0.13, 0.34]} color={ROOM_PALETTE.ink} />
-        </group>
-      ))}
+      <SeatedFigure />
     </group>
   );
 }
@@ -116,7 +83,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
         <Block
           position={[-0.8, 0.012, -0.15]}
           size={[4.7, 0.02, 2.7]}
-          color="#6C6956"
+          color={ROOM_PALETTE.rug}
           finish="fabric"
         />
         {[-1.36, 1.06].map((z) => (
@@ -189,14 +156,14 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
           <RoundedSolid
             position={[0.2, 0.48, 0]}
             size={[0.96, 0.52, 0.42]}
-            color="#969477"
+            color={ROOM_PALETTE.storage}
             radius={0.025}
             finish="fabric"
           />
           <RoundedSolid
             position={[0.2, 0.745, 0]}
             size={[0.98, 0.035, 0.44]}
-            color="#74745B"
+            color={ROOM_PALETTE.forest}
             radius={0.012}
             finish="fabric"
           />
@@ -205,14 +172,14 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
             size={[0.21, 0.035, 0.012]}
             color={ROOM_PALETTE.charcoal}
           />
-          <Jar position={[-0.49, 1.03, 0]} height={0.38} />
-          <Jar position={[-0.08, 1.03, 0]} height={0.29} />
+          <Jar position={[-0.49, 1.03, 0]} height={0.38} color={ROOM_PALETTE.sage} />
+          <Jar position={[-0.08, 1.03, 0]} height={0.29} color={ROOM_PALETTE.parchment} />
           {[0.28, 0.41, 0.55].map((x, index) => (
             <Book
               key={x}
               position={[x, 1.84, 0]}
               height={0.39 + index * 0.035}
-              color={index === 1 ? ROOM_PALETTE.ceramic : ROOM_PALETTE.charcoal}
+              color={[ROOM_PALETTE.dustyBlue, ROOM_PALETTE.forest, ROOM_PALETTE.ochre][index]}
             />
           ))}
           <group position={[-0.43, 1.84, 0]}>
