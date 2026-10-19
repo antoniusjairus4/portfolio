@@ -1,15 +1,16 @@
 import {
+  type Camera,
   Mesh,
-  MeshStandardMaterial,
+  type MeshStandardMaterial,
+  type Scene,
   SkinnedMesh,
   Texture,
-  type Camera,
-  type Scene,
   type WebGLRenderer,
 } from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import type { ProductionAssetDriver } from './types';
 import { createAthleteAnimation } from '@/webgl/scenes/kaiforge/athleteAnimation';
+import { createSculpturalAthleteMaterials } from '@/webgl/scenes/kaiforge/athleteMaterials';
+import type { ProductionAssetDriver } from './types';
 
 export interface KaiForgeGLTFContext {
   gl: WebGLRenderer;
@@ -20,27 +21,13 @@ export type KaiForgeGLTF = Awaited<ReturnType<typeof prepare>>;
 
 async function prepare(bytes: ArrayBuffer) {
   const gltf = await new GLTFLoader().parseAsync(bytes, '');
-  const materials = {
-    KF_Skin: new MeshStandardMaterial({ name: 'KF_Skin', color: '#b89175', roughness: 0.76 }),
-    KF_Cloth: new MeshStandardMaterial({ name: 'KF_Cloth', color: '#202522', roughness: 0.94 }),
-    KF_HairShoes: new MeshStandardMaterial({
-      name: 'KF_HairShoes',
-      color: '#171b19',
-      roughness: 0.97,
-    }),
-    KF_Rubber: new MeshStandardMaterial({ name: 'KF_Rubber', color: '#222724', roughness: 0.92 }),
-    KF_Wood: new MeshStandardMaterial({ name: 'KF_Wood', color: '#87725b', roughness: 0.8 }),
-  };
+  const materials = createSculpturalAthleteMaterials();
   const oldMaterials = new Set<MeshStandardMaterial>();
   gltf.scene.traverse((object) => {
     if (!(object instanceof Mesh)) return;
     const original = object.material as MeshStandardMaterial;
     oldMaterials.add(original);
-    const replacement = materials[original.name as keyof typeof materials];
-    if (!replacement) throw new Error(`Unmapped athlete material: ${original.name}`);
-    object.material = replacement;
-    object.castShadow = true;
-    object.receiveShadow = true;
+    materials.apply(object, original.name);
     // Animated bounds are evaluated explicitly by validation; never cull using bind-pose bounds.
     if (object instanceof SkinnedMesh) object.frustumCulled = false;
   });
@@ -76,7 +63,7 @@ async function prepare(bytes: ArrayBuffer) {
         if (typeof ImageBitmap !== 'undefined' && image instanceof ImageBitmap) image.close();
         texture.dispose();
       }
-      for (const material of Object.values(materials)) material.dispose();
+      materials.dispose();
       gltf.scene.removeFromParent();
     },
   };

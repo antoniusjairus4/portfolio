@@ -5,26 +5,26 @@ import type {
 } from '@/experience/assets/types';
 
 export const KAI_FORGE_ATHLETE = 'KF_ATHLETE_ASSEMBLY';
-export const productionAssetManifest: readonly ProductionAssetDefinition[] = [
-  {
-    id: KAI_FORGE_ATHLETE,
-    owner: 'kaiforge',
-    resourceType: 'kaiforge-glb',
-    priority: 'critical-next',
-    preload: 'after-critical-ready',
-    disposal: 'chapter-established',
-    variants: [
-      {
-        id: 'assembly-high-247ce0e9',
-        url: '/models/kaiforge/athlete-assembly-247ce0e9.glb',
-        profile: 'desktop',
-        quality: ['high', 'reduced'],
-        estimatedBytes: 811992,
-      },
-    ],
-    // Pass 1 uses the desktop asset on portrait. Add a real mobile variant after its export gate.
-  },
-];
+// Retained for a future direction decision; the procedural robot never requests this asset.
+export const archivedKaiForgeAthlete: ProductionAssetDefinition = {
+  id: KAI_FORGE_ATHLETE,
+  owner: 'kaiforge',
+  resourceType: 'kaiforge-glb',
+  priority: 'critical-next',
+  preload: 'after-critical-ready',
+  disposal: 'chapter-established',
+  variants: [
+    {
+      id: 'assembly-high-247ce0e9',
+      url: '/models/kaiforge/athlete-assembly-247ce0e9.glb',
+      profile: 'desktop',
+      quality: ['high', 'reduced'],
+      estimatedBytes: 811992,
+    },
+  ],
+  // Pass 1 uses the desktop asset on portrait. Add a real mobile variant after its export gate.
+};
+export const productionAssetManifest: readonly ProductionAssetDefinition[] = [];
 
 export function selectProductionAssetVariant(
   definition: ProductionAssetDefinition,

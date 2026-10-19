@@ -2,16 +2,15 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useLayoutEffect, useMemo } from 'react';
-import { Vector3, Frustum, Matrix4, Mesh } from 'three';
+import { Frustum, Matrix4, Mesh, Vector3 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { Architecture } from './kaiforge/Architecture';
 import { Equipment } from './kaiforge/Equipment';
-import { ProductionAthlete } from './kaiforge/ProductionAthlete';
-import { ProxyAthlete } from './kaiforge/ProxyAthlete';
+import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
+import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
+import { getRobotPose, ROBOT_ROOT } from './kaiforge/robot/pose';
+import { CAMERAS, CONTACT, sampleCamera } from './kaiforge/staging';
 import { Trajectory } from './kaiforge/Trajectory';
-import { athleteFrame } from './kaiforge/athleteAnimation';
-import { CAMERAS, sampleCamera } from './kaiforge/staging';
 
 function ProductionScene({
   controller,
@@ -22,10 +21,6 @@ function ProductionScene({
 }) {
   const materials = useKaiForgeMaterials();
   const { camera, scene, gl } = useThree();
-  const debugProxy =
-    process.env.NODE_ENV !== 'production' &&
-    typeof window !== 'undefined' &&
-    new URLSearchParams(window.location.search).has('kfProxy');
   const target = useMemo(() => new Vector3(), []);
   useFrame(() => {
     const p = controller.progress.current;
@@ -40,14 +35,20 @@ function ProductionScene({
     const previous = scene.onAfterRender;
     const frustum = new Frustum();
     const matrix = new Matrix4();
+    const contactPoint = new Vector3();
     scene.onAfterRender = () => {
       frustum.setFromProjectionMatrix(
         matrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse),
       );
       let visibleTriangles = 0,
-        shadowCasters = 0;
+        shadowCasters = 0,
+        athleteInstances = 0,
+        robotInstances = 0;
       const activeMaterials = new Set();
       scene.traverseVisible((object) => {
+        if (object.name === 'KF_ProductionAthlete') athleteInstances++;
+        if (object.name === 'KF_StagingProxy_NOT_PRODUCTION') athleteInstances++;
+        if (object.name === 'KF_ProceduralRobot') robotInstances++;
         if (
           !(object instanceof Mesh) ||
           (object.frustumCulled && !frustum.intersectsObject(object))
@@ -62,9 +63,33 @@ function ProductionScene({
         if (object.castShadow) shadowCasters++;
         activeMaterials.add(object.material);
       });
+      let robotTriangles = 0,
+        robotMeshes = 0;
+      const robotMaterials = new Set();
+      scene.getObjectByName('KF_ProceduralRobot')?.traverseVisible((object) => {
+        if (!(object instanceof Mesh)) return;
+        robotTriangles +=
+          (object.geometry.index?.count ?? object.geometry.attributes.position.count) / 3;
+        robotMeshes++;
+        robotMaterials.add(object.material);
+      });
+      scene.getObjectByName('KF_Robot_ContactProbe')?.getWorldPosition(contactPoint);
+      const pose = getRobotPose(controller.progress.current);
       gl.domElement.dataset.kfMetrics = JSON.stringify({
-        athlete: !!scene.getObjectByName('KF_ProductionAthlete'),
-        athleteFrame: athleteFrame(controller.progress.current),
+        athleteInstances,
+        robotInstances,
+        robotTriangles,
+        robotMeshes,
+        robotMaterials: robotMaterials.size,
+        robotPhase: pose.phase,
+        robotPose: [
+          pose.shoulderYaw,
+          pose.shoulderPitch,
+          pose.elbowPitch,
+          ...pose.wristRotation.toArray(),
+        ],
+        contact: contactPoint.toArray(),
+        contactError: contactPoint.distanceTo(CONTACT),
         programs: gl.info.programs?.length,
         calls: gl.info.render.calls,
         visibleTriangles,
@@ -86,11 +111,11 @@ function ProductionScene({
   return (
     <>
       <color attach="background" args={['#191b19']} />
-      <hemisphereLight args={['#eee6d8', '#817665', 0.7]} />
+      <hemisphereLight args={['#eee2ce', '#777168', 0.78]} />
       <directionalLight
-        position={[-3, 6, 4]}
-        intensity={3}
-        color="#fff4e8"
+        position={[-3.8, 5.8, 3.2]}
+        intensity={2.25}
+        color="#fff0d9"
         castShadow={!portrait}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -104,14 +129,10 @@ function ProductionScene({
         shadow-normalBias={0.008}
         shadow-bias={-0.0002}
       />
-      <directionalLight position={[2, 3, -4]} intensity={1.1} color="#e7e1d5" />
+      <directionalLight position={[2.8, 3.6, -3.5]} intensity={1.6} color="#e2e8df" />
       <Architecture progress={controller.progress} portrait={portrait} />
       <Equipment />
-      {debugProxy ? (
-        <ProxyAthlete progress={controller.progress} />
-      ) : (
-        <ProductionAthlete progress={controller.progress} portrait={portrait} />
-      )}
+      <ProceduralRobot progress={controller.progress} />
       <Trajectory progress={controller.progress} portrait={portrait} />
       {/* Low-tier contact impression; no shadow renderer or transparent floor layers. */}
       {portrait && (
@@ -120,7 +141,11 @@ function ProductionScene({
             <planeGeometry args={[2.1, 1.05]} />
             <primitive attach="material" object={materials.contact} />
           </mesh>
-          <mesh position={[-1.95, 0.002, 0.38]} rotation={[-Math.PI / 2, 0, 0]} scale={[0.5, 1, 1]}>
+          <mesh
+            position={[ROBOT_ROOT[0], 0.002, ROBOT_ROOT[2]]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            scale={[0.75, 0.65, 1]}
+          >
             <circleGeometry args={[0.55, 24]} />
             <primitive attach="material" object={materials.contact} />
           </mesh>

@@ -1,0 +1,178 @@
+{
+  "samples": [
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "recognition",
+      "metrics": {
+        "athleteInstances": 0,
+        "robotInstances": 1,
+        "robotTriangles": 10880,
+        "robotMeshes": 26,
+        "robotMaterials": 5,
+        "robotPhase": "ready",
+        "robotPose": [
+          -0.02468702831797312,
+          2.0192880170981162,
+          -2.0630172677815932,
+          -0.026201071627091402,
+          0.4990293100224772,
+          -0.08748352188203143,
+          0.8617597605964196
+        ],
+        "contact": [
+          -1.4587654317441683,
+          1.4280021326507706,
+          0.25304230183070847
+        ],
+        "contactError": 0.30356846629962486,
+        "programs": 4,
+        "calls": 63,
+        "visibleTriangles": 11396,
+        "shadowCasters": 28,
+        "materials": 11,
+        "dpr": 1,
+        "triangles": 22420,
+        "geometries": 35,
+        "textures": 4,
+        "progress": 0.07989417989417989,
+        "camera": [
+          -0.3616673380959935,
+          2.403555376507735,
+          5.510666129523205
+        ]
+      }
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "impact",
+      "metrics": {
+        "athleteInstances": 0,
+        "robotInstances": 1,
+        "robotTriangles": 10880,
+        "robotMeshes": 26,
+        "robotMaterials": 5,
+        "robotPhase": "impact",
+        "robotPose": [
+          0.3192838598435955,
+          1.5601078111197173,
+          -1.8906637198230185,
+          -0.04925012000066631,
+          0.29526532711543196,
+          0.15698215239598848,
+          0.9411426119948344
+        ],
+        "contact": [
+          -1.2514000000000003,
+          1.3125000000000004,
+          0.06380000000000005
+        ],
+        "contactError": 4.996003610813204e-16,
+        "programs": 5,
+        "calls": 64,
+        "visibleTriangles": 11408,
+        "shadowCasters": 28,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 22432,
+        "geometries": 36,
+        "textures": 4,
+        "progress": 0.4701058201058201,
+        "camera": [
+          -1.6440785672737968,
+          1.9078952436349372,
+          4.6
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "recognition",
+      "metrics": {
+        "athleteInstances": 0,
+        "robotInstances": 1,
+        "robotTriangles": 10880,
+        "robotMeshes": 26,
+        "robotMaterials": 5,
+        "robotPhase": "ready",
+        "robotPose": [
+          -0.02468702831797312,
+          2.0192880170981162,
+          -2.0630172677815932,
+          -0.026201071627091402,
+          0.4990293100224772,
+          -0.08748352188203143,
+          0.8617597605964196
+        ],
+        "contact": [
+          -1.4587654317441683,
+          1.4280021326507706,
+          0.25304230183070847
+        ],
+        "contactError": 0.30356846629962486,
+        "programs": 4,
+        "calls": 37,
+        "visibleTriangles": 11410,
+        "shadowCasters": 28,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 11410,
+        "geometries": 37,
+        "textures": 2,
+        "progress": 0.07989167230873392,
+        "camera": [
+          -0.32548293774907744,
+          3.658901527593276,
+          11.463276568651086
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "impact",
+      "metrics": {
+        "athleteInstances": 0,
+        "robotInstances": 1,
+        "robotTriangles": 10880,
+        "robotMeshes": 26,
+        "robotMaterials": 5,
+        "robotPhase": "impact",
+        "robotPose": [
+          0.3192838598435955,
+          1.5601078111197173,
+          -1.8906637198230185,
+          -0.04925012000066631,
+          0.29526532711543196,
+          0.15698215239598848,
+          0.9411426119948344
+        ],
+        "contact": [
+          -1.2514000000000003,
+          1.3125000000000004,
+          0.06380000000000005
+        ],
+        "contactError": 4.996003610813204e-16,
+        "programs": 4,
+        "calls": 38,
+        "visibleTriangles": 11422,
+        "shadowCasters": 28,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 11422,
+        "geometries": 38,
+        "textures": 2,
+        "progress": 0.4698713608666215,
+        "camera": [
+          -1.541985874716166,
+          2.420035313209585,
+          6.856098876986837
+        ]
+      }
+    }
+  ],
+  "errors": [],
+  "glbRequests": []
+}

@@ -4,55 +4,352 @@
       "width": 1440,
       "height": 900,
       "name": "recognition",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":1,\"programs\":6,\"calls\":27,\"visibleTriangles\":28396,\"shadowCasters\":10,\"materials\":10,\"dpr\":1,\"triangles\":56420,\"geometries\":17,\"textures\":4,\"progress\":0.07989417989417989,\"camera\":[-0.3616673380959935,2.403555376507735,5.510666129523205]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 1,
+        "programs": 7,
+        "calls": 27,
+        "visibleTriangles": 28396,
+        "shadowCasters": 10,
+        "materials": 11,
+        "dpr": 1,
+        "triangles": 56420,
+        "geometries": 17,
+        "textures": 5,
+        "progress": 0.07989417989417989,
+        "camera": [
+          -0.3616673380959935,
+          2.403555376507735,
+          5.510666129523205
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 1440,
       "height": 900,
       "name": "approach",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":6.999979858008916,\"programs\":6,\"calls\":27,\"visibleTriangles\":28396,\"shadowCasters\":10,\"materials\":10,\"dpr\":1,\"triangles\":56420,\"geometries\":17,\"textures\":4,\"progress\":0.2798941798941799,\"camera\":[-1.505921432726203,2.0921047563650625,4.6]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 6.999979858008916,
+        "programs": 7,
+        "calls": 27,
+        "visibleTriangles": 28396,
+        "shadowCasters": 10,
+        "materials": 11,
+        "dpr": 1,
+        "triangles": 56420,
+        "geometries": 17,
+        "textures": 5,
+        "progress": 0.2798941798941799,
+        "camera": [
+          -1.505921432726203,
+          2.0921047563650625,
+          4.6
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 1440,
       "height": 900,
       "name": "impact",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":18,\"programs\":7,\"calls\":28,\"visibleTriangles\":28408,\"shadowCasters\":10,\"materials\":11,\"dpr\":1,\"triangles\":56432,\"geometries\":18,\"textures\":4,\"progress\":0.455026455026455,\"camera\":[-1.637183653917508,1.9170884614433226,4.6]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 18,
+        "programs": 8,
+        "calls": 28,
+        "visibleTriangles": 28408,
+        "shadowCasters": 10,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 56432,
+        "geometries": 18,
+        "textures": 5,
+        "progress": 0.455026455026455,
+        "camera": [
+          -1.637183653917508,
+          1.9170884614433226,
+          4.6
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 1440,
       "height": 900,
       "name": "understanding",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":25.000016415854834,\"programs\":7,\"calls\":31,\"visibleTriangles\":30380,\"shadowCasters\":10,\"materials\":12,\"dpr\":1,\"triangles\":58404,\"geometries\":19,\"textures\":4,\"progress\":0.6701058201058201,\"camera\":[0.8922762782522811,2.5071107530154704,4.675888844126934]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 25.000016415854834,
+        "programs": 8,
+        "calls": 31,
+        "visibleTriangles": 30380,
+        "shadowCasters": 10,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 58404,
+        "geometries": 19,
+        "textures": 5,
+        "progress": 0.6701058201058201,
+        "camera": [
+          0.8922762782522811,
+          2.5071107530154704,
+          4.675888844126934
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 1440,
       "height": 900,
       "name": "release",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":36,\"programs\":7,\"calls\":29,\"visibleTriangles\":29420,\"shadowCasters\":10,\"materials\":12,\"dpr\":1,\"triangles\":57444,\"geometries\":19,\"textures\":4,\"progress\":0.91005291005291,\"camera\":[0.501832292566035,3.1581229469600456,5.334324080406216]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 36,
+        "programs": 8,
+        "calls": 29,
+        "visibleTriangles": 29420,
+        "shadowCasters": 10,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 57444,
+        "geometries": 19,
+        "textures": 5,
+        "progress": 0.91005291005291,
+        "camera": [
+          0.501832292566035,
+          3.1581229469600456,
+          5.334324080406216
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 390,
       "height": 844,
       "name": "recognition",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":1,\"programs\":9,\"calls\":19,\"visibleTriangles\":28410,\"shadowCasters\":10,\"materials\":11,\"dpr\":1,\"triangles\":28410,\"geometries\":19,\"textures\":2,\"progress\":0.07989167230873392,\"camera\":[-0.32548293774907744,3.658901527593276,11.463276568651086]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 1,
+        "programs": 5,
+        "calls": 19,
+        "visibleTriangles": 28410,
+        "shadowCasters": 10,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 28410,
+        "geometries": 19,
+        "textures": 3,
+        "progress": 0.07989167230873392,
+        "camera": [
+          -0.32548293774907744,
+          3.658901527593276,
+          11.463276568651086
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 390,
       "height": 844,
       "name": "impact",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":17.9999980068771,\"programs\":9,\"calls\":20,\"visibleTriangles\":28422,\"shadowCasters\":10,\"materials\":12,\"dpr\":1,\"triangles\":28422,\"geometries\":20,\"textures\":2,\"progress\":0.4549763033175355,\"camera\":[-1.532876007924691,2.4428099801882723,6.919867944527163]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 17.9999980068771,
+        "programs": 5,
+        "calls": 20,
+        "visibleTriangles": 28422,
+        "shadowCasters": 10,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 28422,
+        "geometries": 20,
+        "textures": 3,
+        "progress": 0.4549763033175355,
+        "camera": [
+          -1.532876007924691,
+          2.4428099801882723,
+          6.919867944527163
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 390,
       "height": 844,
       "name": "release",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":36,\"programs\":9,\"calls\":21,\"visibleTriangles\":29434,\"shadowCasters\":10,\"materials\":13,\"dpr\":1,\"triangles\":29434,\"geometries\":21,\"textures\":2,\"progress\":0.909952606635071,\"camera\":[0.32532510617759514,4.063399922779931,11.764874662162198]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 36,
+        "programs": 5,
+        "calls": 21,
+        "visibleTriangles": 29434,
+        "shadowCasters": 10,
+        "materials": 14,
+        "dpr": 1,
+        "triangles": 29434,
+        "geometries": 21,
+        "textures": 3,
+        "progress": 0.909952606635071,
+        "camera": [
+          0.32532510617759514,
+          4.063399922779931,
+          11.764874662162198
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     },
     {
       "width": 1920,
       "height": 1080,
       "name": "impact",
-      "metrics": "{\"athlete\":true,\"athleteFrame\":18,\"programs\":12,\"calls\":28,\"visibleTriangles\":28408,\"shadowCasters\":10,\"materials\":11,\"dpr\":1,\"triangles\":56432,\"geometries\":19,\"textures\":4,\"progress\":0.455026455026455,\"camera\":[-1.637183653917508,1.9170884614433226,4.6]}"
+      "metrics": {
+        "athlete": true,
+        "athleteFrame": 18,
+        "programs": 8,
+        "calls": 28,
+        "visibleTriangles": 28408,
+        "shadowCasters": 10,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 56432,
+        "geometries": 18,
+        "textures": 5,
+        "progress": 0.455026455026455,
+        "camera": [
+          -1.637183653917508,
+          1.9170884614433226,
+          4.6
+        ]
+      },
+      "lifecycle": {
+        "id": "KF_ATHLETE_ASSEMBLY",
+        "owner": "kaiforge",
+        "state": "active",
+        "operation": "idle",
+        "variant": "assembly-high-247ce0e9",
+        "bytesRequested": true,
+        "downloaded": true,
+        "prepared": true,
+        "resident": true,
+        "active": true,
+        "leaseCount": 1,
+        "retryCount": 0,
+        "error": null
+      }
     }
   ],
   "errors": []

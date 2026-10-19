@@ -1,9 +1,30 @@
-import { useKaiForgeMaterials } from './Materials';
 import { useFrame } from '@react-three/fiber';
-import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
-import { Float32BufferAttribute, type Group } from 'three';
-import { boxes, type Box } from './geometry';
-import { releaseProgress, impactPulse } from './staging';
+import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
+import { type BufferGeometry, Float32BufferAttribute, type Group } from 'three';
+import { type Box, boxes } from './geometry';
+import { useKaiForgeMaterials } from './Materials';
+import { impactPulse, releaseProgress } from './staging';
+
+/** Face and depth tint for the existing slabs; no new geometry or texture download. */
+function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') {
+  const positions = geometry.getAttribute('position');
+  const normals = geometry.getAttribute('normal');
+  const colors: number[] = [];
+  for (let i = 0; i < positions.count; i++) {
+    const nx = normals.getX(i);
+    const ny = normals.getY(i);
+    const nz = normals.getZ(i);
+    const depth = Math.min(1, Math.max(0, (-positions.getZ(i) - 1) / 9));
+    const height = Math.min(1, Math.max(0, positions.getY(i) / 7));
+    const face = ny > 0.5 ? 1.06 : nx < -0.5 ? 0.79 : nx > 0.5 ? 0.91 : nz > 0.5 ? 1 : 0.75;
+    const distance = 1 - depth * (kind === 'ground' ? 0.08 : 0.17);
+    const vertical = kind === 'ground' ? 1 : 0.94 + height * 0.07;
+    const shade = face * distance * vertical;
+    colors.push(shade, shade * (kind === 'wall' ? 0.99 : 1), shade * 0.97);
+  }
+  geometry.setAttribute('color', new Float32BufferAttribute(colors, 3));
+  return geometry;
+}
 
 /** Unequal, inhabited architectural cuts, rather than a repeated rectangle tunnel. */
 export function Architecture({
@@ -18,82 +39,81 @@ export function Architecture({
   const register = useRef<Group>(null);
   const ground = useMemo(
     () =>
-      boxes([
-        [
-          [-0.6, -0.18, 0.1],
-          [8.4, 0.36, 7.2],
-        ],
-        [
-          [-5.7, -0.34, -3],
-          [1.35, 0.68, 13],
-        ],
-        [
-          [5.3, -0.5, -5],
-          [2.4, 1, 15],
-        ],
-      ]),
+      tintSlabs(
+        boxes([
+          [
+            [-0.6, -0.18, 0.1],
+            [8.4, 0.36, 7.2],
+          ],
+          [
+            [-5.7, -0.34, -3],
+            [1.35, 0.68, 13],
+          ],
+          [
+            [5.3, -0.5, -5],
+            [2.4, 1, 15],
+          ],
+        ]),
+        'ground',
+      ),
     [],
   );
   const walls = useMemo(
     () =>
-      boxes([
-        [
-          [-4.4, 3.5, -4.3],
-          [2.1, 7, 0.48],
-        ],
-        [
-          [2.9, 3, -5.8],
-          [3.4, 6, 0.65],
-        ],
-        [
-          [-0.9, 5.8, -7.8],
-          [8, 0.48, 0.8],
-        ],
-        [
-          [-6.5, 2.6, -8],
-          [0.5, 5.2, 6],
-        ],
-      ]),
+      tintSlabs(
+        boxes([
+          [
+            [-4.4, 3.5, -4.3],
+            [2.1, 7, 0.48],
+          ],
+          [
+            [2.9, 3, -5.8],
+            [3.4, 6, 0.65],
+          ],
+          [
+            [-0.9, 5.8, -7.8],
+            [8, 0.48, 0.8],
+          ],
+          [
+            [-6.5, 2.6, -8],
+            [0.5, 5.2, 6],
+          ],
+        ]),
+        'wall',
+      ),
     [],
   );
-  useMemo(() => {
-    const positions = walls.getAttribute('position');
-    const colors = [];
-    for(let i=0;i<positions.count;i++) {
-      const z = positions.getZ(i);
-      const tone = z < -7 ? .58 : z < -5 ? .82 : 1;
-      colors.push(tone,tone,tone);
-    }
-    walls.setAttribute('color',new Float32BufferAttribute(colors,3));
-  },[walls]);
   const outerGeometry = useMemo(
     () =>
-      boxes(
-        (portrait
-          ? [
-              [
-                [2.8, 2.4, -3.2],
-                [0.28, 4.8, 0.8],
-              ],
-              [
-                [1.2, 4.8, -3.2],
-                [3.5, 0.28, 0.8],
-              ],
-            ]
-          : [
-              [
-                [4.4, 2.6, -1.4],
-                [0.38, 5.2, 1.1],
-              ],
-              [
-                [2.6, 5.2, -1.4],
-                [4, 0.38, 1.1],
-              ],
-              [
-                [-5, 1.5, -0.6],
-                [0.35, 3, 0.8],
-              ],
-            ]) as Box[],
+      tintSlabs(
+        boxes(
+          (portrait
+            ? [
+                [
+                  [2.8, 2.4, -3.2],
+                  [0.28, 4.8, 0.8],
+                ],
+                [
+                  [1.2, 4.8, -3.2],
+                  [3.5, 0.28, 0.8],
+                ],
+              ]
+            : [
+                [
+                  [4.4, 2.6, -1.4],
+                  [0.38, 5.2, 1.1],
+                ],
+                [
+                  [2.6, 5.2, -1.4],
+                  [4, 0.38, 1.1],
+                ],
+                [
+                  [-5, 1.5, -0.6],
+                  [0.35, 3, 0.8],
+                ],
+              ]) as Box[],
+        ),
+        'outer',
       ),
     [portrait],
   );

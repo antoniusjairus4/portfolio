@@ -1,0 +1,105 @@
+{
+  "samples": [
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "recognition",
+      "metrics": {
+        "athlete": true,
+        "athleteInstances": 1,
+        "athleteFrame": 1,
+        "programs": 8,
+        "calls": 27,
+        "visibleTriangles": 28396,
+        "shadowCasters": 10,
+        "materials": 12,
+        "dpr": 1,
+        "triangles": 56420,
+        "geometries": 17,
+        "textures": 5,
+        "progress": 0.07989417989417989,
+        "camera": [
+          -0.3616673380959935,
+          2.403555376507735,
+          5.510666129523205
+        ]
+      }
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "name": "impact",
+      "metrics": {
+        "athlete": true,
+        "athleteInstances": 1,
+        "athleteFrame": 18,
+        "programs": 9,
+        "calls": 28,
+        "visibleTriangles": 28408,
+        "shadowCasters": 10,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 56432,
+        "geometries": 18,
+        "textures": 5,
+        "progress": 0.455026455026455,
+        "camera": [
+          -1.637183653917508,
+          1.9170884614433226,
+          4.6
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "recognition",
+      "metrics": {
+        "athlete": true,
+        "athleteInstances": 1,
+        "athleteFrame": 1,
+        "programs": 6,
+        "calls": 19,
+        "visibleTriangles": 28410,
+        "shadowCasters": 10,
+        "materials": 13,
+        "dpr": 1,
+        "triangles": 28410,
+        "geometries": 19,
+        "textures": 3,
+        "progress": 0.07989167230873392,
+        "camera": [
+          -0.32548293774907744,
+          3.658901527593276,
+          11.463276568651086
+        ]
+      }
+    },
+    {
+      "width": 390,
+      "height": 844,
+      "name": "impact",
+      "metrics": {
+        "athlete": true,
+        "athleteInstances": 1,
+        "athleteFrame": 17.9999980068771,
+        "programs": 6,
+        "calls": 20,
+        "visibleTriangles": 28422,
+        "shadowCasters": 10,
+        "materials": 14,
+        "dpr": 1,
+        "triangles": 28422,
+        "geometries": 20,
+        "textures": 3,
+        "progress": 0.4549763033175355,
+        "camera": [
+          -1.532876007924691,
+          2.4428099801882723,
+          6.919867944527163
+        ]
+      }
+    }
+  ],
+  "errors": []
+}
