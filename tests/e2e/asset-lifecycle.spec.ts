@@ -15,24 +15,36 @@ test('prefetches bytes after critical readiness, prepares near KaiForge, dispose
   });
   await page.goto('/?assetLifecycleFixture=1');
   await page.waitForFunction(
-    () => window.__portfolioAssetLifecycle?.snapshot()[0]?.state === 'downloaded',
+    () =>
+      window.__portfolioAssetLifecycle
+        ?.snapshot()
+        .find((asset) => asset.id === 'TEST_LIFECYCLE_FIXTURE')?.state === 'downloaded',
   );
   expect(requests).toHaveLength(1);
 
   await page.locator('#kaiforge').scrollIntoViewIfNeeded();
   await page.waitForFunction(
-    () => window.__portfolioAssetLifecycle?.snapshot()[0]?.state === 'prepared',
+    () =>
+      window.__portfolioAssetLifecycle
+        ?.snapshot()
+        .find((asset) => asset.id === 'TEST_LIFECYCLE_FIXTURE')?.state === 'prepared',
   );
 
   await page.locator('#palindrome').scrollIntoViewIfNeeded();
   await page.evaluate(() => window.scrollBy(0, window.innerHeight));
   await page.waitForFunction(
-    () => window.__portfolioAssetLifecycle?.snapshot()[0]?.state === 'disposed',
+    () =>
+      window.__portfolioAssetLifecycle
+        ?.snapshot()
+        .find((asset) => asset.id === 'TEST_LIFECYCLE_FIXTURE')?.state === 'disposed',
   );
 
   await page.locator('#kaiforge').scrollIntoViewIfNeeded();
   await page.waitForFunction(
-    () => window.__portfolioAssetLifecycle?.snapshot()[0]?.state === 'prepared',
+    () =>
+      window.__portfolioAssetLifecycle
+        ?.snapshot()
+        .find((asset) => asset.id === 'TEST_LIFECYCLE_FIXTURE')?.state === 'prepared',
   );
   expect(requests.length).toBeGreaterThanOrEqual(2);
 });
@@ -73,12 +85,12 @@ test('keeps Contact at zero canvas and releases fixture state', async ({ page })
   });
   await expect(page.locator('#contact')).toBeInViewport();
   await expect(page.locator('canvas')).toHaveCount(0);
-  await page.waitForFunction(
-    () => {
-      const asset = window.__portfolioAssetLifecycle?.snapshot()[0];
-      return asset && !asset.downloaded && !asset.prepared && !asset.resident && !asset.active;
-    },
-  );
+  await page.waitForFunction(() => {
+    const asset = window.__portfolioAssetLifecycle
+      ?.snapshot()
+      .find((asset) => asset.id === 'TEST_LIFECYCLE_FIXTURE');
+    return asset && !asset.downloaded && !asset.prepared && !asset.resident && !asset.active;
+  });
   expect(requests).toHaveLength(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(
     await page.evaluate(() => document.documentElement.clientWidth),

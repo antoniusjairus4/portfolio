@@ -44,10 +44,12 @@ class BoundedTaskQueue {
     return new Promise<T>((resolve, reject) => {
       const start = () => {
         this.active += 1;
-        task().then(resolve, reject).finally(() => {
-          this.active -= 1;
-          this.pending.shift()?.();
-        });
+        task()
+          .then(resolve, reject)
+          .finally(() => {
+            this.active -= 1;
+            this.pending.shift()?.();
+          });
       };
       if (this.active < this.limit) start();
       else this.pending.push(start);
@@ -64,6 +66,7 @@ const defaultByteFetcher: ByteFetcher = async (url, signal) => {
 export class AssetLifecycleManager {
   private readonly records = new Map<string, AssetRecord>();
   private readonly drivers = new Map<string, ProductionAssetDriver>();
+  private readonly preparationTasks = new Map<string, Promise<void>>();
   private readonly listeners = new Set<SnapshotListener>();
   private readonly requestQueue: BoundedTaskQueue;
   private readonly prepareQueue: BoundedTaskQueue;
@@ -114,7 +117,7 @@ export class AssetLifecycleManager {
   subscribe(listener: SnapshotListener) {
     this.listeners.add(listener);
     listener(this.getSnapshot());
-    return () => this.listeners.delete(listener);
+    return () => { this.listeners.delete(listener); };
   }
 
   getSnapshot(): readonly ProductionAssetSnapshot[] {
@@ -142,11 +145,15 @@ export class AssetLifecycleManager {
   }
 
   async requestOwner(owner: ProductionAssetOwner) {
-    await Promise.all(this.definitionsForOwner(owner).map((definition) => this.request(definition.id)));
+    await Promise.all(
+      this.definitionsForOwner(owner).map((definition) => this.request(definition.id)),
+    );
   }
 
   async prepareOwner(owner: ProductionAssetOwner) {
-    await Promise.all(this.definitionsForOwner(owner).map((definition) => this.prepare(definition.id)));
+    await Promise.all(
+      this.definitionsForOwner(owner).map((definition) => this.prepare(definition.id)),
+    );
   }
 
   async request(assetId: string, options: { retry?: boolean } = {}): Promise<void> {
@@ -158,7 +165,8 @@ export class AssetLifecycleManager {
       record.retryCount += 1;
     }
 
-    const variant = record.variant ?? selectProductionAssetVariant(record.definition, this.environment);
+    const variant =
+      record.variant ?? selectProductionAssetVariant(record.definition, this.environment);
     if (!variant) return;
     record.variant = variant;
     record.error = null;
@@ -195,7 +203,17 @@ export class AssetLifecycleManager {
     return record.requestPromise;
   }
 
-  async prepare(assetId: string): Promise<void> {
+  prepare(assetId: string): Promise<void> {
+    const pending = this.preparationTasks.get(assetId);
+    if (pending) return pending;
+    const task = this.prepareOnce(assetId).finally(() => {
+      if (this.preparationTasks.get(assetId) === task) this.preparationTasks.delete(assetId);
+    });
+    this.preparationTasks.set(assetId, task);
+    return task;
+  }
+
+  private async prepareOnce(assetId: string): Promise<void> {
     const record = this.requireRecord(assetId);
     if (record.prepared !== null) return;
     if (record.preparePromise) return record.preparePromise;
@@ -307,6 +325,7 @@ export class AssetLifecycleManager {
 
   cancel(assetId: string) {
     const record = this.requireRecord(assetId);
+    this.preparationTasks.delete(assetId);
     record.generation += 1;
     record.abortController?.abort();
     record.abortController = null;
@@ -342,6 +361,7 @@ export class AssetLifecycleManager {
       this.emit();
       return false;
     }
+    this.preparationTasks.delete(assetId);
     record.generation += 1;
     record.abortController?.abort();
     const driver = this.drivers.get(record.definition.resourceType);
@@ -376,7 +396,8 @@ export class AssetLifecycleManager {
 
   private requireDriver(record: AssetRecord) {
     const driver = this.drivers.get(record.definition.resourceType);
-    if (!driver) throw new Error(`No asset driver registered for ${record.definition.resourceType}`);
+    if (!driver)
+      throw new Error(`No asset driver registered for ${record.definition.resourceType}`);
     return driver;
   }
 

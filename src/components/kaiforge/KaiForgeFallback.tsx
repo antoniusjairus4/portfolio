@@ -1,6 +1,10 @@
 import { kaiForgeContent } from '@/content/kaiforge';
 
-export function KaiForgeFallback({ reason }: { reason: 'reduced-motion' | 'no-webgl' }) {
+export function KaiForgeFallback({
+  reason,
+}: {
+  reason: 'reduced-motion' | 'no-webgl' | 'asset-unavailable';
+}) {
   return (
     <div className="kaiforge-fallback" data-fallback-reason={reason}>
       <div className="kaiforge-fallback-stage" aria-hidden="true">

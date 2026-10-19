@@ -33,8 +33,10 @@ export function coordinateProductionAssets(
     return;
   }
 
-  void manager.requestOwner('kaiforge');
-  if (kf && kf.top <= vh * 2) void manager.prepareOwner('kaiforge');
+  if (!pal || pal.progress < 0.12) {
+    void manager.requestOwner('kaiforge');
+    if (kf && kf.top <= vh * 2) void manager.prepareOwner('kaiforge');
+  }
 
   if ((kf && kf.progress >= 0.18) || (pal && pal.top <= vh * 6)) {
     void manager.requestOwner('palindrome');

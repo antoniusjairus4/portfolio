@@ -1,7 +1,7 @@
 import { useKaiForgeMaterials } from './Materials';
 import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, type MutableRefObject } from 'react';
-import type { Group } from 'three';
+import { Float32BufferAttribute, type Group } from 'three';
 import { boxes, type Box } from './geometry';
 import { releaseProgress, impactPulse } from './staging';
 
@@ -56,6 +56,16 @@ export function Architecture({
       ]),
     [],
   );
+  useMemo(() => {
+    const positions = walls.getAttribute('position');
+    const colors = [];
+    for(let i=0;i<positions.count;i++) {
+      const z = positions.getZ(i);
+      const tone = z < -7 ? .58 : z < -5 ? .82 : 1;
+      colors.push(tone,tone,tone);
+    }
+    walls.setAttribute('color',new Float32BufferAttribute(colors,3));
+  },[walls]);
   const outerGeometry = useMemo(
     () =>
       boxes(
@@ -107,10 +117,10 @@ export function Architecture({
   return (
     <group name="KF_Architecture">
       <mesh geometry={ground} receiveShadow>
-        <primitive attach="material" object={materials.parchment} />
+        <primitive attach="material" object={materials.ground} />
       </mesh>
       <mesh geometry={walls}>
-        <primitive attach="material" object={materials.parchment} />
+        <primitive attach="material" object={materials.architecture} />
       </mesh>
       <group ref={outer}>
         <mesh geometry={outerGeometry}>

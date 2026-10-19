@@ -171,3 +171,28 @@
 .kaiforge-chapter .kaiforge-fallback-stage {
   top: 57%;
 }
+
+/* Pass 1: real athlete hair/legs occupy more of the accepted overlay envelope. */
+@media (orientation: landscape) {
+  .kaiforge-chapter .kaiforge-semantic-header {
+    top: clamp(0.875rem, 2vh, 1.5rem);
+  }
+
+  .kaiforge-chapter .kaiforge-semantic-header h2 {
+    margin-block: 0.06em 0.1em;
+  }
+
+  .kaiforge-chapter .kaiforge-purpose {
+    margin-top: 0.5rem;
+  }
+
+  .kaiforge-chapter .beat-impact {
+    left: auto;
+    right: clamp(1.5rem, 6vw, 7rem);
+    max-width: 42vw;
+  }
+
+  .kaiforge-chapter .beat-understanding {
+    top: 6vh;
+  }
+}

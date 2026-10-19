@@ -16,11 +16,9 @@ import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ChapterActivity } from '@/experience/useChapterActivity';
 import { AssetLifecycleManager } from '@/experience/assets/AssetLifecycleManager';
 import { coordinateProductionAssets } from '@/experience/assets/coordinator';
-import {
-  lifecycleTestFixture,
-  lifecycleTestFixtureDriver,
-} from '@/experience/assets/fixture';
+import { lifecycleTestFixture, lifecycleTestFixtureDriver } from '@/experience/assets/fixture';
 import { productionAssetManifest } from '@/experience/assets/manifest';
+import type { KaiForgeGLTF, KaiForgeGLTFContext } from '@/experience/assets/kaiforgeGLTF';
 import type { ProductionAssetSnapshot } from '@/experience/assets/types';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 
@@ -78,6 +76,17 @@ export function ProjectExperienceProvider({
       { quality: environment.quality, portrait: environment.portrait },
       productionAssetManifest,
     );
+    // Loader code is deferred until preparation; it shares the session manager and renderer.
+    const driver = () =>
+      import('@/experience/assets/kaiforgeGLTF').then((module) => module.kaiForgeGLTFDriver);
+    manager.registerDriver<KaiForgeGLTF, KaiForgeGLTF, KaiForgeGLTFContext>('kaiforge-glb', {
+      prepare: async (bytes, definition, variant) =>
+        (await driver()).prepare(bytes, definition, variant),
+      makeResident: async (prepared, context, definition, variant) =>
+        (await driver()).makeResident(prepared, context, definition, variant),
+      disposePrepared: (resource) => resource.dispose(),
+      disposeResident: (resource) => resource.dispose(),
+    });
     const fixtureEnabled =
       process.env.NODE_ENV !== 'production' &&
       new URLSearchParams(window.location.search).has('assetLifecycleFixture');
@@ -132,7 +141,16 @@ export function ProjectExperienceProvider({
           const registration = registrations[key];
           const rect = registration?.sectionRef.current?.getBoundingClientRect();
           return registration && rect
-            ? [[key, { progress: registration.controller.progress.current, top: rect.top, bottom: rect.bottom }]]
+            ? [
+                [
+                  key,
+                  {
+                    progress: registration.controller.progress.current,
+                    top: rect.top,
+                    bottom: rect.bottom,
+                  },
+                ],
+              ]
             : [];
         }),
       );
@@ -191,7 +209,14 @@ export function ProjectExperienceProvider({
       if (frameRef.current) cancelAnimationFrame(frameRef.current);
       frameRef.current = 0;
     };
-  }, [assetManager, criticalReady, environment.quality, environment.ready, environment.reducedMotion, registrations]);
+  }, [
+    assetManager,
+    criticalReady,
+    environment.quality,
+    environment.ready,
+    environment.reducedMotion,
+    registrations,
+  ]);
 
   const activeRegistration = activeKey ? registrations[activeKey] : null;
   const contextValue = useMemo(

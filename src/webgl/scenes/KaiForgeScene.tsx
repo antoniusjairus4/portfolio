@@ -7,8 +7,10 @@ import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { Architecture } from './kaiforge/Architecture';
 import { Equipment } from './kaiforge/Equipment';
+import { ProductionAthlete } from './kaiforge/ProductionAthlete';
 import { ProxyAthlete } from './kaiforge/ProxyAthlete';
 import { Trajectory } from './kaiforge/Trajectory';
+import { athleteFrame } from './kaiforge/athleteAnimation';
 import { CAMERAS, sampleCamera } from './kaiforge/staging';
 
 function ProductionScene({
@@ -20,6 +22,10 @@ function ProductionScene({
 }) {
   const materials = useKaiForgeMaterials();
   const { camera, scene, gl } = useThree();
+  const debugProxy =
+    process.env.NODE_ENV !== 'production' &&
+    typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).has('kfProxy');
   const target = useMemo(() => new Vector3(), []);
   useFrame(() => {
     const p = controller.progress.current;
@@ -42,7 +48,11 @@ function ProductionScene({
         shadowCasters = 0;
       const activeMaterials = new Set();
       scene.traverseVisible((object) => {
-        if (!(object instanceof Mesh) || !frustum.intersectsObject(object)) return;
+        if (
+          !(object instanceof Mesh) ||
+          (object.frustumCulled && !frustum.intersectsObject(object))
+        )
+          return;
         const geometry = object.geometry;
         visibleTriangles +=
           Math.min(
@@ -53,6 +63,9 @@ function ProductionScene({
         activeMaterials.add(object.material);
       });
       gl.domElement.dataset.kfMetrics = JSON.stringify({
+        athlete: !!scene.getObjectByName('KF_ProductionAthlete'),
+        athleteFrame: athleteFrame(controller.progress.current),
+        programs: gl.info.programs?.length,
         calls: gl.info.render.calls,
         visibleTriangles,
         shadowCasters,
@@ -73,11 +86,11 @@ function ProductionScene({
   return (
     <>
       <color attach="background" args={['#191b19']} />
-      <hemisphereLight args={['#f3ead8', '#6e685e', 1.4]} />
+      <hemisphereLight args={['#eee6d8', '#817665', 0.7]} />
       <directionalLight
-        position={[-3, 7, 4]}
-        intensity={2.3}
-        color="#fff1d9"
+        position={[-3, 6, 4]}
+        intensity={3}
+        color="#fff4e8"
         castShadow={!portrait}
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -87,12 +100,18 @@ function ProductionScene({
         shadow-camera-bottom={-3.5}
         shadow-camera-near={0.1}
         shadow-camera-far={15}
-        shadow-normalBias={0.02}
+        shadow-radius={5}
+        shadow-normalBias={0.008}
         shadow-bias={-0.0002}
       />
+      <directionalLight position={[2, 3, -4]} intensity={1.1} color="#e7e1d5" />
       <Architecture progress={controller.progress} portrait={portrait} />
       <Equipment />
-      <ProxyAthlete progress={controller.progress} />
+      {debugProxy ? (
+        <ProxyAthlete progress={controller.progress} />
+      ) : (
+        <ProductionAthlete progress={controller.progress} portrait={portrait} />
+      )}
       <Trajectory progress={controller.progress} portrait={portrait} />
       {/* Low-tier contact impression; no shadow renderer or transparent floor layers. */}
       {portrait && (

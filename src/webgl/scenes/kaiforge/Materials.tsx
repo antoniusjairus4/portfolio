@@ -3,11 +3,13 @@ import { LineBasicMaterial, MeshBasicMaterial, MeshStandardMaterial } from 'thre
 import { PALETTE } from './staging';
 function createMaterials() {
   return {
-    parchment: new MeshStandardMaterial({ color: PALETTE.parchment, roughness: 0.95 }),
-    mineral: new MeshStandardMaterial({ color: PALETTE.mineral, roughness: 1 }),
+    parchment: new MeshStandardMaterial({ color: '#e4ddcf', roughness: 0.9 }),
+    architecture: new MeshStandardMaterial({ color: '#e4ddcf', roughness: .92, vertexColors: true }),
+    ground: new MeshStandardMaterial({ color: '#cfc4b0', roughness: 0.98 }),
+    mineral: new MeshStandardMaterial({ color: '#b5ae9f', roughness: 0.97 }),
     ink: new MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.85 }),
     skin: new MeshStandardMaterial({ color: '#ad9c87', roughness: 0.95 }),
-    table: new MeshStandardMaterial({ color: '#303e3b', roughness: 0.78 }),
+    table: new MeshStandardMaterial({ color: '#283531', roughness: 0.7 }),
     net: new LineBasicMaterial({ color: '#56564d' }),
     trace: new MeshBasicMaterial({ color: '#aba18e' }),
     echo: new MeshBasicMaterial({ color: '#746f62' }),

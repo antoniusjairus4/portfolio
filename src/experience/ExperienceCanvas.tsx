@@ -1,6 +1,7 @@
 'use client';
 
 import { Canvas, useThree } from '@react-three/fiber';
+import { PCFShadowMap } from 'three';
 import { useEffect } from 'react';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
@@ -40,7 +41,7 @@ export function ExperienceCanvas({
       dpr={[1, dprCap]}
       camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
       gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
-      shadows={portrait ? false : 'basic'}
+      shadows={portrait ? false : scene === 'kaiforge' ? { type: PCFShadowMap } : 'basic'}
       onCreated={({ gl }) => {
         gl.setClearColor('#0b0908');
       }}

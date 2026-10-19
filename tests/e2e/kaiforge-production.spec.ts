@@ -28,6 +28,14 @@ for (const viewport of [
       timeout: 15000,
     });
     await progress(page, 0.49);
+    await expect
+      .poll(
+        async () =>
+          JSON.parse(
+            (await page.locator('canvas[data-kf-metrics]').getAttribute('data-kf-metrics')) ?? '{}',
+          ).athlete,
+      )
+      .toBe(true);
     const canvas = page.locator('canvas[data-kf-metrics]');
     const original = await canvas.screenshot();
     const initial = JSON.parse((await canvas.getAttribute('data-kf-metrics')) ?? '{}');
@@ -39,8 +47,8 @@ for (const viewport of [
     expect(reconstructed.camera).toEqual(initial.camera);
     expect(reconstructed.geometries).toBeLessThanOrEqual(initial.geometries + 2);
     expect(reconstructed.calls).toBeLessThan(viewport.width === 390 ? 40 : 80);
-    expect(reconstructed.visibleTriangles).toBeLessThan(5000);
-    expect(reconstructed.materials).toBeLessThanOrEqual(10);
+    expect(reconstructed.visibleTriangles).toBeLessThan(65000);
+    expect(reconstructed.materials).toBeLessThanOrEqual(18);
     await expect(page.locator('[data-experience-renderer="shared"]')).toHaveCount(1);
     await expect(page.locator('#hero')).toHaveAttribute('data-hero-handoff', 'center-seam');
   });

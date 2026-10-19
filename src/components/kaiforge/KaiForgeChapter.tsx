@@ -12,7 +12,11 @@ import {
 } from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
-import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
+import { KAI_FORGE_ATHLETE } from '@/experience/assets/manifest';
+import {
+  useProductionAssetManager,
+  useProjectSceneRegistration,
+} from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
 const BEAT_PRESENTATION = [
@@ -28,6 +32,17 @@ export function KaiForgeChapter() {
   const headerRef = useRef<HTMLElement>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
+  const assetManager = useProductionAssetManager();
+  const [assetFailed, setAssetFailed] = useState(false);
+  useEffect(
+    () =>
+      assetManager?.subscribe((snapshot) => {
+        setAssetFailed(
+          snapshot.find((asset) => asset.id === KAI_FORGE_ATHLETE)?.state === 'failed',
+        );
+      }),
+    [assetManager],
+  );
   const ownsEtherRef = useRef(false);
   const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
   const { setMode: setGlobalEtherMode } = useGlobalEther();
@@ -112,6 +127,7 @@ export function KaiForgeChapter() {
       className={`kaiforge-chapter ${reducedMotion || quality === 'fallback' ? 'kaiforge-static' : ''}`}
     >
       <div className="kaiforge-sticky">
+        {assetFailed && renderWebGL && <KaiForgeFallback reason="asset-unavailable" />}
         {!rendererActive && <div className="kaiforge-render-placeholder" aria-hidden="true" />}
 
         {ready && (reducedMotion || quality === 'fallback') && (
