@@ -12,22 +12,27 @@ import {
   useRef,
   useState,
 } from 'react';
-import type { ChapterProgressController } from '@/experience/chapterProgress';
-import type { ChapterActivity } from '@/experience/useChapterActivity';
 import { AssetLifecycleManager } from '@/experience/assets/AssetLifecycleManager';
 import { coordinateProductionAssets } from '@/experience/assets/coordinator';
 import { lifecycleTestFixture, lifecycleTestFixtureDriver } from '@/experience/assets/fixture';
-import { productionAssetManifest } from '@/experience/assets/manifest';
 import type { KaiForgeGLTF, KaiForgeGLTFContext } from '@/experience/assets/kaiforgeGLTF';
+import { productionAssetManifest } from '@/experience/assets/manifest';
 import type { ProductionAssetSnapshot } from '@/experience/assets/types';
+import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
+import type { ChapterActivity } from '@/experience/useChapterActivity';
 
 const ExperienceCanvas = dynamic(
   () => import('@/experience/ExperienceCanvas').then((module) => module.ExperienceCanvas),
   { ssr: false },
 );
 
-export type ProjectSceneKey = 'kaiforge' | 'palindrome' | 'neuroshield' | 'skills';
+export type ProjectSceneKey =
+  | 'kaiforge'
+  | 'kai-palindrome-bridge'
+  | 'palindrome'
+  | 'neuroshield'
+  | 'skills';
 
 interface SceneRegistration {
   controller: ChapterProgressController;
@@ -130,12 +135,15 @@ export function ProjectExperienceProvider({
     const selectScene = () => {
       frameRef.current = 0;
       const kaiForge = registrations.kaiforge;
+      const bridge = registrations['kai-palindrome-bridge'];
       const palindrome = registrations.palindrome;
+      const bridgeTop = bridge?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShield = registrations.neuroshield;
       const skills = registrations.skills;
       const palindromeTop = palindrome?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
       const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
+      const viewportHeight = window.innerHeight;
       // The Hero exposes Recognition before the chapter enters the viewport.
       // Prepare its first frame after critical content is ready, while the Hero
       // still covers it. Demand rendering keeps this idle preparation to one frame.
@@ -168,11 +176,19 @@ export function ProjectExperienceProvider({
           chapters: chapterSignals,
         });
       }
+      // Both boundaries are geometrically exact: the bridge starts on KaiForge's
+      // Release frame and ends on Palindrome's Ordinary room frame.
+      const bridgeOwnsFrame =
+        bridge?.enabled &&
+        bridge.activity !== 'inactive' &&
+        bridgeTop !== undefined &&
+        bridgeTop <= viewportHeight &&
+        (palindromeTop === undefined || palindromeTop > viewportHeight);
       const palindromeOwnsFrame =
         palindrome?.enabled &&
         palindrome.activity !== 'inactive' &&
         palindromeTop !== undefined &&
-        palindromeTop <= window.innerHeight * 0.45;
+        palindromeTop <= viewportHeight;
       const neuroShieldOwnsFrame =
         neuroShield?.enabled &&
         neuroShield.activity !== 'inactive' &&
@@ -190,10 +206,10 @@ export function ProjectExperienceProvider({
           ? 'neuroshield'
           : palindromeOwnsFrame
             ? 'palindrome'
-            : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
-              ? 'kaiforge'
-              : palindrome?.enabled && palindrome.activity !== 'inactive'
-                ? 'palindrome'
+            : bridgeOwnsFrame
+              ? 'kai-palindrome-bridge'
+              : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
+                ? 'kaiforge'
                 : neuroShield?.enabled && neuroShield.activity !== 'inactive'
                   ? 'neuroshield'
                   : skills?.enabled && skills.activity !== 'inactive'

@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
-import { Object3D, type PointLight } from 'three';
+import { type Group, type HemisphereLight, Object3D, type PointLight, type SpotLight } from 'three';
 import { sampleColorDirection } from './colorDirection';
 import { boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
@@ -9,12 +9,20 @@ import { CONTACT, PALETTE } from './staging';
 export function ArenaLighting({
   portrait,
   progress,
+  bridgeProgress,
 }: {
   portrait: boolean;
   progress: MutableRefObject<number>;
+  bridgeProgress?: MutableRefObject<number>;
 }) {
   const materials = useKaiForgeMaterials();
   const contactLight = useRef<PointLight>(null);
+  const roof = useRef<Group>(null);
+  const hemisphere = useRef<HemisphereLight>(null);
+  const key = useRef<SpotLight>(null);
+  const robotFill = useRef<SpotLight>(null);
+  const rim = useRef<SpotLight>(null);
+  const bounce = useRef<PointLight>(null);
   const targets = useMemo(() => {
     const table = new Object3D();
     table.position.set(-0.35, 0.76, 0);
@@ -76,18 +84,34 @@ export function ArenaLighting({
     [ceiling, reveal],
   );
   useFrame(() => {
+    const bridge = bridgeProgress
+      ? Math.min(1, Math.max(0, (bridgeProgress.current - 0.24) / 0.58))
+      : 0;
+    const remaining = 1 - bridge * bridge * (3 - 2 * bridge);
+    if (roof.current) {
+      roof.current.scale.setScalar(Math.max(0.001, remaining));
+      roof.current.position.y = 3.8 * (1 - remaining);
+    }
+    if (hemisphere.current) hemisphere.current.intensity = 0.28 * remaining;
+    if (key.current) key.current.intensity = 44 * remaining;
+    if (robotFill.current) robotFill.current.intensity = 7 * remaining;
+    if (rim.current) rim.current.intensity = 7.5 * remaining;
+    if (bounce.current) bounce.current.intensity = 0.35 * remaining;
     if (contactLight.current) {
       contactLight.current.intensity = sampleColorDirection(progress.current).contact * 0.065;
     }
   });
   return (
     <group name="KF_ArenaLighting">
-      <mesh geometry={ceiling} material={materials.ceiling} />
-      <mesh geometry={reveal} material={materials.reveal} />
+      <group ref={roof}>
+        <mesh geometry={ceiling} material={materials.ceiling} />
+        <mesh geometry={reveal} material={materials.reveal} />
+      </group>
       <primitive object={targets.table} />
       <primitive object={targets.robot} />
-      <hemisphereLight args={[PALETTE.parchment, '#302a21', 0.28]} />
+      <hemisphereLight ref={hemisphere} args={[PALETTE.parchment, '#302a21', 0.28]} />
       <spotLight
+        ref={key}
         position={[-0.35, 3.55, 0.15]}
         target={targets.table}
         color="#fff0d8"
@@ -108,6 +132,7 @@ export function ArenaLighting({
       />
       {/* Local, unshadowed reflected light; no global wash across the distant walls. */}
       <spotLight
+        ref={robotFill}
         position={[-2.8, 3.1, 3.4]}
         target={targets.robot}
         color={PALETTE.parchment}
@@ -119,6 +144,7 @@ export function ArenaLighting({
       />
       {/* Restrained rear edge light separates the dark joints from the Ink recess. */}
       <spotLight
+        ref={rim}
         position={[-3, 2.9, -0.8]}
         target={targets.robot}
         color="#f2e8d5"
@@ -130,6 +156,7 @@ export function ArenaLighting({
       />
       {/* Low-energy, local floor bounce reaches lower faces without lifting the walls. */}
       <pointLight
+        ref={bounce}
         position={[-1.1, 0.28, 0.35]}
         color="#e8d6b6"
         intensity={0.35}

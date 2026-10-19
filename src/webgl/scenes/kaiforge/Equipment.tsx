@@ -1,10 +1,37 @@
+import { useFrame } from '@react-three/fiber';
+import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
+import {
+  BoxGeometry,
+  BufferGeometry,
+  Color,
+  Float32BufferAttribute,
+  type Group,
+  type Mesh,
+} from 'three';
+import { ROOM_PALETTE } from '../palindrome/palette';
+import { type Box, boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
-import { useEffect, useMemo } from 'react';
-import { BoxGeometry, BufferGeometry, Float32BufferAttribute } from 'three';
-import { boxes, type Box } from './geometry';
 
-export function Equipment() {
+function ease(a: number, b: number, value: number) {
+  const t = Math.min(1, Math.max(0, (value - a) / (b - a)));
+  return t * t * (3 - 2 * t);
+}
+
+export function Equipment({
+  bridgeProgress,
+  bridgePortrait = false,
+}: {
+  bridgeProgress?: MutableRefObject<number>;
+  bridgePortrait?: boolean;
+}) {
   const materials = useKaiForgeMaterials();
+  const tabletopRef = useRef<Mesh>(null);
+  const supportRef = useRef<Group>(null);
+  const newSupportRef = useRef<Group>(null);
+  const markingsRef = useRef<Group>(null);
+  const morphMaterial = useMemo(() => materials.table.clone(), [materials.table]);
+  const tableGreen = useMemo(() => new Color('#183d2b'), []);
+  const deskWood = useMemo(() => new Color(ROOM_PALETTE.timber), []);
   const tabletop = useMemo(() => {
     const geometry = new BoxGeometry(2.74, 0.04, 1.525);
     const normals = geometry.getAttribute('normal');
@@ -103,23 +130,76 @@ export function Equipment() {
       markings.dispose();
       weave.dispose();
       tabletop.dispose();
+      morphMaterial.dispose();
     },
-    [supports, markings, weave, tabletop],
+    [supports, markings, weave, tabletop, morphMaterial],
   );
+  useFrame(() => {
+    if (!bridgeProgress) return;
+    const p = bridgeProgress.current;
+    const table = ease(0.2, 0.77, p);
+    const support = ease(0.25, 0.75, p);
+    if (tabletopRef.current) {
+      tabletopRef.current.position.set(
+        -1.02 * (bridgePortrait ? 0.76 : 1) * table,
+        0.74 + 0.33 * table,
+        -0.35 * table,
+      );
+      tabletopRef.current.scale.set(
+        1 + ((3.8 * (bridgePortrait ? 0.76 : 1)) / 2.74 - 1) * table,
+        1 + 2.5 * table,
+        1 + (1.65 / 1.525 - 1) * table,
+      );
+    }
+    morphMaterial.color.lerpColors(tableGreen, deskWood, table);
+    if (supportRef.current) supportRef.current.scale.setScalar(Math.max(0.001, 1 - support));
+    if (newSupportRef.current)
+      newSupportRef.current.scale.set(
+        Math.max(0.001, support) * (bridgePortrait ? 0.76 : 1),
+        Math.max(0.001, support),
+        Math.max(0.001, support),
+      );
+    if (markingsRef.current)
+      markingsRef.current.scale.setScalar(Math.max(0.001, 1 - ease(0.2, 0.5, p)));
+  });
   return (
     <group name="KF_RegulationTable">
-      <mesh geometry={tabletop} position={[0, 0.74, 0]} receiveShadow castShadow>
-        <primitive attach="material" object={materials.table} />
+      <mesh ref={tabletopRef} geometry={tabletop} position={[0, 0.74, 0]} receiveShadow castShadow>
+        <primitive attach="material" object={bridgeProgress ? morphMaterial : materials.table} />
       </mesh>
-      <mesh geometry={supports} castShadow>
-        <primitive attach="material" object={materials.ink} />
-      </mesh>
-      <mesh geometry={markings}>
-        <primitive attach="material" object={materials.markings} />
-      </mesh>
-      <lineSegments geometry={weave}>
-        <primitive attach="material" object={materials.net} />
-      </lineSegments>
+      <group ref={supportRef}>
+        <mesh geometry={supports} castShadow>
+          <primitive attach="material" object={materials.ink} />
+        </mesh>
+      </group>
+      {bridgeProgress && (
+        <group
+          ref={newSupportRef}
+          position={[bridgePortrait ? -0.7752 : -1.02, 0, -0.35]}
+          scale={0.001}
+        >
+          <mesh position={[0, 0.9, 0]} castShadow receiveShadow>
+            <boxGeometry args={[3.45, 0.22, 1.36]} />
+            <meshStandardMaterial color="#24201C" roughness={0.87} />
+          </mesh>
+          {[-1.62, 1.62].flatMap((x) =>
+            [-0.63, 0.63].map((z) => (
+              <mesh key={`${x}:${z}`} position={[x, 0.5, z]} castShadow receiveShadow>
+                <boxGeometry args={[0.095, 1, 0.095]} />
+                <meshStandardMaterial color={ROOM_PALETTE.charcoal} roughness={0.84} />
+              </mesh>
+            )),
+          )}
+        </group>
+      )}
+      <group ref={markingsRef}>
+        <mesh geometry={markings}>
+          <primitive attach="material" object={materials.markings} />
+        </mesh>
+        <lineSegments geometry={weave}>
+          <primitive attach="material" object={materials.net} />
+        </lineSegments>
+      </group>
     </group>
   );
 }

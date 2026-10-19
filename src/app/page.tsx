@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
 import { ContactFinale } from '@/components/contact-finale/ContactFinale';
 import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
@@ -8,9 +9,9 @@ import { NeuroShieldChapter } from '@/components/neuroshield/NeuroShieldChapter'
 import { PalindromeChapter } from '@/components/palindrome/PalindromeChapter';
 import { Preloader } from '@/components/preloader/Preloader';
 import { SkillsChapter } from '@/components/skills/SkillsChapter';
+import { KaiPalindromeBridge } from '@/components/transitions/KaiPalindromeBridge';
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
-import { useState } from 'react';
 
 export default function Home() {
   const { refresh } = useLenis();
@@ -56,6 +57,8 @@ export default function Home() {
       <ProjectExperienceProvider criticalReady={criticalReady}>
         {/* Phase 2: accepted KaiForge spatial and camera greybox */}
         <KaiForgeChapter />
+
+        <KaiPalindromeBridge />
 
         {/* Phase 3: Palindrome domestic-information greybox */}
         <PalindromeChapter />

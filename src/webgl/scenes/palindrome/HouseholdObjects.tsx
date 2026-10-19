@@ -1,10 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { Object3D, Shape, Vector2 } from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { ROOM_PALETTE } from './palette';
 import { SpatialType } from './SpatialType';
 import { ContactPatch, Surface } from './Surfaces';
 import { DOMESTIC_SOURCES } from './sources';
-import { ROOM_PALETTE } from './palette';
 
 type Point = readonly [number, number, number];
 type Finish = 'wood' | 'paper' | 'ceramic' | 'metal' | 'fabric' | 'plaster';
@@ -392,49 +392,57 @@ export function ShelfBowl() {
   return <Vessel profile={BOWL} color={ROOM_PALETTE.terracotta} />;
 }
 
-export function HouseholdObjects() {
+export function HouseholdObjects({ kind = 'all' }: { kind?: 'all' | 'lamp' | 'daily' }) {
   return (
     <group>
-      <GroceryBag />
-      <MilkCarton />
-      <CoffeeCup />
-      <PaperSlip />
-      <PaperSlip previous />
-      <Notebook />
-      <TableLamp />
-      <group position={[-1.11, 1.14, -0.74]}>
-        <RoundedSolid
-          position={[0, 0.1, 0]}
-          size={[0.47, 0.2, 0.24]}
-          color="#B4A58A"
-          radius={0.075}
-          finish="paper"
-        />
-        <RoundedSolid
-          position={[0, 0.11, 0]}
-          size={[0.15, 0.21, 0.25]}
-          color={ROOM_PALETTE.parchment}
-          radius={0.025}
-          finish="paper"
-        />
-        <ContactPatch position={[0, 0.002, 0]} size={[0.65, 0.4]} />
-      </group>
-      <group position={[1.65, 2.65, -2.3]}>
-        <RoundedSolid
-          position={[0, 0.17, 0]}
-          size={[0.23, 0.34, 0.21]}
-          color={ROOM_PALETTE.ochre}
-          radius={0.009}
-          finish="paper"
-        />
-        <RoundedSolid
-          position={[0, 0.27, 0.109]}
-          size={[0.18, 0.06, 0.004]}
-          color="#CDC2AC"
-          radius={0.002}
-          finish="paper"
-        />
-      </group>
+      {kind !== 'lamp' && (
+        <>
+          <GroceryBag />
+          <MilkCarton />
+          <CoffeeCup />
+          <PaperSlip />
+          <PaperSlip previous />
+          <Notebook />
+        </>
+      )}
+      {kind !== 'daily' && <TableLamp />}
+      {kind !== 'lamp' && (
+        <>
+          <group position={[-1.11, 1.14, -0.74]}>
+            <RoundedSolid
+              position={[0, 0.1, 0]}
+              size={[0.47, 0.2, 0.24]}
+              color="#B4A58A"
+              radius={0.075}
+              finish="paper"
+            />
+            <RoundedSolid
+              position={[0, 0.11, 0]}
+              size={[0.15, 0.21, 0.25]}
+              color={ROOM_PALETTE.parchment}
+              radius={0.025}
+              finish="paper"
+            />
+            <ContactPatch position={[0, 0.002, 0]} size={[0.65, 0.4]} />
+          </group>
+          <group position={[1.65, 2.65, -2.3]}>
+            <RoundedSolid
+              position={[0, 0.17, 0]}
+              size={[0.23, 0.34, 0.21]}
+              color={ROOM_PALETTE.ochre}
+              radius={0.009}
+              finish="paper"
+            />
+            <RoundedSolid
+              position={[0, 0.27, 0.109]}
+              size={[0.18, 0.06, 0.004]}
+              color="#CDC2AC"
+              radius={0.002}
+              finish="paper"
+            />
+          </group>
+        </>
+      )}
     </group>
   );
 }

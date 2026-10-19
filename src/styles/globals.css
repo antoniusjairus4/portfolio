@@ -1,36 +1,36 @@
 @import "tailwindcss";
 
 @font-face {
-  font-family: 'Clash Display';
-  src: url('/fonts/ClashDisplay-Variable.woff2') format('woff2');
+  font-family: "Clash Display";
+  src: url("/fonts/ClashDisplay-Variable.woff2") format("woff2");
   font-weight: 200 700;
   font-display: swap;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Satoshi';
-  src: url('/fonts/Satoshi-Variable.woff2') format('woff2');
+  font-family: "Satoshi";
+  src: url("/fonts/Satoshi-Variable.woff2") format("woff2");
   font-weight: 300 900;
   font-display: swap;
   font-style: normal;
 }
 
 @theme {
-  --color-base: #0C0907;
-  --color-surface: #17110C;
-  --color-ivory: #F2E9D8;
-  --color-muted: #A89880;
-  --color-gold: #E0A93B;
-  --color-ember: #E8481F;
-  --color-blue: #4F6BFF;
-  --color-paper: #F1E8D8;
+  --color-base: #0c0907;
+  --color-surface: #17110c;
+  --color-ivory: #f2e9d8;
+  --color-muted: #a89880;
+  --color-gold: #e0a93b;
+  --color-ember: #e8481f;
+  --color-blue: #4f6bff;
+  --color-paper: #f1e8d8;
 
-  --color-hero-name: #FFF4E0;
+  --color-hero-name: #fff4e0;
   --color-hero-role: rgba(255, 244, 224, 0.65);
 
-  --font-display: 'Clash Display', system-ui, sans-serif;
-  --font-secondary: 'Satoshi', system-ui, sans-serif;
+  --font-display: "Clash Display", system-ui, sans-serif;
+  --font-secondary: "Satoshi", system-ui, sans-serif;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
@@ -41,18 +41,18 @@
 }
 
 :root {
-  --color-base: #0C0907;
-  --color-surface: #17110C;
-  --color-ivory: #F2E9D8;
-  --color-muted: #A89880;
-  --color-gold: #E0A93B;
-  --color-ember: #E8481F;
+  --color-base: #0c0907;
+  --color-surface: #17110c;
+  --color-ivory: #f2e9d8;
+  --color-muted: #a89880;
+  --color-gold: #e0a93b;
+  --color-ember: #e8481f;
 
-  --color-hero-name: #FFF4E0;
+  --color-hero-name: #fff4e0;
   --color-hero-role: rgba(255, 244, 224, 0.65);
 
-  --font-display: 'Clash Display', system-ui, sans-serif;
-  --font-secondary: 'Satoshi', system-ui, sans-serif;
+  --font-display: "Clash Display", system-ui, sans-serif;
+  --font-secondary: "Satoshi", system-ui, sans-serif;
 
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
@@ -64,48 +64,48 @@
 
 /* Scoped Venture Product Theme Takeovers */
 [data-venture="palindrome"] {
-  --v-bg: #FAF7F2;
-  --v-surface: #FFFFFF;
-  --v-text: #0F172A;
-  --v-muted: #64748B;
-  --v-accent: #6366F1;
-  --v-accent2: #A5B4FC;
-  --v-on-accent: #FFFFFF;
-  --v-danger: #EF4444;
-  --v-font: 'Inter', sans-serif;
+  --v-bg: #faf7f2;
+  --v-surface: #ffffff;
+  --v-text: #0f172a;
+  --v-muted: #64748b;
+  --v-accent: #6366f1;
+  --v-accent2: #a5b4fc;
+  --v-on-accent: #ffffff;
+  --v-danger: #ef4444;
+  --v-font: "Inter", sans-serif;
   --v-radius: 9999px;
 }
 
 [data-venture="kaiforge"] {
-  --v-bg: #F4F6F9;
-  --v-surface: #FFFFFF;
-  --v-text: #0B132B;
-  --v-muted: #5B6B83;
-  --v-accent: #0EA5E9;
-  --v-accent2: #38BDF8;
-  --v-on-accent: #FFFFFF;
-  --v-danger: #E11D48;
-  --v-font: 'Poppins', sans-serif;
+  --v-bg: #f4f6f9;
+  --v-surface: #ffffff;
+  --v-text: #0b132b;
+  --v-muted: #5b6b83;
+  --v-accent: #0ea5e9;
+  --v-accent2: #38bdf8;
+  --v-on-accent: #ffffff;
+  --v-danger: #e11d48;
+  --v-font: "Poppins", sans-serif;
   --v-radius: 16px;
 }
 
 [data-venture="neuroshield"] {
-  --v-bg: #F0F7FF;
-  --v-surface: #FFFFFF;
-  --v-text: #0A192F;
-  --v-muted: #4A6A8A;
-  --v-accent: #00A8E8;
-  --v-accent2: #00C49F;
-  --v-on-accent: #FFFFFF;
-  --v-danger: #FF4A4A;
-  --v-font: 'Space Grotesk', sans-serif;
+  --v-bg: #f0f7ff;
+  --v-surface: #ffffff;
+  --v-text: #0a192f;
+  --v-muted: #4a6a8a;
+  --v-accent: #00a8e8;
+  --v-accent2: #00c49f;
+  --v-on-accent: #ffffff;
+  --v-danger: #ff4a4a;
+  --v-font: "Space Grotesk", sans-serif;
   --v-radius: 4px;
 }
 
 html {
   min-height: 100%;
   width: 100%;
-  background-color: #0C0907;
+  background-color: #0c0907;
   overflow-x: clip;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -114,7 +114,7 @@ html {
 body {
   min-height: 100%;
   width: 100%;
-  background-color: #0C0907;
+  background-color: #0c0907;
   overflow-x: clip;
   margin: 0;
   padding: 0;
@@ -122,7 +122,7 @@ body {
 
 /* Enormous Display Typography for Loader Numerals */
 .font-display-enormous {
-  font-family: 'Clash Display', system-ui, sans-serif;
+  font-family: "Clash Display", system-ui, sans-serif;
   font-size: clamp(6rem, 25vw, 36vw);
   font-weight: 700;
   line-height: 0.85;
@@ -133,7 +133,7 @@ body {
 
 /* Centre Content Typography */
 .font-hero-name {
-  font-family: 'Cinzel Decorative', 'Cinzel Variable', 'Cinzel', serif;
+  font-family: "Cinzel Decorative", "Cinzel Variable", "Cinzel", serif;
   font-size: clamp(4.8rem, 10.5vw, 11rem);
   font-weight: 700;
   line-height: 0.82;
@@ -148,7 +148,7 @@ body {
   --hero-ink: #11100f;
   --hero-charcoal: #27231f;
   --hero-parchment: #eadfcd;
-  --hero-crimson: #8B1E2D;
+  --hero-crimson: #8b1e2d;
   --hero-accent-feed: 0;
   --hero-rule-top: clamp(4.5rem, 13vh, 8.5rem);
   --hero-rule-left: clamp(4.75rem, 7vw, 8.5rem);
@@ -212,7 +212,7 @@ body {
   padding-block: clamp(2rem, 5vh, 4rem);
   background: var(--hero-charcoal);
   color: var(--hero-parchment);
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: "Satoshi", system-ui, sans-serif;
   font-size: clamp(0.6rem, 0.68vw, 0.78rem);
   font-weight: 600;
   letter-spacing: 0.22em;
@@ -229,10 +229,22 @@ body {
 .hero-editorial-crossbar {
   position: absolute;
   /* The existing rule becomes a short seam mark, then leaves with the curtain. */
-  top: calc(var(--hero-rule-top) + (var(--hero-rupture-y) - var(--hero-rule-top)) * var(--hero-accent-feed));
-  left: calc(var(--hero-rule-left) + (50% - 18px - var(--hero-rule-left)) * var(--hero-accent-feed));
+  top: calc(
+    var(--hero-rule-top) +
+    (var(--hero-rupture-y) - var(--hero-rule-top)) *
+    var(--hero-accent-feed)
+  );
+  left: calc(
+    var(--hero-rule-left) +
+    (50% - 18px - var(--hero-rule-left)) *
+    var(--hero-accent-feed)
+  );
   width: calc(var(--hero-rule-width) + (36px - var(--hero-rule-width)) * var(--hero-accent-feed));
-  height: calc(var(--hero-rule-height) + (1.5px - var(--hero-rule-height)) * var(--hero-accent-feed));
+  height: calc(
+    var(--hero-rule-height) +
+    (1.5px - var(--hero-rule-height)) *
+    var(--hero-accent-feed)
+  );
   transform: translate3d(0, calc(var(--hero-opening) * -60vh), 0);
   opacity: clamp(0, calc(1 - var(--hero-opening) * 6), 1);
   background: var(--hero-crimson);
@@ -281,7 +293,7 @@ body {
 }
 
 .font-hero-role {
-  font-family: 'Satoshi', system-ui, sans-serif;
+  font-family: "Satoshi", system-ui, sans-serif;
   font-weight: 500;
   font-size: clamp(0.9rem, 1.45vw, 1.4rem);
   line-height: 1.25;
@@ -307,7 +319,9 @@ body {
   transform: translate3d(0, calc(var(--hero-opening, 0) * 18vh), 0);
 }
 
-body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
+body:has(#hero[data-hero-depth="active"])
+  #kaiforge
+  .kaiforge-sticky {
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -372,25 +386,25 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
     will-change: auto;
   }
 
-  [data-reduced-motion='true'] .hero-editorial-copy {
+  [data-reduced-motion="true"] .hero-editorial-copy {
     isolation: isolate;
     mix-blend-mode: normal;
   }
 
-  [data-reduced-motion='true'] .hero-editorial-copy::before {
+  [data-reduced-motion="true"] .hero-editorial-copy::before {
     position: absolute;
     z-index: -1;
     width: min(78vw, 72rem);
     height: min(56svh, 34rem);
-    content: '';
+    content: "";
     background: var(--hero-parchment);
   }
 
-  [data-reduced-motion='true'] .font-hero-name {
+  [data-reduced-motion="true"] .font-hero-name {
     color: var(--hero-ink);
   }
 
-  [data-reduced-motion='true'] .font-hero-role {
+  [data-reduced-motion="true"] .font-hero-role {
     color: color-mix(in srgb, var(--hero-charcoal) 70%, transparent);
   }
 }
@@ -418,8 +432,19 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(112deg, transparent 0 32%, rgba(116, 108, 98, 0.08) 32.1% 32.25%, transparent 32.35%),
-    linear-gradient(68deg, transparent 0 64%, rgba(229, 218, 199, 0.07) 64.1% 64.2%, transparent 64.3%),
+  background:
+    linear-gradient(
+      112deg,
+      transparent 0 32%,
+      rgba(116, 108, 98, 0.08) 32.1% 32.25%,
+      transparent 32.35%
+    ),
+    linear-gradient(
+      68deg,
+      transparent 0 64%,
+      rgba(229, 218, 199, 0.07) 64.1% 64.2%,
+      transparent 64.3%
+    ),
     #0b0908;
 }
 
@@ -428,8 +453,15 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  content: '';
-  background: linear-gradient(180deg, rgba(11, 9, 8, 0.5), transparent 24%, transparent 74%, rgba(11, 9, 8, 0.76)),
+  content: "";
+  background:
+    linear-gradient(
+      180deg,
+      rgba(11, 9, 8, 0.5),
+      transparent 24%,
+      transparent 74%,
+      rgba(11, 9, 8, 0.76)
+    ),
     radial-gradient(circle at 52% 47%, transparent 28%, rgba(11, 9, 8, 0.5) 100%);
 }
 
@@ -450,7 +482,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 .neuroshield-fallback-field > em,
 .neuroshield-fallback .evidence-plane {
   margin: 0;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.62rem, 0.7vw, 0.76rem);
   font-style: normal;
   line-height: 1.4;
@@ -669,10 +701,23 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   background: #0b0908;
 }
 
-.neuroshield-fallback .node-a { top: 24%; left: 28%; }
-.neuroshield-fallback .node-b { top: 37%; left: 46%; }
-.neuroshield-fallback .node-c { top: 25%; right: 26%; }
-.neuroshield-fallback .node-d { right: 18%; bottom: 22%; border-color: #7d201d; }
+.neuroshield-fallback .node-a {
+  top: 24%;
+  left: 28%;
+}
+.neuroshield-fallback .node-b {
+  top: 37%;
+  left: 46%;
+}
+.neuroshield-fallback .node-c {
+  top: 25%;
+  right: 26%;
+}
+.neuroshield-fallback .node-d {
+  right: 18%;
+  bottom: 22%;
+  border-color: #7d201d;
+}
 
 .neuroshield-fallback .evidence-path {
   position: absolute;
@@ -683,11 +728,36 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   background: #9c9180;
 }
 
-.neuroshield-fallback .path-a { top: 28%; left: 28%; width: 20%; transform: rotate(24deg); }
-.neuroshield-fallback .path-b { top: 37%; left: 46%; width: 26%; transform: rotate(-14deg); }
-.neuroshield-fallback .path-c { top: 40%; left: 46%; width: 27%; transform: rotate(42deg); }
-.neuroshield-fallback .path-gap-a { right: 25%; bottom: 30%; width: 7%; transform: rotate(32deg); }
-.neuroshield-fallback .path-gap-b { right: 17%; bottom: 22%; width: 5%; transform: rotate(32deg); }
+.neuroshield-fallback .path-a {
+  top: 28%;
+  left: 28%;
+  width: 20%;
+  transform: rotate(24deg);
+}
+.neuroshield-fallback .path-b {
+  top: 37%;
+  left: 46%;
+  width: 26%;
+  transform: rotate(-14deg);
+}
+.neuroshield-fallback .path-c {
+  top: 40%;
+  left: 46%;
+  width: 27%;
+  transform: rotate(42deg);
+}
+.neuroshield-fallback .path-gap-a {
+  right: 25%;
+  bottom: 30%;
+  width: 7%;
+  transform: rotate(32deg);
+}
+.neuroshield-fallback .path-gap-b {
+  right: 17%;
+  bottom: 22%;
+  width: 5%;
+  transform: rotate(32deg);
+}
 
 .neuroshield-fallback-field > em {
   position: absolute;
@@ -796,10 +866,18 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
     padding: 0.45rem;
   }
 
-  .neuroshield-fallback .evidence-plane-a { left: 0; }
-  .neuroshield-fallback .evidence-plane-b { left: 37%; }
-  .neuroshield-fallback .evidence-plane-c { right: 0; }
-  .neuroshield-fallback-field > em { display: none; }
+  .neuroshield-fallback .evidence-plane-a {
+    left: 0;
+  }
+  .neuroshield-fallback .evidence-plane-b {
+    left: 37%;
+  }
+  .neuroshield-fallback .evidence-plane-c {
+    right: 0;
+  }
+  .neuroshield-fallback-field > em {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -813,7 +891,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 @media (prefers-reduced-motion: reduce) and (orientation: portrait) {
-  [data-reduced-motion='true'] .hero-editorial-copy::before {
+  [data-reduced-motion="true"] .hero-editorial-copy::before {
     width: calc(100vw - 2rem);
     height: min(48svh, 30rem);
   }
@@ -843,8 +921,14 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  content: '';
-  background: linear-gradient(180deg, rgba(11, 9, 8, 0.48), transparent 23%, transparent 74%, rgba(11, 9, 8, 0.72));
+  content: "";
+  background: linear-gradient(
+    180deg,
+    rgba(11, 9, 8, 0.48),
+    transparent 23%,
+    transparent 74%,
+    rgba(11, 9, 8, 0.72)
+  );
 }
 
 .skills-render-placeholder {
@@ -871,7 +955,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 .skills-fallback-category > span,
 .skills-fallback-category ul {
   margin: 0;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.62rem, 0.72vw, 0.78rem);
   line-height: 1.55;
   letter-spacing: 0.15em;
@@ -959,7 +1043,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 
 .skills-category li::before {
   margin-right: 0.45rem;
-  content: '—';
+  content: "—";
   color: #6f665a;
 }
 
@@ -995,7 +1079,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   left: 5vw;
   z-index: 5;
   height: 2px;
-  content: '';
+  content: "";
   background: #e5dac7;
   opacity: clamp(0, calc((var(--skills-progress) - 0.9) * 10), 1);
   transform: scaleX(clamp(0, calc((var(--skills-progress) - 0.88) * 8.4), 1));
@@ -1059,7 +1143,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 
 .skills-fallback-category li::before {
   margin-right: 0.4rem;
-  content: '—';
+  content: "—";
   color: #6f665a;
 }
 
@@ -1216,6 +1300,25 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   height: 100%;
 }
 
+.kai-palindrome-bridge {
+  position: relative;
+  z-index: 2;
+  height: 370svh;
+  pointer-events: none;
+}
+
+.kai-palindrome-bridge-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  background: transparent;
+}
+
+.kai-palindrome-bridge-disabled {
+  height: 0;
+  overflow: hidden;
+}
+
 .kaiforge-chapter {
   --kaiforge-progress: 0;
   position: relative;
@@ -1233,7 +1336,12 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   height: 100svh;
   overflow: hidden;
   isolation: isolate;
-  background: linear-gradient(90deg, transparent 49.94%, rgba(242, 233, 216, 0.08) 50%, transparent 50.06%);
+  background: linear-gradient(
+    90deg,
+    transparent 49.94%,
+    rgba(242, 233, 216, 0.08) 50%,
+    transparent 50.06%
+  );
 }
 
 .kaiforge-render-layer,
@@ -1250,9 +1358,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 .kaiforge-render-placeholder {
-  background:
-    radial-gradient(circle at 50% 52%, rgba(111, 98, 82, 0.12), transparent 32%),
-    #0b0908;
+  background: radial-gradient(circle at 50% 52%, rgba(111, 98, 82, 0.12), transparent 32%), #0b0908;
 }
 
 .kaiforge-sticky::after {
@@ -1260,9 +1366,15 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  content: '';
+  content: "";
   background:
-    linear-gradient(180deg, rgba(11, 9, 8, 0.44), transparent 22%, transparent 72%, rgba(11, 9, 8, 0.7)),
+    linear-gradient(
+      180deg,
+      rgba(11, 9, 8, 0.44),
+      transparent 22%,
+      transparent 72%,
+      rgba(11, 9, 8, 0.7)
+    ),
     radial-gradient(circle at 50% 45%, transparent 35%, rgba(11, 9, 8, 0.42) 100%);
 }
 
@@ -1282,7 +1394,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 .kaiforge-destination,
 .kaiforge-fallback-copy > p {
   margin: 0;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.62rem, 0.72vw, 0.78rem);
   line-height: 1.3;
   letter-spacing: 0.18em;
@@ -1704,7 +1816,8 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   position: absolute;
   inset: 0;
   z-index: 0;
-  background: linear-gradient(90deg, #1d1a18 0 19%, transparent 19%),
+  background:
+    linear-gradient(90deg, #1d1a18 0 19%, transparent 19%),
     linear-gradient(180deg, transparent 0 66%, #171412 66%), #0b0908;
 }
 
@@ -1713,8 +1826,15 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  content: '';
-  background: linear-gradient(180deg, rgba(11, 9, 8, 0.54), transparent 22%, transparent 72%, rgba(11, 9, 8, 0.72)),
+  content: "";
+  background:
+    linear-gradient(
+      180deg,
+      rgba(11, 9, 8, 0.54),
+      transparent 22%,
+      transparent 72%,
+      rgba(11, 9, 8, 0.72)
+    ),
     radial-gradient(circle at 48% 49%, transparent 34%, rgba(11, 9, 8, 0.44));
 }
 
@@ -1733,7 +1853,7 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 .palindrome-disclosure,
 .palindrome-fallback-room > p {
   margin: 0;
-  font-family: 'JetBrains Mono Variable', monospace;
+  font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.62rem, 0.72vw, 0.78rem);
   line-height: 1.4;
   letter-spacing: 0.16em;
@@ -1896,7 +2016,11 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
   width: 22%;
   height: 42%;
   border: 1px solid rgba(232, 221, 202, 0.2);
-  background: repeating-linear-gradient(180deg, transparent 0 31%, rgba(232, 221, 202, 0.14) 31% 32%);
+  background: repeating-linear-gradient(
+    180deg,
+    transparent 0 31%,
+    rgba(232, 221, 202, 0.14) 31% 32%
+  );
 }
 
 .palindrome-fallback-table {
@@ -2086,4 +2210,3 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
     will-change: auto;
   }
 }
-
