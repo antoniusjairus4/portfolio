@@ -165,15 +165,8 @@ body {
 }
 
 .hero-portrait-reveal {
-  /* One continuous image, contained inside the already-open typographic seam.
-     Hidden in server HTML and at rest; never a pair of covering 50% panels. */
-  opacity: var(--hero-portrait-opacity, 0);
-  clip-path: inset(
-    max(0%, calc(var(--hero-rupture-y) - var(--hero-opening) * 60% + 1.5%))
-    calc(50% * (1 - var(--hero-portrait-reveal, 0)))
-    max(0%, calc(100% - var(--hero-rupture-y) - var(--hero-opening) * 60% + 1.5%))
-    calc(50% * (1 - var(--hero-portrait-reveal, 0)))
-  );
+  /* Full portrait opens the story and retires before the name, never over KaiForge. */
+  opacity: var(--hero-portrait-opacity, 1);
 }
 
 .hero-depth-curtain {
@@ -254,7 +247,7 @@ body {
   height: 1px;
   pointer-events: none;
   background: var(--hero-crimson);
-  opacity: clamp(0, calc(1 - var(--hero-opening) * 3), 1);
+  opacity: calc(var(--hero-identity-opacity, 0) * clamp(0, 1 - var(--hero-opening) * 3, 1));
   transform: translate3d(0, calc(var(--hero-opening) * 18vh), 0);
 }
 
@@ -306,6 +299,7 @@ body {
 
 .hero-editorial-copy {
   mix-blend-mode: difference;
+  opacity: var(--hero-identity-opacity, 0);
 }
 
 .hero-role-list {
@@ -362,6 +356,14 @@ body:has(#hero[data-hero-depth='active']) #kaiforge .kaiforge-sticky {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .hero-portrait-reveal {
+    opacity: 0;
+  }
+
+  .hero-editorial-copy {
+    opacity: 1;
+  }
+
   .hero-role-accent {
     opacity: 1;
   }

@@ -12,6 +12,7 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
+import './palindromeProduction.css';
 
 const BEAT_PRESENTATION = [
   { center: 0.08, width: 0.16 },

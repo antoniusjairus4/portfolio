@@ -1,0 +1,123 @@
+.palindrome-chapter {
+  color: #f2e8d5;
+}
+
+.palindrome-semantic-header h2,
+.palindrome-beat strong,
+.palindrome-disclosure a {
+  color: #f2e8d5;
+}
+
+.palindrome-semantic-header > p:first-child,
+.palindrome-semantic-header > p:nth-of-type(2),
+.palindrome-purpose,
+.palindrome-beat > span,
+.palindrome-beat small,
+.palindrome-chapter-index {
+  color: #d4cbb9;
+}
+
+.palindrome-disclosure p {
+  color: #b3aa98;
+}
+
+.palindrome-static .palindrome-sticky {
+  background: #111111;
+}
+
+.palindrome-fallback-room {
+  border-color: #716b60;
+  background: #292925;
+}
+
+.palindrome-fallback-window {
+  position: absolute;
+  left: 6%;
+  top: 36%;
+  width: 15%;
+  height: 25%;
+  border: 0.4rem solid #645b4c;
+  background: #cdc2ac;
+}
+
+.palindrome-fallback-window::after {
+  position: absolute;
+  inset: 0 48%;
+  background: #645b4c;
+  content: "";
+}
+
+.palindrome-fallback-table {
+  background: #645b4c;
+  border-color: #484840;
+}
+
+.palindrome-fallback-table > i {
+  position: absolute;
+  left: 10%;
+  bottom: 100%;
+  width: 12%;
+  height: 2.8rem;
+  background: #b4a58a;
+  border-top: 0.25rem solid #8e8068;
+}
+
+.palindrome-fallback-shelf > i {
+  position: absolute;
+  bottom: 36%;
+  left: 14%;
+  width: 19%;
+  height: 17%;
+  border-radius: 15% 15% 5% 5%;
+  background: #cdc2ac;
+}
+
+.palindrome-fallback-shelf > i:nth-child(2) {
+  left: 48%;
+  height: 12%;
+}
+
+.palindrome-fallback-shelf > i:nth-child(3) {
+  bottom: 4%;
+  width: 65%;
+  height: 22%;
+  border-radius: 0;
+  background: #a69b86;
+}
+
+.palindrome-fallback-information {
+  top: auto;
+  bottom: 28%;
+  left: 32%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 8.5rem;
+  padding: 0.6rem;
+  background: #f2e8d5;
+  color: #111111;
+  font: 0.55rem / 1.5 monospace;
+}
+
+.palindrome-fallback-information span {
+  display: flex;
+  justify-content: space-between;
+  height: auto;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.palindrome-fallback-information b {
+  font-weight: 400;
+}
+
+@media (orientation: portrait) {
+  .palindrome-fallback-information {
+    top: auto;
+    bottom: 24%;
+    left: 24%;
+    gap: 0.2rem;
+    width: 7.2rem;
+  }
+}

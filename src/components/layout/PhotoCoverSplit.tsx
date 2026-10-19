@@ -118,16 +118,16 @@ export const PhotoCoverSplit: React.FC = () => {
       );
       container.style.setProperty('--hero-progress', progress.toFixed(4));
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
-      // Let the existing name rupture clear a central aperture before exposing
-      // any portrait pixels. Both image reveal and retirement use that same clock.
+      // Portrait first, then the complete identity, then the existing KaiForge
+      // rupture. The portrait is fully retired before readable type appears.
       const ease = (value: number) => {
         const t = Math.min(1, Math.max(0, value));
         return t * t * (3 - 2 * t);
       };
-      const portraitReveal = reducedMotion ? 0 : ease((openingProgress - 0.35) / 0.4);
-      const portraitOpacity = portraitReveal * (1 - ease((openingProgress - 0.8) / 0.2));
-      container.style.setProperty('--hero-portrait-reveal', portraitReveal.toFixed(4));
+      const portraitOpacity = reducedMotion ? 0 : 1 - ease((progress - 0.04) / 0.14);
+      const identityOpacity = reducedMotion ? 1 : ease((progress - 0.18) / 0.06);
       container.style.setProperty('--hero-portrait-opacity', portraitOpacity.toFixed(4));
+      container.style.setProperty('--hero-identity-opacity', identityOpacity.toFixed(4));
       container.style.setProperty('--hero-accent-feed',
         (accentTravel * accentTravel * (3 - 2 * accentTravel)).toFixed(4));
       container.dataset.heroDepth =
@@ -179,7 +179,7 @@ export const PhotoCoverSplit: React.FC = () => {
 
       context = gsap.context(() => {
         gsap.set(contentWrapper, { force3D: !reducedMotion });
-        // The initial and reverse-scroll resting frame is the complete identity.
+        // Keep all letters intact; reveal the full text layer after the portrait exits.
         gsap.set(nameLetters, { opacity: 1, yPercent: 0 });
         gsap.set(roleLetters, { opacity: 1, yPercent: 0 });
         gsap.set(pageBackground, { opacity: 1 });
@@ -261,8 +261,8 @@ export const PhotoCoverSplit: React.FC = () => {
       delete container.dataset.reducedMotion;
       container.style.removeProperty('--hero-progress');
       container.style.removeProperty('--hero-opening');
-      container.style.removeProperty('--hero-portrait-reveal');
       container.style.removeProperty('--hero-portrait-opacity');
+      container.style.removeProperty('--hero-identity-opacity');
       container.style.removeProperty('--hero-accent-feed');
       container.style.removeProperty('--hero-copy-half-height');
     };

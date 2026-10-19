@@ -34,21 +34,22 @@ export function getPalindromeBeat(progress: number): PalindromeBeat {
 }
 
 export function getBeatOpacity(progress: number, center: number, halfWidth: number) {
-  return smoothstep(1 - Math.abs(progress - center) / halfWidth);
+  // Keep a readable plateau within each existing beat, then ease across its edges.
+  return smoothstep((halfWidth - Math.abs(progress - center)) / (halfWidth * 0.55));
 }
 
 export function getFragmentationProgress(progress: number) {
-  return smoothstep(rangeProgress(progress, 0.13, 0.37));
+  return smoothstep(rangeProgress(progress, 0.18, 0.36));
 }
 
 export function getRelationshipProgress(progress: number) {
-  return smoothstep(rangeProgress(progress, 0.35, 0.61));
+  return smoothstep(rangeProgress(progress, 0.43, 0.58));
 }
 
 export function getOrganizationProgress(progress: number) {
-  return smoothstep(rangeProgress(progress, 0.57, 0.82));
+  return smoothstep(rangeProgress(progress, 0.65, 0.78));
 }
 
 export function getControlProgress(progress: number) {
-  return smoothstep(rangeProgress(progress, 0.8, 0.96));
+  return smoothstep(rangeProgress(progress, 0.85, 0.95));
 }
