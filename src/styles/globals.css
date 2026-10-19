@@ -409,14 +409,14 @@ body:has(#hero[data-hero-depth="active"])
   }
 }
 
-/* Phase 4 NeuroShield greybox: evidence, branches, gaps, and uncertainty. */
+/* NeuroShield research field: keep chapter copy legible over the spatial evidence. */
 .neuroshield-chapter {
   --neuroshield-progress: 0;
   position: relative;
   z-index: 2;
   width: 100%;
   height: 500svh;
-  color: #e5dac7;
+  color: #f2e8d5;
 }
 
 .neuroshield-sticky {
@@ -488,7 +488,7 @@ body:has(#hero[data-hero-depth="active"])
   line-height: 1.4;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #9c9180;
+  color: #c4b8a7;
 }
 
 .neuroshield-semantic-header h2 {
@@ -499,7 +499,7 @@ body:has(#hero[data-hero-depth="active"])
   line-height: 0.82;
   letter-spacing: -0.07em;
   text-transform: uppercase;
-  color: #e5dac7;
+  color: #f2e8d5;
 }
 
 .neuroshield-semantic-header > p:nth-of-type(2) {
@@ -508,7 +508,7 @@ body:has(#hero[data-hero-depth="active"])
   font-family: var(--font-secondary);
   font-size: clamp(1rem, 1.22vw, 1.25rem);
   line-height: 1.48;
-  color: rgba(229, 218, 199, 0.88);
+  color: rgba(242, 232, 213, 0.92);
 }
 
 .neuroshield-role {
@@ -517,7 +517,7 @@ body:has(#hero[data-hero-depth="active"])
   font-family: var(--font-secondary);
   font-size: clamp(0.8rem, 0.88vw, 0.96rem);
   line-height: 1.55;
-  color: #9c9180;
+  color: #c6baa9;
 }
 
 .neuroshield-beats {
@@ -542,7 +542,7 @@ body:has(#hero[data-hero-depth="active"])
   font-weight: 560;
   line-height: 0.88;
   letter-spacing: -0.055em;
-  color: #e5dac7;
+  color: #f2e8d5;
 }
 
 .neuroshield-beat small {
@@ -552,7 +552,7 @@ body:has(#hero[data-hero-depth="active"])
   font-family: var(--font-secondary);
   font-size: clamp(0.74rem, 0.82vw, 0.9rem);
   line-height: 1.55;
-  color: #a99d8b;
+  color: #c7baa8;
 }
 
 .neuroshield-beat.beat-observation,
@@ -593,7 +593,7 @@ body:has(#hero[data-hero-depth="active"])
   flex-direction: column;
   gap: 0.7rem;
   transform: translateY(-50%);
-  color: #625b52;
+  color: #ada292;
 }
 
 .neuroshield-metadata span:nth-child(2) {
@@ -638,13 +638,13 @@ body:has(#hero[data-hero-depth="active"])
 .neuroshield-disclosure p {
   max-width: 40rem;
   margin: 0;
-  color: #766e64;
+  color: #b8ad9e;
 }
 
 .neuroshield-disclosure a {
   flex: 0 0 auto;
   min-height: 2.6rem;
-  color: #d9cdbc;
+  color: #f2e8d5;
   text-decoration: none;
   pointer-events: auto;
 }
@@ -848,12 +848,22 @@ body:has(#hero[data-hero-depth="active"])
   .neuroshield-disclosure {
     right: 1.25rem;
     bottom: 1rem;
-    left: auto;
+    left: 1.25rem;
+    gap: 0.7rem;
     max-width: none;
   }
 
   .neuroshield-disclosure p {
-    display: none;
+    display: block;
+    max-width: 12rem;
+    font-size: 0.55rem;
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  .neuroshield-disclosure a {
+    font-size: 0.58rem;
+    white-space: nowrap;
   }
 
   .neuroshield-fallback-field {
