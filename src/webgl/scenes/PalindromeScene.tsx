@@ -1,9 +1,10 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo } from 'react';
-import { type PerspectiveCamera, Vector3 } from 'three';
+import { useMemo, useRef } from 'react';
+import { Color, type PerspectiveCamera, type PointLight, Vector3 } from 'three';
 import {
+  getControlProgress,
   getOrganizationProgress,
   getRelationshipProgress,
 } from '@/components/palindrome/palindromeChoreography';
@@ -19,11 +20,25 @@ interface PalindromeSceneProps {
 export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) {
   const { camera } = useThree();
   const target = useMemo(() => new Vector3(0, 1.9, -0.55), []);
+  const reflectedFill = useRef<PointLight>(null);
+  const fillColors = useMemo(
+    () => ({
+      warm: new Color(ROOM_PALETTE.parchment),
+      crimson: new Color(ROOM_PALETTE.crimson),
+    }),
+    [],
+  );
 
   useFrame(() => {
     const p = controller.progress.current;
     const relationships = getRelationshipProgress(p);
     const organization = getOrganizationProgress(p);
+    const attention = relationships * (1 - getControlProgress(p));
+    // Reuse the local fill: a small reflected warmth shift, never a red wash.
+    if (reflectedFill.current) {
+      reflectedFill.current.color.lerpColors(fillColors.warm, fillColors.crimson, attention * 0.18);
+      reflectedFill.current.intensity = 1.45 + attention * 0.2;
+    }
     const perspectiveCamera = camera as PerspectiveCamera;
     const desiredFov = portrait ? 51 : 39;
     if (perspectiveCamera.fov !== desiredFov) {
@@ -44,10 +59,10 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
     <>
       <color attach="background" args={[ROOM_PALETTE.ink]} />
       <ambientLight intensity={0.24} color={ROOM_PALETTE.parchment} />
-      <hemisphereLight args={[ROOM_PALETTE.parchment, '#625B4E', 0.58]} />
+      <hemisphereLight args={[ROOM_PALETTE.parchment, '#594632', 0.58]} />
       <directionalLight
         position={[-3.8, 4.2, 1.5]}
-        intensity={1.75}
+        intensity={1.9}
         color={ROOM_PALETTE.parchment}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
@@ -62,10 +77,11 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
         shadow-radius={5}
       />
       <pointLight
+        ref={reflectedFill}
         position={[1.3, 1.8, 1.1]}
-        intensity={1.2}
+        intensity={1.45}
         color={ROOM_PALETTE.parchment}
-        distance={6}
+        distance={4.6}
         decay={2}
       />
       <DomesticRoom portrait={portrait} />

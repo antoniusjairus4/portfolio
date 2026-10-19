@@ -5,13 +5,14 @@ import {
   LinearMipmapLinearFilter,
   RepeatWrapping,
   RGBAFormat,
+  SRGBColorSpace,
 } from 'three';
 
 type Finish = 'plaster' | 'wood' | 'paper' | 'ceramic' | 'fabric' | 'metal';
-type Maps = Record<Finish, DataTexture>;
+type Maps = Record<Finish, DataTexture> & { woodTone: DataTexture };
 const SurfaceContext = createContext<Maps | null>(null);
 
-function grain(finish: Finish) {
+function grain(finish: Finish, albedo = false) {
   const size = 128;
   const pixels = new Uint8Array(size * size * 4);
   let seed = 417;
@@ -32,6 +33,10 @@ function grain(finish: Finish) {
       pixels[at + 1] = Math.round(235 + noise * 18);
       pixels[at + 2] = pixels[at];
       pixels[at + 3] = 255;
+      if (albedo) {
+        const tone = Math.round(237 + structure * 0.48 + noise * 6);
+        pixels[at] = pixels[at + 1] = pixels[at + 2] = tone;
+      }
     }
   }
   const texture = new DataTexture(pixels, size, size, RGBAFormat);
@@ -41,18 +46,22 @@ function grain(finish: Finish) {
   texture.minFilter = LinearMipmapLinearFilter;
   texture.magFilter = LinearFilter;
   texture.needsUpdate = true;
+  if (albedo) texture.colorSpace = SRGBColorSpace;
   return texture;
 }
 
 export function DomesticSurfaces({ children }: { children: ReactNode }) {
   const maps = useMemo(
     () =>
-      Object.fromEntries(
-        (['plaster', 'wood', 'paper', 'ceramic', 'fabric', 'metal'] as Finish[]).map((finish) => [
-          finish,
-          grain(finish),
-        ]),
-      ) as Maps,
+      ({
+        ...Object.fromEntries(
+          (['plaster', 'wood', 'paper', 'ceramic', 'fabric', 'metal'] as Finish[]).map((finish) => [
+            finish,
+            grain(finish),
+          ]),
+        ),
+        woodTone: grain('wood', true),
+      }) as Maps,
     [],
   );
   useEffect(
@@ -67,21 +76,22 @@ export function DomesticSurfaces({ children }: { children: ReactNode }) {
 export function Surface({ color, finish = 'wood' }: { color: string; finish?: Finish }) {
   const maps = useContext(SurfaceContext);
   const bump = {
-    plaster: 0.022,
-    wood: 0.009,
-    paper: 0.005,
-    ceramic: 0.003,
-    fabric: 0.018,
+    plaster: 0.018,
+    wood: 0.011,
+    paper: 0.0025,
+    ceramic: 0.0015,
+    fabric: 0.014,
     metal: 0.001,
   }[finish];
-  const roughness = { plaster: 0.98, wood: 0.84, paper: 1, ceramic: 0.49, fabric: 1, metal: 0.62 }[
+  const roughness = { plaster: 0.96, wood: 0.82, paper: 1, ceramic: 0.6, fabric: 1, metal: 0.58 }[
     finish
   ];
   return (
     <meshStandardMaterial
       color={color}
       roughness={roughness}
-      metalness={finish === 'metal' ? 0.55 : 0}
+      metalness={finish === 'metal' ? 0.65 : 0}
+      map={finish === 'wood' ? maps?.woodTone : undefined}
       bumpMap={maps?.[finish]}
       bumpScale={bump}
       roughnessMap={maps?.[finish]}

@@ -1,6 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { useRef, type MutableRefObject } from 'react';
-import { MathUtils, Vector3, type Group, type Mesh, type MeshBasicMaterial } from 'three';
+import { Color, MathUtils, Vector3, type Group, type Mesh, type MeshBasicMaterial } from 'three';
 import {
   getControlProgress,
   getFragmentationProgress,
@@ -111,6 +111,8 @@ const RELATIONS = [
   { object: false, from: 6, to: 7, start: 0.78, change: false },
 ] as const;
 const up = new Vector3(0, 1, 0);
+const parchment = new Color(ROOM_PALETTE.parchment);
+const crimson = new Color(ROOM_PALETTE.crimson);
 
 export function InformationField({
   progress,
@@ -134,6 +136,7 @@ export function InformationField({
     const sourceX = portrait ? 0.76 : 1;
     const alignment = related * 0.36 + organized * 0.64;
     const reading = smoothstep(rangeProgress(fragmented, 0.12, 0.65));
+    const attention = related * (1 - control);
 
     FRAGMENTS.forEach((data, index) => {
       const fragment = fragments.current[index];
@@ -171,6 +174,13 @@ export function InformationField({
       );
       fragment.scale.setScalar(MathUtils.lerp(data.scale, 1, fragmented));
       material.opacity = reading * (keep ? 1 : 1 - control);
+      // Retain parchment luminance in the dark room; pure Crimson belongs to
+      // the change connectors and physical marks. Control returns to parchment.
+      material.color.lerpColors(
+        parchment,
+        crimson,
+        index === 0 || index === 3 ? attention * 0.7 : 0,
+      );
       sourceMaterial.opacity = 1 - reading;
       fragment.visible = material.map !== null && material.opacity + sourceMaterial.opacity > 0.001;
     });

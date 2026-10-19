@@ -31,7 +31,7 @@ export function RoundedSolid({
   );
 }
 
-function Vessel({ profile, color = '#CDC2AC' }: { profile: [number, number][]; color?: string }) {
+function Vessel({ profile, color = '#E4D7BF' }: { profile: [number, number][]; color?: string }) {
   const points = useMemo(() => profile.map(([r, y]) => new Vector2(r, y)), [profile]);
   return (
     <mesh castShadow receiveShadow>
@@ -93,7 +93,7 @@ export function CeramicJar({ position, height = 0.32 }: { position: Point; heigh
   );
   return (
     <group position={[...position]}>
-      <Vessel profile={profile} />
+      <Vessel profile={profile} color="#D9D2BB" />
       <mesh position={[0, height + 0.012, 0]} castShadow>
         <cylinderGeometry args={[0.132, 0.136, 0.034, 32]} />
         <Surface color="#645B4C" />
@@ -113,14 +113,14 @@ function GroceryBag() {
       <RoundedSolid
         position={[0, 0.32, 0]}
         size={[0.62, 0.64, 0.43]}
-        color="#B4A58A"
+        color="#AF8960"
         radius={0.027}
         finish="paper"
       />
       <RoundedSolid
         position={[0, 0.643, 0]}
         size={[0.56, 0.01, 0.36]}
-        color="#514A3E"
+        color="#493725"
         finish="paper"
       />
       {[-0.215, 0.215].map((z) => (
@@ -128,13 +128,13 @@ function GroceryBag() {
           <RoundedSolid
             position={[0, 0.64, z]}
             size={[0.63, 0.065, 0.022]}
-            color="#C2B296"
+            color="#C4A47C"
             radius={0.007}
             finish="paper"
           />
           <mesh position={[0, 0.67, z]}>
             <torusGeometry args={[0.145, 0.012, 6, 24, Math.PI]} />
-            <Surface color="#8E8068" finish="paper" />
+            <Surface color="#856646" finish="paper" />
           </mesh>
         </group>
       ))}
@@ -143,7 +143,7 @@ function GroceryBag() {
           key={x}
           position={[x, 0.32, 0.02]}
           size={[0.008, 0.52, 0.045]}
-          color="#8E8068"
+          color="#856646"
           radius={0.002}
           finish="paper"
         />
@@ -169,7 +169,7 @@ function MilkCarton() {
       />
       <mesh position={[0, 0.46, -0.14]} castShadow>
         <extrudeGeometry args={[gable, { depth: 0.28, bevelEnabled: false }]} />
-        <Surface color="#CDC2AC" finish="paper" />
+        <Surface color="#E4D7BF" finish="paper" />
       </mesh>
       <RoundedSolid
         position={[0, 0.6, 0]}
@@ -185,7 +185,7 @@ function MilkCarton() {
       <RoundedSolid
         position={[0, 0.07, 0.148]}
         size={[0.265, 0.033, 0.003]}
-        color="#645B4C"
+        color="#8B1E2D"
         radius={0.001}
         finish="paper"
       />
@@ -199,14 +199,14 @@ function CoffeeCup() {
     <group position={[...DOMESTIC_SOURCES.coffee]}>
       <Vessel profile={PLATE} />
       <group position={[0, 0.024, 0]}>
-        <Vessel profile={CUP} />
+        <Vessel profile={CUP} color="#F2E8D5" />
         <mesh position={[0.145, 0.145, 0]} castShadow>
           <torusGeometry args={[0.082, 0.023, 10, 24]} />
-          <Surface color="#CDC2AC" finish="ceramic" />
+          <Surface color="#F2E8D5" finish="ceramic" />
         </mesh>
         <mesh position={[0, 0.239, 0]} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[0.116, 32]} />
-          <meshStandardMaterial color="#29241E" roughness={0.45} />
+          <meshStandardMaterial color="#29241E" roughness={0.56} />
         </mesh>
       </group>
       <ContactPatch position={[0, 0.002, 0]} size={[0.55, 0.55]} opacity={0.2} />
@@ -221,7 +221,7 @@ function PaperSlip({ previous = false }: { previous?: boolean }) {
     <group position={[...(previous ? DOMESTIC_SOURCES.previousReceipt : DOMESTIC_SOURCES.receipt)]}>
       <RoundedSolid
         size={[w, 0.008, d]}
-        color={previous ? '#CFC3AB' : '#F2E8D5'}
+        color={previous ? '#E4D6BB' : '#F2E8D5'}
         radius={0.003}
         finish="paper"
       />
@@ -300,28 +300,28 @@ function Notebook() {
       <RoundedSolid
         position={[0, 0.027, 0]}
         size={[0.57, 0.054, 0.62]}
-        color="#292925"
+        color="#111111"
         radius={0.018}
         finish="fabric"
       />
       <RoundedSolid
         position={[0.012, 0.025, 0]}
         size={[0.54, 0.028, 0.59]}
-        color="#CDC2AC"
+        color="#E8DDC7"
         radius={0.008}
         finish="paper"
       />
       <RoundedSolid
         position={[0, 0.05, 0]}
         size={[0.57, 0.01, 0.62]}
-        color="#292925"
+        color="#111111"
         radius={0.004}
         finish="fabric"
       />
       <RoundedSolid
         position={[0.18, 0.057, 0]}
         size={[0.023, 0.004, 0.62]}
-        color="#645B4C"
+        color="#8B1E2D"
         radius={0.001}
         finish="fabric"
       />
@@ -344,15 +344,15 @@ function TableLamp() {
     <group position={[0.56, 1.14, -0.91]}>
       <mesh position={[0, 0.025, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.18, 0.05, 32]} />
-        <Surface color="#292925" finish="metal" />
+        <Surface color="#414735" finish="metal" />
       </mesh>
       <mesh position={[0, 0.38, 0]} castShadow>
         <cylinderGeometry args={[0.018, 0.021, 0.7, 16]} />
-        <Surface color="#8D8371" finish="metal" />
+        <Surface color="#998466" finish="metal" />
       </mesh>
       <mesh position={[0, 0.76, 0]} castShadow>
         <cylinderGeometry args={[0.12, 0.25, 0.28, 32, 1, true]} />
-        <meshStandardMaterial color="#CDC2AC" roughness={0.95} side={2} />
+        <meshStandardMaterial color="#F2E8D5" roughness={0.92} side={2} />
       </mesh>
       <mesh position={[0, 0.68, 0]}>
         <sphereGeometry args={[0.045, 12, 8]} />
@@ -368,7 +368,7 @@ function TableLamp() {
         position={[0, 0.65, 0]}
         target={target}
         color="#F2E8D5"
-        intensity={4.5}
+        intensity={5.4}
         angle={0.9}
         penumbra={1}
         distance={3.5}
@@ -380,7 +380,7 @@ function TableLamp() {
 }
 
 export function ShelfBowl() {
-  return <Vessel profile={BOWL} />;
+  return <Vessel profile={BOWL} color="#BDBDA7" />;
 }
 
 export function HouseholdObjects() {
@@ -414,7 +414,7 @@ export function HouseholdObjects() {
         <RoundedSolid
           position={[0, 0.17, 0]}
           size={[0.23, 0.34, 0.21]}
-          color="#A69B86"
+          color="#8F9072"
           radius={0.009}
           finish="paper"
         />

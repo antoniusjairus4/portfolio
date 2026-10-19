@@ -11,11 +11,11 @@ export const ROOM_PALETTE = {
   ink: '#111111',
   parchment: '#F2E8D5',
   crimson: '#8B1E2D',
-  plaster: '#41413B',
-  floor: '#8D8371',
-  timber: '#645B4C',
-  ceramic: '#CDC2AC',
-  charcoal: '#292925',
+  plaster: '#2E2B27',
+  floor: '#A89371',
+  timber: '#806047',
+  ceramic: '#E4D7BF',
+  charcoal: '#1F211E',
 };
 
 type Point = [number, number, number];
@@ -105,7 +105,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
         <Block
           position={[-4.15, 2.65, -0.45]}
           size={[0.16, 5.3, 4.6]}
-          color="#A69B86"
+          color={ROOM_PALETTE.parchment}
           finish="plaster"
         />
         <Block position={[0, 0.12, -2.68]} size={[8.3, 0.24, 0.07]} color={ROOM_PALETTE.timber} />
@@ -116,7 +116,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
         <Block
           position={[-0.8, 0.012, -0.15]}
           size={[4.7, 0.02, 2.7]}
-          color="#7B7465"
+          color="#6C6956"
           finish="fabric"
         />
         {[-1.36, 1.06].map((z) => (
@@ -132,6 +132,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
           position={[-2.75, 2.65, -2.55]}
           size={[1.19, 1.69, 0.025]}
           color={ROOM_PALETTE.parchment}
+          finish="plaster"
         />
         <Block
           position={[-2.75, 2.65, -2.52]}
@@ -147,6 +148,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
           position={[-2.75, 1.71, -2.46]}
           size={[1.51, 0.09, 0.38]}
           color={ROOM_PALETTE.ceramic}
+          finish="ceramic"
         />
         <Jar position={[-3.13, 1.76, -2.4]} height={0.24} />
 
@@ -159,7 +161,7 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
             radius={0.025}
           />
           <ContactPatch position={[0, 0.025, 0]} size={[4.5, 2.5]} opacity={0.12} />
-          <Block position={[0, 0.9, 0]} size={[3.45, 0.22, 1.36]} color="#514A3E" />
+          <Block position={[0, 0.9, 0]} size={[3.45, 0.22, 1.36]} color="#24201C" />
           {[-1.62, 1.62].flatMap((x) =>
             [-0.63, 0.63].map((z) => (
               <Block
@@ -178,28 +180,23 @@ export function DomesticRoom({ portrait }: { portrait: boolean }) {
               key={x}
               position={[x, 1.34, 0]}
               size={[0.075, 2.68, 0.47]}
-              color={ROOM_PALETTE.timber}
+              color={ROOM_PALETTE.ink}
             />
           ))}
           {[0.18, 0.99, 1.8, 2.61].map((y) => (
-            <Block
-              key={y}
-              position={[0, y, 0]}
-              size={[1.85, 0.075, 0.54]}
-              color={ROOM_PALETTE.timber}
-            />
+            <Block key={y} position={[0, y, 0]} size={[1.85, 0.075, 0.54]} color="#554435" />
           ))}
           <RoundedSolid
             position={[0.2, 0.48, 0]}
             size={[0.96, 0.52, 0.42]}
-            color="#A69B86"
+            color="#969477"
             radius={0.025}
             finish="fabric"
           />
           <RoundedSolid
             position={[0.2, 0.745, 0]}
             size={[0.98, 0.035, 0.44]}
-            color="#8D8371"
+            color="#74745B"
             radius={0.012}
             finish="fabric"
           />
