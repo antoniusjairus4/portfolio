@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, type ReactNode, type RefObject, useRef } from 'react';
+import { type MutableRefObject, type ReactNode, useRef } from 'react';
 import type { Group } from 'three';
 import {
   Book,
@@ -35,13 +35,7 @@ function Block({
   );
 }
 
-function SeatedPresence({
-  headAnchorRef,
-  interiorProgress,
-}: {
-  headAnchorRef?: RefObject<Group | null>;
-  interiorProgress?: MutableRefObject<number>;
-}) {
+function SeatedPresence() {
   // The approved chair and seated anchor stay fixed; only the human is refined.
   return (
     <group position={[0.45, 0, -1.28]} rotation={[0, -0.18, 0]}>
@@ -57,7 +51,7 @@ function SeatedPresence({
           />
         )),
       )}
-      <SeatedFigure headAnchorRef={headAnchorRef} interiorProgress={interiorProgress} />
+      <SeatedFigure />
     </group>
   );
 }
@@ -96,16 +90,12 @@ export function DomesticRoom({
   bridgeShell = true,
   bridgeDesk = true,
   bridgeBall = true,
-  headAnchorRef,
-  interiorProgress,
 }: {
   portrait: boolean;
   transitionProgress?: MutableRefObject<number>;
   bridgeShell?: boolean;
   bridgeDesk?: boolean;
   bridgeBall?: boolean;
-  headAnchorRef?: RefObject<Group | null>;
-  interiorProgress?: MutableRefObject<number>;
 }) {
   return (
     <DomesticSurfaces>
@@ -200,10 +190,10 @@ export function DomesticRoom({
           end={0.97}
           anchor={[0.45, 1, -1.28]}
         >
-          <SeatedPresence headAnchorRef={headAnchorRef} interiorProgress={interiorProgress} />
+          <SeatedPresence />
         </BridgeReveal>
         {bridgeDesk && (
-          <group name="Palindrome_TransitionProps" position={[-1.02, 0, -0.35]}>
+          <group position={[-1.02, 0, -0.35]}>
             <RoundedSolid
               position={[0, 1.07, 0]}
               size={[3.8, 0.14, 1.65]}
@@ -258,7 +248,7 @@ export function DomesticRoom({
           end={0.87}
           anchor={[2.1, 1.34, -2.3]}
         >
-          <group name="Palindrome_TransitionShelf" position={[2.1, 0, -2.3]}>
+          <group position={[2.1, 0, -2.3]}>
             {[-0.86, 0.86].map((x) => (
               <Block
                 key={x}

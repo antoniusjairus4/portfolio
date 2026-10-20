@@ -1,0 +1,289 @@
+'use client';
+
+import { useFrame } from '@react-three/fiber';
+import { useLayoutEffect, useMemo, useRef } from 'react';
+import { Color, type Group, type InstancedMesh, Object3D, Vector3 } from 'three';
+import { assemblyProgress, SKILLS_REGIONS, skillAnchor } from '@/components/skills/skillsSpatial';
+import { skillCategories } from '@/content/skills';
+import type { ChapterProgressController } from '@/experience/chapterProgress';
+
+type Point = [number, number, number];
+interface Member {
+  position: Point;
+  size: Point;
+  tone: string;
+  rotation?: Point;
+}
+const PAPER = '#F2E8D5';
+const STONE = '#b9ae96';
+const INK = '#111111';
+const CHARCOAL = '#343b3b';
+const CRIMSON = '#8B1E2D';
+function member(position: Point, size: Point, tone = PAPER, rotation?: Point): Member {
+  return { position, size, tone, rotation };
+}
+function rail(from: Point, to: Point, width: number, tone = STONE): Member {
+  const direction = new Vector3(...to).sub(new Vector3(...from));
+  const object = new Object3D();
+  object.quaternion.setFromUnitVectors(new Vector3(0, 1, 0), direction.clone().normalize());
+  return member(
+    from.map((value, axis) => (value + to[axis]) / 2) as Point,
+    [width, direction.length(), width],
+    tone,
+    [object.rotation.x, object.rotation.y, object.rotation.z],
+  );
+}
+
+// Each family is one instanced draw, including its different material colours.
+// Unit boxes, no textures, no per-object shadows or imported resources.
+function Members({ pieces }: { pieces: Member[] }) {
+  const mesh = useRef<InstancedMesh>(null);
+  useLayoutEffect(() => {
+    if (!mesh.current) return;
+    const transform = new Object3D();
+    const color = new Color();
+    pieces.forEach((piece, index) => {
+      transform.position.set(...piece.position);
+      transform.scale.set(...piece.size);
+      transform.rotation.set(...(piece.rotation ?? [0, 0, 0]));
+      transform.updateMatrix();
+      mesh.current?.setMatrixAt(index, transform.matrix);
+      mesh.current?.setColorAt(index, color.set(piece.tone));
+    });
+    mesh.current.instanceMatrix.needsUpdate = true;
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
+    mesh.current.computeBoundingSphere();
+  }, [pieces]);
+  return (
+    <instancedMesh ref={mesh} args={[undefined, undefined, pieces.length]}>
+      <boxGeometry />
+      <meshStandardMaterial roughness={0.84} metalness={0.08} />
+    </instancedMesh>
+  );
+}
+
+function createDomain(domain: number, portrait: boolean) {
+  const fixed: Member[] = [];
+  const moving: Member[] = [];
+  const bays = portrait ? [-5.5, 4] : [-6, 0, 6];
+  switch (domain) {
+    case 0: {
+      // Foundation: ordered intersections hold the landscape above the void.
+      for (const z of bays) {
+        for (const x of [-5.8, 5.8]) {
+          fixed.push(member([x, 2.4, z], [0.52, 8.4, 0.65]));
+          fixed.push(member([x, -1.5, z], [1.2, 0.65, 1.3], INK));
+        }
+        fixed.push(member([0, -1.25, z], [13.6, 0.55, 1.3], STONE));
+        moving.push(member([0, 6.55, z], [12.4, 0.42, 0.7]));
+      }
+      for (const x of [-4.2, -2.1, 0, 2.1, 4.2]) {
+        fixed.push(member([x, -0.68, 0], [0.18, 0.38, 18], CHARCOAL));
+      }
+      // DSA has a repeated structural order around its inscription.
+      for (const y of [1.4, 2.9, 4.4]) {
+        fixed.push(member([-5.7, y, -0.8], [0.16, 0.16, 10.8], STONE));
+      }
+      break;
+    }
+    case 1: {
+      // Composition: layered cantilevers widen around the same central route.
+      for (const side of [-1, 1]) {
+        fixed.push(member([side * 7.2, 2.4, 0], [0.35, 8.4, 17], CHARCOAL));
+        for (const level of [0.4, 3.4, 6.4]) {
+          moving.push(member([side * 5.6, level, -1], [4.3, 0.2, 16]));
+        }
+        fixed.push(member([side * 6.7, 2.8, -3.8], [0.22, 6.2, 0.35], STONE));
+      }
+      for (const z of portrait ? [-4, 3] : [-5, -1, 3, 7]) {
+        fixed.push(member([6.7, 4.8, z], [1.4, 3.4, 0.12], STONE));
+      }
+      fixed.push(member([0, 6.7, -6], [15, 0.24, 3.8]));
+      fixed.push(rail([-6, 0.28, -5], [-2.4, -0.4, -13], 0.22));
+      break;
+    }
+    case 2: {
+      // Infrastructure: descended foundations, wells and longitudinal conduits.
+      for (const side of [-1, 1]) {
+        for (const tier of [0, 1, 2]) {
+          fixed.push(
+            member(
+              [side * (4.3 + tier * 1.25), -1.1 - tier * 1.25, 0],
+              [1.1, 1.2, 18],
+              tier === 0 ? PAPER : CHARCOAL,
+            ),
+          );
+          fixed.push(
+            member([side * (4.7 + tier * 0.65), 5.3 + tier * 0.45, -1], [0.18, 0.24, 21], STONE),
+          );
+        }
+        fixed.push(member([side * 6.5, 0, -5], [0.6, 10, 0.7]));
+        fixed.push(member([side * 5.4, 1.7, 1.2], [0.4, 4.2, 0.6], CHARCOAL));
+        moving.push(member([side * 2.5, 0.36, 0], [0.13, 0.18, 17.5]));
+      }
+      fixed.push(member([0, -4.7, 0], [18, 0.4, 18], CHARCOAL));
+      break;
+    }
+    case 3: {
+      // Perforated boundaries and terminated side routes, not an enclosed room.
+      for (const side of [-1, 1]) {
+        fixed.push(member([side * 4.4, 0.7, 0], [0.4, 1.4, 18]));
+        fixed.push(member([side * 4.4, 5.7, 0], [0.4, 2, 18]));
+        for (const z of [-6, 5]) {
+          fixed.push(member([side * 4.4, 3.2, z], [0.42, 3.8, 2.6], STONE));
+        }
+        fixed.push(member([side * 2.5, 0.12, 0], [0.12, 0.18, 19], CHARCOAL));
+        fixed.push(rail([side * 5.2, 1.8, 5], [side * 5.2, 1.8, -0.5], 0.12));
+        fixed.push(member([side * 5.2, 2.05, -0.5], [0.5, 0.6, 0.16], INK));
+      }
+      moving.push(member([0, 6.1, -3], [8.5, 0.32, 0.8]));
+      break;
+    }
+    case 4: {
+      // Mechanism: branching/merging load-bearing rails and a sliding coupling.
+      for (const side of [-1, 1]) {
+        fixed.push(rail([side * 1.8, 0.35, 8], [side * 6, 0.35, 0], 0.32, PAPER));
+        fixed.push(rail([side * 6, 0.35, 0], [side * 2.2, 0.35, -9], 0.32, PAPER));
+        fixed.push(rail([side * 1.8, 5.8, 8], [side * 6, 5.8, 0], 0.18));
+        fixed.push(rail([side * 6, 5.8, 0], [side * 2.2, 5.8, -9], 0.18));
+        fixed.push(member([side * 6, 1.8, 0], [0.62, 8.4, 1.5], CHARCOAL));
+        fixed.push(member([side * 5.2, -0.5, -4], [2.6, 0.25, 7], STONE));
+      }
+      for (const y of [1.4, 2.2, 3]) {
+        fixed.push(member([-6.8, y, -2], [2.4, 0.16, 7.5], STONE));
+      }
+      moving.push(member([0, 5.8, -2], [11.8, 0.38, 1.2]));
+      break;
+    }
+    case 5: {
+      // Orchestration combines earlier languages into one larger open span.
+      for (const side of [-1, 1]) {
+        fixed.push(member([side * 7.2, 2.5, -3], [0.65, 10, 0.8]));
+        fixed.push(member([side * 6, 1.4, -2], [3, 0.22, 18], STONE));
+        fixed.push(member([side * 6.6, 4.6, -4], [3.8, 0.16, 14]));
+        fixed.push(rail([side * 2.2, 0.2, 8], [side * 7.2, 0.2, -6], 0.24));
+        fixed.push(member([side * 4.3, -2.6, -2], [0.25, 5.5, 17], CHARCOAL));
+        fixed.push(member([side * 8.5, 3.5, -6], [0.25, 7.5, 4], STONE));
+      }
+      moving.push(member([0, 7.1, -3], [15.2, 0.4, 2.2]));
+      fixed.push(member([0, -3.6, -3], [21, 0.5, 22], STONE));
+      break;
+    }
+  }
+  const origin = SKILLS_REGIONS[domain];
+  skillCategories[domain].skills.forEach((_, skill) => {
+    const anchor = skillAnchor(domain, skill, portrait);
+    const x = anchor[0] - origin.x;
+    const y = anchor[1] - origin.y - 0.34;
+    const z = anchor[2] - origin.z;
+    const side = x < 0 ? -1 : 1;
+    const support = domain === 3 ? 4.4 : domain === 0 ? 5.8 : 6.5;
+    // Thin inscription ledges return into the structural system. No backing cards.
+    fixed.push(rail([x, y, z], [side * support, y, z], 0.025, STONE));
+  });
+  return { fixed, moving };
+}
+
+function StructuralSystem({
+  domain,
+  portrait,
+  controller,
+}: {
+  domain: number;
+  portrait: boolean;
+  controller: ChapterProgressController;
+}) {
+  const mechanism = useRef<Group>(null);
+  const connection = useRef<Group>(null);
+  const pieces = useMemo(() => createDomain(domain, portrait), [domain, portrait]);
+  const accent = useMemo(() => [member([0, 0.95, -2], [1.4, 0.035, 0.05], CRIMSON)], []);
+  const region = SKILLS_REGIONS[domain];
+  useFrame(() => {
+    const group = mechanism.current;
+    if (!group) return;
+    const assembly = assemblyProgress(controller.progress.current, domain);
+    const remaining = 1 - assembly;
+    // Absolute assignments: seek, restore and reverse equal forward playback.
+    group.position.set(0, 0, 0);
+    group.rotation.set(0, 0, 0);
+    group.scale.set(1, 1, 1);
+    if (domain === 0) group.position.y = remaining * 1.6;
+    if (domain === 1) group.scale.x = 0.76 + assembly * 0.24;
+    if (domain === 2) group.scale.z = 0.3 + assembly * 0.7;
+    if (domain === 3) group.rotation.y = remaining * 0.32;
+    if (domain === 4) group.position.z = remaining * 4;
+    if (domain === 5) group.position.y = remaining * 2;
+    // Crimson marks only the connection currently being made.
+    if (connection.current) {
+      connection.current.visible = assembly > 0 && assembly < 1;
+      connection.current.scale.x = Math.sin(assembly * Math.PI);
+    }
+  });
+  return (
+    <group position={[region.x, region.y, region.z]}>
+      <Members pieces={pieces.fixed} />
+      <group ref={mechanism}>
+        <Members pieces={pieces.moving} />
+      </group>
+      <group ref={connection}>
+        <Members pieces={accent} />
+      </group>
+    </group>
+  );
+}
+
+export function SkillsArchitecture({
+  portrait,
+  controller,
+}: {
+  portrait: boolean;
+  controller: ChapterProgressController;
+}) {
+  const connectiveTissue = useMemo(() => {
+    const pieces: Member[] = [];
+    for (let i = 0; i < SKILLS_REGIONS.length - 1; i++) {
+      const start = SKILLS_REGIONS[i];
+      const end = SKILLS_REGIONS[i + 1];
+      // These shared bridges and service rails survive every change of language.
+      pieces.push(
+        rail([start.x, start.y - 1.1, start.z + 8], [end.x, end.y - 1.1, end.z + 8], 2.1, CHARCOAL),
+      );
+      for (const side of [-1, 1]) {
+        pieces.push(
+          rail(
+            [start.x + side * 1.35, start.y, start.z + 8],
+            [end.x + side * 1.35, end.y, end.z + 8],
+            0.08,
+            PAPER,
+          ),
+        );
+        pieces.push(
+          rail(
+            [start.x + side * 7.8, start.y - 2, start.z + 8],
+            [end.x + side * 7.8, end.y - 2, end.z + 8],
+            0.3,
+          ),
+        );
+      }
+    }
+    pieces.push(member([0, -1.1, 12], [2.1, 2.1, 8], CHARCOAL));
+    pieces.push(member([0, -0.1, -80], [2.1, 2.1, 16], CHARCOAL));
+    pieces.push(member([0, -6, -37], [48, 0.5, 116], CHARCOAL));
+    pieces.push(member([-16, 2, -40], [0.8, 18, 112], STONE));
+    pieces.push(member([18, 5, -44], [0.8, 24, 118], INK));
+    return pieces;
+  }, []);
+  return (
+    <group>
+      <Members pieces={connectiveTissue} />
+      {SKILLS_REGIONS.map((region, domain) => (
+        <StructuralSystem
+          key={region.z}
+          domain={domain}
+          portrait={portrait}
+          controller={controller}
+        />
+      ))}
+    </group>
+  );
+}

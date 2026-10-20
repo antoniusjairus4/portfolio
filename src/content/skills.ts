@@ -33,7 +33,7 @@ export const skillCategories: readonly SkillCategory[] = [
     index: '04',
     name: 'CYBERSECURITY',
     statement: 'Boundaries, controlled access, and defensive structure.',
-    skills: ['Cybersecurity Fundamentals', 'Network Security', 'Web Scraping'],
+    skills: ['Fundamentals', 'Network Security', 'Web Scraping'],
   },
   {
     key: 'tools',

@@ -1,18 +1,14 @@
-import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, type RefObject, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 import {
   BufferGeometry,
   CatmullRomCurve3,
   Color,
   Float32BufferAttribute,
-  type Group,
-  type Mesh,
-  type MeshStandardMaterial,
   TubeGeometry,
   Vector3,
 } from 'three';
 import { ROOM_PALETTE } from './palette';
-import { rangeProgress, smoothstep } from '@/components/palindrome/palindromeChoreography';
+import { HumanHead, HUMAN_SKIN } from './HumanHead';
 
 type Point = [number, number, number];
 type Section = { y: number; x?: number; z: number; width: number; depth: number };
@@ -100,45 +96,7 @@ function clothPlanes(geometry: BufferGeometry, shadow: string, light: string) {
   return geometry;
 }
 
-function noseProfile() {
-  const geometry = new BufferGeometry();
-  geometry.setAttribute(
-    'position',
-    new Float32BufferAttribute(
-      [
-        0, 0.065, 0.112, -0.026, -0.052, 0.115, 0.026, -0.052, 0.115, 0, -0.028, 0.183, 0, -0.065,
-        0.136,
-      ],
-      3,
-    ),
-  );
-  geometry.setIndex([0, 1, 3, 0, 3, 2, 1, 4, 3, 3, 4, 2, 0, 2, 1, 1, 2, 4]);
-  geometry.computeVertexNormals();
-  return geometry;
-}
-
-export function SeatedFigure({
-  headAnchorRef,
-  interiorProgress,
-}: {
-  headAnchorRef?: RefObject<Group | null>;
-  interiorProgress?: MutableRefObject<number>;
-}) {
-  const headMaterials = useRef<(MeshStandardMaterial | null)[]>([]);
-  const headMeshes = useRef<(Mesh | null)[]>([]);
-  useFrame(() => {
-    if (!interiorProgress) return;
-    const opening = smoothstep(rangeProgress(interiorProgress.current, 0.49, 0.74));
-    headMeshes.current.forEach((mesh) => {
-      if (mesh) mesh.castShadow = opening < 0.01;
-    });
-    headMaterials.current.forEach((material) => {
-      if (!material) return;
-      material.opacity = 1 - opening;
-      material.depthWrite = opening < 0.01;
-      material.emissiveIntensity = Math.sin(opening * Math.PI) * 0.12;
-    });
-  });
+export function SeatedFigure() {
   const forms = useMemo(() => {
     const torso = clothPlanes(
       silhouette(
@@ -169,20 +127,6 @@ export function SeatedFigure({
       ),
       '#131718',
       '#293134',
-    );
-    const head = silhouette(
-      [
-        { y: -0.205, z: 0.035, width: 0.058, depth: 0.065 },
-        { y: -0.165, z: 0.015, width: 0.104, depth: 0.092 },
-        { y: -0.095, z: -0.005, width: 0.138, depth: 0.116 },
-        { y: 0, z: -0.018, width: 0.16, depth: 0.139 },
-        { y: 0.095, z: -0.024, width: 0.154, depth: 0.143 },
-        { y: 0.17, z: -0.03, width: 0.124, depth: 0.118 },
-        { y: 0.215, z: -0.03, width: 0.065, depth: 0.065 },
-        { y: 0.23, z: -0.03, width: 0.012, depth: 0.012 },
-      ],
-      20,
-      true,
     );
     const neck = limb(
       [
@@ -261,7 +205,7 @@ export function SeatedFigure({
         0.6,
       ),
     );
-    return { torso, pelvis, head, neck, nose: noseProfile(), arms, hands, legs, shoes };
+    return { torso, pelvis, neck, arms, hands, legs, shoes };
   }, []);
 
   useEffect(
@@ -282,56 +226,12 @@ export function SeatedFigure({
         </mesh>
       ))}
       <mesh geometry={forms.neck} castShadow receiveShadow>
-        <meshStandardMaterial color="#C8BDA6" roughness={0.92} />
+        <meshStandardMaterial color={HUMAN_SKIN} roughness={0.92} />
       </mesh>
-      <group
-        name="Palindrome_Head"
-        ref={headAnchorRef}
-        position={[-0.008, 1.8, 0.14]}
-        rotation={[0.1, -0.13, -0.035]}
-      >
-        <mesh
-          ref={(mesh) => {
-            headMeshes.current[0] = mesh;
-          }}
-          geometry={forms.head}
-          castShadow
-          receiveShadow
-        >
-          <meshStandardMaterial
-            ref={(material) => {
-              headMaterials.current[0] = material;
-            }}
-            color={ROOM_PALETTE.ceramic}
-            roughness={0.9}
-            transparent={!!interiorProgress}
-            emissive="#9BC4C5"
-            emissiveIntensity={0}
-          />
-        </mesh>
-        <mesh
-          ref={(mesh) => {
-            headMeshes.current[1] = mesh;
-          }}
-          geometry={forms.nose}
-          castShadow
-          receiveShadow
-        >
-          <meshStandardMaterial
-            ref={(material) => {
-              headMaterials.current[1] = material;
-            }}
-            color={ROOM_PALETTE.ceramic}
-            roughness={0.9}
-            transparent={!!interiorProgress}
-            emissive="#9BC4C5"
-            emissiveIntensity={0}
-          />
-        </mesh>
-      </group>
+      <HumanHead />
       {forms.hands.map((geometry) => (
         <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
-          <meshStandardMaterial color="#D5C8AF" roughness={0.92} />
+          <meshStandardMaterial color={HUMAN_SKIN} roughness={0.92} />
         </mesh>
       ))}
       {forms.shoes.map((geometry) => (

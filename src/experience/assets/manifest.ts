@@ -38,7 +38,6 @@ export const productionAssetManifest: readonly ProductionAssetDefinition[] = NEU
   (id, index) => ({
     id,
     owner: 'neuroshield',
-    allowedConsumers: ['neuroshield', 'palindrome-neuroshield-bridge'],
     resourceType: 'neuro-image',
     priority: index === 0 ? 'critical-next' : 'normal',
     preload: 'previous-chapter',

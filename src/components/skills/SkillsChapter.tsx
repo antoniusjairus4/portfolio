@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { SkillsFallback } from '@/components/skills/SkillsFallback';
 import { getCategoryOpacity, getSkillsCategory } from '@/components/skills/skillsChoreography';
+import { bindSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
 import { skillCategories } from '@/content/skills';
 import {
   type ChapterProgressController,
@@ -12,6 +13,7 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
+import './skills.css';
 
 export function SkillsChapter() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -115,7 +117,7 @@ export function SkillsChapter() {
         )}
 
         <header ref={introRef} className="skills-intro">
-          <p>CAPABILITY LANDSCAPE · SIX CONNECTED STRUCTURES</p>
+          <p>CAPABILITY LANDSCAPE · SIX CONNECTED SYSTEMS</p>
           <h2 id="skills-title">SKILLS</h2>
           <p>
             One continuous system of foundations, surfaces, services, boundaries, tools, and
@@ -126,26 +128,42 @@ export function SkillsChapter() {
         {ready && staticExperience ? (
           <SkillsFallback reason={reducedMotion ? 'reduced-motion' : 'no-webgl'} />
         ) : (
-          <div className="skills-category-presentations">
-            {skillCategories.map((category, index) => (
-              <section
-                key={category.key}
-                ref={(node) => {
-                  categoryRefs.current[index] = node;
-                }}
-                className={`skills-category skills-category-${category.key}`}
-              >
-                <span>{category.index} / 06</span>
-                <h3>{category.name}</h3>
-                <p>{category.statement}</p>
-                <ul aria-label={`${category.name} skills`}>
-                  {category.skills.map((skill) => (
-                    <li key={skill}>{skill}</li>
-                  ))}
-                </ul>
-              </section>
-            ))}
-          </div>
+          <>
+            <div className="skills-category-presentations">
+              {skillCategories.map((category, index) => (
+                <section
+                  key={category.key}
+                  ref={(node) => {
+                    categoryRefs.current[index] = node;
+                  }}
+                  className={`skills-category skills-category-${category.key}`}
+                >
+                  <span>{category.index} / 06</span>
+                  <h3>{category.name}</h3>
+                  <p>{category.statement}</p>
+                  <ul className="skills-semantic-list" aria-label={`${category.name} skills`}>
+                    {category.skills.map((skill) => (
+                      <li key={skill}>{skill}</li>
+                    ))}
+                  </ul>
+                </section>
+              ))}
+            </div>
+            <div className="skills-spatial-labels" aria-hidden="true">
+              {skillCategories.flatMap((category, domain) =>
+                category.skills.map((skill, index) => (
+                  <span
+                    key={`${category.key}-${skill}`}
+                    ref={(node) => bindSkillLabel(skillLabelId(domain, index), node)}
+                    className={`skills-inscription ${domain === 0 && index === 0 ? 'skills-inscription-foundation' : ''}`}
+                  >
+                    <i />
+                    {skill}
+                  </span>
+                )),
+              )}
+            </div>
+          </>
         )}
 
         <div className="skills-chapter-index" aria-hidden="true">

@@ -1,12 +1,11 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { type MutableRefObject, type RefObject, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   type AmbientLight,
   Color,
   type DirectionalLight,
-  type Group,
   type HemisphereLight,
   type PerspectiveCamera,
   type PointLight,
@@ -17,8 +16,6 @@ import {
   getFragmentationProgress,
   getOrganizationProgress,
   getRelationshipProgress,
-  rangeProgress,
-  smoothstep,
 } from '@/components/palindrome/palindromeChoreography';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { DomesticRoom, ROOM_PALETTE } from './palindrome/DomesticRoom';
@@ -27,18 +24,9 @@ import { InformationField } from './palindrome/InformationField';
 interface PalindromeSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
-  bridgeProgress?: MutableRefObject<number>;
-  headAnchorRef?: RefObject<Group | null>;
-  headInteriorProgress?: MutableRefObject<number>;
 }
 
-export function PalindromeScene({
-  controller,
-  portrait,
-  bridgeProgress,
-  headAnchorRef,
-  headInteriorProgress,
-}: PalindromeSceneProps) {
+export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) {
   const { camera } = useThree();
   const target = useMemo(() => new Vector3(0, 1.9, -0.55), []);
   const reflectedFill = useRef<PointLight>(null);
@@ -55,12 +43,9 @@ export function PalindromeScene({
 
   useFrame(() => {
     const p = controller.progress.current;
-    const domesticLight = bridgeProgress
-      ? 1 - smoothstep(rangeProgress(bridgeProgress.current, 0.28, 0.78))
-      : 1;
-    if (ambient.current) ambient.current.intensity = 0.24 * domesticLight;
-    if (hemisphere.current) hemisphere.current.intensity = 0.58 * domesticLight;
-    if (key.current) key.current.intensity = 1.9 * domesticLight;
+    if (ambient.current) ambient.current.intensity = 0.24;
+    if (hemisphere.current) hemisphere.current.intensity = 0.58;
+    if (key.current) key.current.intensity = 1.9;
     const relationships = getRelationshipProgress(p);
     const organization = getOrganizationProgress(p);
     const attention =
@@ -68,9 +53,8 @@ export function PalindromeScene({
     // Reuse the local fill: a small reflected warmth shift, never a red wash.
     if (reflectedFill.current) {
       reflectedFill.current.color.lerpColors(fillColors.warm, fillColors.crimson, attention * 0.1);
-      reflectedFill.current.intensity = (1.45 + attention * 0.2) * domesticLight;
+      reflectedFill.current.intensity = 1.45 + attention * 0.2;
     }
-    if (bridgeProgress) return;
     const perspectiveCamera = camera as PerspectiveCamera;
     const desiredFov = portrait ? 51 : 39;
     if (perspectiveCamera.fov !== desiredFov || perspectiveCamera.near !== 0.1) {
@@ -90,7 +74,7 @@ export function PalindromeScene({
 
   return (
     <>
-      {!bridgeProgress && <color attach="background" args={[ROOM_PALETTE.ink]} />}
+      <color attach="background" args={[ROOM_PALETTE.ink]} />
       <ambientLight ref={ambient} intensity={0.24} color="#F3F0E9" />
       <hemisphereLight ref={hemisphere} args={['#E5EBE7', '#686E64', 0.58]} />
       <directionalLight
@@ -118,16 +102,8 @@ export function PalindromeScene({
         distance={4.6}
         decay={2}
       />
-      <DomesticRoom
-        portrait={portrait}
-        headAnchorRef={headAnchorRef}
-        interiorProgress={headInteriorProgress ?? bridgeProgress}
-      />
-      <InformationField
-        progress={controller.progress}
-        portrait={portrait}
-        exitProgress={bridgeProgress}
-      />
+      <DomesticRoom portrait={portrait} />
+      <InformationField progress={controller.progress} portrait={portrait} />
     </>
   );
 }

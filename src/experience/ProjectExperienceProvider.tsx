@@ -162,8 +162,8 @@ export function ProjectExperienceProvider({
       const kaiForge = registrations.kaiforge;
       const bridge = registrations['kai-palindrome-bridge'];
       const palindrome = registrations.palindrome;
-      const brainBridge = registrations['palindrome-neuroshield-bridge'];
-      const brainBridgeTop = brainBridge?.sectionRef.current?.getBoundingClientRect().top;
+      const researchHandoff = registrations['palindrome-neuroshield-bridge'];
+      const researchHandoffTop = researchHandoff?.sectionRef.current?.getBoundingClientRect().top;
       const bridgeTop = bridge?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShield = registrations.neuroshield;
       const skills = registrations.skills;
@@ -221,11 +221,11 @@ export function ProjectExperienceProvider({
         neuroShield.activity !== 'inactive' &&
         neuroShieldTop !== undefined &&
         neuroShieldTop <= 0;
-      const brainBridgeOwnsFrame =
-        brainBridge?.enabled &&
-        brainBridge.activity !== 'inactive' &&
-        brainBridgeTop !== undefined &&
-        brainBridgeTop <= 0 &&
+      const researchHandoffOwnsFrame =
+        researchHandoff?.enabled &&
+        researchHandoff.activity !== 'inactive' &&
+        researchHandoffTop !== undefined &&
+        researchHandoffTop <= 0 &&
         (neuroShieldTop === undefined || neuroShieldTop > 0);
       const skillsOwnsFrame =
         skills?.enabled &&
@@ -237,7 +237,7 @@ export function ProjectExperienceProvider({
         ? 'skills'
         : neuroShieldOwnsFrame
           ? 'neuroshield'
-          : brainBridgeOwnsFrame
+          : researchHandoffOwnsFrame
             ? 'palindrome-neuroshield-bridge'
             : palindromeOwnsFrame
               ? 'palindrome'

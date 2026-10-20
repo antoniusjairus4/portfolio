@@ -1,7 +1,7 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { type MutableRefObject, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import {
   type AmbientLight,
   type HemisphereLight,
@@ -22,14 +22,6 @@ import { SCAN_BACKGROUND } from './neuroshield/ScanVolume';
 interface NeuroShieldSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
-  entry?: NeuroShieldEntry;
-}
-
-export interface NeuroShieldEntry {
-  lighting: MutableRefObject<number>;
-  brain: MutableRefObject<number>;
-  environment: MutableRefObject<number>;
-  scale: MutableRefObject<number>;
 }
 
 const KEYS = [0, 0.18, 0.35, 0.45, 0.52, 0.6, 0.68, 0.78, 0.88, 1] as const;
@@ -72,7 +64,7 @@ function samplePath(points: readonly (readonly number[])[], progress: number, ou
   out.set(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t);
 }
 
-export function NeuroShieldScene({ controller, portrait, entry }: NeuroShieldSceneProps) {
+export function NeuroShieldScene({ controller, portrait }: NeuroShieldSceneProps) {
   const { camera } = useThree();
   const target = useMemo(() => new Vector3(), []);
   const warm = useRef<DirectionalLight>(null);
@@ -86,22 +78,20 @@ export function NeuroShieldScene({ controller, portrait, entry }: NeuroShieldSce
 
   useFrame(() => {
     const p = controller.progress.current;
-    if (!entry) {
-      samplePath(CAMERA, p, camera.position);
-      samplePath(TARGET, p, target);
-      if (portrait) {
-        camera.position.z += 1.6;
-        target.x += 0.12;
-      }
-      camera.lookAt(target);
-      camera.updateMatrixWorld();
-      const perspective = camera as PerspectiveCamera;
-      const fov = portrait ? 53 : 40;
-      if (perspective.fov !== fov || perspective.near !== 0.1) {
-        perspective.fov = fov;
-        perspective.near = 0.1;
-        perspective.updateProjectionMatrix();
-      }
+    samplePath(CAMERA, p, camera.position);
+    samplePath(TARGET, p, target);
+    if (portrait) {
+      camera.position.z += 1.6;
+      target.x += 0.12;
+    }
+    camera.lookAt(target);
+    camera.updateMatrixWorld();
+    const perspective = camera as PerspectiveCamera;
+    const fov = portrait ? 53 : 40;
+    if (perspective.fov !== fov || perspective.near !== 0.1) {
+      perspective.fov = fov;
+      perspective.near = 0.1;
+      perspective.updateProjectionMatrix();
     }
     const hypothesis = smoothstep(rangeProgress(p, 0.18, 0.42));
     const experiment = smoothstep(rangeProgress(p, 0.43, 0.68));
@@ -121,36 +111,16 @@ export function NeuroShieldScene({ controller, portrait, entry }: NeuroShieldSce
         smoothstep(rangeProgress(p, 0.27, 0.34)) *
         (1 - smoothstep(rangeProgress(p, 0.38, 0.46))) *
         0.16;
-    const light = entry?.lighting.current ?? 1;
-    const scale = entry?.scale.current ?? 1;
-    if (ambient.current) ambient.current.intensity = 0.43 * light;
-    if (hemisphere.current) hemisphere.current.intensity = 0.42 * light;
-    if (warm.current) {
-      warm.current.intensity *= light;
-      if (entry) {
-        const shadow = warm.current.shadow.camera;
-        shadow.left = shadow.bottom = -5 * scale;
-        shadow.right = shadow.top = 5 * scale;
-        shadow.near = 0.5 * scale;
-        shadow.far = 500 * scale;
-        shadow.updateProjectionMatrix();
-        warm.current.shadow.normalBias = 0.018 * scale;
-      }
-    }
-    [cool, violet, evidence, crimson].forEach((ref, index) => {
-      if (!ref.current) return;
-      // A scaled interior uses the same local illumination as the full research world.
-      ref.current.intensity *= light * scale * scale;
-      ref.current.distance = [26, 18, 15, 3][index] * scale;
-    });
+    if (ambient.current) ambient.current.intensity = 0.43;
+    if (hemisphere.current) hemisphere.current.intensity = 0.42;
   });
 
   return (
     <>
-      {!entry && <color attach="background" args={[SCAN_BACKGROUND]} />}
-      {!entry && <fog attach="fog" args={[SCAN_BACKGROUND, 24, 62]} />}
-      <ambientLight ref={ambient} color="#B4CCD0" intensity={entry ? 0 : 0.43} />
-      <hemisphereLight ref={hemisphere} args={['#C1DEE1', '#8698AA', entry ? 0 : 0.42]} />
+      <color attach="background" args={[SCAN_BACKGROUND]} />
+      <fog attach="fog" args={[SCAN_BACKGROUND, 24, 62]} />
+      <ambientLight ref={ambient} color="#B4CCD0" intensity={0.43} />
+      <hemisphereLight ref={hemisphere} args={['#C1DEE1', '#8698AA', 0.42]} />
       <primitive object={lightTarget} />
       <directionalLight
         ref={warm}
@@ -199,16 +169,12 @@ export function NeuroShieldScene({ controller, portrait, entry }: NeuroShieldSce
         distance={3}
         decay={2}
       />
-      <AnatomicalEnvironment progress={controller.progress} presence={entry?.environment} />
-      <BrainAnatomy progress={controller.progress} presence={entry?.brain} />
-      {!entry && (
-        <>
-          <AnatomicalSlices progress={controller.progress} />
-          <ImagingSequence progress={controller.progress} portrait={portrait} />
-          <BrainAnatomy progress={controller.progress} ending />
-          <AnatomicalSlices progress={controller.progress} ending />
-        </>
-      )}
+      <AnatomicalEnvironment progress={controller.progress} />
+      <BrainAnatomy progress={controller.progress} />
+      <AnatomicalSlices progress={controller.progress} />
+      <ImagingSequence progress={controller.progress} portrait={portrait} />
+      <BrainAnatomy progress={controller.progress} ending />
+      <AnatomicalSlices progress={controller.progress} ending />
     </>
   );
 }

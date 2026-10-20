@@ -43,15 +43,13 @@ export function getSkillsCategory(progress: number): SkillCategoryKey {
 }
 
 export function getCategoryOpacity(progress: number, index: number) {
-  const center = SKILLS_CENTERS[index];
-  const previous = SKILLS_CENTERS[Math.max(0, index - 1)];
-  const next = SKILLS_CENTERS[Math.min(SKILLS_CENTERS.length - 1, index + 1)];
-  const halfWidth = Math.max(0.115, Math.min(center - previous || 0.16, next - center || 0.16));
-  const centeredOpacity = smoothstep(1 - Math.abs(progress - center) / halfWidth);
-  if (index === 0) {
-    return centeredOpacity * smoothstep(rangeProgress(progress, 0.03, 0.055));
-  }
-  return centeredOpacity;
+  const start = index === 0 ? 0.025 : (SKILLS_CENTERS[index - 1] + SKILLS_CENTERS[index]) / 2;
+  const end = index === 5 ? 0.982 : (SKILLS_CENTERS[index] + SKILLS_CENTERS[index + 1]) / 2;
+  // Long reading plateaus, with only a short overlap at the domain seams.
+  return (
+    smoothstep(rangeProgress(progress, start - 0.012, start + 0.014)) *
+    (1 - smoothstep(rangeProgress(progress, end - 0.014, end + 0.012)))
+  );
 }
 
 export function getLandscapeProgress(progress: number) {

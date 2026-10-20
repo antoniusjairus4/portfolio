@@ -117,11 +117,9 @@ const crimson = new Color(ROOM_PALETTE.crimson);
 export function InformationField({
   progress,
   portrait,
-  exitProgress,
 }: {
   progress: MutableRefObject<number>;
   portrait: boolean;
-  exitProgress?: MutableRefObject<number>;
 }) {
   const fragments = useRef<(Group | null)[]>([]);
   const materials = useRef<(MeshBasicMaterial | null)[]>([]);
@@ -139,9 +137,7 @@ export function InformationField({
     const alignment = related * 0.36 + organized * 0.64;
     const reading = smoothstep(rangeProgress(fragmented, 0.12, 0.65));
     const attention = (fragmented * 0.22 + related * 0.78) * (1 - control);
-    const presence = exitProgress
-      ? 1 - smoothstep(rangeProgress(exitProgress.current, 0, 0.16))
-      : 1;
+    const presence = 1;
 
     FRAGMENTS.forEach((data, index) => {
       const fragment = fragments.current[index];
