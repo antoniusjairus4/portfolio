@@ -319,9 +319,7 @@ body {
   transform: translate3d(0, calc(var(--hero-opening, 0) * 18vh), 0);
 }
 
-body:has(#hero[data-hero-depth="active"])
-  #kaiforge
-  .kaiforge-sticky {
+body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   position: fixed;
   z-index: 0;
   inset: 0;
@@ -409,7 +407,7 @@ body:has(#hero[data-hero-depth="active"])
   }
 }
 
-/* NeuroShield research field: keep chapter copy legible over the spatial evidence. */
+/* NeuroShield research wall: editorial copy sits over an architectural field. */
 .neuroshield-chapter {
   --neuroshield-progress: 0;
   position: relative;
@@ -436,16 +434,16 @@ body:has(#hero[data-hero-depth="active"])
     linear-gradient(
       112deg,
       transparent 0 32%,
-      rgba(116, 108, 98, 0.08) 32.1% 32.25%,
+      rgba(156, 198, 197, 0.2) 32.1% 32.25%,
       transparent 32.35%
     ),
     linear-gradient(
       68deg,
       transparent 0 64%,
-      rgba(229, 218, 199, 0.07) 64.1% 64.2%,
+      rgba(242, 232, 213, 0.15) 64.1% 64.2%,
       transparent 64.3%
     ),
-    #0b0908;
+    #315768;
 }
 
 .neuroshield-sticky::after {
@@ -457,12 +455,12 @@ body:has(#hero[data-hero-depth="active"])
   background:
     linear-gradient(
       180deg,
-      rgba(11, 9, 8, 0.5),
+      rgba(25, 50, 61, 0.26),
       transparent 24%,
       transparent 74%,
-      rgba(11, 9, 8, 0.76)
+      rgba(25, 50, 61, 0.46)
     ),
-    radial-gradient(circle at 52% 47%, transparent 28%, rgba(11, 9, 8, 0.5) 100%);
+    linear-gradient(90deg, rgba(25, 50, 61, 0.18), transparent 24% 74%, rgba(25, 50, 61, 0.2));
 }
 
 .neuroshield-semantic-header {
@@ -488,7 +486,7 @@ body:has(#hero[data-hero-depth="active"])
   line-height: 1.4;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #c4b8a7;
+  color: #d5e0da;
 }
 
 .neuroshield-semantic-header h2 {
@@ -517,7 +515,7 @@ body:has(#hero[data-hero-depth="active"])
   font-family: var(--font-secondary);
   font-size: clamp(0.8rem, 0.88vw, 0.96rem);
   line-height: 1.55;
-  color: #c6baa9;
+  color: #d5e0da;
 }
 
 .neuroshield-beats {
@@ -552,7 +550,7 @@ body:has(#hero[data-hero-depth="active"])
   font-family: var(--font-secondary);
   font-size: clamp(0.74rem, 0.82vw, 0.9rem);
   line-height: 1.55;
-  color: #c7baa8;
+  color: #d5e0da;
 }
 
 .neuroshield-beat.beat-observation,
@@ -593,7 +591,7 @@ body:has(#hero[data-hero-depth="active"])
   flex-direction: column;
   gap: 0.7rem;
   transform: translateY(-50%);
-  color: #ada292;
+  color: #c5d6d6;
 }
 
 .neuroshield-metadata span:nth-child(2) {
@@ -603,7 +601,7 @@ body:has(#hero[data-hero-depth="active"])
 .neuroshield-metadata span:nth-child(3) {
   margin-left: 0.45rem;
   text-decoration: line-through;
-  text-decoration-color: #7d201d;
+  text-decoration-color: #8b1e2d;
 }
 
 .neuroshield-chapter-index {
@@ -620,7 +618,7 @@ body:has(#hero[data-hero-depth="active"])
   display: block;
   width: 3.5rem;
   height: 1px;
-  background: rgba(229, 218, 199, 0.28);
+  background: rgba(242, 232, 213, 0.42);
 }
 
 .neuroshield-disclosure {
@@ -638,7 +636,7 @@ body:has(#hero[data-hero-depth="active"])
 .neuroshield-disclosure p {
   max-width: 40rem;
   margin: 0;
-  color: #b8ad9e;
+  color: #e1e6dd;
 }
 
 .neuroshield-disclosure a {
@@ -669,10 +667,20 @@ body:has(#hero[data-hero-depth="active"])
   width: 10rem;
   height: 6rem;
   padding: 0.7rem;
-  border: 1px solid rgba(229, 218, 199, 0.26);
-  color: #39342f;
-  background: #b8aa95;
-  box-shadow: inset 0 0.65rem 0 -0.55rem #302c28;
+  border: 1px solid rgba(156, 198, 197, 0.5);
+  color: #f2e8d5;
+  background: #416b82;
+  box-shadow: inset 0 0.65rem 0 -0.55rem #9cc6c5;
+}
+
+.neuroshield-fallback .evidence-plane-b {
+  background: #397d82;
+}
+
+.neuroshield-fallback .evidence-plane-c {
+  color: #111111;
+  background: #f2e8d5;
+  box-shadow: inset 0 0.65rem 0 -0.55rem #b88946;
 }
 
 .neuroshield-fallback .evidence-plane-a {
@@ -696,9 +704,9 @@ body:has(#hero[data-hero-depth="active"])
   display: block;
   width: 0.75rem;
   aspect-ratio: 1;
-  border: 2px solid #e5dac7;
-  border-radius: 50%;
-  background: #0b0908;
+  border: 2px solid #9cc6c5;
+  transform: rotate(45deg);
+  background: #416b82;
 }
 
 .neuroshield-fallback .node-a {
@@ -716,7 +724,7 @@ body:has(#hero[data-hero-depth="active"])
 .neuroshield-fallback .node-d {
   right: 18%;
   bottom: 22%;
-  border-color: #7d201d;
+  border-color: #b88946;
 }
 
 .neuroshield-fallback .evidence-path {
@@ -725,7 +733,7 @@ body:has(#hero[data-hero-depth="active"])
   display: block;
   height: 1px;
   transform-origin: left center;
-  background: #9c9180;
+  background: #9cc6c5;
 }
 
 .neuroshield-fallback .path-a {
@@ -773,7 +781,7 @@ body:has(#hero[data-hero-depth="active"])
 .neuroshield-static .neuroshield-sticky {
   position: relative;
   min-height: 100svh;
-  background: #0b0908;
+  background: #315768;
 }
 
 .neuroshield-static .neuroshield-semantic-header {
