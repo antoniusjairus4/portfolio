@@ -7,6 +7,7 @@ export const neuroShieldContent = {
   disclosure:
     'This work is experimental research. It is not a clinical diagnostic tool, medical device, or replacement for professional medical judgment.',
   destination: 'https://antoniusjairus4.github.io/neuro-shield/',
+  workPdf: '/research/neuroshield/Alzheimers_Detection_Research_Report%20(2).pdf',
 } as const;
 
 export const neuroShieldBeats = [

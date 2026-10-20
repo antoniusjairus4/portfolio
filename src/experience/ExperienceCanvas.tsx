@@ -9,6 +9,7 @@ import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
 import { KaiPalindromeBridgeScene } from '@/webgl/scenes/KaiPalindromeBridgeScene';
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
+import { PalindromeNeuroShieldBridgeScene } from '@/webgl/scenes/PalindromeNeuroShieldBridgeScene';
 import { SkillsScene } from '@/webgl/scenes/SkillsScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
@@ -59,6 +60,9 @@ export function ExperienceCanvas({
         <KaiPalindromeBridgeScene controller={controller} portrait={portrait} />
       )}
       {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
+      {scene === 'palindrome-neuroshield-bridge' && (
+        <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
+      )}
       {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
       {scene === 'skills' && (
         <SkillsScene controller={controller} portrait={portrait} finePointer={finePointer} />

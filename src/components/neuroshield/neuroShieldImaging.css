@@ -1,0 +1,35 @@
+.neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header h2 {
+  font-size: clamp(3.8rem, 7.2vw, 8.2rem);
+}
+
+.neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header > p:nth-of-type(2),
+.neuroshield-chapter:not(.neuroshield-static) .neuroshield-role {
+  max-width: 25rem;
+}
+
+.neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat strong {
+  font-size: clamp(1.4rem, calc(5.1vw - 3.4vw * var(--neuro-imaging-focus, 0)), 6rem);
+}
+
+.neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat small {
+  opacity: calc(1 - 0.6 * var(--neuro-imaging-focus, 0));
+}
+
+.neuroshield-render-placeholder {
+  background: #172e43;
+}
+
+@media (orientation: portrait) {
+  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header h2 {
+    font-size: clamp(2.3rem, 10vw, 4.5rem);
+  }
+
+  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header > p:nth-of-type(2),
+  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-role {
+    max-width: 100%;
+  }
+
+  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat strong {
+    font-size: clamp(1.15rem, calc(9vw - 4.2vw * var(--neuro-imaging-focus, 0)), 3.6rem);
+  }
+}

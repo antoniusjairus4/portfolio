@@ -1,5 +1,5 @@
 import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, type ReactNode, useRef } from 'react';
+import { type MutableRefObject, type ReactNode, type RefObject, useRef } from 'react';
 import type { Group } from 'three';
 import {
   Book,
@@ -35,7 +35,13 @@ function Block({
   );
 }
 
-function SeatedPresence() {
+function SeatedPresence({
+  headAnchorRef,
+  interiorProgress,
+}: {
+  headAnchorRef?: RefObject<Group | null>;
+  interiorProgress?: MutableRefObject<number>;
+}) {
   // The approved chair and seated anchor stay fixed; only the human is refined.
   return (
     <group position={[0.45, 0, -1.28]} rotation={[0, -0.18, 0]}>
@@ -51,7 +57,7 @@ function SeatedPresence() {
           />
         )),
       )}
-      <SeatedFigure />
+      <SeatedFigure headAnchorRef={headAnchorRef} interiorProgress={interiorProgress} />
     </group>
   );
 }
@@ -90,12 +96,16 @@ export function DomesticRoom({
   bridgeShell = true,
   bridgeDesk = true,
   bridgeBall = true,
+  headAnchorRef,
+  interiorProgress,
 }: {
   portrait: boolean;
   transitionProgress?: MutableRefObject<number>;
   bridgeShell?: boolean;
   bridgeDesk?: boolean;
   bridgeBall?: boolean;
+  headAnchorRef?: RefObject<Group | null>;
+  interiorProgress?: MutableRefObject<number>;
 }) {
   return (
     <DomesticSurfaces>
@@ -190,7 +200,7 @@ export function DomesticRoom({
           end={0.97}
           anchor={[0.45, 1, -1.28]}
         >
-          <SeatedPresence />
+          <SeatedPresence headAnchorRef={headAnchorRef} interiorProgress={interiorProgress} />
         </BridgeReveal>
         {bridgeDesk && (
           <group position={[-1.02, 0, -0.35]}>

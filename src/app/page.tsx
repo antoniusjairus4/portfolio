@@ -10,6 +10,7 @@ import { PalindromeChapter } from '@/components/palindrome/PalindromeChapter';
 import { Preloader } from '@/components/preloader/Preloader';
 import { SkillsChapter } from '@/components/skills/SkillsChapter';
 import { KaiPalindromeBridge } from '@/components/transitions/KaiPalindromeBridge';
+import { PalindromeNeuroShieldBridge } from '@/components/transitions/PalindromeNeuroShieldBridge';
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
@@ -62,6 +63,8 @@ export default function Home() {
 
         {/* Phase 3: Palindrome domestic-information greybox */}
         <PalindromeChapter />
+
+        <PalindromeNeuroShieldBridge />
 
         {/* Phase 4: NeuroShield research-uncertainty greybox */}
         <NeuroShieldChapter />

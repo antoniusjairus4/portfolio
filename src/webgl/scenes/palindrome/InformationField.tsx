@@ -117,9 +117,11 @@ const crimson = new Color(ROOM_PALETTE.crimson);
 export function InformationField({
   progress,
   portrait,
+  exitProgress,
 }: {
   progress: MutableRefObject<number>;
   portrait: boolean;
+  exitProgress?: MutableRefObject<number>;
 }) {
   const fragments = useRef<(Group | null)[]>([]);
   const materials = useRef<(MeshBasicMaterial | null)[]>([]);
@@ -137,6 +139,9 @@ export function InformationField({
     const alignment = related * 0.36 + organized * 0.64;
     const reading = smoothstep(rangeProgress(fragmented, 0.12, 0.65));
     const attention = (fragmented * 0.22 + related * 0.78) * (1 - control);
+    const presence = exitProgress
+      ? 1 - smoothstep(rangeProgress(exitProgress.current, 0, 0.16))
+      : 1;
 
     FRAGMENTS.forEach((data, index) => {
       const fragment = fragments.current[index];
@@ -173,7 +178,7 @@ export function InformationField({
         ((index % 5) - 2) * 0.09 * fragmented * (1 - alignment),
       );
       fragment.scale.setScalar(MathUtils.lerp(data.scale, 1, fragmented));
-      material.opacity = reading * (keep ? 1 : 1 - control);
+      material.opacity = reading * (keep ? 1 : 1 - control) * presence;
       // Retain parchment luminance in the dark room; pure Crimson belongs to
       // the change connectors and physical marks. Control returns to parchment.
       material.color.lerpColors(
@@ -181,7 +186,7 @@ export function InformationField({
         crimson,
         index === 0 || index === 3 ? attention * 0.7 : 0,
       );
-      sourceMaterial.opacity = 1 - reading;
+      sourceMaterial.opacity = (1 - reading) * presence;
       fragment.visible = material.map !== null && material.opacity + sourceMaterial.opacity > 0.001;
     });
 
@@ -216,7 +221,7 @@ export function InformationField({
       line.scale.set(1, Math.max(0.001, length), 1);
       if (length > 0.0001) line.quaternion.setFromUnitVectors(up, direction.normalize());
       (line.material as MeshBasicMaterial).opacity =
-        reveal * fade * (relation.change ? 0.85 : relation.object ? 0.26 : 0.34);
+        reveal * fade * presence * (relation.change ? 0.85 : relation.object ? 0.26 : 0.34);
       line.visible = reveal * fade > 0.001;
     });
   });

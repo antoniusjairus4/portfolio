@@ -31,6 +31,7 @@ export type ProjectSceneKey =
   | 'kaiforge'
   | 'kai-palindrome-bridge'
   | 'palindrome'
+  | 'palindrome-neuroshield-bridge'
   | 'neuroshield'
   | 'skills';
 
@@ -92,6 +93,30 @@ export function ProjectExperienceProvider({
       disposePrepared: (resource) => resource.dispose(),
       disposeResident: (resource) => resource.dispose(),
     });
+    manager.registerDriver('neuro-image', {
+      prepare: async (bytes, definition, variant) =>
+        (await import('@/experience/assets/neuroImage')).neuroImageDriver.prepare(
+          bytes,
+          definition,
+          variant,
+        ),
+      makeResident: async (prepared, context, definition, variant) =>
+        (await import('@/experience/assets/neuroImage')).neuroImageDriver.makeResident(
+          prepared as ImageBitmap,
+          context as { gl: import('three').WebGLRenderer },
+          definition,
+          variant,
+        ),
+      disposePrepared: (resource) => {
+        if (resource instanceof ImageBitmap) resource.close();
+      },
+      disposeResident: (resource) => {
+        const texture = resource as import('three').Texture;
+        const bitmap = texture.image;
+        texture.dispose();
+        if (bitmap instanceof ImageBitmap) bitmap.close();
+      },
+    });
     const fixtureEnabled =
       process.env.NODE_ENV !== 'production' &&
       new URLSearchParams(window.location.search).has('assetLifecycleFixture');
@@ -137,6 +162,8 @@ export function ProjectExperienceProvider({
       const kaiForge = registrations.kaiforge;
       const bridge = registrations['kai-palindrome-bridge'];
       const palindrome = registrations.palindrome;
+      const brainBridge = registrations['palindrome-neuroshield-bridge'];
+      const brainBridgeTop = brainBridge?.sectionRef.current?.getBoundingClientRect().top;
       const bridgeTop = bridge?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShield = registrations.neuroshield;
       const skills = registrations.skills;
@@ -193,7 +220,13 @@ export function ProjectExperienceProvider({
         neuroShield?.enabled &&
         neuroShield.activity !== 'inactive' &&
         neuroShieldTop !== undefined &&
-        neuroShieldTop <= window.innerHeight * 0.45;
+        neuroShieldTop <= 0;
+      const brainBridgeOwnsFrame =
+        brainBridge?.enabled &&
+        brainBridge.activity !== 'inactive' &&
+        brainBridgeTop !== undefined &&
+        brainBridgeTop <= 0 &&
+        (neuroShieldTop === undefined || neuroShieldTop > 0);
       const skillsOwnsFrame =
         skills?.enabled &&
         skills.activity !== 'inactive' &&
@@ -204,17 +237,19 @@ export function ProjectExperienceProvider({
         ? 'skills'
         : neuroShieldOwnsFrame
           ? 'neuroshield'
-          : palindromeOwnsFrame
-            ? 'palindrome'
-            : bridgeOwnsFrame
-              ? 'kai-palindrome-bridge'
-              : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
-                ? 'kaiforge'
-                : neuroShield?.enabled && neuroShield.activity !== 'inactive'
-                  ? 'neuroshield'
-                  : skills?.enabled && skills.activity !== 'inactive'
-                    ? 'skills'
-                    : null;
+          : brainBridgeOwnsFrame
+            ? 'palindrome-neuroshield-bridge'
+            : palindromeOwnsFrame
+              ? 'palindrome'
+              : bridgeOwnsFrame
+                ? 'kai-palindrome-bridge'
+                : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
+                  ? 'kaiforge'
+                  : neuroShield?.enabled && neuroShield.activity !== 'inactive'
+                    ? 'neuroshield'
+                    : skills?.enabled && skills.activity !== 'inactive'
+                      ? 'skills'
+                      : null;
       setActiveKey((current) => (current === nextKey ? current : nextKey));
     };
     const schedule = () => {

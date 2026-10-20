@@ -5,6 +5,8 @@ import { NeuroShieldFallback } from '@/components/neuroshield/NeuroShieldFallbac
 import {
   getBeatOpacity,
   getNeuroShieldBeat,
+  rangeProgress,
+  smoothstep,
 } from '@/components/neuroshield/neuroShieldChoreography';
 import { neuroShieldBeats, neuroShieldContent } from '@/content/neuroshield';
 import {
@@ -15,6 +17,7 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
+import './neuroShieldImaging.css';
 
 const BEAT_PRESENTATION = [
   { center: 0.08, width: 0.16 },
@@ -23,11 +26,19 @@ const BEAT_PRESENTATION = [
   { center: 0.74, width: 0.15 },
   { center: 0.92, width: 0.14 },
 ] as const;
+const ANNOTATIONS = [
+  { label: 'CEREBRAL FORM', center: 0.14, width: 0.09 },
+  { label: 'TEMPORAL REGION', center: 0.24, width: 0.1 },
+  { label: 'INTERNAL SECTION', center: 0.32, width: 0.085 },
+  { label: 'SELECTED REGION', center: 0.36, width: 0.065 },
+] as const;
 
 export function NeuroShieldChapter() {
   const sectionRef = useRef<HTMLElement>(null);
   const headerRef = useRef<HTMLElement>(null);
+  const presentationRef = useRef<HTMLDivElement>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const annotationRefs = useRef<(HTMLSpanElement | null)[]>([]);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const ownsEtherRef = useRef(false);
   const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
@@ -61,7 +72,17 @@ export function NeuroShieldChapter() {
       if (!section) return;
       const progress = next.progress.current;
       section.style.setProperty('--neuroshield-progress', progress.toFixed(4));
+      const imagingFocus =
+        smoothstep(rangeProgress(progress, 0.3, 0.38)) *
+        (1 - smoothstep(rangeProgress(progress, 0.65, 0.72)));
+      section.style.setProperty('--neuro-imaging-focus', imagingFocus.toFixed(4));
       section.dataset.neuroshieldBeat = getNeuroShieldBeat(progress);
+      if (presentationRef.current) {
+        const t = Math.min(1, progress / 0.035);
+        const entry = section.getBoundingClientRect().top > 0 ? 0 : t * t * (3 - 2 * t);
+        presentationRef.current.style.opacity =
+          reducedMotion || quality === 'fallback' ? '1' : entry.toFixed(3);
+      }
 
       if (headerRef.current && !reducedMotion && quality !== 'fallback') {
         const headerOpacity = Math.max(0, Math.min(1, (0.23 - progress) / 0.09));
@@ -76,6 +97,15 @@ export function NeuroShieldChapter() {
         element.style.opacity = opacity.toFixed(3);
         element.style.transform = `translate3d(0, ${(1 - opacity) * 18}px, 0)`;
         element.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
+      });
+      annotationRefs.current.forEach((element, index) => {
+        if (!element) return;
+        const annotation = ANNOTATIONS[index];
+        element.style.opacity = getBeatOpacity(
+          progress,
+          annotation.center,
+          annotation.width,
+        ).toFixed(3);
       });
     };
 
@@ -116,7 +146,7 @@ export function NeuroShieldChapter() {
       data-renderer-active={rendererActive ? 'true' : 'false'}
       className={`neuroshield-chapter ${staticExperience ? 'neuroshield-static' : ''}`}
     >
-      <div className="neuroshield-sticky">
+      <div ref={presentationRef} className="neuroshield-sticky">
         {!rendererActive && <div className="neuroshield-render-placeholder" aria-hidden="true" />}
 
         {ready && staticExperience && (
@@ -154,10 +184,26 @@ export function NeuroShieldChapter() {
           </div>
         )}
 
+        {!staticExperience && (
+          <div className="neuroshield-annotations" aria-hidden="true">
+            {ANNOTATIONS.map((annotation, index) => (
+              <span
+                key={annotation.label}
+                ref={(node) => {
+                  annotationRefs.current[index] = node;
+                }}
+                className={`neuroshield-annotation annotation-${index + 1}`}
+              >
+                {annotation.label}
+              </span>
+            ))}
+          </div>
+        )}
+
         <div className="neuroshield-metadata" aria-hidden="true">
-          <span>OBS / A</span>
-          <span>EXP / 02</span>
-          <span>RUN / B</span>
+          <span>ANATOMY</span>
+          <span>IMAGING</span>
+          <span>RESEARCH</span>
         </div>
 
         <div className="neuroshield-chapter-index" aria-hidden="true">
@@ -168,9 +214,14 @@ export function NeuroShieldChapter() {
 
         <div className="neuroshield-disclosure">
           <p>{neuroShieldContent.disclosure}</p>
-          <a href={neuroShieldContent.destination} target="_blank" rel="noopener noreferrer">
-            View research project <span aria-hidden="true">↗</span>
-          </a>
+          <div className="neuroshield-disclosure-links">
+            <a href={neuroShieldContent.workPdf} target="_blank" rel="noopener noreferrer">
+              View work <span aria-hidden="true">↗</span>
+            </a>
+            <a href={neuroShieldContent.destination} target="_blank" rel="noopener noreferrer">
+              View research project <span aria-hidden="true">↗</span>
+            </a>
+          </div>
         </div>
       </div>
     </section>

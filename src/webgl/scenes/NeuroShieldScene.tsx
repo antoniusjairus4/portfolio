@@ -1,144 +1,214 @@
 'use client';
 
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import { type DirectionalLight, type PerspectiveCamera, type PointLight, Vector3 } from 'three';
+import { type MutableRefObject, useMemo, useRef } from 'react';
 import {
-  getEvidenceProgress,
-  getExperimentProgress,
-  getHypothesisProgress,
-  getUncertaintyProgress,
-  smoothstep,
-} from '@/components/neuroshield/neuroShieldChoreography';
+  type AmbientLight,
+  type HemisphereLight,
+  Object3D,
+  type DirectionalLight,
+  type PerspectiveCamera,
+  type PointLight,
+  Vector3,
+} from 'three';
+import { rangeProgress, smoothstep } from '@/components/neuroshield/neuroShieldChoreography';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { NeuralConstellation } from './neuroshield/NeuralConstellation';
-import { ResearchWall } from './neuroshield/ResearchWall';
+import { AnatomicalEnvironment } from './neuroshield/AnatomicalEnvironment';
+import { AnatomicalSlices } from './neuroshield/AnatomicalSlices';
+import { BrainAnatomy } from './neuroshield/BrainAnatomy';
+import { ImagingSequence } from './neuroshield/ImagingSequence';
+import { SCAN_BACKGROUND } from './neuroshield/ScanVolume';
 
 interface NeuroShieldSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
+  entry?: NeuroShieldEntry;
 }
 
-const KEYS = [0, 0.2, 0.42, 0.64, 0.84, 1] as const;
-const DESKTOP_CAMERA = [
-  [-2.7, 2.62, 13],
-  [-2.1, 2.52, 9.8],
-  [3.15, 2.65, 6.8],
-  [-0.5, 2.32, -2.8],
-  [4.05, 2.58, 2.5],
-  [-0.9, 3.5, 12.5],
+export interface NeuroShieldEntry {
+  lighting: MutableRefObject<number>;
+  brain: MutableRefObject<number>;
+  environment: MutableRefObject<number>;
+  scale: MutableRefObject<number>;
+}
+
+const KEYS = [0, 0.18, 0.35, 0.45, 0.52, 0.6, 0.68, 0.78, 0.88, 1] as const;
+const CAMERA = [
+  [0.6, 2.45, 10.8],
+  [-1.45, 2.35, 6.7],
+  [0.15, 2.08, 2.6],
+  [0.1, 1.9, -0.4],
+  [-0.1, 1.88, -5.2],
+  [0.1, 1.83, -11.1],
+  [0.2, 1.82, -17.8],
+  [0.5, 2.05, -19.2],
+  [1.3, 2.65, -19.1],
+  [0.7, 2.8, -17.3],
 ] as const;
-const DESKTOP_TARGET = [
-  [-1.2, 2.3, -4.6],
-  [-1.3, 2.3, -4.4],
-  [0.8, 2.52, -4.8],
-  [0.2, 2.35, -6.2],
-  [3.3, 2.25, -4],
-  [0.1, 2.5, -7.2],
-] as const;
-const PORTRAIT_CAMERA = [
-  [-1.25, 2.7, 15.1],
-  [-0.8, 2.55, 11.2],
-  [1.65, 2.75, 8.7],
-  [0.1, 2.36, -1.5],
-  [2.0, 2.65, 5.1],
-  [-0.3, 3.55, 15.2],
-] as const;
-const PORTRAIT_TARGET = [
-  [-0.7, 2.3, -4.7],
-  [-0.8, 2.3, -4.5],
-  [0.4, 2.52, -4.8],
-  [0.1, 2.34, -6.1],
-  [1.6, 2.25, -4],
-  [0.1, 2.5, -7.1],
+const TARGET = [
+  [0.65, 1.8, -2.2],
+  [0.8, 1.8, -2.2],
+  [0.45, 1.8, -4.4],
+  [0, 1.8, -7.2],
+  [0, 1.8, -10.9],
+  [0, 1.8, -16.7],
+  [0, 1.9, -25.8],
+  [0, 2.1, -27],
+  [0, 1.8, -30],
+  [0, 1.8, -30],
 ] as const;
 
 function samplePath(points: readonly (readonly number[])[], progress: number, out: Vector3) {
-  const last = KEYS.length - 1;
-  let index = last - 1;
-  for (let key = 0; key < last; key++) {
+  let index = KEYS.length - 2;
+  for (let key = 0; key < KEYS.length - 1; key++) {
     if (progress <= KEYS[key + 1]) {
       index = key;
       break;
     }
   }
-  const t = smoothstep((progress - KEYS[index]) / (KEYS[index + 1] - KEYS[index]));
+  const t = smoothstep(rangeProgress(progress, KEYS[index], KEYS[index + 1]));
   const a = points[index];
   const b = points[index + 1];
   out.set(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t);
 }
 
-export function NeuroShieldScene({ controller, portrait }: NeuroShieldSceneProps) {
+export function NeuroShieldScene({ controller, portrait, entry }: NeuroShieldSceneProps) {
   const { camera } = useThree();
   const target = useMemo(() => new Vector3(), []);
-  const keyLight = useRef<DirectionalLight>(null);
-  const coolLight = useRef<PointLight>(null);
-  const evidenceLight = useRef<PointLight>(null);
-  const pathLight = useRef<PointLight>(null);
+  const warm = useRef<DirectionalLight>(null);
+  const cool = useRef<PointLight>(null);
+  const violet = useRef<PointLight>(null);
+  const evidence = useRef<PointLight>(null);
+  const crimson = useRef<PointLight>(null);
+  const ambient = useRef<AmbientLight>(null);
+  const hemisphere = useRef<HemisphereLight>(null);
+  const lightTarget = useMemo(() => new Object3D(), []);
 
   useFrame(() => {
     const p = controller.progress.current;
-    const hypothesis = getHypothesisProgress(p);
-    const experiment = getExperimentProgress(p);
-    const evidence = getEvidenceProgress(p);
-    const uncertainty = getUncertaintyProgress(p);
-    const perspective = camera as PerspectiveCamera;
-    const fov = (portrait ? 50 : 39) + uncertainty * (portrait ? 3 : 4);
-    if (perspective.fov !== fov) {
-      perspective.fov = fov;
-      perspective.updateProjectionMatrix();
+    if (!entry) {
+      samplePath(CAMERA, p, camera.position);
+      samplePath(TARGET, p, target);
+      if (portrait) {
+        camera.position.z += 1.6;
+        target.x += 0.12;
+      }
+      camera.lookAt(target);
+      camera.updateMatrixWorld();
+      const perspective = camera as PerspectiveCamera;
+      const fov = portrait ? 53 : 40;
+      if (perspective.fov !== fov || perspective.near !== 0.1) {
+        perspective.fov = fov;
+        perspective.near = 0.1;
+        perspective.updateProjectionMatrix();
+      }
     }
-    samplePath(portrait ? PORTRAIT_CAMERA : DESKTOP_CAMERA, p, camera.position);
-    samplePath(portrait ? PORTRAIT_TARGET : DESKTOP_TARGET, p, target);
-    camera.lookAt(target);
-    camera.updateMatrixWorld();
-    if (keyLight.current) keyLight.current.intensity = 0.82 + experiment * 0.22 + evidence * 0.16;
-    if (coolLight.current)
-      coolLight.current.intensity = 1.25 + hypothesis * 0.32 + experiment * 0.38 - evidence * 0.23;
-    if (evidenceLight.current)
-      evidenceLight.current.intensity = 0.26 + evidence * 1.72 - uncertainty * 0.66;
-    if (pathLight.current) {
-      pathLight.current.position.set(
-        -3.8 + hypothesis * 2.2 + experiment * 3.2 + evidence * 1.25,
-        3.2,
-        -2.4 - experiment * 1.25,
-      );
-      pathLight.current.intensity =
-        hypothesis * (0.45 + experiment * 0.45 + evidence * 0.24) * (1 - uncertainty * 0.76);
+    const hypothesis = smoothstep(rangeProgress(p, 0.18, 0.42));
+    const experiment = smoothstep(rangeProgress(p, 0.43, 0.68));
+    const clarity = smoothstep(rangeProgress(p, 0.65, 0.79));
+    const uncertainty = smoothstep(rangeProgress(p, 0.82, 1));
+    if (warm.current)
+      warm.current.intensity = 1.5 - hypothesis * 0.45 + clarity * 0.55 - uncertainty * 0.5;
+    if (cool.current)
+      cool.current.intensity = 1.8 + hypothesis * 0.8 + experiment * 0.55 - clarity * 0.4;
+    if (cool.current) cool.current.position.z = -0.2 - experiment * 9.8;
+    if (violet.current)
+      violet.current.intensity = 0.24 + hypothesis * 0.56 * (1 - uncertainty * 0.7);
+    if (violet.current) violet.current.position.z = -1.2 - experiment * 16.8;
+    if (evidence.current) evidence.current.intensity = clarity * 1.45 * (1 - uncertainty * 0.55);
+    if (crimson.current)
+      crimson.current.intensity =
+        smoothstep(rangeProgress(p, 0.27, 0.34)) *
+        (1 - smoothstep(rangeProgress(p, 0.38, 0.46))) *
+        0.16;
+    const light = entry?.lighting.current ?? 1;
+    const scale = entry?.scale.current ?? 1;
+    if (ambient.current) ambient.current.intensity = 0.43 * light;
+    if (hemisphere.current) hemisphere.current.intensity = 0.42 * light;
+    if (warm.current) {
+      warm.current.intensity *= light;
+      if (entry) {
+        const shadow = warm.current.shadow.camera;
+        shadow.left = shadow.bottom = -5 * scale;
+        shadow.right = shadow.top = 5 * scale;
+        shadow.near = 0.5 * scale;
+        shadow.far = 500 * scale;
+        shadow.updateProjectionMatrix();
+        warm.current.shadow.normalBias = 0.018 * scale;
+      }
     }
+    [cool, violet, evidence, crimson].forEach((ref, index) => {
+      if (!ref.current) return;
+      // A scaled interior uses the same local illumination as the full research world.
+      ref.current.intensity *= light * scale * scale;
+      ref.current.distance = [26, 18, 15, 3][index] * scale;
+    });
   });
 
   return (
     <>
-      <color attach="background" args={['#315768']} />
-      <ambientLight intensity={0.35} color="#9CC6C5" />
-      <directionalLight ref={keyLight} position={[-6, 8, 5]} intensity={0.82} color="#F2E8D5" />
+      {!entry && <color attach="background" args={[SCAN_BACKGROUND]} />}
+      {!entry && <fog attach="fog" args={[SCAN_BACKGROUND, 24, 62]} />}
+      <ambientLight ref={ambient} color="#B4CCD0" intensity={entry ? 0 : 0.43} />
+      <hemisphereLight ref={hemisphere} args={['#C1DEE1', '#8698AA', entry ? 0 : 0.42]} />
+      <primitive object={lightTarget} />
+      <directionalLight
+        ref={warm}
+        target={lightTarget}
+        position={[-5, 7, 7]}
+        color="#F2E8D5"
+        intensity={1.5}
+        castShadow
+        shadow-mapSize={[1024, 1024]}
+        shadow-camera-left={-5}
+        shadow-camera-right={5}
+        shadow-camera-top={5}
+        shadow-camera-bottom={-5}
+        shadow-normalBias={0.018}
+        shadow-radius={3}
+      />
       <pointLight
-        ref={coolLight}
-        position={[-5.8, 5.1, -1.4]}
-        intensity={1.25}
-        color="#9CC6C5"
-        distance={14}
+        ref={cool}
+        position={[3.2, 3.5, -0.2]}
+        color="#8BBCC6"
+        intensity={1.8}
+        distance={26}
         decay={2}
       />
       <pointLight
-        ref={evidenceLight}
-        position={[4.15, 3.7, -2.7]}
-        intensity={0.26}
-        color="#B88946"
-        distance={10}
+        ref={violet}
+        position={[-2.6, 2.7, -1.2]}
+        color="#9B90AF"
+        intensity={0.24}
+        distance={18}
         decay={2}
       />
       <pointLight
-        ref={pathLight}
-        position={[-3.8, 3.2, -2.4]}
+        ref={evidence}
+        position={[1, 5, -27]}
+        color="#F7F4E8"
         intensity={0}
-        color="#8B1E2D"
-        distance={4.6}
+        distance={15}
         decay={2}
       />
-      <ResearchWall progress={controller.progress} portrait={portrait} />
-      <NeuralConstellation progress={controller.progress} portrait={portrait} />
+      <pointLight
+        ref={crimson}
+        position={[1.5, 2.7, -0.5]}
+        color="#8B1E2D"
+        intensity={0}
+        distance={3}
+        decay={2}
+      />
+      <AnatomicalEnvironment progress={controller.progress} presence={entry?.environment} />
+      <BrainAnatomy progress={controller.progress} presence={entry?.brain} />
+      {!entry && (
+        <>
+          <AnatomicalSlices progress={controller.progress} />
+          <ImagingSequence progress={controller.progress} portrait={portrait} />
+          <BrainAnatomy progress={controller.progress} ending />
+          <AnatomicalSlices progress={controller.progress} ending />
+        </>
+      )}
     </>
   );
 }

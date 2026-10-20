@@ -24,7 +24,34 @@ export const archivedKaiForgeAthlete: ProductionAssetDefinition = {
   ],
   // Pass 1 uses the desktop asset on portrait. Add a real mobile variant after its export gate.
 };
-export const productionAssetManifest: readonly ProductionAssetDefinition[] = [];
+export const NEURO_IMAGE_IDS = [
+  'NS_RESEARCH_IMAGE_01',
+  'NS_RESEARCH_IMAGE_02',
+  'NS_RESEARCH_IMAGE_03',
+  'NS_RESEARCH_IMAGE_04',
+] as const;
+export const NEURO_IMAGE_URLS = NEURO_IMAGE_IDS.map(
+  (_, index) => `/research/neuroshield/image-0${index + 1}.png`,
+);
+
+export const productionAssetManifest: readonly ProductionAssetDefinition[] = NEURO_IMAGE_IDS.map(
+  (id, index) => ({
+    id,
+    owner: 'neuroshield',
+    resourceType: 'neuro-image',
+    priority: index === 0 ? 'critical-next' : 'normal',
+    preload: 'previous-chapter',
+    disposal: 'chapter-established',
+    variants: [
+      {
+        id: `research-image-${index + 1}`,
+        url: NEURO_IMAGE_URLS[index],
+        profile: 'universal',
+        quality: ['high', 'reduced'],
+      },
+    ],
+  }),
+);
 
 export function selectProductionAssetVariant(
   definition: ProductionAssetDefinition,

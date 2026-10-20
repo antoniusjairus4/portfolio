@@ -27,6 +27,7 @@ export function coordinateProductionAssets(
   const pal = chapters.palindrome;
   const ns = chapters.neuroshield;
   const skills = chapters.skills;
+  const enteredNeuroShield = !!ns && ns.top <= 0;
 
   if (skills && skills.bottom <= vh * 0.25) {
     manager.disposeAll();
@@ -38,10 +39,10 @@ export function coordinateProductionAssets(
     if (kf && kf.top <= vh * 2) void manager.prepareOwner('kaiforge');
   }
 
-  if ((kf && kf.progress >= 0.18) || (pal && pal.top <= vh * 6)) {
+  if (!enteredNeuroShield && ((kf && kf.progress >= 0.18) || (pal && pal.top <= vh * 6))) {
     void manager.requestOwner('palindrome');
   }
-  if ((kf && kf.progress >= 0.7) || (pal && pal.top <= vh * 2)) {
+  if (!enteredNeuroShield && ((kf && kf.progress >= 0.7) || (pal && pal.top <= vh * 2))) {
     void manager.prepareOwner('palindrome');
   }
 
@@ -60,6 +61,6 @@ export function coordinateProductionAssets(
   }
 
   if (pal && pal.progress >= 0.12) manager.disposeOwner('kaiforge');
-  if (ns && ns.progress >= 0.12) manager.disposeOwner('palindrome');
+  if (enteredNeuroShield) manager.disposeOwner('palindrome');
   if (skills && skills.progress >= 0.12) manager.disposeOwner('neuroshield');
 }

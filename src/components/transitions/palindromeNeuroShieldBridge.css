@@ -1,0 +1,33 @@
+.palindrome-neuroshield-bridge {
+  position: relative;
+  z-index: 2;
+  height: 580svh;
+  margin-top: -100svh;
+  pointer-events: none;
+}
+
+.palindrome-neuroshield-bridge-sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+
+.palindrome-neuroshield-bridge:not(.bridge-disabled) + .neuroshield-chapter {
+  margin-top: -100svh;
+}
+
+.palindrome-sticky {
+  opacity: var(--palindrome-exit-opacity, 1);
+}
+
+.palindrome-neuroshield-bridge.bridge-disabled {
+  height: 0;
+  margin-top: 0;
+  overflow: hidden;
+}
+
+@media (orientation: portrait) {
+  .palindrome-neuroshield-bridge:not(.bridge-disabled) {
+    height: 520svh;
+  }
+}
