@@ -284,7 +284,12 @@ export function SeatedFigure({
       <mesh geometry={forms.neck} castShadow receiveShadow>
         <meshStandardMaterial color="#C8BDA6" roughness={0.92} />
       </mesh>
-      <group ref={headAnchorRef} position={[-0.008, 1.8, 0.14]} rotation={[0.1, -0.13, -0.035]}>
+      <group
+        name="Palindrome_Head"
+        ref={headAnchorRef}
+        position={[-0.008, 1.8, 0.14]}
+        rotation={[0.1, -0.13, -0.035]}
+      >
         <mesh
           ref={(mesh) => {
             headMeshes.current[0] = mesh;

@@ -350,7 +350,7 @@ function TableLamp() {
     return object;
   }, []);
   return (
-    <group position={[0.56, 1.14, -0.91]}>
+    <group name="Palindrome_TransitionLamp" position={[0.56, 1.14, -0.91]}>
       <mesh position={[0, 0.025, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.18, 0.05, 32]} />
         <Surface color={ROOM_PALETTE.forest} finish="metal" />
@@ -394,7 +394,7 @@ export function ShelfBowl() {
 
 export function HouseholdObjects({ kind = 'all' }: { kind?: 'all' | 'lamp' | 'daily' }) {
   return (
-    <group>
+    <group name="Palindrome_TransitionProps">
       {kind !== 'lamp' && (
         <>
           <GroceryBag />

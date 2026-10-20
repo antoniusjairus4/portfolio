@@ -203,7 +203,7 @@ export function DomesticRoom({
           <SeatedPresence headAnchorRef={headAnchorRef} interiorProgress={interiorProgress} />
         </BridgeReveal>
         {bridgeDesk && (
-          <group position={[-1.02, 0, -0.35]}>
+          <group name="Palindrome_TransitionProps" position={[-1.02, 0, -0.35]}>
             <RoundedSolid
               position={[0, 1.07, 0]}
               size={[3.8, 0.14, 1.65]}
@@ -258,7 +258,7 @@ export function DomesticRoom({
           end={0.87}
           anchor={[2.1, 1.34, -2.3]}
         >
-          <group position={[2.1, 0, -2.3]}>
+          <group name="Palindrome_TransitionShelf" position={[2.1, 0, -2.3]}>
             {[-0.86, 0.86].map((x) => (
               <Block
                 key={x}
