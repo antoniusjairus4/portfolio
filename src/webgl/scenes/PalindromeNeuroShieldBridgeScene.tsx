@@ -29,6 +29,8 @@ import {
   scanRamp as ramp,
   scanSpread,
   spineReveal,
+  spineCameraLock,
+  spineCanalPoint,
 } from './neuroshield/scanJourney';
 
 function heldController(value: number): ChapterProgressController {
@@ -75,6 +77,10 @@ export function PalindromeNeuroShieldBridgeScene({
       spineRotation: new Quaternion(),
       inverse: new Quaternion(),
       identity: new Quaternion(),
+      canal: new Vector3(),
+      canalTarget: new Vector3(),
+      canalNormal: new Vector3(),
+      canalRotation: new Quaternion(),
       start: new Vector3(portrait ? 0.1 : -0.02, portrait ? 3.15 : 3.13, portrait ? 11.4 : 9.4),
       startTarget: new Vector3(portrait ? 0 : -0.05, 1.94, -0.55),
       arrival: new Vector3(0.6, 2.45, portrait ? 12.4 : 10.8),
@@ -149,9 +155,19 @@ export function PalindromeNeuroShieldBridgeScene({
         const cursor = scanCursor(p);
         scanPath(cursor, scanSpread(p), path.local);
         scanPath(cursor + 0.075, scanSpread(p), path.target);
-        // Slight lateral examination rather than a central straight tunnel.
-        path.local.x +=
-          (portrait ? 0.13 : 0.24) * Math.sin(Math.PI * ramp(p, 0.48, 0.9)) * ramp(p, 0.6, 0.7);
+        // Enter the center of the openings before the first vertebra, follow
+        // the same curved frame as the column, then ease out into research.
+        const center = spineCameraLock(p);
+        spineCanalPoint(cursor, portrait, path.canal, path.canalRotation, path.canalNormal);
+        spineCanalPoint(
+          cursor + 0.025,
+          portrait,
+          path.canalTarget,
+          path.canalRotation,
+          path.canalNormal,
+        );
+        path.local.lerp(path.canal, center);
+        path.target.lerp(path.canalTarget, center);
         camera.up.set(0, 1, 0).applyQuaternion(journey.current.quaternion);
       }
       path.offset

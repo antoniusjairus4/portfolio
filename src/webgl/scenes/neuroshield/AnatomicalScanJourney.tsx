@@ -39,6 +39,7 @@ function sliceMaterial(empty: DataTexture) {
       uSource2: { value: empty },
       uReady: { value: new Vector3() },
       uFlip: { value: new Vector3() },
+      uPassage: { value: 0 },
     },
     vertexShader: `
       attribute vec4 aCrop, aState;
@@ -53,6 +54,7 @@ function sliceMaterial(empty: DataTexture) {
     fragmentShader: `
       uniform sampler2D uSource0, uSource1, uSource2;
       uniform vec3 uReady, uFlip;
+      uniform float uPassage;
       varying vec2 vUv;
       varying vec4 vCrop, vState;
       varying float vSource, vDepth;
@@ -89,19 +91,28 @@ function sliceMaterial(empty: DataTexture) {
         float left=stroke(q.x+.35+.055*sin(q.y*4.+vDepth*5.),.009);
         float right=stroke(q.x-.35-.04*sin(q.y*3.-vDepth*4.),.009);
         float longitudinal=(left+right)*step(-.84,q.y)*step(q.y,.81);
+        // Sparse section boundaries carry depth through the dark passage.
+        // They are schematic outlines, including when source images are absent.
+        vec2 section=q/vec2(.72,.86);
+        float sectionEdge=stroke(length(section)-.82,.012);
+        float sectionBreak=step(.13,abs(section.x+.12));
+        float sectionContour=sectionEdge*sectionBreak;
         float bounds=stroke(max(abs(q.x),abs(q.y))-.87,.004);
         float cornerMask=step(.63,min(abs(q.x),abs(q.y)));
         float corner=bounds*cornerMask;
         float tick=stroke(q.x+.86,.008)*step(.94,cos(q.y*36.));
         float sampleMark=stroke(q.y-.29,.005)*step(.28,q.x)*step(q.x,.48);
-        float contours=mix(sourceContour*.34,longitudinal,abstract);
+        float schematic=mix(sectionContour,longitudinal,vState.z);
+        float contours=mix(sourceContour*.34,schematic,abstract);
+        contours=max(contours,sectionContour*uPassage*.75);
         contours=mix(contours,corner+tick*.45,extracted*.8);
-        float registration=(corner*.3+tick*.17)*( .25+focus*.75);
+        float registration=(corner*.3+tick*.17)*( .25+focus*.75)*(1.-uPassage*.9);
         float imageAlpha=anatomy*(1.-abstract);
         float contourAlpha=(contours*.65+registration+sampleMark*abstract*.3);
         // One small selected boundary, with no red wash or emission.
         float selected=sampleMark*step(.77,vDepth)*step(vDepth,.83)*abstract;
         vec3 color=mix(imageColor,cool,abstract);
+        color=mix(color,cool,clamp(contours*uPassage,0.,1.));
         color=mix(color,vec3(.26,.012,.025),selected);
         float alpha=(imageAlpha+contourAlpha)*vState.x;
         if(alpha<.003) discard;
@@ -203,6 +214,8 @@ export function AnatomicalScanJourney({
     const revealCount = 1 + (count - 1) * scanRamp(p, 0.29, 0.48);
     const presence = scanRamp(p, 0.245, 0.275);
     const extraction = scanRamp(p, 0.81, 0.96);
+    const passage = scanRamp(p, 0.32, 0.415) * (1 - spineReveal(p));
+    resources.material.uniforms.uPassage.value = passage;
     frame.current.updateWorldMatrix(true, false);
     frame.current.worldToLocal(scratch.camera.copy(camera.position));
     frame.current.getWorldQuaternion(scratch.inverse).invert();
@@ -244,12 +257,16 @@ export function AnatomicalScanJourney({
       const anticipation = Math.exp(-Math.max(0, distance - 2) * 0.14);
       const stackOpacity = 0.12 + (i === 0 ? 0.44 : 0);
       const travelOpacity = (0.055 + focus * 0.78) * anticipation * ahead * clearance;
+      // Keep the current/next sections readable in darkness; distant layers
+      // remain quiet instead of filling the view with faint vertical rails.
+      const passageContrast = passage * (0.14 + 0.36 * focus);
       const opacity =
         presence *
         revealed *
         // Keep scans faint through head/neck entry, then secondary to the spine.
         (1 -
           0.96 * scanRamp(p, 0.32, 0.415) +
+          passageContrast +
           0.2 * spineReveal(p) +
           0.76 * scanRamp(p, 0.76, 0.87)) *
         ((stackOpacity * (1 - enter) + travelOpacity * enter) * (1 - unfold) + unfold * 0.42) *

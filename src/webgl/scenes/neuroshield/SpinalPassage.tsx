@@ -14,11 +14,19 @@ import {
   Vector3,
 } from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
-import { scanCursor, scanPath, scanRamp, spineReveal } from './scanJourney';
+import {
+  scanCursor,
+  scanPath,
+  scanRamp,
+  spineReveal,
+  spineCameraLock,
+  spineSection,
+  spineSectionSize,
+} from './scanJourney';
 
 // A deliberately simplified editorial spine, not a patient reconstruction.
 // Vertebral bodies, posterior arches and short processes give the column a
-// readable silhouette. The camera travels beside it, never through the bones.
+// readable silhouette. The camera follows the center of the posterior openings.
 function vertebra() {
   const body = new CylinderGeometry(0.32, 0.35, 0.24, 16, 1);
   body.rotateX(Math.PI / 2);
@@ -96,9 +104,7 @@ export function SpinalPassage({
   const scratch = useMemo(
     () => ({
       object: new Object3D(),
-      next: new Vector3(),
       normal: new Vector3(),
-      axis: new Vector3(0, 0, 1),
     }),
     [],
   );
@@ -120,12 +126,8 @@ export function SpinalPassage({
     for (let i = 0; i < count; i++) {
       const t = 0.22 + (i / (count - 1)) * 0.6;
       const object = scratch.object;
-      scanPath(t, 1, object.position);
-      scanPath(t + 0.004, 1, scratch.next);
-      scratch.normal.copy(object.position).sub(scratch.next).normalize();
-      object.quaternion.setFromUnitVectors(scratch.axis, scratch.normal);
-      object.position.x += portrait ? 0.6 : 0.83;
-      const size = 0.82 + 0.3 * scanRamp(t, 0.22, 0.75);
+      spineSection(t, portrait, object.position, object.quaternion, scratch.normal);
+      const size = spineSectionSize(t);
       object.scale.set(size, size, size * 2.2);
       object.updateMatrix();
       column.current.setMatrixAt(i, object.matrix);
@@ -136,7 +138,9 @@ export function SpinalPassage({
     }
     resources.focus.needsUpdate = true;
     column.current.instanceMatrix.needsUpdate = true;
-    if (cordMaterial.current) cordMaterial.current.opacity = presence * 0.24;
+    // Clear the thin illustrative cord from the camera's passage through the canal.
+    if (cordMaterial.current)
+      cordMaterial.current.opacity = presence * 0.24 * (1 - spineCameraLock(p));
   });
   return (
     <>

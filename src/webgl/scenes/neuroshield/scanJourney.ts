@@ -1,4 +1,4 @@
-import { Vector3 } from 'three';
+import { Quaternion, Vector3 } from 'three';
 import { rangeProgress, smoothstep } from '@/components/neuroshield/neuroShieldChoreography';
 
 export const scanRamp = (p: number, a: number, b: number) => smoothstep(rangeProgress(p, a, b));
@@ -30,6 +30,44 @@ export function scanCursor(p: number) {
 // The spine is revealed only after the camera clears the cervical entry.
 export function spineReveal(p: number) {
   return scanRamp(scanCursor(p), 0.12, 0.2);
+}
+
+export function spineCameraLock(p: number) {
+  const cursor = scanCursor(p);
+  return scanRamp(cursor, 0.09, 0.21) * (1 - scanRamp(cursor, 0.85, 1.07));
+}
+
+const SPINE_AXIS = new Vector3(0, 0, 1);
+
+export function spineSection(
+  t: number,
+  portrait: boolean,
+  center: Vector3,
+  rotation: Quaternion,
+  scratch: Vector3,
+) {
+  scanPath(t, 1, center);
+  scanPath(t + 0.004, 1, scratch);
+  scratch.subVectors(center, scratch).normalize();
+  rotation.setFromUnitVectors(SPINE_AXIS, scratch);
+  center.x += portrait ? 0.6 : 0.83;
+}
+
+export function spineSectionSize(t: number) {
+  return 0.82 + 0.3 * scanRamp(t, 0.22, 0.75);
+}
+
+export function spineCanalPoint(
+  t: number,
+  portrait: boolean,
+  out: Vector3,
+  rotation: Quaternion,
+  scratch: Vector3,
+) {
+  spineSection(t, portrait, out, rotation, scratch);
+  // Match the actual arch opening, including each section's scale and tilt.
+  scratch.set(0, -0.12 * spineSectionSize(t), 0).applyQuaternion(rotation);
+  return out.add(scratch);
 }
 
 // These are the existing environment's first six section frames. The final
