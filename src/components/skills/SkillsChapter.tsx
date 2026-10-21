@@ -154,6 +154,7 @@ export function SkillsChapter() {
                 category.skills.map((skill, index) => (
                   <span
                     key={`${category.key}-${skill}`}
+                    data-skill-label={skillLabelId(domain, index)}
                     ref={(node) => bindSkillLabel(skillLabelId(domain, index), node)}
                     className={`skills-inscription ${domain === 0 && index === 0 ? 'skills-inscription-foundation' : ''}`}
                   >

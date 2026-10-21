@@ -49,14 +49,27 @@ const custom = {
   scraping: svg(
     '<path d="M16 24H78M16 44H78M16 64H50M16 84H78M16 104H78M96 44H114V84H96"/><path stroke="#8B1E2D" d="M50 64H110M98 54L110 64L98 74"/>',
   ),
-  mern: svg(
-    '<path stroke="#83b4a0" d="M12 46V18L24 34L36 18V46M52 18H76M52 18V46H76M52 32H72M14 110V82H38V96H14M26 96L40 110M56 110V82L78 110V82"/><path stroke="#F2E8D5" stroke-width="3" d="M12 64H102V110M96 18H112M96 32H112M96 46H112"/>',
-  ),
 };
 await fs.mkdir(root, { recursive: true });
 for (const [id, data] of Object.entries(custom))
   await fs.writeFile(path.join(root, `${id}.svg`), data);
 const mono = new Set(['express', 'github', 'linux', 'ollama', 'kali']);
+// A stack has no single official logo: present its actual four constituent
+// marks together, rather than inventing a typographic MERN brand.
+const stack = await Promise.all(
+  ['mongodb', 'express', 'react', 'node'].map(async (id, i) => {
+    let source = await fs.readFile(path.join(root, `${id}.svg`), 'utf8');
+    if (id === 'express')
+      source = source
+        .replace('<svg ', '<svg fill="#F2E8D5" ')
+        .replace(/fill="#000"/g, 'fill="#F2E8D5"');
+    return `<image x="${(i % 2) * 64 + 5}" y="${Math.floor(i / 2) * 64 + 5}" width="54" height="54" href="data:image/svg+xml;base64,${Buffer.from(source).toString('base64')}"/>`;
+  }),
+);
+await fs.writeFile(
+  path.join(root, 'mern.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">${stack.join('')}</svg>`,
+);
 const tiles = await Promise.all(
   ids.map(async (id, index) => {
     let source = await fs.readFile(path.join(root, `${id}.svg`), 'utf8');
@@ -92,5 +105,7 @@ await sharp(atlas)
 const sources = JSON.parse(await fs.readFile(path.join(root, 'sources.json'), 'utf8'));
 for (const id of Object.keys(custom))
   sources[id] = 'Original conceptual symbol; not a product logo';
-await fs.writeFile(path.join(root, 'sources.json'), JSON.stringify(sources, null, 2) + '\n');
+sources.mern =
+  'Composite of the local MongoDB, Express.js, React and Node.js marks; see their individual sources';
+await fs.writeFile(path.join(root, 'sources.json'), `${JSON.stringify(sources, null, 2)}\n`);
 console.log(`Built ${ids.length} local skill identities into desktop and portrait atlases.`);

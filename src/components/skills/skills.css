@@ -83,7 +83,9 @@
   line-height: 1.15;
   letter-spacing: -0.035em;
   white-space: nowrap;
-  text-shadow: 0 1px 2px #111111;
+  text-shadow:
+    0 1px 2px #111111,
+    0 0 5px #111111;
   will-change: transform, opacity;
 }
 
@@ -144,4 +146,22 @@
   .skills-inscription-foundation {
     font-size: clamp(1.55rem, 7.6vw, 2.3rem);
   }
+}
+
+.skills-fallback-category li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.skills-fallback-category li::before {
+  display: none;
+}
+.skills-fallback-mark {
+  display: inline-block;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-image: url("/skills/marks/identities.webp");
+  background-size: 400% 800%;
+  background-repeat: no-repeat;
 }

@@ -4,14 +4,14 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { type PerspectiveCamera, Vector2, Vector3 } from 'three';
 import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
-import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
 import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
+import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { SkillsArchitecture } from './skills/SkillsArchitecture';
-import { SkillsMaterialProvider } from './skills/SkillsMaterials';
 import { SkillIdentitySystem } from './skills/SkillIdentitySystem';
+import { SkillsArchitecture } from './skills/SkillsArchitecture';
 import { SkillsLighting } from './skills/SkillsLighting';
+import { SkillsMaterialProvider } from './skills/SkillsMaterials';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -115,12 +115,13 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
         inscription.skill,
         inscription.count,
       );
-      const opacity = inFrame
-        ? domainOpacity * (portrait ? recognition : 0.16 + recognition * 0.84)
-        : 0;
+      const opacity = inFrame ? domainOpacity * recognition : 0;
       element.style.setProperty('--skill-focus', recognition.toFixed(3));
       element.style.opacity = opacity.toFixed(3);
-      if (opacity < 0.002) continue;
+      if (opacity < 0.002) {
+        element.style.transform = '';
+        continue;
+      }
       const x = (projection.x * 0.5 + 0.5) * size.width;
       const y = (-projection.y * 0.5 + 0.5) * size.height;
       const distance = camera.position.distanceTo(inscription.anchor);
@@ -134,8 +135,8 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
 
   return (
     <>
-      <color attach="background" args={['#303837']} />
-      <fog attach="fog" args={['#303837', 25, 50]} />
+      <color attach="background" args={['#293333']} />
+      <fog attach="fog" args={['#293333', 24, 64]} />
       <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>
         <SkillsArchitecture portrait={portrait} controller={controller} />

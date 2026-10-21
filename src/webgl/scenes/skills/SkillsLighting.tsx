@@ -5,10 +5,10 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import {
   type DirectionalLight,
   Object3D,
-  PCFShadowMap,
   type PointLight,
   type SpotLight,
   Vector3,
+  VSMShadowMap,
 } from 'three';
 import { getSkillsCategoryIndex, smoothstep } from '@/components/skills/skillsChoreography';
 import { assemblyProgress, SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
@@ -32,7 +32,7 @@ export function SkillsLighting({
   useLayoutEffect(() => {
     const previous = gl.shadowMap.type;
     if (!portrait) {
-      gl.shadowMap.type = PCFShadowMap;
+      gl.shadowMap.type = VSMShadowMap;
       gl.shadowMap.needsUpdate = true;
     }
     return () => {
@@ -56,7 +56,7 @@ export function SkillsLighting({
         target.position.y + 17,
         target.position.z + 8,
       );
-      key.current.intensity = 3.25 + openness * 0.5;
+      key.current.intensity = 2.8 + openness * 0.4;
     }
     if (floorBounce.current) {
       floorBounce.current.position.set(
@@ -82,14 +82,15 @@ export function SkillsLighting({
   });
   return (
     <>
-      <hemisphereLight args={['#e9e0ce', '#566364', 0.68]} />
+      <hemisphereLight args={['#e9e0ce', '#6d7975', 1.35]} />
+      <ambientLight color="#d4d9d2" intensity={0.45} />
       <primitive object={target} />
       <primitive object={pool} />
       <directionalLight
         ref={key}
         target={target}
         color="#fff0d8"
-        intensity={3.25}
+        intensity={2.8}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-17}
@@ -101,6 +102,7 @@ export function SkillsLighting({
         shadow-bias={-0.00025}
         shadow-normalBias={0.035}
         shadow-radius={3}
+        shadow-blurSamples={6}
       />
       <spotLight
         ref={aperture}

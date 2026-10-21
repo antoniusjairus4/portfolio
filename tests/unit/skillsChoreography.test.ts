@@ -29,7 +29,10 @@ describe('Skills choreography', () => {
   });
 
   it('gives each category one readable center', () => {
-    expect(getCategoryOpacity(0.02, 0)).toBe(0);
+    // The existing entrance starts at .013; .02 is already inside its fade.
+    expect(getCategoryOpacity(0.01, 0)).toBe(0);
+    expect(getCategoryOpacity(0.02, 0)).toBeGreaterThan(0);
+    expect(getCategoryOpacity(0.02, 0)).toBeLessThan(1);
     expect(getCategoryOpacity(0.06, 0)).toBe(1);
     expect(getCategoryOpacity(0.4, 2)).toBe(1);
     expect(getCategoryOpacity(0.92, 2)).toBe(0);

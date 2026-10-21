@@ -12,10 +12,9 @@ import {
   TextureLoader,
 } from 'three';
 import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
-import { identityAnchor, SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
+import { identityAnchor } from '@/components/skills/skillsSpatial';
 import { type SkillIdentity, skillIdentities } from '@/content/skillIdentities';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { useSkillsMaterials } from './SkillsMaterials';
 
 function useIdentityAtlas(portrait: boolean) {
   const [atlas, setAtlas] = useState<Texture | null>(null);
@@ -66,15 +65,14 @@ function IdentityMark({
   controller: ChapterProgressController;
 }) {
   const mark = useRef<Group>(null);
-  const resources = useSkillsMaterials();
   const position = useMemo(
     () => identityAnchor(domain, skill, portrait),
     [domain, skill, portrait],
   );
   const face = useMemo(() => {
     const geometry = new PlaneGeometry(
-      portrait ? 1.9 : identity.id === 'dsa' ? 1.5 : 1.18,
-      portrait ? 1.9 : identity.id === 'dsa' ? 1.5 : 1.18,
+      portrait ? 1.65 : identity.id === 'dsa' ? 1.9 : 1.75,
+      portrait ? 1.65 : identity.id === 'dsa' ? 1.9 : 1.75,
     );
     const uv = geometry.attributes.uv;
     // Tile has a 32px gutter. Sample only its 192px content, so mipmaps never
@@ -128,82 +126,21 @@ function IdentityMark({
         : (skill % 2 ? -1 : 1) *
           (0.05 + (identity.treatment === 'junction' ? (1 - focus) * 0.18 : 0.06));
     }
+    if (mark.current) mark.current.scale.setScalar(0.96 + focus * 0.04);
     material.opacity = presence;
-    material.emissiveIntensity =
-      identity.treatment === 'stamp' ? 0.08 + focus * 0.13 : 0.16 + focus * 0.42;
+    material.emissiveIntensity = 0.28 + focus * 0.48;
     material.color.setScalar(0.78 + focus * 0.22);
   });
 
-  const side = position[0] - SKILLS_REGIONS[domain].x < 0 ? -1 : 1;
-  const support = SKILLS_REGIONS[domain].x + side * (domain === 3 ? 4.4 : 6.5);
-  const reach = Math.abs(support - position[0]);
   return (
-    <>
-      {/* Supports persist independently of the recognition light. Each mark has a
-        structural treatment, not a detached square app tile. */}
-      {!portrait && identity.treatment === 'inlay' && (
-        <mesh
-          geometry={resources.geometry}
-          material={resources.surfaces.metal}
-          position={[(support + position[0]) / 2, position[1], position[2] - 0.25]}
-          scale={[reach + 1.5, 1.35, 0.42]}
-          receiveShadow
-          dispose={null}
-        />
-      )}
-      {!portrait && identity.treatment === 'stamp' && (
-        <mesh
-          geometry={resources.geometry}
-          material={resources.surfaces.technical}
-          position={[position[0], position[1] - 0.85, position[2] - 0.33]}
-          scale={[1.65, 3.1, 0.6]}
-          receiveShadow
-          dispose={null}
-        />
-      )}
-      {!portrait && identity.treatment === 'projection' && (
-        <mesh
-          geometry={resources.geometry}
-          material={resources.surfaces.metal}
-          position={[(support + position[0]) / 2, position[1], position[2] - 0.32]}
-          scale={[reach + 1.5, 2.1, 0.3]}
-          receiveShadow
-          dispose={null}
-        />
-      )}
-      {!portrait &&
-        identity.treatment === 'fins' &&
-        [0, 1, 2].map((fin) => (
-          <mesh
-            key={fin}
-            geometry={resources.geometry}
-            material={resources.surfaces.technical}
-            position={[
-              (support + position[0]) / 2,
-              position[1] + (fin - 1) * 0.48,
-              position[2] - 0.16 - fin * 0.08,
-            ]}
-            scale={[reach + 1.5, 0.4, 0.12]}
-            receiveShadow
-            dispose={null}
-          />
-        ))}
-      {!portrait &&
-        (identity.treatment === 'opening' || identity.treatment === 'junction') &&
-        [-1, 1].map((edge) => (
-          <mesh
-            key={edge}
-            geometry={resources.geometry}
-            material={resources.surfaces.stone}
-            position={[position[0] + edge * 0.85, position[1], position[2] - 0.16]}
-            scale={[0.1, 1.8, 0.4]}
-            dispose={null}
-          />
-        ))}
-      <group ref={mark} position={position}>
-        <mesh geometry={face} material={material} dispose={null} />
-      </group>
-    </>
+    <group ref={mark} position={position}>
+      <mesh
+        name={`skills-logo-${domain}-${skill}`}
+        geometry={face}
+        material={material}
+        dispose={null}
+      />
+    </group>
   );
 }
 

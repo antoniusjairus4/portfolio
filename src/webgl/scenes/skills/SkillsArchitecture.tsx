@@ -2,8 +2,9 @@
 
 import { useFrame } from '@react-three/fiber';
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { Color, type Group, type InstancedMesh, Object3D, Vector3 } from 'three';
-import { assemblyProgress, SKILLS_REGIONS, skillAnchor } from '@/components/skills/skillsSpatial';
+import { CatmullRomCurve3, Color, type Group, type InstancedMesh, Object3D, Vector3 } from 'three';
+import { getSkillRecognition } from '@/components/skills/skillsChoreography';
+import { assemblyProgress, SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { type SkillsFinish, useSkillsMaterials } from './SkillsMaterials';
@@ -101,206 +102,109 @@ function Members({ pieces }: { pieces: Member[] }) {
 function createDomain(domain: number, portrait: boolean) {
   const fixed: Member[] = [];
   const moving: Member[] = [];
-  const bays = portrait ? [-5.5, 4] : [-6, 0, 6];
+  // Reserve the entire central travel volume, not just a ray through the logo.
+  // No mid-height slab enters x=-4.6..4.6. Portrait moves structural returns
+  // toward the edge of its narrower frustum while retaining both sides.
+  const edge = portrait ? 5.2 : 6.7;
   switch (domain) {
     case 0: {
-      // Foundation: ordered intersections hold the landscape above the void.
-      for (const z of bays) {
-        for (const x of [-5.8, 5.8]) {
-          fixed.push(member([x, 2.4, z], [0.52, 8.4, 0.65]));
-          fixed.push(member([x, -1.5, z], [1.2, 0.65, 1.3], INK));
+      // Keep the foundation's vertical rhythm; retire the intermediate shelves.
+      for (const z of [-5, 5]) {
+        for (const side of [-1, 1]) {
+          fixed.push(member([side * edge, 2.6, z], [0.52, 9.4, 0.65]));
+          fixed.push(member([side * edge, -1.8, z], [1.2, 0.65, 1.3], INK));
         }
-        fixed.push(member([0, -1.25, z], [13.6, 0.55, 1.3], STONE));
-        moving.push(member([0, 6.55, z], [12.4, 0.42, 0.7]));
+        fixed.push(member([0, -1.8, z], [edge * 2 + 1, 0.5, 1.3], STONE));
+        moving.push(member([0, 7.6, z], [edge * 2 + 1, 0.38, 0.65]));
       }
-      for (const x of [-4.2, -2.1, 0, 2.1, 4.2]) {
-        fixed.push(member([x, -0.68, 0], [0.18, 0.38, 18], CHARCOAL));
-      }
-      // DSA has a repeated structural order around its inscription.
-      for (const y of [1.4, 2.9, 4.4]) {
-        fixed.push(member([-5.7, y, -0.8], [0.16, 0.16, 10.8], STONE));
+      for (const side of [-1, 1]) {
+        fixed.push(rail([side * 3.2, -0.8, 6], [side * 3.2, -0.8, -8], 0.12, STONE));
+        fixed.push(rail([side * edge, 5.6, -4], [side * (edge + 3), 7.3, -7], 0.12));
       }
       break;
     }
     case 1: {
-      // Composition: layered cantilevers widen around the same central route.
-      for (const side of [-1, 1]) {
-        fixed.push(member([side * 7.2, 2.4, 0], [0.35, 8.4, 17], CHARCOAL));
-        for (const level of [0.4, 3.4, 6.4]) {
-          moving.push(member([side * 5.6, level, -1], [4.3, 0.2, 16]));
-        }
-        fixed.push(member([side * 6.7, 2.8, -3.8], [0.22, 6.2, 0.35], STONE));
+      // A single flowing ribbon replaces the banks of stacked Web shelves.
+      fixed.push(member([-edge - 2.4, 2, -2], [0.3, 11, 13], CHARCOAL));
+      fixed.push(member([edge + 2, 3.2, -6], [0.24, 8, 6], PAPER, [0, -0.18, 0]));
+      moving.push(member([-edge - 1.1, -1.4, -2], [5, 0.23, 13], PAPER));
+      moving.push(member([edge + 1.6, 8.3, -4], [6, 0.2, 10], PAPER, [0, 0.12, 0]));
+      const ribbon = new CatmullRomCurve3([
+        new Vector3(edge, 4.8, 8),
+        new Vector3(edge + 2, 6.6, 1),
+        new Vector3(edge + 1, 7.1, -6),
+        new Vector3(edge - 0.5, 7.5, -11),
+      ]);
+      const segments = portrait ? 10 : 16;
+      for (let i = 0; i < segments; i++) {
+        fixed.push(
+          rail(
+            ribbon.getPoint(i / segments).toArray() as Point,
+            ribbon.getPoint((i + 1) / segments).toArray() as Point,
+            0.26,
+            PAPER,
+          ),
+        );
       }
-      for (const z of portrait ? [-4, 3] : [-5, -1, 3, 7]) {
-        fixed.push(member([6.7, 4.8, z], [1.4, 3.4, 0.12], STONE));
-      }
-      fixed.push(member([0, 6.7, -6], [15, 0.24, 3.8]));
-      fixed.push(rail([-6, 0.28, -5], [-2.4, -0.4, -13], 0.22));
       break;
     }
     case 2: {
-      // Infrastructure: descended foundations, wells and longitudinal conduits.
+      // Infrastructure retains the descended wells, with two routes instead of
+      // three stacks on both sides and a full ceiling slab.
       for (const side of [-1, 1]) {
-        for (const tier of [0, 1, 2]) {
-          fixed.push(
-            member(
-              [side * (4.3 + tier * 1.25), -1.1 - tier * 1.25, 0],
-              [1.1, 1.2, 18],
-              tier === 0 ? PAPER : CHARCOAL,
-            ),
-          );
-          fixed.push(
-            member([side * (4.7 + tier * 0.65), 5.3 + tier * 0.45, -1], [0.18, 0.24, 21], STONE),
-          );
-        }
-        fixed.push(member([side * 6.5, 0, -5], [0.6, 10, 0.7]));
-        fixed.push(member([side * 5.4, 1.7, 1.2], [0.4, 4.2, 0.6], CHARCOAL));
-        moving.push(member([side * 2.5, 0.36, 0], [0.13, 0.18, 17.5]));
+        fixed.push(member([side * edge, -2.3, -1], [2.2, 2.4, 17], STONE));
+        fixed.push(member([side * (edge + 2), -3.6, -3], [1.2, 4, 12], CHARCOAL));
+        fixed.push(member([side * edge, 1, -6], [0.65, 12, 0.9], PAPER));
+        moving.push(member([side * (edge - 0.7), 6.6, -1], [0.16, 0.22, 19], STONE));
+        fixed.push(rail([side * edge, -0.9, 5], [side * (edge + 2), -2.6, -9], 0.14, PAPER));
       }
-      fixed.push(member([0, -4.7, 0], [18, 0.4, 18], CHARCOAL));
+      fixed.push(member([0, -5.4, -1], [22, 0.4, 19], CHARCOAL));
       break;
     }
     case 3: {
-      // Perforated boundaries and terminated side routes, not an enclosed room.
+      // Segmented boundaries frame a protected central passage; no shelf wall.
       for (const side of [-1, 1]) {
-        fixed.push(member([side * 4.4, 0.7, 0], [0.4, 1.4, 18]));
-        fixed.push(member([side * 4.4, 5.7, 0], [0.4, 2, 18]));
         for (const z of [-6, 5]) {
-          fixed.push(member([side * 4.4, 3.2, z], [0.42, 3.8, 2.6], STONE));
+          fixed.push(member([side * (edge - 0.3), 2.5, z], [0.45, 8.2, 1.8], STONE));
         }
-        fixed.push(member([side * 2.5, 0.12, 0], [0.12, 0.18, 19], CHARCOAL));
-        fixed.push(rail([side * 5.2, 1.8, 5], [side * 5.2, 1.8, -0.5], 0.12));
-        fixed.push(member([side * 5.2, 2.05, -0.5], [0.5, 0.6, 0.16], INK));
+        fixed.push(member([side * (edge - 0.3), -1.5, 0], [0.4, 0.6, 17], PAPER));
+        moving.push(member([side * (edge + 1), 3.1, -3], [0.24, 5.5, 2.2], CHARCOAL));
+        fixed.push(rail([side * 3.3, -0.8, 7], [side * (edge - 0.4), -0.8, 0], 0.1));
+        fixed.push(member([side * (edge - 0.4), -0.6, 0], [0.4, 0.5, 0.18], INK));
       }
-      moving.push(member([0, 6.1, -3], [8.5, 0.32, 0.8]));
+      moving.push(member([0, 7.9, -4], [edge * 2, 0.24, 0.6]));
       break;
     }
     case 4: {
-      // Mechanism: branching/merging load-bearing rails and a sliding coupling.
+      // Retain fork/merge rails and their coupling. Remove every intermediate shelf.
       for (const side of [-1, 1]) {
-        fixed.push(rail([side * 1.8, 0.35, 8], [side * 6, 0.35, 0], 0.32, PAPER));
-        fixed.push(rail([side * 6, 0.35, 0], [side * 2.2, 0.35, -9], 0.32, PAPER));
-        fixed.push(rail([side * 1.8, 5.8, 8], [side * 6, 5.8, 0], 0.18));
-        fixed.push(rail([side * 6, 5.8, 0], [side * 2.2, 5.8, -9], 0.18));
-        fixed.push(member([side * 6, 1.8, 0], [0.62, 8.4, 1.5], CHARCOAL));
-        fixed.push(member([side * 5.2, -0.5, -4], [2.6, 0.25, 7], STONE));
+        fixed.push(rail([side * 3.6, -0.8, 8], [side * edge, -0.8, 0], 0.26, PAPER));
+        fixed.push(rail([side * edge, -0.8, 0], [side * 3.6, -0.8, -9], 0.26, PAPER));
+        fixed.push(rail([side * 4.8, 7.4, 8], [side * (edge + 1), 7.4, 0], 0.16));
+        fixed.push(rail([side * (edge + 1), 7.4, 0], [side * 4.8, 7.4, -9], 0.16));
+        fixed.push(member([side * (edge + 1), 2.5, 0], [0.62, 10.4, 1.2], CHARCOAL));
+        moving.push(member([side * (edge + 1), 7.4, -2], [1, 0.6, 1.4], PAPER));
       }
-      for (const y of [1.4, 2.2, 3]) {
-        fixed.push(member([-6.8, y, -2], [2.4, 0.16, 7.5], STONE));
-      }
-      moving.push(member([0, 5.8, -2], [11.8, 0.38, 1.2]));
       break;
     }
     case 5: {
-      // Orchestration combines earlier languages into one larger open span.
+      // Earlier spans and routes converge in an open suspended landscape.
       for (const side of [-1, 1]) {
-        fixed.push(member([side * 7.2, 2.5, -3], [0.65, 10, 0.8]));
-        fixed.push(member([side * 6, 1.4, -2], [3, 0.22, 18], STONE));
-        fixed.push(member([side * 6.6, 4.6, -4], [3.8, 0.16, 14]));
-        fixed.push(rail([side * 2.2, 0.2, 8], [side * 7.2, 0.2, -6], 0.24));
-        fixed.push(member([side * 4.3, -2.6, -2], [0.25, 5.5, 17], CHARCOAL));
-        fixed.push(member([side * 8.5, 3.5, -6], [0.25, 7.5, 4], STONE));
+        fixed.push(member([side * (edge + 1), 3.8, -6], [0.45, 12, 1.1], STONE));
+        fixed.push(rail([side * 3.5, -0.6, 8], [side * (edge + 1), -0.6, -8], 0.2));
+        moving.push(rail([side * (edge + 1), 8.4, 3], [side * 2.8, 8.4, -9], 0.18, PAPER));
       }
-      moving.push(member([0, 7.1, -3], [15.2, 0.4, 2.2]));
-      fixed.push(member([0, -3.6, -3], [21, 0.5, 22], STONE));
+      moving.push(member([edge + 1.6, 7.8, -5], [5.2, 0.2, 9], PAPER, [0, 0.2, 0]));
+      fixed.push(member([-edge - 2, 3.5, -8], [0.25, 8.5, 5], PAPER, [0, 0.22, 0]));
+      fixed.push(member([0, -4.1, -3], [23, 0.4, 22], STONE));
       break;
     }
   }
-  // Pass 2 detailing grows from the approved frame; the central authored route
-  // remains clear. The large outer spans make the inner system read as inhabited scale.
-  for (const side of [-1, 1]) {
-    fixed.push(member([side * 10.8, 3.2, -2], [1.2, 13.5, 2.1], STONE));
-    fixed.push(member([side * 10.8, -3.3, -2], [2.2, 0.25, 3], INK));
-    fixed.push(member([side * 7.8, 7.6, -5], [7.4, 0.66, 1.7], PAPER));
-  }
-  if (domain === 0) {
-    fixed.push(member([0, 8.8, -2], [24, 1.05, 2.4], PAPER));
-    for (const z of [-3, -1, 1]) {
-      fixed.push(rail([-8.8, 4.6, z], [-5.7, 3.1, z - 2], 0.08, STONE));
-      fixed.push(member([-8.8, 4.6, z], [0.24, 0.24, 0.24], PAPER));
-    }
-    // C and C++ share a root before their ordered tracks separate.
-    fixed.push(rail([1, 0.16, 3], [1, 0.16, -3], 0.13, PAPER));
-    fixed.push(rail([1, 0.16, -3], [3, 0.16, -7], 0.13, PAPER));
-    fixed.push(rail([1, 0.16, -3], [-1.5, 0.16, -7], 0.13, PAPER));
-    for (let i = 0; i < 5; i++) {
-      fixed.push(member([7.7 + Math.sin(i * 0.7) * 0.55, 2.5, -i * 1.3], [0.18, 5.4, 0.3], STONE));
-    }
-  } else if (domain === 1) {
-    for (const side of [-1, 1]) {
-      moving.push(member([side * 10.6, 3.4, -2], [7.2, 0.24, 17], PAPER));
-      fixed.push({
-        ...member([side * 8.5, 5.1, -3], [3.8, 0.08, 13], '#c6d3cf'),
-        finish: 'translucent',
-      });
-    }
-    for (let i = 0; i < (portrait ? 3 : 6); i++) {
-      fixed.push(member([8.4, 1.8 + i * 0.18, -1.5 - i * 0.5], [5.7, 0.06, 6], STONE));
-    }
-    for (const x of [-7.6, -6.2, -4.8]) {
-      for (const y of [1.2, 2.6]) fixed.push(member([x, y, -10], [1.2, 0.12, 2.6], PAPER));
-    }
-  } else if (domain === 2) {
-    fixed.push(member([0, 7.5, -3], [20, 0.9, 12], PAPER));
-    for (const side of [-1, 1]) {
-      for (const y of [-1.4, 1.3, 4]) {
-        fixed.push(rail([side * 7.4, y, 5], [side * 7.4, y, -9], 0.14, CHARCOAL));
-        fixed.push(rail([side * 7.4, y, -9], [side * 5, y - 1.3, -11], 0.14, STONE));
-      }
-      fixed.push(member([side * 8.3, -1.4, -5], [3, 0.65, 10], PAPER));
-    }
-  } else if (domain === 3) {
-    for (const side of [-1, 1]) {
-      moving.push(member([side * 5.1, 3.1, -3], [0.26, 5.5, 2.2], CHARCOAL));
-      fixed.push(rail([side * 7.6, 0.4, 6], [side * 4.8, 0.4, 0], 0.09, STONE));
-      fixed.push(rail([side * 4.8, 0.4, 0], [side * 4.8, 0.4, -8], 0.09, STONE));
-    }
-    for (let i = 0; i < 5; i++) {
-      fixed.push(member([-7.8, 0.6 + i * 0.65, -7], [3.2, 0.08, 3.8], STONE));
-    }
-    moving.push(member([-6.2, 1.9, -6], [2.8, 0.11, 1.2], PAPER));
-  } else if (domain === 4) {
-    for (const side of [-1, 1]) {
-      fixed.push(rail([side * 2.3, 6.9, 7], [side * 9.5, 6.9, -1], 0.3, PAPER));
-      fixed.push(rail([side * 9.5, 6.9, -1], [side * 2.5, 6.9, -10], 0.3, PAPER));
-      moving.push(member([side * 5.8, 5.8, -2], [1.3, 0.8, 1.5], CHARCOAL));
-      fixed.push(member([side * 8, 0.2, -5], [4, 0.6, 12], PAPER));
-    }
-  } else {
-    // The final mechanism carries beams, fins, routes and boundary elements together.
-    for (const side of [-1, 1]) {
-      moving.push(member([side * 5.7, 6.7, -3], [0.3, 0.3, 16], CHARCOAL));
-      moving.push(member([side * 8.3, 6.8, -5], [4.2, 0.12, 11], PAPER));
-      moving.push(member([side * 7.4, 5.5, -6], [0.16, 3, 1.8], STONE));
-      fixed.push({
-        ...member([side * 8, 2.2, -5], [4.5, 0.09, 12], '#c6d3cf'),
-        finish: 'translucent',
-      });
-    }
-    moving.push(rail([-7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
-    moving.push(rail([7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
-    fixed.push(member([0, 9.2, -9], [27, 0.8, 3], PAPER));
-  }
-  const origin = SKILLS_REGIONS[domain];
-  if (portrait) {
-    // One shared structural opening carries the portrait recognition sequence.
-    // Its uprights return to the overhead span; individual marks have no UI plaques.
-    for (const side of [-1, 1]) {
-      fixed.push(member([side * 1.75, 4.15, -5.6], [0.1, 4.9, 0.35], CHARCOAL));
-      fixed.push(member([side * 2.6, 6.55, -5.6], [1.8, 0.22, 0.5], STONE));
-    }
-    fixed.push(member([0, 4.65, -5.6], [3.6, 0.1, 0.3], STONE));
-  }
-  skillCategories[domain].skills.forEach((_, skill) => {
-    const anchor = skillAnchor(domain, skill, portrait);
-    const x = anchor[0] - origin.x;
-    const y = anchor[1] - origin.y - 0.34;
-    const z = anchor[2] - origin.z;
-    const side = x < 0 ? -1 : 1;
-    const support = domain === 3 ? 4.4 : domain === 0 ? 5.8 : 6.5;
-    // Thin inscription ledges return into the structural system. No backing cards.
-    fixed.push(rail([x, y, z], [side * support, y, z], 0.025, STONE));
-  });
+  // Sparse background masses carry scale. Alternating sides creates open volumes
+  // between clusters, instead of duplicating a giant gateway in every region.
+  const side = domain % 2 ? 1 : -1;
+  fixed.push(member([side * (edge + 5), 3.8, -4], [1.1, 15, portrait ? 3 : 5], STONE));
+  if (!portrait) fixed.push(member([-side * 11.8, 7.8, -7], [7, 0.35, 2.2], PAPER));
   return { fixed, moving };
 }
 
@@ -314,6 +218,7 @@ function StructuralSystem({
   controller: ChapterProgressController;
 }) {
   const mechanism = useRef<Group>(null);
+  const surround = useRef<Group>(null);
   const connection = useRef<Group>(null);
   const pieces = useMemo(() => createDomain(domain, portrait), [domain, portrait]);
   const accent = useMemo(() => [member([0, 0.95, -2], [1.4, 0.035, 0.05], CRIMSON)], []);
@@ -321,7 +226,15 @@ function StructuralSystem({
   useFrame(() => {
     const group = mechanism.current;
     if (!group) return;
-    const assembly = assemblyProgress(controller.progress.current, domain);
+    const p = controller.progress.current;
+    const focus = Math.max(
+      ...skillCategories[domain].skills.map((_, skill) =>
+        getSkillRecognition(p, domain, skill, skillCategories[domain].skills.length),
+      ),
+    );
+    // The outer structure gives the exhibit a little more air as it becomes active.
+    if (surround.current) surround.current.scale.x = 1 + focus * 0.035;
+    const assembly = assemblyProgress(p, domain);
     const remaining = 1 - assembly;
     // Absolute assignments: seek, restore and reverse equal forward playback.
     group.position.set(0, 0, 0);
@@ -353,7 +266,9 @@ function StructuralSystem({
   });
   return (
     <group position={[region.x, region.y, region.z]}>
-      <Members pieces={pieces.fixed} />
+      <group ref={surround}>
+        <Members pieces={pieces.fixed} />
+      </group>
       <group ref={mechanism}>
         <Members pieces={pieces.moving} />
       </group>
@@ -379,7 +294,7 @@ function TransitionSpan({
     const phase = assemblyProgress(controller.progress.current, destination);
     members.current.forEach((group, index) => {
       if (!group) return;
-      const side = index - 1;
+      const side = index === 0 ? -1 : 1;
       group.position.set(side * 3.4, 6.7, 0);
       group.rotation.set(0, 0, 0);
       group.scale.set(2.2, 0.6, 7);
@@ -397,7 +312,7 @@ function TransitionSpan({
       } else if (destination === 3) {
         // Outer conduits acquire boundary fins around an unchanged clear opening.
         group.position.x = side * 4.7;
-        group.position.y = side === 0 ? 6.7 : 5.1;
+        group.position.y = 5.1;
         group.rotation.z = side * phase * Math.PI * 0.42;
         group.scale.set(2.4, 0.2, 6.4);
       } else if (destination === 4) {
@@ -412,13 +327,17 @@ function TransitionSpan({
         group.rotation.y = side * (1 - phase) * 0.42;
         group.scale.set(2.4, 0.2 + phase * 0.24, 8);
       }
+      group.position.x = side * Math.max(6.7, Math.abs(group.position.x));
+      group.position.y = Math.max(7.6, group.position.y);
+      group.scale.x = Math.min(1.2, group.scale.x);
+      group.scale.y = Math.min(0.24, group.scale.y);
     });
   });
   return (
     <group
       position={[(before.x + after.x) / 2, (before.y + after.y) / 2, (before.z + after.z) / 2]}
     >
-      {[0, 1, 2].map((index) => (
+      {[0, 1].map((index) => (
         <group
           key={index}
           ref={(node) => {
@@ -487,7 +406,7 @@ export function SkillsArchitecture({
     return pieces;
   }, []);
   return (
-    <group>
+    <group name="skills-architecture">
       <Members pieces={connectiveTissue} />
       {SKILLS_REGIONS.map((region, domain) => (
         <StructuralSystem

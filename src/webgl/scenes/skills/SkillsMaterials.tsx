@@ -18,8 +18,8 @@ function architecturalMaterial(finish: SkillsFinish) {
   const mineral = finish === 'mineral' || finish === 'stone';
   const material = new MeshStandardMaterial({
     color: '#ffffff',
-    roughness: finish === 'mineral' ? 0.86 : finish === 'stone' ? 0.72 : brushed ? 0.53 : 0.38,
-    metalness: brushed ? 0.64 : finish === 'technical' ? 0.36 : 0.04,
+    roughness: finish === 'mineral' ? 0.86 : finish === 'stone' ? 0.72 : brushed ? 0.62 : 0.76,
+    metalness: brushed ? 0.38 : finish === 'technical' ? 0.12 : 0.04,
     transparent: finish === 'translucent',
     opacity: finish === 'translucent' ? 0.22 : 1,
     depthWrite: finish !== 'translucent',
@@ -51,9 +51,10 @@ function architecturalMaterial(finish: SkillsFinish) {
         '#include <map_fragment>',
         `
         #include <map_fragment>
-        float grain = sin(dot(vSkillsSurface, vec3(${brushed ? '180.0, 1.7, 2.1' : '43.1, 57.7, 32.3'})));
+        float grainPhase = dot(vSkillsSurface, vec3(${brushed ? '70.0, 1.7, 2.1' : '13.1, 17.7, 12.3'}));
+        float grain = sin(grainPhase) / (1.0 + fwidth(grainPhase) * fwidth(grainPhase));
         float strata = sin(vSkillsSurface.y * 3.3 + sin(vSkillsSurface.z * 1.9) * 0.7);
-        diffuseColor.rgb *= 0.96 + grain * ${brushed ? '0.025' : '0.018'} + strata * ${brushed ? '0.01' : '0.035'};
+        diffuseColor.rgb *= 0.96 + grain * ${brushed ? '0.012' : '0.01'} + strata * ${brushed ? '0.008' : '0.018'};
       `,
       );
       shader.fragmentShader = shader.fragmentShader.replace(
@@ -64,7 +65,7 @@ function architecturalMaterial(finish: SkillsFinish) {
       `,
       );
     };
-    material.customProgramCacheKey = () => `skills-surface-${finish}-v1`;
+    material.customProgramCacheKey = () => `skills-surface-${finish}-v2`;
   }
   return material;
 }

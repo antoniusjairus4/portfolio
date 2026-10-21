@@ -53,7 +53,7 @@ export function getCategoryOpacity(progress: number, index: number) {
 }
 
 // Each recognition window is a reversible sample of chapter progress, never a
-// trigger/timer. Small gaps between labels keep portrait handoffs from overprinting.
+// trigger/timer. The short overlap keeps traversal continuous while one subject takes priority.
 export function getSkillRecognition(
   progress: number,
   domain: number,
@@ -63,7 +63,7 @@ export function getSkillRecognition(
   const start = domain === 0 ? 0.025 : (SKILLS_CENTERS[domain - 1] + SKILLS_CENTERS[domain]) / 2;
   const end = domain === 5 ? 0.978 : (SKILLS_CENTERS[domain] + SKILLS_CENTERS[domain + 1]) / 2;
   const ordinal = ((progress - start) / (end - start)) * count - 0.5;
-  return 1 - smoothstep((Math.abs(ordinal - skill) - 0.22) / 0.28);
+  return 1 - smoothstep((Math.abs(ordinal - skill) - 0.25) / 0.45);
 }
 
 export function getLandscapeProgress(progress: number) {
