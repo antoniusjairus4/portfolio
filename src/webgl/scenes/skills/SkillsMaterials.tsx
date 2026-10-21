@@ -11,7 +11,8 @@ export type SkillsFinish =
   | 'translucent'
   | 'signal'
   | 'light'
-  | 'floor';
+  | 'floor'
+  | 'landscape';
 const FINISHES: SkillsFinish[] = [
   'mineral',
   'stone',
@@ -21,6 +22,7 @@ const FINISHES: SkillsFinish[] = [
   'signal',
   'light',
   'floor',
+  'landscape',
 ];
 
 function architecturalMaterial(finish: SkillsFinish) {
@@ -31,15 +33,17 @@ function architecturalMaterial(finish: SkillsFinish) {
     color: finish === 'light' ? '#000000' : '#ffffff',
     roughness:
       finish === 'floor'
-        ? 0.58
-        : finish === 'mineral'
-          ? 0.7
-          : finish === 'stone'
-            ? 0.78
-            : brushed
-              ? 0.48
-              : 0.72,
-    metalness: brushed ? 0.34 : finish === 'floor' ? 0.16 : finish === 'technical' ? 0.12 : 0.03,
+        ? 0.82
+        : finish === 'landscape'
+          ? 0.94
+          : finish === 'mineral'
+            ? 0.7
+            : finish === 'stone'
+              ? 0.78
+              : brushed
+                ? 0.48
+                : 0.72,
+    metalness: brushed ? 0.34 : finish === 'floor' ? 0.05 : finish === 'technical' ? 0.12 : 0.03,
     envMapIntensity: finish === 'floor' ? 0.18 : 0.12,
     transparent: finish === 'translucent',
     opacity: finish === 'translucent' ? 0.22 : 1,
@@ -108,6 +112,7 @@ function createResources() {
     stone: architecturalMaterial('stone'),
     light: architecturalMaterial('light'),
     floor: architecturalMaterial('floor'),
+    landscape: architecturalMaterial('landscape'),
   };
   surfaces.mineral.color.set('#F2E8D5');
   surfaces.metal.color.set('#252b2e');
@@ -115,6 +120,11 @@ function createResources() {
   surfaces.stone.color.set('#7f796e');
   surfaces.light.color.set('#000000');
   surfaces.floor.color.set('#151d23');
+  surfaces.floor.emissive.set('#0d151a');
+  surfaces.floor.emissiveIntensity = 0.28;
+  surfaces.landscape.color.set('#111b17');
+  surfaces.landscape.emissive.set('#07130d');
+  surfaces.landscape.emissiveIntensity = 0.34;
   return {
     surfaces,
     geometry: new BoxGeometry(),

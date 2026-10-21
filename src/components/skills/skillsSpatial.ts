@@ -79,6 +79,10 @@ export function skillFocusProgress(domain: number, skill: number) {
   return start + ((skill + 0.5) / skillCategories[domain].skills.length) * (end - start);
 }
 
+export function skillBillboardScale(portrait: boolean) {
+  return portrait ? 0.078 : 0.296;
+}
+
 const routes = [createSkillsRoute(false), createSkillsRoute(true)];
 export function skillAnchor(
   domain: number,
@@ -93,13 +97,13 @@ export function skillAnchor(
   const up = new Vector3().crossVectors(right, forward).normalize();
   const lateral = portrait
     ? skill % 2
-      ? 0.22
-      : -0.22
-    : [-2.65, 2.65, -2.5, 2.6, -2.6, 2.45][skill];
+      ? 0.08
+      : -0.08
+    : [-1.5, 1.5, -1.42, 1.47, -1.47, 1.39][skill];
   return eye
-    .addScaledVector(forward, 11.5)
+    .addScaledVector(forward, portrait ? 0.9 : 3.4)
     .addScaledVector(right, lateral)
-    .addScaledVector(up, portrait ? -0.9 : -0.5)
+    .addScaledVector(up, portrait ? -0.04 : -0.15)
     .toArray() as [number, number, number];
 }
 
@@ -109,5 +113,5 @@ export function identityAnchor(
   portrait: boolean,
 ): [number, number, number] {
   const anchor = skillAnchor(domain, skill, portrait);
-  return [anchor[0], anchor[1] + 1.65, anchor[2]];
+  return [anchor[0], anchor[1] + 1.65 * skillBillboardScale(portrait), anchor[2]];
 }

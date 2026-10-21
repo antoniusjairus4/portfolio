@@ -4,24 +4,27 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   type Group,
+  MathUtils,
   MeshStandardMaterial,
   PlaneGeometry,
   type PointLight,
   SRGBColorSpace,
   type Texture,
   TextureLoader,
+  Vector3,
 } from 'three';
-import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
+import { getSkillRecognition } from '@/components/skills/skillsChoreography';
 import {
   identityAnchor,
   SKILLS_REGIONS,
   skillAnchor,
+  skillBillboardScale,
   skillFocusProgress,
 } from '@/components/skills/skillsSpatial';
 import { type SkillIdentity, skillIdentities } from '@/content/skillIdentities';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { useSkillsMaterials } from './SkillsMaterials';
-import { ToolsLandmark } from './ToolsLandmark';
+import type { SkillsPointerState } from './skillsInteraction';
 
 function useIdentityAtlas(portrait: boolean) {
   const [atlas, setAtlas] = useState<Texture | null>(null);
@@ -62,6 +65,8 @@ function IdentityMark({
   atlas,
   portrait,
   controller,
+  pointer,
+  interactive,
 }: {
   identity: SkillIdentity;
   domain: number;
@@ -70,9 +75,13 @@ function IdentityMark({
   atlas: Texture;
   portrait: boolean;
   controller: ChapterProgressController;
+  pointer: SkillsPointerState;
+  interactive: boolean;
 }) {
   const mark = useRef<Group>(null);
   const installation = useRef<Group>(null);
+  const hover = useRef(0);
+  const projection = useMemo(() => new Vector3(), []);
   const resources = useSkillsMaterials();
   const label = useMemo(() => skillAnchor(domain, skill, portrait), [domain, skill, portrait]);
   const casing = useMemo(() => {
@@ -80,17 +89,17 @@ function IdentityMark({
     backing.color.set('#070c10');
     backing.metalness = 0.1;
     backing.envMapIntensity = 0.04;
-    backing.roughness = domain === 4 ? 0.82 : 0.72;
+    backing.roughness = 0.76;
     backing.transparent = true;
     const mounting = resources.surfaces.metal.clone();
-    mounting.color.set(domain === 4 ? '#81796c' : '#756d61');
+    mounting.color.set('#756f65');
     mounting.metalness = 0.32;
     mounting.roughness = 0.46;
     mounting.transparent = true;
     const light = resources.surfaces.light.clone();
     light.transparent = true;
     return { backing, mounting, light };
-  }, [resources, domain]);
+  }, [resources]);
   useEffect(
     () => () =>
       Object.values(casing).forEach((material) => {
@@ -102,11 +111,10 @@ function IdentityMark({
     () => identityAnchor(domain, skill, portrait),
     [domain, skill, portrait],
   );
+  const billboardScale = skillBillboardScale(portrait);
   const face = useMemo(() => {
-    const geometry = new PlaneGeometry(
-      portrait ? 1.65 : identity.id === 'dsa' ? 1.9 : 1.75,
-      portrait ? 1.65 : identity.id === 'dsa' ? 1.9 : 1.75,
-    );
+    const size = (identity.id === 'dsa' ? 1.9 : portrait ? 1.65 : 1.75) * billboardScale;
+    const geometry = new PlaneGeometry(size, size);
     const uv = geometry.attributes.uv;
     // Tile has a 32px gutter. Sample only its 192px content, so mipmaps never
     // pick up another brand. Keep the atlas shared, with no per-mark texture clones.
@@ -118,7 +126,7 @@ function IdentityMark({
       );
     }
     return geometry;
-  }, [atlasIndex, portrait, identity.id]);
+  }, [atlasIndex, portrait, identity.id, billboardScale]);
   const material = useMemo(
     () =>
       new MeshStandardMaterial({
@@ -130,7 +138,7 @@ function IdentityMark({
         toneMapped: false,
         envMapIntensity: 0,
         transparent: true,
-        opacity: 0,
+        opacity: 0.28,
         alphaTest: 0.015,
         depthWrite: false,
         roughness: identity.treatment === 'stamp' ? 0.88 : 0.55,
@@ -147,85 +155,100 @@ function IdentityMark({
     },
     [face, material],
   );
-  useFrame(() => {
+  useFrame((state, delta) => {
     const focus = getSkillRecognition(
       controller.progress.current,
       domain,
       skill,
       skillIdentities[domain].length,
     );
-    const presence = getCategoryOpacity(controller.progress.current, domain) * focus;
     if (mark.current) {
-      mark.current.visible = presence > 0.005;
+      mark.current.visible = true;
       mark.current.rotation.y = 0;
     }
-    // Illumination carries the active state; the installation never scales like a UI tile.
-    if (installation.current) installation.current.visible = presence > 0.002;
+    // Existence and illumination are deliberately independent. Every installation
+    // remains a solid world object while scroll proximity controls its light.
+    if (installation.current) installation.current.visible = true;
     for (const surface of Object.values(casing)) {
-      const solidity = Math.min(1, presence / 0.18);
-      surface.opacity = solidity * solidity * (3 - 2 * solidity);
-      surface.depthWrite = surface.opacity > 0.95;
+      surface.opacity = 1;
+      surface.depthWrite = true;
     }
+    let pointerNear = 0;
+    if (interactive && pointer.current.active && focus > 0.12) {
+      projection.set(...position).project(state.camera);
+      if (projection.z > -1 && projection.z < 1) {
+        const dx = pointer.current.ndc.x - projection.x;
+        const dy = pointer.current.ndc.y - projection.y;
+        pointerNear = Math.max(0, 1 - Math.hypot(dx, dy) / 0.34);
+      }
+    }
+    hover.current = MathUtils.damp(hover.current, pointerNear, 10, delta);
     casing.light.emissive.set('#ffd59a');
-    casing.light.emissiveIntensity = 0.18 + focus * 1.75;
+    casing.light.emissiveIntensity = 0.06 + focus * 1.87;
     casing.backing.emissive.set('#5a422a');
     casing.backing.emissiveIntensity = 0.002 + focus * 0.007;
-    material.opacity = presence;
-    material.emissiveIntensity = 0.5 + focus * 0.58;
+    material.opacity = 0.28 + focus * 0.72;
+    material.emissiveIntensity = 0.12 + focus * 0.96 + hover.current * 0.08;
     material.color.setScalar(0);
   });
 
-  const width = portrait ? 3.4 : 3.5;
-  const side = skill % 2 ? 1 : -1;
-  const floor = SKILLS_REGIONS[domain].y - 0.4;
-  const ceiling = SKILLS_REGIONS[domain].y + 8.4;
-  const suspended = skill % 3 === 1;
-  const bottom = label[1] - 1.15;
-  const top = label[1] + 2.85;
-  const mountStart = suspended ? top : floor;
-  const mountEnd = suspended ? ceiling : bottom;
+  const width = (portrait ? 3.45 : 3.7) * billboardScale;
+  const floor = SKILLS_REGIONS[domain].y - 0.42;
+  const bottom = label[1] - 1.15 * billboardScale;
+  const supportHeight = Math.max(0.25, bottom - floor);
   return (
     <group name={`skills-exhibit-${domain}-${skill}`} ref={installation}>
       <group name="skills-exhibit-structure">
-        {domain === 4 ? (
-          <ToolsLandmark label={label} skill={skill} portrait={portrait} materials={casing} />
-        ) : (
-          <>
-            <mesh
-              geometry={resources.geometry}
-              material={casing.backing}
-              position={[label[0], label[1] + 0.85, label[2] - 0.26]}
-              scale={[width, 4, 0.4]}
-              receiveShadow
-              dispose={null}
-            />
-            <mesh
-              geometry={resources.geometry}
-              material={casing.mounting}
-              position={[
-                label[0] + side * (width / 2 + 0.06),
-                (mountStart + mountEnd) / 2,
-                label[2] - 0.48,
-              ]}
-              scale={[0.11, Math.max(0.15, mountEnd - mountStart), 0.18]}
-              dispose={null}
-            />
-            <mesh
-              geometry={resources.geometry}
-              material={casing.light}
-              position={[label[0] + side * (width / 2 - 0.035), label[1] + 0.85, label[2] - 0.045]}
-              scale={[0.025, 4, 0.025]}
-              dispose={null}
-            />
-            <mesh
-              geometry={resources.geometry}
-              material={casing.mounting}
-              position={[label[0], suspended ? top + 0.05 : bottom - 0.05, label[2] - 0.26]}
-              scale={[width + 0.18, 0.08, 0.48]}
-              dispose={null}
-            />
-          </>
-        )}
+        <mesh
+          geometry={resources.geometry}
+          material={casing.backing}
+          position={[label[0], label[1] + 0.85 * billboardScale, label[2] - 0.26 * billboardScale]}
+          scale={[width, 4 * billboardScale, 0.36 * billboardScale]}
+          receiveShadow
+          dispose={null}
+        />
+        {[-1, 1].map((side) => (
+          <mesh
+            key={`side-${side}`}
+            geometry={resources.geometry}
+            material={casing.mounting}
+            position={[
+              label[0] + side * (width / 2 + 0.045 * billboardScale),
+              label[1] + 0.85 * billboardScale,
+              label[2] - 0.3 * billboardScale,
+            ]}
+            scale={[0.09 * billboardScale, 4.14 * billboardScale, 0.46 * billboardScale]}
+            dispose={null}
+          />
+        ))}
+        {[-1, 1].map((edge) => (
+          <mesh
+            key={`edge-${edge}`}
+            geometry={resources.geometry}
+            material={edge < 0 ? casing.light : casing.mounting}
+            position={[
+              label[0],
+              label[1] + 0.85 * billboardScale + edge * 2.045 * billboardScale,
+              label[2] - 0.3 * billboardScale,
+            ]}
+            scale={[width + 0.16 * billboardScale, 0.08 * billboardScale, 0.46 * billboardScale]}
+            dispose={null}
+          />
+        ))}
+        {[-1, 1].map((side) => (
+          <mesh
+            key={`post-${side}`}
+            geometry={resources.geometry}
+            material={casing.mounting}
+            position={[
+              label[0] + side * width * 0.31,
+              floor + supportHeight / 2,
+              label[2] - 0.5 * billboardScale,
+            ]}
+            scale={[0.1 * billboardScale, supportHeight, 0.16 * billboardScale]}
+            dispose={null}
+          />
+        ))}
       </group>
       <group ref={mark} position={position}>
         <mesh
@@ -242,9 +265,13 @@ function IdentityMark({
 export function SkillIdentitySystem({
   controller,
   portrait,
+  pointer,
+  interactive,
 }: {
   controller: ChapterProgressController;
   portrait: boolean;
+  pointer: SkillsPointerState;
+  interactive: boolean;
 }) {
   const atlas = useIdentityAtlas(portrait);
   const response = useRef<PointLight>(null);
@@ -268,13 +295,20 @@ export function SkillIdentitySystem({
     const p = controller.progress.current;
     let strongest = 0;
     for (const entry of identities) {
-      const focus =
-        getSkillRecognition(p, entry.domain, entry.skill, skillIdentities[entry.domain].length) *
-        getCategoryOpacity(controller.progress.current, entry.domain);
+      const focus = getSkillRecognition(
+        p,
+        entry.domain,
+        entry.skill,
+        skillIdentities[entry.domain].length,
+      );
       if (focus > strongest) {
         strongest = focus;
         const position = identityAnchor(entry.domain, entry.skill, portrait);
-        light.position.set(position[0], position[1] + 0.35, position[2] + 1.4);
+        light.position.set(
+          position[0],
+          position[1] + (portrait ? 0.12 : 0.35),
+          position[2] + (portrait ? 0.2 : 1.4),
+        );
         light.color.set('#ffe7c4');
       }
     }
@@ -284,8 +318,12 @@ export function SkillIdentitySystem({
     if (next) {
       const approach = 1 - Math.min(1, Math.max(0, (next.progress - p) / 0.075));
       const position = identityAnchor(next.domain, next.skill, portrait);
-      hint.position.set(position[0], position[1] - 0.15, position[2] + 1.7);
-      hint.intensity = approach * approach * (portrait ? 3.5 : 7);
+      hint.position.set(
+        position[0],
+        position[1] - (portrait ? 0.05 : 0.15),
+        position[2] + (portrait ? 0.25 : 1.7),
+      );
+      hint.intensity = approach * approach * (portrait ? 1.8 : 3.5);
     } else {
       hint.intensity = 0;
     }
@@ -302,6 +340,8 @@ export function SkillIdentitySystem({
             atlas={atlas}
             portrait={portrait}
             controller={controller}
+            pointer={pointer}
+            interactive={interactive}
           />
         ))}
     </>

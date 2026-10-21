@@ -77,7 +77,7 @@ export function SkillsLighting({
       key.current.intensity = 0.12 + localPool * 0.28;
     }
     if (ceilingLight.current) {
-      ceilingLight.current.intensity = 0.7 + localPool * 3.1;
+      ceilingLight.current.intensity = 0.4 + localPool * 1.6;
       ceilingLight.current.width = portrait ? 5.5 : 7.5;
       ceilingLight.current.height = portrait ? 8 : 11;
       ceilingLight.current.position.set(
@@ -92,7 +92,7 @@ export function SkillsLighting({
         target.position.y - 0.7,
         target.position.z + 3,
       );
-      floorBounce.current.intensity = 6 + localPool * (portrait ? 28 : 40);
+      floorBounce.current.intensity = 3 + localPool * (portrait ? 14 : 18);
     }
     if (aperture.current) {
       aperture.current.position.set(
@@ -146,12 +146,12 @@ export function SkillsLighting({
       <rectAreaLight
         ref={ceilingLight}
         color="#ffd49a"
-        intensity={0.7}
+        intensity={0.4}
         width={7.5}
         height={11}
         rotation={[-Math.PI / 2, 0, 0]}
       />
-      <pointLight ref={floorBounce} color="#ffc981" intensity={6} distance={17} decay={2} />
+      <pointLight ref={floorBounce} color="#ffc981" intensity={3} distance={12} decay={2} />
       <pointLight ref={routeResponse} color="#8B1E2D" intensity={0} distance={3.4} decay={2} />
     </>
   );

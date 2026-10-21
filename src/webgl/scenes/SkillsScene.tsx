@@ -3,7 +3,7 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
 import { type PerspectiveCamera, Vector2, Vector3 } from 'three';
-import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
+import { getSkillRecognition } from '@/components/skills/skillsChoreography';
 import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
 import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
 import { skillCategories } from '@/content/skills';
@@ -33,7 +33,7 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
     };
   }, [camera]);
   const route = useMemo(() => createSkillsRoute(portrait), [portrait]);
-  const pointer = useRef(new Vector2());
+  const pointer = useRef({ active: false, ndc: new Vector2() });
   const target = useMemo(() => new Vector3(), []);
   const projection = useMemo(() => new Vector3(), []);
   const inscriptions = useMemo(
@@ -57,14 +57,16 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       return;
     const move = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
-      pointer.current.set(
+      pointer.current.active = true;
+      pointer.current.ndc.set(
         Math.max(-1, Math.min(1, (event.clientX / window.innerWidth) * 2 - 1)),
         Math.max(-1, Math.min(1, 1 - (event.clientY / window.innerHeight) * 2)),
       );
       invalidate();
     };
     const reset = () => {
-      pointer.current.set(0, 0);
+      pointer.current.active = false;
+      pointer.current.ndc.set(0, 0);
       invalidate();
     };
     window.addEventListener('pointermove', move, { passive: true });
@@ -74,7 +76,8 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       window.removeEventListener('pointermove', move);
       document.documentElement.removeEventListener('pointerleave', reset);
       window.removeEventListener('blur', reset);
-      pointer.current.set(0, 0);
+      pointer.current.active = false;
+      pointer.current.ndc.set(0, 0);
     };
   }, [finePointer, portrait, invalidate]);
 
@@ -100,10 +103,10 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
     route.camera.getPoint(parameter, camera.position);
     route.target.getPoint(parameter, target);
     const agency = !portrait && finePointer ? 1 : 0;
-    camera.position.x += pointer.current.x * 0.12 * agency;
-    camera.position.y += pointer.current.y * 0.07 * agency;
-    target.x += pointer.current.x * 0.25 * agency;
-    target.y += pointer.current.y * 0.12 * agency;
+    camera.position.x += pointer.current.ndc.x * 0.12 * agency;
+    camera.position.y += pointer.current.ndc.y * 0.07 * agency;
+    target.x += pointer.current.ndc.x * 0.25 * agency;
+    target.y += pointer.current.ndc.y * 0.12 * agency;
     camera.up.set(0, 1, 0);
     camera.lookAt(target);
     camera.updateMatrixWorld();
@@ -114,7 +117,6 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       const element = getSkillLabel(inscription.id);
       if (!element) continue;
       projection.copy(inscription.anchor).project(camera);
-      const domainOpacity = getCategoryOpacity(progress, inscription.domain);
       const inFrame =
         projection.z > -1 &&
         projection.z < 1 &&
@@ -126,7 +128,9 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
         inscription.skill,
         inscription.count,
       );
-      const opacity = inFrame ? domainOpacity * recognition : 0;
+      const distance = camera.position.distanceTo(inscription.anchor);
+      const distanceFade = Math.max(0, Math.min(1, (94 - distance) / 72));
+      const opacity = inFrame ? distanceFade * (0.12 + recognition * 0.88) : 0;
       element.style.setProperty('--skill-focus', recognition.toFixed(3));
       element.style.opacity = opacity.toFixed(3);
       if (opacity < 0.002) {
@@ -135,10 +139,9 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       }
       const x = (projection.x * 0.5 + 0.5) * size.width;
       const y = (-projection.y * 0.5 + 0.5) * size.height;
-      const distance = camera.position.distanceTo(inscription.anchor);
       const scale = Math.max(
-        portrait ? 0.86 : 0.8,
-        Math.min(1.12, (portrait ? 14 : 12) / distance),
+        portrait ? 0.24 : 0.18,
+        Math.min(1.12, (portrait ? 0.93 : 3.5) / distance),
       );
       element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
     }
@@ -146,13 +149,23 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
 
   return (
     <>
-      <color attach="background" args={['#081018']} />
-      <fog attach="fog" args={['#0a121a', 24, 126]} />
+      <color attach="background" args={['#07131d']} />
+      <fog attach="fog" args={['#0b1a24', 22, 122]} />
       <SkillsEnvironment portrait={portrait} />
       <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>
-        <SkillsArchitecture portrait={portrait} controller={controller} />
-        <SkillIdentitySystem portrait={portrait} controller={controller} />
+        <SkillsArchitecture
+          portrait={portrait}
+          controller={controller}
+          pointer={pointer}
+          interactive={finePointer && !portrait}
+        />
+        <SkillIdentitySystem
+          portrait={portrait}
+          controller={controller}
+          pointer={pointer}
+          interactive={finePointer && !portrait}
+        />
       </SkillsMaterialProvider>
     </>
   );
