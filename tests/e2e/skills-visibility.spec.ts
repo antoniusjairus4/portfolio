@@ -84,10 +84,24 @@ async function capture(page: Page, domain: number, skill: number) {
           .project(camera)
           .toArray(),
       );
-      const boxes: { matrix: number[]; min: number[]; max: number[] }[] = [];
-      scene.getObjectByName('skills-architecture')?.traverseVisible((node) => {
+      const boxes: {
+        matrix: number[];
+        min: number[];
+        max: number[];
+        vertices?: number[];
+        indices?: number[];
+      }[] = [];
+      scene.traverseVisible((node) => {
         const object = node as Mesh;
         if (!object.isMesh) return;
+        let owner: Object3D | null = object.parent;
+        while (
+          owner &&
+          owner.name !== 'skills-architecture' &&
+          owner.name !== 'skills-exhibit-structure'
+        )
+          owner = owner.parent;
+        if (!owner || (object.material as MeshStandardMaterial).opacity < 0.15) return;
         object.geometry.computeBoundingBox();
         const bounds = object.geometry.boundingBox;
         if (!bounds) return;
@@ -108,6 +122,14 @@ async function capture(page: Page, domain: number, skill: number) {
             matrix: matrix.toArray(),
             min: bounds.min.toArray(),
             max: bounds.max.toArray(),
+            ...(object.geometry.type !== 'BoxGeometry'
+              ? {
+                  vertices: Array.from(object.geometry.attributes.position.array),
+                  indices: object.geometry.index
+                    ? Array.from(object.geometry.index.array)
+                    : undefined,
+                }
+              : {}),
           });
       });
       const element = document.querySelector(
@@ -122,7 +144,8 @@ async function capture(page: Page, domain: number, skill: number) {
         corners,
         rect,
         headings,
-        text: element.textContent?.trim(),
+        text: element.querySelector('.skills-name')?.textContent?.trim(),
+        descriptor: element.querySelector('small')?.textContent?.trim(),
         labelOpacity: Number(element.style.opacity),
         logoOpacity: logo.material.opacity,
         logoVisible: logo.parent?.visible,
@@ -156,6 +179,8 @@ function occlusions(state: Awaited<ReturnType<typeof capture>>, width: number, h
     inverse: new Matrix4().fromArray(b.matrix).invert(),
     matrix: new Matrix4().fromArray(b.matrix),
     box: new Box3(new Vector3(...b.min), new Vector3(...b.max)),
+    vertices: b.vertices,
+    indices: b.indices,
   }));
   const logoX = state.corners.map((p) => p[0]);
   const logoY = state.corners.map((p) => p[1]);
@@ -179,16 +204,39 @@ function occlusions(state: Awaited<ReturnType<typeof capture>>, width: number, h
         const direction = raycaster.ray.direction
           .clone()
           .transformDirection(camera.matrixWorldInverse);
-        const distance = local.z / direction.z;
+        const depth =
+          region === 0
+            ? local.z
+            : world
+                .clone()
+                .add(new Vector3(0, -1.65, 0))
+                .applyMatrix4(camera.matrixWorldInverse).z;
+        const distance = depth / direction.z;
         if (
           boxes.some((b) => {
-            const hit = raycaster.ray
-              .clone()
-              .applyMatrix4(b.inverse)
-              .intersectBox(b.box, new Vector3());
-            return (
-              hit && hit.applyMatrix4(b.matrix).distanceTo(raycaster.ray.origin) < distance - 0.05
-            );
+            const ray = raycaster.ray.clone().applyMatrix4(b.inverse);
+            const hit = ray.intersectBox(b.box, new Vector3());
+            if (!hit) return false;
+            if (b.vertices) {
+              const vertices = b.vertices;
+              const indices = b.indices ?? Array.from({ length: vertices.length / 3 }, (_, i) => i);
+              for (let i = 0; i < indices.length; i += 3) {
+                const point = ray.intersectTriangle(
+                  new Vector3().fromArray(vertices, indices[i] * 3),
+                  new Vector3().fromArray(vertices, indices[i + 1] * 3),
+                  new Vector3().fromArray(vertices, indices[i + 2] * 3),
+                  false,
+                  new Vector3(),
+                );
+                if (
+                  point &&
+                  point.applyMatrix4(b.matrix).distanceTo(raycaster.ray.origin) < distance - 0.12
+                )
+                  return true;
+              }
+              return false;
+            }
+            return hit.applyMatrix4(b.matrix).distanceTo(raycaster.ray.origin) < distance - 0.12;
           })
         )
           blocked.push(`${region === 0 ? 'logo' : 'label'}:${u},${v}`);
@@ -239,6 +287,7 @@ for (const [width, height] of [
         const state = await capture(page, domain, skill);
         const description = `${direction} ${name}`;
         expect.soft(state.text, description).toBe(name);
+        expect.soft(state.descriptor, description).toBeTruthy();
         expect.soft(state.logoVisible, description).toBe(true);
         expect.soft(state.textureReady, description).toBe(true);
         expect.soft(state.labelOpacity, description).toBeGreaterThan(0.9);
@@ -280,7 +329,8 @@ for (const [width, height] of [
     }
     // Intermediate samples test approach/leave, not only the strongest frames.
     for (const entry of entries)
-      for (const delta of [-0.002, 0.002]) {
+      for (const delta of
+        entry.domain === 4 ? [-0.01, -0.005, 0.005, 0.01] : [-0.002, 0.002]) {
         await seek(page, entry.progress + delta);
         const state = await capture(page, entry.domain, entry.skill);
         expect

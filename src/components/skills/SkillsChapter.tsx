@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { SkillsFallback } from '@/components/skills/SkillsFallback';
 import { getCategoryOpacity, getSkillsCategory } from '@/components/skills/skillsChoreography';
 import { bindSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
+import { skillDescriptors } from '@/content/skillDescriptors';
 import { skillCategories } from '@/content/skills';
 import {
   type ChapterProgressController,
@@ -159,7 +160,8 @@ export function SkillsChapter() {
                     className={`skills-inscription ${domain === 0 && index === 0 ? 'skills-inscription-foundation' : ''}`}
                   >
                     <i />
-                    {skill}
+                    <span className="skills-name">{skill}</span>
+                    <small>{skillDescriptors[domain][index]}</small>
                   </span>
                 )),
               )}

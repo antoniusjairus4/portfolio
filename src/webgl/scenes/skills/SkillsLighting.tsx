@@ -4,14 +4,22 @@ import { useFrame, useThree } from '@react-three/fiber';
 import { useLayoutEffect, useMemo, useRef } from 'react';
 import {
   type DirectionalLight,
+  type HemisphereLight,
   Object3D,
   type PointLight,
+  type RectAreaLight,
   type SpotLight,
   Vector3,
   VSMShadowMap,
 } from 'three';
-import { getSkillsCategoryIndex, smoothstep } from '@/components/skills/skillsChoreography';
+import { RectAreaLightUniformsLib } from 'three/addons/lights/RectAreaLightUniformsLib.js';
+import {
+  getSkillRecognition,
+  getSkillsCategoryIndex,
+  smoothstep,
+} from '@/components/skills/skillsChoreography';
 import { assemblyProgress, SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
+import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 
 export function SkillsLighting({
@@ -23,6 +31,8 @@ export function SkillsLighting({
 }) {
   const { camera, gl } = useThree();
   const key = useRef<DirectionalLight>(null);
+  const sky = useRef<HemisphereLight>(null);
+  const ceilingLight = useRef<RectAreaLight>(null);
   const floorBounce = useRef<PointLight>(null);
   const aperture = useRef<SpotLight>(null);
   const routeResponse = useRef<PointLight>(null);
@@ -30,6 +40,7 @@ export function SkillsLighting({
   const pool = useMemo(() => new Object3D(), []);
   const ahead = useMemo(() => new Vector3(), []);
   useLayoutEffect(() => {
+    RectAreaLightUniformsLib.init();
     const previous = gl.shadowMap.type;
     if (!portrait) {
       gl.shadowMap.type = VSMShadowMap;
@@ -42,6 +53,8 @@ export function SkillsLighting({
   }, [gl, portrait]);
   useFrame(() => {
     const p = controller.progress.current;
+    const tools = smoothstep((p - 0.64) / 0.04) * (1 - smoothstep((p - 0.835) / 0.04));
+    if (sky.current) sky.current.intensity = 0.65 - tools * 0.28;
     camera.getWorldDirection(ahead);
     target.position.copy(camera.position).addScaledVector(ahead, 12);
     target.position.y -= 1.8;
@@ -52,11 +65,27 @@ export function SkillsLighting({
     const openness = smoothstep((p - 0.12) / 0.09) * (1 - smoothstep((p - 0.3) / 0.1));
     if (key.current) {
       key.current.position.set(
-        target.position.x - 9,
-        target.position.y + 17,
-        target.position.z + 8,
+        target.position.x - 5,
+        target.position.y + 11,
+        target.position.z + 6,
       );
-      key.current.intensity = 2.8 + openness * 0.4;
+      const domain = getSkillsCategoryIndex(p);
+      const focus = Math.max(
+        ...skillCategories[domain].skills.map((_, skill) =>
+          getSkillRecognition(p, domain, skill, skillCategories[domain].skills.length),
+        ),
+      );
+      key.current.intensity = 1.05 + openness * 0.15 - focus * 0.12 - tools * 0.25;
+    }
+    if (ceilingLight.current) {
+      ceilingLight.current.intensity = 4 + tools * 3;
+      ceilingLight.current.width = 9 - tools * 3;
+      ceilingLight.current.height = 18 - tools * 9;
+      ceilingLight.current.position.set(
+        target.position.x + 1,
+        target.position.y + 7,
+        target.position.z + 3,
+      );
     }
     if (floorBounce.current) {
       floorBounce.current.position.set(
@@ -64,7 +93,7 @@ export function SkillsLighting({
         target.position.y - 0.7,
         target.position.z + 3,
       );
-      floorBounce.current.intensity = 30 + openness * 9;
+      floorBounce.current.intensity = 55 + openness * 12 + tools * 20;
     }
     if (aperture.current)
       aperture.current.position.set(
@@ -82,15 +111,15 @@ export function SkillsLighting({
   });
   return (
     <>
-      <hemisphereLight args={['#e9e0ce', '#6d7975', 1.35]} />
-      <ambientLight color="#d4d9d2" intensity={0.45} />
+      <hemisphereLight ref={sky} args={['#b8d0df', '#a4957a', 0.65]} />
+      <ambientLight color="#d4d9d2" intensity={0.12} />
       <primitive object={target} />
       <primitive object={pool} />
       <directionalLight
         ref={key}
         target={target}
-        color="#fff0d8"
-        intensity={2.8}
+        color="#ffe3b5"
+        intensity={1.05}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-17}
@@ -107,14 +136,22 @@ export function SkillsLighting({
       <spotLight
         ref={aperture}
         target={pool}
-        color="#d9e3df"
-        intensity={100}
+        color="#bdd8e8"
+        intensity={130}
         distance={38}
         angle={0.85}
         penumbra={0.85}
         decay={2}
       />
-      <pointLight ref={floorBounce} color="#ead3ae" intensity={30} distance={21} decay={2} />
+      <rectAreaLight
+        ref={ceilingLight}
+        color="#ffe0ae"
+        intensity={4}
+        width={9}
+        height={18}
+        rotation={[-Math.PI / 2, 0, 0]}
+      />
+      <pointLight ref={floorBounce} color="#ffe5bc" intensity={55} distance={21} decay={2} />
       <pointLight ref={routeResponse} color="#8B1E2D" intensity={0} distance={3.4} decay={2} />
     </>
   );

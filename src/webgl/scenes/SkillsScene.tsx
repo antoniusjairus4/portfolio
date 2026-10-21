@@ -10,6 +10,7 @@ import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { SkillIdentitySystem } from './skills/SkillIdentitySystem';
 import { SkillsArchitecture } from './skills/SkillsArchitecture';
+import { SkillsEnvironment } from './skills/SkillsEnvironment';
 import { SkillsLighting } from './skills/SkillsLighting';
 import { SkillsMaterialProvider } from './skills/SkillsMaterials';
 
@@ -21,6 +22,16 @@ interface SkillsSceneProps {
 
 export function SkillsScene({ controller, portrait, finePointer }: SkillsSceneProps) {
   const { camera, size, invalidate } = useThree();
+  useEffect(() => {
+    const perspective = camera as PerspectiveCamera;
+    const previous = perspective.far;
+    perspective.far = 180;
+    perspective.updateProjectionMatrix();
+    return () => {
+      perspective.far = previous;
+      perspective.updateProjectionMatrix();
+    };
+  }, [camera]);
   const route = useMemo(() => createSkillsRoute(portrait), [portrait]);
   const pointer = useRef(new Vector2());
   const target = useMemo(() => new Vector3(), []);
@@ -135,8 +146,9 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
 
   return (
     <>
-      <color attach="background" args={['#293333']} />
-      <fog attach="fog" args={['#293333', 24, 64]} />
+      <color attach="background" args={['#718994']} />
+      <fog attach="fog" args={['#718994', 26, 158]} />
+      <SkillsEnvironment portrait={portrait} />
       <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>
         <SkillsArchitecture portrait={portrait} controller={controller} />

@@ -20,12 +20,12 @@ export function createSkillsRoute(portrait: boolean) {
     (region, index) =>
       new Vector3(
         region.x + (portrait ? 0 : [0.35, -0.55, 0.35, 0, -0.45, 0.3][index]),
-        region.y + (portrait ? 3.6 : 3.1),
+        region.y + (portrait ? 3.15 : 2.65),
         region.z + (portrait ? 12.8 : 10.5),
       ),
   );
   const targets = SKILLS_REGIONS.map(
-    (region) => new Vector3(region.x, region.y + (portrait ? 2.2 : 2.35), region.z - 5),
+    (region) => new Vector3(region.x, region.y + (portrait ? 2.1 : 2.2), region.z - 5),
   );
   return {
     camera: new CatmullRomCurve3(
@@ -95,7 +95,7 @@ export function skillAnchor(
     ? skill % 2
       ? 0.22
       : -0.22
-    : [-1.9, 1.9, -1.1, 1.65, -1.65, 1.15][skill];
+    : [-2.65, 2.65, -2.5, 2.6, -2.6, 2.45][skill];
   return eye
     .addScaledVector(forward, 11.5)
     .addScaledVector(right, lateral)
