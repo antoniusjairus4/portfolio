@@ -6,6 +6,7 @@ import { Color, type Group, type InstancedMesh, Object3D, Vector3 } from 'three'
 import { assemblyProgress, SKILLS_REGIONS, skillAnchor } from '@/components/skills/skillsSpatial';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
+import { type SkillsFinish, useSkillsMaterials } from './SkillsMaterials';
 
 type Point = [number, number, number];
 interface Member {
@@ -13,6 +14,7 @@ interface Member {
   size: Point;
   tone: string;
   rotation?: Point;
+  finish?: SkillsFinish;
 }
 const PAPER = '#F2E8D5';
 const STONE = '#b9ae96';
@@ -36,8 +38,9 @@ function rail(from: Point, to: Point, width: number, tone = STONE): Member {
 
 // Each family is one instanced draw, including its different material colours.
 // Unit boxes, no textures, no per-object shadows or imported resources.
-function Members({ pieces }: { pieces: Member[] }) {
+function MemberBatch({ pieces, finish }: { pieces: Member[]; finish: SkillsFinish }) {
   const mesh = useRef<InstancedMesh>(null);
+  const resources = useSkillsMaterials();
   useLayoutEffect(() => {
     if (!mesh.current) return;
     const transform = new Object3D();
@@ -55,11 +58,28 @@ function Members({ pieces }: { pieces: Member[] }) {
     mesh.current.computeBoundingSphere();
   }, [pieces]);
   return (
-    <instancedMesh ref={mesh} args={[undefined, undefined, pieces.length]}>
-      <boxGeometry />
-      <meshStandardMaterial roughness={0.84} metalness={0.08} />
-    </instancedMesh>
+    <instancedMesh
+      ref={mesh}
+      args={[resources.geometry, resources.materials[finish], pieces.length]}
+      castShadow={finish !== 'translucent'}
+      receiveShadow
+      dispose={null}
+    />
   );
+}
+
+function Members({ pieces }: { pieces: Member[] }) {
+  const batches = useMemo(() => {
+    const result = new Map<SkillsFinish, Member[]>();
+    for (const piece of pieces) {
+      const finish = piece.finish ?? (piece.tone === PAPER ? 'mineral' : piece.tone === STONE ? 'stone' : piece.tone === CRIMSON ? 'signal' : piece.tone === INK ? 'technical' : 'metal');
+      const batch = result.get(finish) ?? [];
+      batch.push(piece);
+      result.set(finish, batch);
+    }
+    return Array.from(result);
+  }, [pieces]);
+  return <>{batches.map(([finish, batch]) => <MemberBatch key={finish} finish={finish} pieces={batch} />)}</>;
 }
 
 function createDomain(domain: number, portrait: boolean) {
@@ -170,6 +190,75 @@ function createDomain(domain: number, portrait: boolean) {
       break;
     }
   }
+  // Pass 2 detailing grows from the approved frame; the central authored route
+  // remains clear. The large outer spans make the inner system read as inhabited scale.
+  for (const side of [-1, 1]) {
+    fixed.push(member([side * 10.8, 3.2, -2], [1.2, 13.5, 2.1], STONE));
+    fixed.push(member([side * 10.8, -3.3, -2], [2.2, 0.25, 3], INK));
+    fixed.push(member([side * 7.8, 7.6, -5], [7.4, 0.66, 1.7], PAPER));
+  }
+  if (domain === 0) {
+    fixed.push(member([0, 8.8, -2], [24, 1.05, 2.4], PAPER));
+    for (const z of [-3, -1, 1]) {
+      fixed.push(rail([-8.8, 4.6, z], [-5.7, 3.1, z - 2], 0.08, STONE));
+      fixed.push(member([-8.8, 4.6, z], [0.24, 0.24, 0.24], PAPER));
+    }
+    // C and C++ share a root before their ordered tracks separate.
+    fixed.push(rail([1, 0.16, 3], [1, 0.16, -3], 0.13, PAPER));
+    fixed.push(rail([1, 0.16, -3], [3, 0.16, -7], 0.13, PAPER));
+    fixed.push(rail([1, 0.16, -3], [-1.5, 0.16, -7], 0.13, PAPER));
+    for (let i = 0; i < 5; i++) {
+      fixed.push(member([7.7 + Math.sin(i * 0.7) * 0.55, 2.5, -i * 1.3], [0.18, 5.4, 0.3], STONE));
+    }
+  } else if (domain === 1) {
+    for (const side of [-1, 1]) {
+      moving.push(member([side * 10.6, 3.4, -2], [7.2, 0.24, 17], PAPER));
+      fixed.push({ ...member([side * 8.5, 5.1, -3], [3.8, 0.08, 13], '#c6d3cf'), finish: 'translucent' });
+    }
+    for (let i = 0; i < (portrait ? 3 : 6); i++) {
+      fixed.push(member([8.4, 1.8 + i * 0.18, -1.5 - i * 0.5], [5.7, 0.06, 6], STONE));
+    }
+    for (const x of [-7.6, -6.2, -4.8]) {
+      for (const y of [1.2, 2.6]) fixed.push(member([x, y, -10], [1.2, 0.12, 2.6], PAPER));
+    }
+  } else if (domain === 2) {
+    fixed.push(member([0, 7.5, -3], [20, 0.9, 12], PAPER));
+    for (const side of [-1, 1]) {
+      for (const y of [-1.4, 1.3, 4]) {
+        fixed.push(rail([side * 7.4, y, 5], [side * 7.4, y, -9], 0.14, CHARCOAL));
+        fixed.push(rail([side * 7.4, y, -9], [side * 5, y - 1.3, -11], 0.14, STONE));
+      }
+      fixed.push(member([side * 8.3, -1.4, -5], [3, 0.65, 10], PAPER));
+    }
+  } else if (domain === 3) {
+    for (const side of [-1, 1]) {
+      moving.push(member([side * 5.1, 3.1, -3], [0.26, 5.5, 2.2], CHARCOAL));
+      fixed.push(rail([side * 7.6, 0.4, 6], [side * 4.8, 0.4, 0], 0.09, STONE));
+      fixed.push(rail([side * 4.8, 0.4, 0], [side * 4.8, 0.4, -8], 0.09, STONE));
+    }
+    for (let i = 0; i < 5; i++) {
+      fixed.push(member([-7.8, 0.6 + i * 0.65, -7], [3.2, 0.08, 3.8], STONE));
+    }
+    moving.push(member([-6.2, 1.9, -6], [2.8, 0.11, 1.2], PAPER));
+  } else if (domain === 4) {
+    for (const side of [-1, 1]) {
+      fixed.push(rail([side * 2.3, 6.9, 7], [side * 9.5, 6.9, -1], 0.3, PAPER));
+      fixed.push(rail([side * 9.5, 6.9, -1], [side * 2.5, 6.9, -10], 0.3, PAPER));
+      moving.push(member([side * 5.8, 5.8, -2], [1.3, 0.8, 1.5], CHARCOAL));
+      fixed.push(member([side * 8, 0.2, -5], [4, 0.6, 12], PAPER));
+    }
+  } else {
+    // The final mechanism carries beams, fins, routes and boundary elements together.
+    for (const side of [-1, 1]) {
+      moving.push(member([side * 5.7, 6.7, -3], [0.3, 0.3, 16], CHARCOAL));
+      moving.push(member([side * 8.3, 6.8, -5], [4.2, 0.12, 11], PAPER));
+      moving.push(member([side * 7.4, 5.5, -6], [0.16, 3, 1.8], STONE));
+      fixed.push({ ...member([side * 8, 2.2, -5], [4.5, 0.09, 12], '#c6d3cf'), finish: 'translucent' });
+    }
+    moving.push(rail([-7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
+    moving.push(rail([7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
+    fixed.push(member([0, 9.2, -9], [27, 0.8, 3], PAPER));
+  }
   const origin = SKILLS_REGIONS[domain];
   skillCategories[domain].skills.forEach((_, skill) => {
     const anchor = skillAnchor(domain, skill, portrait);
@@ -208,11 +297,23 @@ function StructuralSystem({
     group.rotation.set(0, 0, 0);
     group.scale.set(1, 1, 1);
     if (domain === 0) group.position.y = remaining * 1.6;
-    if (domain === 1) group.scale.x = 0.76 + assembly * 0.24;
-    if (domain === 2) group.scale.z = 0.3 + assembly * 0.7;
+    if (domain === 1) {
+      group.scale.x = 0.76 + assembly * 0.24;
+      group.scale.y = 1 + remaining * 0.1;
+    }
+    if (domain === 2) {
+      group.scale.z = 0.3 + assembly * 0.7;
+      group.position.y = remaining * 0.9;
+    }
     if (domain === 3) group.rotation.y = remaining * 0.32;
-    if (domain === 4) group.position.z = remaining * 4;
-    if (domain === 5) group.position.y = remaining * 2;
+    if (domain === 4) {
+      group.position.z = remaining * 4;
+      group.rotation.y = remaining * -0.14;
+    }
+    if (domain === 5) {
+      group.position.y = remaining * 2;
+      group.scale.x = 1 + remaining * 0.16;
+    }
     // Crimson marks only the connection currently being made.
     if (connection.current) {
       connection.current.visible = assembly > 0 && assembly < 1;

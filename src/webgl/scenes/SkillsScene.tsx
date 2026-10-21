@@ -16,6 +16,7 @@ import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { SkillsArchitecture } from './skills/SkillsArchitecture';
+import { SkillsMaterialProvider } from './skills/SkillsMaterials';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -157,7 +158,9 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
         color="#fff0d6"
       />
       <pointLight ref={bounce} intensity={14} distance={22} decay={2} color="#d7e2df" />
-      <SkillsArchitecture portrait={portrait} controller={controller} />
+      <SkillsMaterialProvider>
+        <SkillsArchitecture portrait={portrait} controller={controller} />
+      </SkillsMaterialProvider>
     </>
   );
 }
