@@ -76,12 +76,9 @@ export function skillAnchor(
 ): [number, number, number] {
   const region = SKILLS_REGIONS[domain];
   if (portrait) {
-    // Stagger the inscriptions vertically on the inner structure, not a reduced desktop grid.
-    return [
-      region.x + (skill % 2 === 0 ? -0.55 : 0.55),
-      region.y + 5.4 - skill * 0.95,
-      region.z - 4 - (skill % 2) * 0.55,
-    ];
+    // Portrait uses a clear central recognition lane, with depth separation.
+    // Scroll reveals one inscription at a time rather than shrinking a desktop list.
+    return [region.x, region.y + 1.4, region.z - 4 - skill * 0.28];
   }
   // Positions follow the particular structural operation, not a repeated label grid.
   // Foundations/intersections → layers → lower routes → openings → forks → spans.
@@ -128,4 +125,17 @@ export function skillAnchor(
   ];
   const anchor = anchors[domain][skill];
   return [region.x + anchor[0], region.y + anchor[1], region.z + anchor[2]];
+}
+
+export function identityAnchor(
+  domain: number,
+  skill: number,
+  portrait: boolean,
+): [number, number, number] {
+  const anchor = skillAnchor(domain, skill, portrait);
+  return [
+    anchor[0] + (portrait ? 0 : skill % 2 ? 0.25 : -0.25),
+    anchor[1] + (portrait ? 1.6 : 1.05),
+    anchor[2] - 0.18,
+  ];
 }

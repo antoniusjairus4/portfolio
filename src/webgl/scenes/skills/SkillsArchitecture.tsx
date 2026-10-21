@@ -72,14 +72,30 @@ function Members({ pieces }: { pieces: Member[] }) {
   const batches = useMemo(() => {
     const result = new Map<SkillsFinish, Member[]>();
     for (const piece of pieces) {
-      const finish = piece.finish ?? (piece.tone === PAPER ? 'mineral' : piece.tone === STONE ? 'stone' : piece.tone === CRIMSON ? 'signal' : piece.tone === INK ? 'technical' : 'metal');
+      const finish =
+        piece.finish ??
+        (piece.tone === PAPER
+          ? 'mineral'
+          : piece.tone === STONE
+            ? 'stone'
+            : piece.tone === CRIMSON
+              ? 'signal'
+              : piece.tone === INK
+                ? 'technical'
+                : 'metal');
       const batch = result.get(finish) ?? [];
       batch.push(piece);
       result.set(finish, batch);
     }
     return Array.from(result);
   }, [pieces]);
-  return <>{batches.map(([finish, batch]) => <MemberBatch key={finish} finish={finish} pieces={batch} />)}</>;
+  return (
+    <>
+      {batches.map(([finish, batch]) => (
+        <MemberBatch key={finish} finish={finish} pieces={batch} />
+      ))}
+    </>
+  );
 }
 
 function createDomain(domain: number, portrait: boolean) {
@@ -213,7 +229,10 @@ function createDomain(domain: number, portrait: boolean) {
   } else if (domain === 1) {
     for (const side of [-1, 1]) {
       moving.push(member([side * 10.6, 3.4, -2], [7.2, 0.24, 17], PAPER));
-      fixed.push({ ...member([side * 8.5, 5.1, -3], [3.8, 0.08, 13], '#c6d3cf'), finish: 'translucent' });
+      fixed.push({
+        ...member([side * 8.5, 5.1, -3], [3.8, 0.08, 13], '#c6d3cf'),
+        finish: 'translucent',
+      });
     }
     for (let i = 0; i < (portrait ? 3 : 6); i++) {
       fixed.push(member([8.4, 1.8 + i * 0.18, -1.5 - i * 0.5], [5.7, 0.06, 6], STONE));
@@ -253,13 +272,25 @@ function createDomain(domain: number, portrait: boolean) {
       moving.push(member([side * 5.7, 6.7, -3], [0.3, 0.3, 16], CHARCOAL));
       moving.push(member([side * 8.3, 6.8, -5], [4.2, 0.12, 11], PAPER));
       moving.push(member([side * 7.4, 5.5, -6], [0.16, 3, 1.8], STONE));
-      fixed.push({ ...member([side * 8, 2.2, -5], [4.5, 0.09, 12], '#c6d3cf'), finish: 'translucent' });
+      fixed.push({
+        ...member([side * 8, 2.2, -5], [4.5, 0.09, 12], '#c6d3cf'),
+        finish: 'translucent',
+      });
     }
     moving.push(rail([-7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
     moving.push(rail([7.5, 6.8, -1], [0, 6.8, -8], 0.15, STONE));
     fixed.push(member([0, 9.2, -9], [27, 0.8, 3], PAPER));
   }
   const origin = SKILLS_REGIONS[domain];
+  if (portrait) {
+    // One shared structural opening carries the portrait recognition sequence.
+    // Its uprights return to the overhead span; individual marks have no UI plaques.
+    for (const side of [-1, 1]) {
+      fixed.push(member([side * 1.75, 4.15, -5.6], [0.1, 4.9, 0.35], CHARCOAL));
+      fixed.push(member([side * 2.6, 6.55, -5.6], [1.8, 0.22, 0.5], STONE));
+    }
+    fixed.push(member([0, 4.65, -5.6], [3.6, 0.1, 0.3], STONE));
+  }
   skillCategories[domain].skills.forEach((_, skill) => {
     const anchor = skillAnchor(domain, skill, portrait);
     const x = anchor[0] - origin.x;
@@ -333,6 +364,87 @@ function StructuralSystem({
   );
 }
 
+function TransitionSpan({
+  destination,
+  controller,
+}: {
+  destination: number;
+  controller: ChapterProgressController;
+}) {
+  const members = useRef<(Group | null)[]>([]);
+  const resources = useSkillsMaterials();
+  const before = SKILLS_REGIONS[destination - 1];
+  const after = SKILLS_REGIONS[destination];
+  useFrame(() => {
+    const phase = assemblyProgress(controller.progress.current, destination);
+    members.current.forEach((group, index) => {
+      if (!group) return;
+      const side = index - 1;
+      group.position.set(side * 3.4, 6.7, 0);
+      group.rotation.set(0, 0, 0);
+      group.scale.set(2.2, 0.6, 7);
+      if (destination === 1) {
+        // The same rigid members become the Web's wide, separated surface layers.
+        group.position.x = side * (3.4 + phase * 1.5);
+        group.position.y += side * phase * 0.65;
+        group.scale.set(2.2 + phase * 1.8, 0.6 - phase * 0.43, 7);
+      } else if (destination === 2) {
+        // Surface seams open while the exposed rails below stay connected.
+        group.position.x = side * (3.4 + phase * 1.2);
+        group.position.y += phase * 1.1;
+        group.rotation.z = side * phase * 0.09;
+        group.scale.set(2.8, 0.2, 9);
+      } else if (destination === 3) {
+        // Outer conduits acquire boundary fins around an unchanged clear opening.
+        group.position.x = side * 4.7;
+        group.position.y = side === 0 ? 6.7 : 5.1;
+        group.rotation.z = side * phase * Math.PI * 0.42;
+        group.scale.set(2.4, 0.2, 6.4);
+      } else if (destination === 4) {
+        // Checkpoint members spread into manipulable fork/merge tracks.
+        group.position.x = side * (3.4 + phase);
+        group.rotation.y = side * phase * 0.42;
+        group.scale.set(0.35, 0.35, 9.5);
+      } else {
+        // Previously divergent tracks coordinate with a broad common span.
+        group.position.x = side * (4.5 - phase * 1.1);
+        group.position.y += (1 - phase) * Math.abs(side);
+        group.rotation.y = side * (1 - phase) * 0.42;
+        group.scale.set(2.4, 0.2 + phase * 0.24, 8);
+      }
+    });
+  });
+  return (
+    <group
+      position={[(before.x + after.x) / 2, (before.y + after.y) / 2, (before.z + after.z) / 2]}
+    >
+      {[0, 1, 2].map((index) => (
+        <group
+          key={index}
+          ref={(node) => {
+            members.current[index] = node;
+          }}
+        >
+          <mesh
+            geometry={resources.geometry}
+            material={resources.surfaces.mineral}
+            castShadow
+            receiveShadow
+            dispose={null}
+          />
+          <mesh
+            geometry={resources.geometry}
+            material={resources.surfaces.metal}
+            position={[0, -0.56, 0]}
+            scale={[0.95, 0.1, 0.98]}
+            dispose={null}
+          />
+        </group>
+      ))}
+    </group>
+  );
+}
+
 export function SkillsArchitecture({
   portrait,
   controller,
@@ -384,6 +496,9 @@ export function SkillsArchitecture({
           portrait={portrait}
           controller={controller}
         />
+      ))}
+      {[1, 2, 3, 4, 5].map((destination) => (
+        <TransitionSpan key={destination} destination={destination} controller={controller} />
       ))}
     </group>
   );

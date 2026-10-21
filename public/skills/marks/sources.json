@@ -19,5 +19,11 @@
   "linux": "https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/linux.svg",
   "ollama": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/ollama.svg",
   "claude": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/claudecode-color.svg",
-  "lovable": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/lovable-color.svg"
+  "lovable": "https://raw.githubusercontent.com/lobehub/lobe-icons/master/packages/static-svg/icons/lovable-color.svg",
+  "leonardo": "https://assets.dblogo.com/logo/leonardo/leonardo-icon-colored-light-svg.svg",
+  "dsa": "Original conceptual symbol; not a product logo",
+  "fundamentals": "Original conceptual symbol; not a product logo",
+  "network": "Original conceptual symbol; not a product logo",
+  "scraping": "Original conceptual symbol; not a product logo",
+  "mern": "Original conceptual symbol; not a product logo"
 }

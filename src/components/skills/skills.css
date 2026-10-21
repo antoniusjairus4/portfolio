@@ -78,7 +78,7 @@
   opacity: 0;
   color: #f2e8d5;
   font-family: var(--font-secondary);
-  font-size: clamp(1.25rem, 2.3vw, 2.8rem);
+  font-size: clamp(1.05rem, 1.7vw, 2.15rem);
   font-weight: 500;
   line-height: 1.15;
   letter-spacing: -0.035em;
@@ -93,12 +93,14 @@
   height: 1px;
   margin-bottom: 0.4rem;
   background: currentColor;
-  opacity: 0.65;
+  opacity: calc(0.3 + var(--skill-focus, 0) * 0.55);
+  transform: scaleX(calc(0.6 + var(--skill-focus, 0) * 0.4));
+  transform-origin: left;
 }
 
 .skills-inscription-foundation {
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 3.2vw, 3.9rem);
+  font-size: clamp(1.5rem, 2.5vw, 3rem);
 }
 
 .skills-chapter:not(.skills-static) .skills-travel-note {

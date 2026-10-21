@@ -2,21 +2,16 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import {
-  type DirectionalLight,
-  Object3D,
-  type PerspectiveCamera,
-  type PointLight,
-  Vector2,
-  Vector3,
-} from 'three';
-import { getCategoryOpacity } from '@/components/skills/skillsChoreography';
+import { type PerspectiveCamera, Vector2, Vector3 } from 'three';
+import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
 import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
 import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { SkillsArchitecture } from './skills/SkillsArchitecture';
 import { SkillsMaterialProvider } from './skills/SkillsMaterials';
+import { SkillIdentitySystem } from './skills/SkillIdentitySystem';
+import { SkillsLighting } from './skills/SkillsLighting';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -30,15 +25,14 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
   const pointer = useRef(new Vector2());
   const target = useMemo(() => new Vector3(), []);
   const projection = useMemo(() => new Vector3(), []);
-  const lightTarget = useMemo(() => new Object3D(), []);
-  const key = useRef<DirectionalLight>(null);
-  const bounce = useRef<PointLight>(null);
   const inscriptions = useMemo(
     () =>
       skillCategories.flatMap((category, domain) =>
         category.skills.map((_, skill) => ({
           id: skillLabelId(domain, skill),
           domain,
+          skill,
+          count: category.skills.length,
           anchor: new Vector3(...skillAnchor(domain, skill, portrait)),
         })),
       ),
@@ -103,21 +97,6 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
     camera.lookAt(target);
     camera.updateMatrixWorld();
 
-    lightTarget.position.copy(target);
-    lightTarget.updateMatrixWorld();
-    if (key.current)
-      key.current.position.set(
-        camera.position.x - 5,
-        camera.position.y + 10,
-        camera.position.z - 7,
-      );
-    if (bounce.current)
-      bounce.current.position.set(
-        camera.position.x + 4,
-        camera.position.y + 1,
-        camera.position.z - 5,
-      );
-
     // DOM text shares immutable world anchors and the same authored camera.
     // No independent parallax and no React state updates on rendered frames.
     for (const inscription of inscriptions) {
@@ -130,7 +109,16 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
         projection.z < 1 &&
         Math.abs(projection.x) < 0.96 &&
         Math.abs(projection.y) < 0.94;
-      const opacity = inFrame ? domainOpacity : 0;
+      const recognition = getSkillRecognition(
+        progress,
+        inscription.domain,
+        inscription.skill,
+        inscription.count,
+      );
+      const opacity = inFrame
+        ? domainOpacity * (portrait ? recognition : 0.16 + recognition * 0.84)
+        : 0;
+      element.style.setProperty('--skill-focus', recognition.toFixed(3));
       element.style.opacity = opacity.toFixed(3);
       if (opacity < 0.002) continue;
       const x = (projection.x * 0.5 + 0.5) * size.width;
@@ -142,24 +130,16 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       );
       element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
     }
-  });
+  }, -2);
 
   return (
     <>
-      <color attach="background" args={['#242b2c']} />
-      <fog attach="fog" args={['#242b2c', 22, 49]} />
-      <hemisphereLight args={['#F2E8D5', '#41494a', 1.5]} />
-      <primitive object={lightTarget} />
-      <directionalLight
-        ref={key}
-        target={lightTarget}
-        position={[-5, 14, 3]}
-        intensity={2.3}
-        color="#fff0d6"
-      />
-      <pointLight ref={bounce} intensity={14} distance={22} decay={2} color="#d7e2df" />
+      <color attach="background" args={['#303837']} />
+      <fog attach="fog" args={['#303837', 25, 50]} />
+      <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>
         <SkillsArchitecture portrait={portrait} controller={controller} />
+        <SkillIdentitySystem portrait={portrait} controller={controller} />
       </SkillsMaterialProvider>
     </>
   );
