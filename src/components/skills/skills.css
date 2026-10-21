@@ -41,12 +41,12 @@
 .skills-chapter:not(.skills-static) .skills-category p {
   max-width: 37ch;
   font-size: clamp(0.75rem, 0.95vw, 0.95rem);
-  color: #c7c7bc;
+  color: #b9afa0;
 }
 
 .skills-chapter .skills-category > span,
 .skills-chapter .skills-intro > p:first-child {
-  color: #c7c7bc;
+  color: #b9afa0;
 }
 
 .skills-chapter .skills-category .skills-semantic-list {
@@ -84,8 +84,8 @@
   letter-spacing: -0.035em;
   white-space: nowrap;
   text-shadow:
-    0 1px 2px #111111,
-    0 0 5px #111111;
+    0 1px 3px #05090d,
+    0 0 9px #05090d;
   will-change: transform, opacity;
 }
 
@@ -106,7 +106,7 @@
 }
 
 .skills-chapter:not(.skills-static) .skills-travel-note {
-  color: #c7c7bc;
+  color: #b9afa0;
 }
 
 .skills-chapter:not(.skills-static) .skills-exit-axis {
@@ -179,12 +179,12 @@
   font-size: clamp(0.7rem, 0.85vw, 0.88rem);
   font-weight: 400;
   letter-spacing: 0;
-  color: #d0d4cf;
+  color: #b9afa0;
 }
 .skills-chapter:not(.skills-static) .skills-category {
   text-shadow:
-    0 1px 3px #17252b,
-    0 0 14px #17252b80;
+    0 1px 4px #05090d,
+    0 0 16px #05090dcc;
 }
 @media (orientation: portrait) {
   .skills-inscription small {

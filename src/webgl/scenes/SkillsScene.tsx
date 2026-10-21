@@ -146,8 +146,8 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
 
   return (
     <>
-      <color attach="background" args={['#718994']} />
-      <fog attach="fog" args={['#718994', 26, 158]} />
+      <color attach="background" args={['#081018']} />
+      <fog attach="fog" args={['#0a121a', 24, 126]} />
       <SkillsEnvironment portrait={portrait} />
       <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>

@@ -148,7 +148,7 @@ function LitSweep({
   );
   useFrame(() => {
     material.emissiveIntensity =
-      0.5 + 2.2 * getSkillRecognition(controller.progress.current, 4, skill, 5);
+      0.18 + 1.45 * getSkillRecognition(controller.progress.current, 4, skill, 5);
   });
   return <mesh geometry={geometry} material={material} dispose={null} />;
 }

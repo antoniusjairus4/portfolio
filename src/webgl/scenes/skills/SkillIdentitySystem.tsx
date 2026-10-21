@@ -12,7 +12,12 @@ import {
   TextureLoader,
 } from 'three';
 import { getCategoryOpacity, getSkillRecognition } from '@/components/skills/skillsChoreography';
-import { identityAnchor, SKILLS_REGIONS, skillAnchor } from '@/components/skills/skillsSpatial';
+import {
+  identityAnchor,
+  SKILLS_REGIONS,
+  skillAnchor,
+  skillFocusProgress,
+} from '@/components/skills/skillsSpatial';
 import { type SkillIdentity, skillIdentities } from '@/content/skillIdentities';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { useSkillsMaterials } from './SkillsMaterials';
@@ -72,14 +77,15 @@ function IdentityMark({
   const label = useMemo(() => skillAnchor(domain, skill, portrait), [domain, skill, portrait]);
   const casing = useMemo(() => {
     const backing = resources.surfaces.technical.clone();
-    backing.color.set('#0d181e');
-    backing.metalness = 0.05;
-    backing.envMapIntensity = 0.06;
-    backing.roughness = domain === 4 ? 0.8 : 0.56;
-    if (domain === 4) backing.color.set('#10191d');
+    backing.color.set('#070c10');
+    backing.metalness = 0.1;
+    backing.envMapIntensity = 0.04;
+    backing.roughness = domain === 4 ? 0.82 : 0.72;
     backing.transparent = true;
     const mounting = resources.surfaces.metal.clone();
-    mounting.color.set(domain === 4 ? '#d8cfbc' : '#a4a49a');
+    mounting.color.set(domain === 4 ? '#81796c' : '#756d61');
+    mounting.metalness = 0.32;
+    mounting.roughness = 0.46;
     mounting.transparent = true;
     const light = resources.surfaces.light.clone();
     light.transparent = true;
@@ -160,11 +166,12 @@ function IdentityMark({
       surface.opacity = solidity * solidity * (3 - 2 * solidity);
       surface.depthWrite = surface.opacity > 0.95;
     }
-    casing.light.emissiveIntensity = 0.4 + focus * 2.2;
-    casing.backing.emissive.set('#b5bdba');
-    casing.backing.emissiveIntensity = 0.005 + focus * 0.012;
+    casing.light.emissive.set('#ffd59a');
+    casing.light.emissiveIntensity = 0.18 + focus * 1.75;
+    casing.backing.emissive.set('#5a422a');
+    casing.backing.emissiveIntensity = 0.002 + focus * 0.007;
     material.opacity = presence;
-    material.emissiveIntensity = 0.55 + focus * 0.45;
+    material.emissiveIntensity = 0.5 + focus * 0.58;
     material.color.setScalar(0);
   });
 
@@ -241,6 +248,7 @@ export function SkillIdentitySystem({
 }) {
   const atlas = useIdentityAtlas(portrait);
   const response = useRef<PointLight>(null);
+  const destinationHint = useRef<PointLight>(null);
   const identities = useMemo(() => {
     let atlasIndex = 0;
     return skillIdentities.flatMap((domainIdentities, domain) =>
@@ -249,21 +257,20 @@ export function SkillIdentitySystem({
         domain,
         skill,
         atlasIndex: atlasIndex++,
+        progress: skillFocusProgress(domain, skill),
       })),
     );
   }, []);
   useFrame(() => {
     const light = response.current;
-    if (!light) return;
+    const hint = destinationHint.current;
+    if (!light || !hint) return;
+    const p = controller.progress.current;
     let strongest = 0;
     for (const entry of identities) {
       const focus =
-        getSkillRecognition(
-          controller.progress.current,
-          entry.domain,
-          entry.skill,
-          skillIdentities[entry.domain].length,
-        ) * getCategoryOpacity(controller.progress.current, entry.domain);
+        getSkillRecognition(p, entry.domain, entry.skill, skillIdentities[entry.domain].length) *
+        getCategoryOpacity(controller.progress.current, entry.domain);
       if (focus > strongest) {
         strongest = focus;
         const position = identityAnchor(entry.domain, entry.skill, portrait);
@@ -271,11 +278,22 @@ export function SkillIdentitySystem({
         light.color.set('#ffe7c4');
       }
     }
-    light.intensity = strongest * (portrait ? 2 : 3);
+    light.intensity = strongest * (portrait ? 18 : 28);
+
+    const next = identities.find((entry) => entry.progress > p + 0.008);
+    if (next) {
+      const approach = 1 - Math.min(1, Math.max(0, (next.progress - p) / 0.075));
+      const position = identityAnchor(next.domain, next.skill, portrait);
+      hint.position.set(position[0], position[1] - 0.15, position[2] + 1.7);
+      hint.intensity = approach * approach * (portrait ? 3.5 : 7);
+    } else {
+      hint.intensity = 0;
+    }
   });
   return (
     <>
-      <pointLight ref={response} intensity={0} distance={6} decay={2} />
+      <pointLight ref={response} color="#ffd39a" intensity={0} distance={8.5} decay={2} />
+      <pointLight ref={destinationHint} color="#dfb278" intensity={0} distance={6} decay={2} />
       {atlas &&
         identities.map((entry) => (
           <IdentityMark

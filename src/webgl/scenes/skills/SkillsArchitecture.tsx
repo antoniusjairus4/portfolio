@@ -7,6 +7,7 @@ import { getSkillRecognition } from '@/components/skills/skillsChoreography';
 import { assemblyProgress, SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
 import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
+import { SkillsBoulevard } from './SkillsBoulevard';
 import { useSkillsMaterials } from './SkillsMaterials';
 import { type Member, Members, member, type Point } from './SkillsStructure';
 import { createSkillsRibbon } from './skillsRibbon';
@@ -206,7 +207,7 @@ export function SkillsArchitecture({
       [10, 9, -92],
     ];
     const base: Member[] = [
-      { ...member([0, -4.8, -43], [48, 0.5, 156], '#8c9da2'), finish: 'floor' },
+      { ...member([0, -4.8, -43], [48, 0.5, 156], '#273139'), finish: 'floor' },
       // Open the Tools reach of the old continuous walls into a structural void.
       member([-13.5, 5, -9], [0.8, 22, 82], CHARCOAL),
       member([-13.5, 5, -101], [0.8, 22, 34], CHARCOAL),
@@ -229,17 +230,6 @@ export function SkillsArchitecture({
         finish="floor"
         portrait={portrait}
       />
-      {[-1, 1].map((side) => (
-        <Ribbon
-          key={side}
-          points={architecture.path}
-          width={0.045}
-          thickness={0.045}
-          offset={side * 1.59}
-          finish="light"
-          portrait={portrait}
-        />
-      ))}
       <Ribbon
         points={architecture.high}
         width={portrait ? 2.6 : 4.6}
@@ -270,6 +260,7 @@ export function SkillsArchitecture({
         finish="light"
         portrait={portrait}
       />
+      <SkillsBoulevard portrait={portrait} />
       <ToolsArchitecture controller={controller} portrait={portrait} />
       {SKILLS_REGIONS.map((region, domain) => (
         <StructuralSystem

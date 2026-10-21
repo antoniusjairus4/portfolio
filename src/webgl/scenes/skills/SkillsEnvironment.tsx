@@ -18,15 +18,15 @@ export function SkillsEnvironment({ portrait }: { portrait: boolean }) {
       if (!mesh.isMesh) return;
       const material = mesh.material as MeshStandardMaterial;
       if (material.emissiveIntensity > 1)
-        material.emissive.set(mesh.position.x > 0 ? '#c2dae8' : '#fff0d7');
-      else material.color.set('#deddd4');
+        material.emissive.set(mesh.position.x > 0 ? '#577183' : '#d8aa70');
+      else material.color.set('#303942');
     });
     const generator = new PMREMGenerator(gl);
     const reflection = generator.fromScene(environment, 0.06, 0.1, 100, {
       size: portrait ? 64 : 128,
     });
     scene.environment = reflection.texture;
-    scene.environmentIntensity = 0.3;
+    scene.environmentIntensity = 0.11;
     environment.dispose();
     generator.dispose();
     invalidate();

@@ -53,8 +53,14 @@ export function SkillsLighting({
   }, [gl, portrait]);
   useFrame(() => {
     const p = controller.progress.current;
-    const tools = smoothstep((p - 0.64) / 0.04) * (1 - smoothstep((p - 0.835) / 0.04));
-    if (sky.current) sky.current.intensity = 0.65 - tools * 0.28;
+    const domain = getSkillsCategoryIndex(p);
+    const focus = Math.max(
+      ...skillCategories[domain].skills.map((_, skill) =>
+        getSkillRecognition(p, domain, skill, skillCategories[domain].skills.length),
+      ),
+    );
+    const localPool = smoothstep(focus);
+    if (sky.current) sky.current.intensity = 0.13 + localPool * 0.04;
     camera.getWorldDirection(ahead);
     target.position.copy(camera.position).addScaledVector(ahead, 12);
     target.position.y -= 1.8;
@@ -62,29 +68,22 @@ export function SkillsLighting({
     pool.position.copy(target.position);
     pool.position.z -= 5;
     pool.updateMatrixWorld();
-    const openness = smoothstep((p - 0.12) / 0.09) * (1 - smoothstep((p - 0.3) / 0.1));
     if (key.current) {
       key.current.position.set(
         target.position.x - 5,
         target.position.y + 11,
         target.position.z + 6,
       );
-      const domain = getSkillsCategoryIndex(p);
-      const focus = Math.max(
-        ...skillCategories[domain].skills.map((_, skill) =>
-          getSkillRecognition(p, domain, skill, skillCategories[domain].skills.length),
-        ),
-      );
-      key.current.intensity = 1.05 + openness * 0.15 - focus * 0.12 - tools * 0.25;
+      key.current.intensity = 0.12 + localPool * 0.28;
     }
     if (ceilingLight.current) {
-      ceilingLight.current.intensity = 4 + tools * 3;
-      ceilingLight.current.width = 9 - tools * 3;
-      ceilingLight.current.height = 18 - tools * 9;
+      ceilingLight.current.intensity = 0.7 + localPool * 3.1;
+      ceilingLight.current.width = portrait ? 5.5 : 7.5;
+      ceilingLight.current.height = portrait ? 8 : 11;
       ceilingLight.current.position.set(
         target.position.x + 1,
         target.position.y + 7,
-        target.position.z + 3,
+        target.position.z + 1.5,
       );
     }
     if (floorBounce.current) {
@@ -93,33 +92,34 @@ export function SkillsLighting({
         target.position.y - 0.7,
         target.position.z + 3,
       );
-      floorBounce.current.intensity = 55 + openness * 12 + tools * 20;
+      floorBounce.current.intensity = 6 + localPool * (portrait ? 28 : 40);
     }
-    if (aperture.current)
+    if (aperture.current) {
       aperture.current.position.set(
         target.position.x + 8,
         target.position.y + 11,
         target.position.z - 9,
       );
+      aperture.current.intensity = 8 + localPool * 12;
+    }
     if (routeResponse.current) {
-      const domain = getSkillsCategoryIndex(p);
       const region = SKILLS_REGIONS[domain];
       const connection = Math.sin(assemblyProgress(p, domain) * Math.PI);
       routeResponse.current.position.set(region.x, region.y + 1.1, region.z - 1.7);
-      routeResponse.current.intensity = connection * 1.2;
+      routeResponse.current.intensity = connection * 0.28;
     }
   });
   return (
     <>
-      <hemisphereLight ref={sky} args={['#b8d0df', '#a4957a', 0.65]} />
-      <ambientLight color="#d4d9d2" intensity={0.12} />
+      <hemisphereLight ref={sky} args={['#183040', '#211913', 0.13]} />
+      <ambientLight color="#293540" intensity={0.018} />
       <primitive object={target} />
       <primitive object={pool} />
       <directionalLight
         ref={key}
         target={target}
-        color="#ffe3b5"
-        intensity={1.05}
+        color="#e8c38e"
+        intensity={0.12}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-17}
@@ -136,22 +136,22 @@ export function SkillsLighting({
       <spotLight
         ref={aperture}
         target={pool}
-        color="#bdd8e8"
-        intensity={130}
-        distance={38}
+        color="#365367"
+        intensity={8}
+        distance={34}
         angle={0.85}
         penumbra={0.85}
         decay={2}
       />
       <rectAreaLight
         ref={ceilingLight}
-        color="#ffe0ae"
-        intensity={4}
-        width={9}
-        height={18}
+        color="#ffd49a"
+        intensity={0.7}
+        width={7.5}
+        height={11}
         rotation={[-Math.PI / 2, 0, 0]}
       />
-      <pointLight ref={floorBounce} color="#ffe5bc" intensity={55} distance={21} decay={2} />
+      <pointLight ref={floorBounce} color="#ffc981" intensity={6} distance={17} decay={2} />
       <pointLight ref={routeResponse} color="#8B1E2D" intensity={0} distance={3.4} decay={2} />
     </>
   );

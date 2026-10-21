@@ -31,21 +31,21 @@ function architecturalMaterial(finish: SkillsFinish) {
     color: finish === 'light' ? '#000000' : '#ffffff',
     roughness:
       finish === 'floor'
-        ? 0.36
+        ? 0.58
         : finish === 'mineral'
-          ? 0.58
+          ? 0.7
           : finish === 'stone'
-            ? 0.69
+            ? 0.78
             : brushed
-              ? 0.42
-              : 0.65,
-    metalness: brushed ? 0.38 : finish === 'floor' ? 0.3 : finish === 'technical' ? 0.15 : 0.04,
-    envMapIntensity: finish === 'floor' ? 0.45 : 0.24,
+              ? 0.48
+              : 0.72,
+    metalness: brushed ? 0.34 : finish === 'floor' ? 0.16 : finish === 'technical' ? 0.12 : 0.03,
+    envMapIntensity: finish === 'floor' ? 0.18 : 0.12,
     transparent: finish === 'translucent',
     opacity: finish === 'translucent' ? 0.22 : 1,
     depthWrite: finish !== 'translucent',
     emissive: finish === 'light' ? '#ffd397' : finish === 'signal' ? '#8B1E2D' : '#000000',
-    emissiveIntensity: finish === 'light' ? 1.8 : finish === 'signal' ? 0.22 : 0,
+    emissiveIntensity: finish === 'light' ? 1.35 : finish === 'signal' ? 0.14 : 0,
   });
   if (mineral || brushed || floor) {
     material.onBeforeCompile = (shader) => {
@@ -110,11 +110,11 @@ function createResources() {
     floor: architecturalMaterial('floor'),
   };
   surfaces.mineral.color.set('#F2E8D5');
-  surfaces.metal.color.set('#303736');
-  surfaces.technical.color.set('#1d2323');
-  surfaces.stone.color.set('#d8d0be');
+  surfaces.metal.color.set('#252b2e');
+  surfaces.technical.color.set('#080d11');
+  surfaces.stone.color.set('#7f796e');
   surfaces.light.color.set('#000000');
-  surfaces.floor.color.set('#34434a');
+  surfaces.floor.color.set('#151d23');
   return {
     surfaces,
     geometry: new BoxGeometry(),
