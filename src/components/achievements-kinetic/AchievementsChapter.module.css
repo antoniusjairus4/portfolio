@@ -19,31 +19,30 @@
   border: 0;
 }
 
-.inheritedRule {
-  position: absolute;
-  top: 0;
-  right: 5vw;
-  left: 5vw;
-  z-index: 8;
-  height: 2px;
-  background: #e5dac7;
-}
-
 .panel {
-  --achievement-progress: 0;
   --achievement-exit: 0;
   position: relative;
-  height: 158svh;
+  height: 145svh;
+}
+
+.intro {
+  height: 128svh;
 }
 
 .karate {
-  height: 146svh;
+  height: 138svh;
 }
+
 .chess {
+  height: 164svh;
+}
+
+.public-speaking {
   height: 178svh;
 }
-.public-speaking {
-  height: 224svh;
+
+.finale {
+  height: 136svh;
 }
 
 .stage {
@@ -58,15 +57,15 @@
 
 .meta {
   position: absolute;
-  top: clamp(1.3rem, 3vw, 2.8rem);
-  right: clamp(1.3rem, 3vw, 3rem);
-  left: clamp(1.3rem, 3vw, 3rem);
-  z-index: 8;
+  top: clamp(1.25rem, 3vw, 2.7rem);
+  right: clamp(1.3rem, 4vw, 4.5rem);
+  left: clamp(1.3rem, 4vw, 4.5rem);
+  z-index: 20;
   display: flex;
   align-items: center;
   gap: 0.8rem;
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.57rem, 0.7vw, 0.72rem);
+  font-size: clamp(0.56rem, 0.68vw, 0.72rem);
   letter-spacing: 0.16em;
   color: #8f8577;
 }
@@ -74,75 +73,202 @@
 .meta i {
   flex: 1;
   height: 1px;
-  background: rgba(229, 218, 199, 0.24);
+  background: currentColor;
+  opacity: 0.28;
 }
 
-.eyebrow,
-.verificationNote,
-.audience p {
+.introStatement {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  padding: 7vw 4vw;
+  text-align: center;
+  opacity: calc(var(--intro-title, 0) * (1 - var(--achievement-exit)));
+  transform: scale(var(--intro-scale, 1.08));
+}
+
+.introStatement p,
+.tableTitle,
+.karateStatement > p,
+.chessTitle p,
+.speakingStatement > p {
   margin: 0;
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.6rem, 0.75vw, 0.78rem);
-  letter-spacing: 0.17em;
-  text-transform: uppercase;
+  font-size: clamp(0.62rem, 0.82vw, 0.86rem);
+  letter-spacing: 0.19em;
+}
+
+.introStatement h3 {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 14.4vw, 14.5rem);
+  font-weight: 650;
+  line-height: 0.8;
+  letter-spacing: -0.075em;
+  white-space: nowrap;
+}
+
+.disciplineIndex {
+  position: absolute;
+  right: 4vw;
+  bottom: 5vh;
+  left: 4vw;
+  z-index: 4;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid rgba(229, 218, 199, 0.28);
+  opacity: calc(var(--intro-split, 0) * (1 - var(--achievement-exit)));
+}
+
+.disciplineIndex span {
+  padding: 1rem 0.8rem 0;
+  font-family: var(--font-display);
+  font-size: clamp(0.78rem, 1.15vw, 1.25rem);
+  text-align: center;
+  transform: translateY(calc((1 - var(--intro-split, 0)) * 2rem));
+}
+
+.table-tennis .stage::after {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  content: "";
+  pointer-events: none;
+  background: #8b1e2d;
+  opacity: calc(var(--tt-impact, 0) * 0.32);
+}
+
+.tableCourt {
+  position: absolute;
+  inset: 13vh 4vw 9vh;
+  z-index: 0;
+  border: 1px solid rgba(229, 218, 199, 0.13);
+  opacity: calc((1 - var(--achievement-exit)) * 0.9);
+  transform: perspective(65rem) rotateX(62deg) translateY(21vh);
+  transform-origin: center bottom;
+}
+
+.tableCourt i {
+  position: absolute;
+  background: rgba(229, 218, 199, 0.18);
+}
+
+.tableCourt i:first-child {
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+}
+
+.tableCourt i:nth-child(2) {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
+
+.tableCourt i:last-child {
+  top: 48%;
+  right: -2vw;
+  left: -2vw;
+  height: 3px;
+  background: rgba(229, 218, 199, 0.56);
+}
+
+.tableTitle {
+  position: absolute;
+  top: 14vh;
+  right: 4vw;
+  left: 4vw;
+  z-index: 4;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 10vw, 10rem);
+  font-weight: 620;
+  line-height: 0.76;
+  letter-spacing: -0.07em;
+  opacity: calc(var(--tt-title, 0) * (1 - var(--achievement-exit)));
+}
+
+.tableTitle span:first-child {
+  transform: translateX(calc((1 - var(--tt-title, 0)) * -24vw));
+}
+
+.tableTitle span:last-child {
+  transform: translateX(calc((1 - var(--tt-title, 0)) * 24vw));
 }
 
 .tableTrajectory {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 5;
   opacity: calc(1 - var(--achievement-exit));
 }
 
 .tableTrajectory i {
   position: absolute;
-  top: 49%;
+  top: 48%;
   left: 50%;
-  width: min(84vw, 88rem);
-  height: 2px;
-  background: #e5dac7;
+  width: min(88vw, 96rem);
+  height: 1px;
+  background: rgba(229, 218, 199, 0.75);
   transform: translate(-50%, -50%) rotate(calc(var(--tt-rule-turn, 0) * 1deg));
-  transform-origin: center;
 }
 
 .tableTrajectory b {
   position: absolute;
-  top: calc(49% + var(--tt-ball-y, 0) * 1vh);
-  left: calc(50% + var(--tt-ball-x, -44) * 1vw);
-  width: clamp(0.8rem, 1.2vw, 1.25rem);
+  top: calc(48% + var(--tt-ball-y, 0) * 1vh);
+  left: calc(50% + var(--tt-ball-x, -46) * 1vw);
+  width: clamp(0.75rem, 1.1vw, 1.15rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #e5dac7;
+  background: #f2e8d5;
+  box-shadow: calc(var(--tt-impact, 0) * -4rem) 0 3rem rgba(242, 232, 213, 0.46);
   transform: translate(-50%, -50%);
+}
+
+.tableTrajectory em {
+  position: absolute;
+  top: 48%;
+  right: 7vw;
+  width: 1px;
+  height: 40vh;
+  background: #8b1e2d;
+  opacity: var(--tt-impact, 0);
+  transform: translateY(-50%) scaleY(calc(0.2 + var(--tt-impact, 0)));
 }
 
 .tableStatement {
   position: absolute;
-  inset: auto auto 11vh clamp(1.4rem, 5vw, 6rem);
-  z-index: 3;
-  width: min(88rem, 90vw);
-  opacity: calc(var(--tt-resolve, 0) * (1 - var(--achievement-exit)));
-  transform: translate3d(calc((1 - var(--tt-resolve, 0)) * -8vw), 0, 0);
-}
-
-.tableMass {
+  right: 4vw;
+  bottom: 8vh;
+  left: 4vw;
+  z-index: 6;
   display: flex;
   align-items: flex-end;
-  gap: clamp(1rem, 3vw, 3.5rem);
+  justify-content: center;
+  gap: clamp(1.2rem, 3.5vw, 4rem);
+  opacity: calc(var(--tt-resolve, 0) * (1 - var(--achievement-exit)));
+  transform: translateX(calc((1 - var(--tt-resolve, 0)) * -9vw));
 }
 
-.tableMass strong {
+.tableStatement strong,
+.speeches strong {
   font-family: var(--font-display);
-  font-size: clamp(10rem, 27vw, 31rem);
+  font-size: clamp(10rem, 25vw, 28rem);
   font-weight: 650;
-  line-height: 0.68;
+  line-height: 0.65;
   letter-spacing: -0.09em;
 }
 
-.tableMass h3 {
-  margin: 0 0 0.02em;
+.tableStatement h3,
+.speeches h3 {
+  margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.5rem, 8.4vw, 9.5rem);
+  font-size: clamp(3.6rem, 8.2vw, 9rem);
   font-weight: 590;
   line-height: 0.78;
   letter-spacing: -0.065em;
@@ -154,308 +280,436 @@
 }
 
 .karate .meta {
-  color: #615a51;
-}
-.karate .meta i {
-  background: rgba(17, 16, 15, 0.25);
+  color: #655d53;
 }
 
-.karateRule {
+.karateDivisions {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  opacity: calc(1 - var(--achievement-exit));
+}
+
+.karateDivisions i {
+  border-right: 1px solid rgba(17, 16, 15, 0.13);
+  transform: scaleY(var(--karate-lock, 0));
+  transform-origin: top;
+}
+
+.karateDivisions i:nth-child(2) {
+  transform-origin: bottom;
+}
+
+.karateDivisions i:last-child {
+  border: 0;
+}
+
+.karate .stage::after {
   position: absolute;
   top: 50%;
   right: 0;
   left: 0;
-  z-index: 1;
-  height: clamp(0.45rem, 0.75vw, 0.8rem);
-  background: #791f2b;
+  z-index: 2;
+  height: clamp(0.35rem, 0.6vw, 0.65rem);
+  content: "";
+  background: #8b1e2d;
   transform: scaleX(var(--karate-impact, 0));
-  transform-origin: center;
 }
 
 .karateStatement {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   display: grid;
   align-content: center;
-  padding: clamp(1.4rem, 5vw, 6rem);
+  padding: 8vh 4vw;
   opacity: calc(1 - var(--achievement-exit));
+}
+
+.karateStatement > p {
+  color: #6a6258;
 }
 
 .karateStatement h3 {
   display: flex;
   justify-content: space-between;
-  margin: 1.5rem 0 0;
+  margin: 1.8rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(6.5rem, 13.5vw, 13rem);
+  font-size: clamp(6.8rem, 14vw, 14rem);
   font-weight: 650;
   line-height: 0.72;
   letter-spacing: -0.08em;
 }
 
 .karateStatement h3 span:first-child {
-  transform: translateX(calc(var(--karate-offset, 1) * -22vw));
+  transform: translateY(calc((1 - var(--karate-lock, 0)) * -32vh));
 }
 
 .karateStatement h3 span:last-child {
-  transform: translateX(calc(var(--karate-offset, 1) * 22vw));
+  transform: translateY(calc((1 - var(--karate-lock, 0)) * 32vh));
 }
 
-.karateClaim {
+.karatePrinciples {
+  position: absolute;
+  right: 4vw;
+  bottom: 6vh;
+  left: 4vw;
+  z-index: 5;
   display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 0.8rem;
-  margin: clamp(2rem, 5vh, 4rem) 0 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.5vw, 3rem);
-  font-weight: 540;
-  letter-spacing: -0.035em;
+  justify-content: space-between;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.7rem, 1vw, 1.05rem);
+  letter-spacing: 0.18em;
+  opacity: calc(var(--karate-words, 0) * (1 - var(--achievement-exit)));
 }
 
-.karateClaim strong {
-  font-size: 2.1em;
-  color: #791f2b;
-}
-
-.verificationNote {
-  justify-self: end;
-  margin-top: 0.75rem;
-  color: #665e55;
+.karatePrinciples span:nth-child(2) {
+  transform: translateY(calc((1 - var(--karate-words, 0)) * 3rem));
 }
 
 .chessGrid {
   position: absolute;
-  inset: 12vh 7vw 10vh;
-  z-index: 1;
-  opacity: calc(var(--chess-grid, 0) * (1 - var(--achievement-exit)) * 0.32);
-  background-image:
-    linear-gradient(rgba(229, 218, 199, 0.45) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(229, 218, 199, 0.45) 1px, transparent 1px);
-  background-size: 12.5% 25%;
+  inset: 12vh 4vw 8vh;
+  z-index: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  opacity: calc(var(--chess-grid, 0) * (1 - var(--achievement-exit)) * 0.38);
+  border: 1px solid rgba(229, 218, 199, 0.2);
+}
+
+.chessGrid i {
+  border-right: 1px solid rgba(229, 218, 199, 0.18);
+  border-bottom: 1px solid rgba(229, 218, 199, 0.18);
+}
+
+.chessGrid i:nth-child(3n + 2),
+.chessGrid i:nth-child(7) {
+  background: rgba(229, 218, 199, 0.08);
+  opacity: var(--chess-path, 0);
+}
+
+.chessPath {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: calc(var(--chess-path, 0) * (1 - var(--achievement-exit)));
+}
+
+.chessPath i {
+  position: absolute;
+  background: #8b1e2d;
+  transform-origin: left;
+}
+
+.chessPath i:first-child {
+  top: 29%;
+  left: 24%;
+  width: 31%;
+  height: 2px;
+  transform: scaleX(var(--chess-path, 0));
+}
+
+.chessPath i:nth-child(2) {
+  top: 29%;
+  left: 55%;
+  width: 2px;
+  height: 22%;
+  transform: scaleY(var(--chess-path, 0));
+  transform-origin: top;
+}
+
+.chessPath i:last-child {
+  top: 51%;
+  left: 55%;
+  width: 20%;
+  height: 2px;
+  transform: scaleX(var(--chess-path, 0));
 }
 
 .chessStatement {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 4;
   display: grid;
-  grid-template-columns: 0.8fr 1.2fr;
+  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
   align-items: center;
-  gap: 6vw;
-  padding: 10vh clamp(1.4rem, 6vw, 7rem) 7vh;
+  gap: 7vw;
+  padding: 10vh 5vw 7vh;
   opacity: calc(1 - var(--achievement-exit));
 }
 
-.chessStatement h3 {
-  margin: 1.1rem 0 0;
+.chessTitle p {
+  color: #958a7b;
+}
+
+.chessTitle h3 {
+  margin: 1rem 0 0;
   font-family: var(--font-display);
-  font-size: clamp(5rem, 11vw, 13rem);
-  font-weight: 610;
-  line-height: 0.78;
-  letter-spacing: -0.07em;
+  font-size: clamp(6rem, 12vw, 13rem);
+  font-weight: 630;
+  line-height: 0.76;
+  letter-spacing: -0.075em;
 }
 
 .ratings {
   display: grid;
-  gap: clamp(1.2rem, 3vh, 2.4rem);
+  gap: clamp(0.8rem, 2vh, 1.8rem);
   margin: 0;
 }
 
 .ratings div {
   display: grid;
-  grid-template-columns: minmax(7rem, 0.55fr) 1fr;
+  grid-template-columns: minmax(6rem, 0.45fr) 1fr;
   align-items: baseline;
-  border-bottom: 1px solid rgba(229, 218, 199, 0.28);
-  opacity: var(--rating-opacity, 1);
+  border-bottom: 1px solid rgba(229, 218, 199, 0.3);
 }
 
-.ratings div:nth-child(1) {
+.ratings div:first-child {
   opacity: var(--chess-one, 0);
-  transform: translateX(calc((1 - var(--chess-one, 0)) * 8vw));
+  transform: translateX(calc((1 - var(--chess-one, 0)) * 7vw));
 }
 
 .ratings div:nth-child(2) {
   opacity: var(--chess-two, 0);
-  transform: translateX(calc((1 - var(--chess-two, 0)) * -8vw));
+  transform: translateX(calc((1 - var(--chess-two, 0)) * -7vw));
 }
 
-.ratings div:nth-child(3) {
+.ratings div:last-child {
   opacity: var(--chess-three, 0);
-  transform: translateX(calc((1 - var(--chess-three, 0)) * 8vw));
+  transform: translateX(calc((1 - var(--chess-three, 0)) * 7vw));
 }
 
-.ratings dt {
+.ratings dt,
+.audienceReach span {
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.66rem, 0.8vw, 0.82rem);
-  letter-spacing: 0.16em;
-  color: #968b7c;
+  font-size: clamp(0.62rem, 0.8vw, 0.84rem);
+  letter-spacing: 0.17em;
+  color: #9b9080;
 }
 
 .ratings dd {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(4.2rem, 8vw, 9rem);
+  font-size: clamp(4.2rem, 8vw, 8.5rem);
   font-weight: 590;
-  line-height: 0.9;
+  line-height: 0.88;
   letter-spacing: -0.06em;
   font-variant-numeric: tabular-nums;
+}
+
+.public-speaking .stage {
+  background: #11100f;
+}
+
+.audienceField {
+  position: absolute;
+  inset: 19vh 5vw 6vh;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle, rgba(229, 218, 199, 0.54) 0 1px, transparent 1.5px),
+    linear-gradient(90deg, transparent 48%, rgba(229, 218, 199, 0.1) 50%, transparent 52%);
+  background-position:
+    0 0,
+    0 0;
+  background-size:
+    2.3rem 2rem,
+    8rem 100%;
+  opacity: calc(var(--speaking-audience, 0) * 0.48 * (1 - var(--achievement-exit)));
+  mask-image: radial-gradient(ellipse at center, #000 18%, rgba(0, 0, 0, 0.7) 52%, transparent 84%);
+  transform: scale(var(--speaking-scale, 0.72));
+}
+
+.speakingLight {
+  position: absolute;
+  top: -20vh;
+  left: 50%;
+  z-index: 1;
+  width: 58vw;
+  height: 110vh;
+  background: radial-gradient(ellipse at 50% 0%, rgba(242, 232, 213, 0.2), transparent 67%);
+  opacity: calc(var(--speaking-reach, 0) * (1 - var(--achievement-exit)));
+  transform: translateX(-50%);
 }
 
 .speakingStatement {
   position: absolute;
   inset: 0;
-  z-index: 3;
-  padding: 13vh clamp(1.4rem, 5vw, 6rem) 8vh;
-  opacity: calc(1 - var(--speaking-silence, 0));
+  z-index: 4;
+  padding: 13vh 5vw 7vh;
+  opacity: calc(1 - var(--achievement-exit));
 }
 
 .speeches {
   display: flex;
   align-items: flex-end;
-  gap: clamp(1rem, 2.5vw, 3rem);
-  margin-top: 9vh;
-  opacity: calc((1 - var(--speaking-speeches-out, 0)) * var(--speaking-build, 0));
-  transform: translateY(calc((1 - var(--speaking-build, 0)) * 5vh));
+  gap: clamp(1.2rem, 3vw, 3.5rem);
+  margin-top: 8vh;
+  opacity: var(--speaking-build, 0);
+  transform: translateY(calc((1 - var(--speaking-build, 0)) * 6vh));
 }
 
 .speeches strong {
-  font-family: var(--font-display);
-  font-size: clamp(8rem, 19vw, 22rem);
-  font-weight: 650;
-  line-height: 0.7;
-  letter-spacing: -0.085em;
+  font-size: clamp(9rem, 21vw, 24rem);
 }
 
 .speeches h3 {
-  margin: 0;
-  font-family: var(--font-display);
-  font-size: clamp(3.3rem, 7vw, 8rem);
-  font-weight: 590;
-  line-height: 0.78;
-  letter-spacing: -0.065em;
+  font-size: clamp(3.3rem, 7vw, 7.8rem);
 }
 
-.audience {
+.audienceReach {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max-content;
-  text-align: center;
-  opacity: var(--speaking-audience, 0);
-  transform: translate(-50%, -47%) scale(var(--speaking-scale, 0.52));
-}
-
-.audience strong {
-  display: block;
-  font-family: var(--font-display);
-  font-size: clamp(12rem, 29vw, 35rem);
-  font-weight: 650;
-  line-height: 0.72;
-  letter-spacing: -0.095em;
-  white-space: nowrap;
-}
-
-.audience p {
-  margin-top: 1.2rem;
-  color: #a39889;
-}
-
-.speakingBaseline {
-  position: absolute;
-  top: 52%;
   right: 5vw;
-  left: 5vw;
-  z-index: 1;
-  height: 1px;
-  background: rgba(229, 218, 199, 0.55);
-  opacity: calc((1 - var(--speaking-speeches-out, 0)) * var(--speaking-build, 0));
-  transform: scaleX(var(--speaking-build, 0));
+  bottom: 7vh;
+  display: grid;
+  justify-items: end;
+  opacity: var(--speaking-reach, 0);
+  transform: translateX(calc((1 - var(--speaking-reach, 0)) * 10vw));
 }
 
-.silence {
+.audienceReach strong {
+  font-family: var(--font-display);
+  font-size: clamp(4rem, 9vw, 10rem);
+  font-weight: 620;
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+}
+
+.finale .stage::before {
   position: absolute;
   inset: 0;
-  z-index: 5;
+  z-index: 1;
+  content: "";
   background: #e5dac7;
-  opacity: var(--speaking-silence, 0);
+  opacity: var(--final-wash, 0);
 }
 
-.silence i {
+.finalDisciplines,
+.finalConcepts {
   position: absolute;
-  right: 10vw;
-  bottom: 16vh;
-  left: 10vw;
-  height: 1px;
-  background: rgba(17, 16, 15, 0.22);
-  transform: scaleX(calc(1 - var(--speaking-silence, 0) * 0.72));
+  inset: 13vh 5vw 8vh;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-content: center;
+  gap: 7vh 6vw;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 5.5vw, 6rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  opacity: var(--final-disciplines, 0);
 }
 
-.static .panel,
-.static .karate,
-.static .chess,
-.static .public-speaking {
+.finalDisciplines span:nth-child(odd) {
+  transform: translateX(calc((1 - var(--final-disciplines, 0)) * -8vw));
+}
+
+.finalDisciplines span:nth-child(even) {
+  transform: translateX(calc((1 - var(--final-disciplines, 0)) * 8vw));
+}
+
+.finalConcepts {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2vw;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.8rem, 1.35vw, 1.5rem);
+  letter-spacing: 0.16em;
+  opacity: var(--final-concepts, 0);
+  transform: scale(calc(0.9 + var(--final-concepts, 0) * 0.1));
+}
+
+.finalStatement {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-content: center;
+  padding: 5vw;
+  color: #f4eee3;
+  font-family: var(--font-display);
+  font-size: clamp(4.2rem, 11vw, 12rem);
+  font-weight: 650;
+  line-height: 0.79;
+  letter-spacing: -0.075em;
+  text-align: center;
+  opacity: var(--final-statement, 0);
+  mix-blend-mode: difference;
+  transform: scale(calc(1.08 - var(--final-statement, 0) * 0.08));
+}
+
+.finalStatement p {
+  margin: 0;
+}
+
+.static .panel {
+  --achievement-exit: 0;
+  --intro-title: 1;
+  --intro-split: 1;
+  --intro-scale: 1;
+  --tt-title: 1;
+  --tt-resolve: 1;
+  --karate-lock: 1;
+  --karate-words: 1;
+  --chess-grid: 1;
+  --chess-path: 1;
+  --chess-one: 1;
+  --chess-two: 1;
+  --chess-three: 1;
+  --speaking-build: 1;
+  --speaking-audience: 1;
+  --speaking-scale: 1;
+  --speaking-reach: 1;
+  --final-statement: 1;
+  --final-wash: 1;
   height: auto;
-  min-height: 78svh;
+  min-height: 92svh;
 }
 
 .static .stage {
   position: relative;
-  min-height: 78svh;
+  min-height: 92svh;
 }
 
 .static .tableTrajectory,
-.static .karateRule,
-.static .chessGrid,
-.static .speakingBaseline,
-.static .silence {
+.static .karateDivisions,
+.static .karate .stage::after,
+.static .chessPath,
+.static .finalDisciplines,
+.static .finalConcepts {
   display: none;
-}
-
-.static .tableStatement,
-.static .karateStatement,
-.static .chessStatement,
-.static .speakingStatement,
-.static .speeches,
-.static .audience,
-.static .ratings div,
-.static .karateStatement h3 span {
-  opacity: 1;
-  transform: none;
-}
-
-.static .audience {
-  top: auto;
-  right: clamp(1.4rem, 5vw, 6rem);
-  bottom: 10vh;
-  left: auto;
-}
-
-.static .audience strong {
-  font-size: 25vw;
 }
 
 @media (orientation: portrait) {
   .panel {
-    height: 142svh;
+    height: 138svh;
   }
+
+  .intro {
+    height: 124svh;
+  }
+
   .karate {
     height: 132svh;
   }
+
   .chess {
-    height: 166svh;
-  }
-  .public-speaking {
-    height: 205svh;
+    height: 158svh;
   }
 
-  .inheritedRule {
-    right: 1.25rem;
-    left: 1.25rem;
+  .public-speaking {
+    height: 168svh;
+  }
+
+  .finale {
+    height: 128svh;
   }
 
   .meta {
-    top: 1.2rem;
+    top: 1.15rem;
     right: 1.25rem;
     left: 1.25rem;
   }
@@ -464,38 +718,77 @@
     display: none;
   }
 
-  .tableTrajectory i {
-    width: calc(100vw - 2.5rem);
+  .introStatement {
+    padding: 10vh 1.25rem;
+    text-align: left;
+  }
+
+  .introStatement h3 {
+    max-width: 100%;
+    font-size: clamp(3.6rem, 18vw, 6.3rem);
+    line-height: 0.86;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .disciplineIndex {
+    right: 1.25rem;
+    bottom: 4vh;
+    left: 1.25rem;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.8rem 1rem;
+  }
+
+  .disciplineIndex span {
+    padding: 0.8rem 0 0;
+    font-size: 0.72rem;
+    text-align: left;
+  }
+
+  .tableCourt {
+    inset: 14vh 1.25rem 11vh;
+  }
+
+  .tableTitle {
+    top: 13vh;
+    right: 1.25rem;
+    left: 1.25rem;
+    display: block;
+    font-size: clamp(4rem, 22vw, 6.8rem);
+  }
+
+  .tableTitle span {
+    display: block;
+  }
+
+  .tableTitle span:last-child {
+    text-align: right;
   }
 
   .tableStatement {
     right: 1.25rem;
-    bottom: 12svh;
+    bottom: 10vh;
     left: 1.25rem;
-    width: auto;
-  }
-
-  .tableMass {
     display: block;
   }
 
-  .tableMass strong {
+  .tableStatement strong {
     display: block;
-    font-size: clamp(10rem, 58vw, 15rem);
+    font-size: clamp(10rem, 57vw, 15rem);
   }
 
-  .tableMass h3 {
-    font-size: clamp(3.3rem, 16vw, 5.2rem);
+  .tableStatement h3 {
+    font-size: clamp(3.1rem, 15vw, 4.8rem);
   }
 
   .karateStatement {
-    padding: 12vh 1.25rem 8vh;
+    padding: 10vh 1.25rem;
   }
 
   .karateStatement h3 {
     display: block;
-    font-size: clamp(5rem, 22.5vw, 7.5rem);
-    line-height: 0.92;
+    font-size: clamp(5.4rem, 24vw, 8rem);
+    line-height: 0.88;
   }
 
   .karateStatement h3 span {
@@ -506,59 +799,47 @@
     text-align: right;
   }
 
-  .karateRule {
-    top: 52%;
-  }
-
-  .karateClaim {
-    display: block;
-    margin-top: 3rem;
-    font-size: clamp(1.25rem, 6vw, 1.8rem);
-    text-align: right;
-  }
-
-  .karateClaim strong {
-    display: block;
-  }
-
-  .karateClaim span {
-    display: block;
-  }
-
-  .verificationNote {
-    max-width: 18rem;
-    text-align: right;
+  .karatePrinciples {
+    right: 1.25rem;
+    bottom: 5vh;
+    left: 1.25rem;
+    font-size: 0.55rem;
   }
 
   .chessGrid {
-    inset: 12vh 1.25rem 8vh;
+    inset: 11vh 1.25rem 7vh;
   }
 
   .chessStatement {
     grid-template-columns: 1fr;
     align-content: center;
-    gap: 5vh;
-    padding: 10vh 1.25rem 7vh;
+    gap: 4vh;
+    padding: 9vh 1.25rem 6vh;
   }
 
-  .chessStatement h3 {
-    font-size: clamp(4.6rem, 22vw, 7rem);
+  .chessTitle h3 {
+    font-size: clamp(5.6rem, 26vw, 8rem);
+  }
+
+  .chessTitle p {
+    max-width: 19rem;
+    line-height: 1.7;
   }
 
   .ratings {
-    gap: 0.7rem;
+    gap: 0.6rem;
   }
 
   .ratings div {
-    grid-template-columns: 5.2rem 1fr;
+    grid-template-columns: 5rem 1fr;
   }
 
   .ratings dd {
-    font-size: clamp(3.7rem, 18vw, 5.6rem);
+    font-size: clamp(3.7rem, 18vw, 5.4rem);
   }
 
   .speakingStatement {
-    padding: 12vh 1.25rem 8vh;
+    padding: 12vh 1.25rem 7vh;
   }
 
   .speeches {
@@ -568,46 +849,51 @@
 
   .speeches strong {
     display: block;
-    font-size: clamp(9rem, 46vw, 13rem);
+    font-size: clamp(9rem, 47vw, 13rem);
   }
 
   .speeches h3 {
-    font-size: clamp(3.2rem, 15.5vw, 5rem);
+    font-size: clamp(3rem, 14.5vw, 4.8rem);
   }
 
-  .audience strong {
-    font-size: clamp(10rem, 50vw, 14rem);
+  .audienceField {
+    inset: 16vh 1.25rem 5vh;
+    background-size:
+      1.4rem 1.5rem,
+      5rem 100%;
   }
 
-  .audience {
-    transform: translate(-50%, -47%) scale(calc(var(--speaking-scale, 0.52) * 0.5));
+  .audienceReach {
+    right: 1.25rem;
+    bottom: 6vh;
   }
 
-  .audience p {
-    margin-top: 0.7rem;
-    font-size: 1.2rem;
+  .audienceReach strong {
+    font-size: clamp(3.7rem, 18vw, 5.4rem);
+  }
+
+  .finalDisciplines,
+  .finalConcepts {
+    inset: 13vh 1.25rem 7vh;
+    grid-template-columns: 1fr;
+    gap: 2.4vh;
+    font-size: clamp(2rem, 10vw, 3.5rem);
+  }
+
+  .finalConcepts {
+    grid-template-columns: 1fr 1fr;
+    font-size: 0.72rem;
+  }
+
+  .finalStatement {
+    padding: 1.25rem;
+    font-size: clamp(3.7rem, 18vw, 6rem);
+    text-align: left;
   }
 
   .static .panel,
-  .static .karate,
-  .static .chess,
-  .static .public-speaking,
   .static .stage {
-    min-height: 86svh;
-  }
-
-  .static .audience {
-    right: 1.25rem;
-    bottom: 8vh;
-    transform: none;
-  }
-
-  .static .audience strong {
-    font-size: 21vw;
-  }
-
-  .static .speeches h3 {
-    font-size: 13vw;
+    min-height: 88svh;
   }
 }
 

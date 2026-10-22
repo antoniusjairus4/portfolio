@@ -1,19 +1,6 @@
 import type { AchievementDisciplineKey } from '@/content/achievementsKinetic';
 
-export type AchievementBeat =
-  | 'entry'
-  | 'trajectory'
-  | 'peak'
-  | 'exit'
-  | 'anticipation'
-  | 'impact'
-  | 'stillness'
-  | 'calculation'
-  | 'ratings'
-  | 'speeches'
-  | 'amplification'
-  | 'audience'
-  | 'silence';
+export type AchievementPanelKey = 'intro' | AchievementDisciplineKey | 'finale';
 
 export function clamp01(value: number) {
   return Math.min(1, Math.max(0, value));
@@ -28,83 +15,116 @@ export function rangeProgress(progress: number, start: number, end: number) {
   return clamp01((progress - start) / (end - start));
 }
 
-export function getAchievementBeat(
-  discipline: AchievementDisciplineKey,
-  progress: number,
-): AchievementBeat {
-  const value = clamp01(progress);
-  if (discipline === 'table-tennis') {
-    if (value < 0.16) return 'entry';
-    if (value < 0.43) return 'trajectory';
-    if (value < 0.82) return 'peak';
-    return 'exit';
-  }
-  if (discipline === 'karate') {
-    if (value < 0.24) return 'anticipation';
-    if (value < 0.4) return 'impact';
-    if (value < 0.84) return 'stillness';
-    return 'exit';
-  }
-  if (discipline === 'chess') {
-    if (value < 0.18) return 'entry';
-    if (value < 0.55) return 'calculation';
-    if (value < 0.84) return 'ratings';
-    return 'exit';
-  }
-  if (value < 0.2) return 'speeches';
-  if (value < 0.48) return 'amplification';
-  if (value < 0.78) return 'audience';
-  return 'silence';
+function pulse(progress: number, start: number, peak: number, end: number) {
+  return (
+    smoothstep(rangeProgress(progress, start, peak)) *
+    (1 - smoothstep(rangeProgress(progress, peak, end)))
+  );
 }
 
-export function getDisciplineMotion(discipline: AchievementDisciplineKey, progress: number) {
+export function getAchievementBeat(panel: AchievementPanelKey, progress: number) {
   const value = clamp01(progress);
-  const exit = smoothstep(rangeProgress(value, 0.82, 0.98));
+  if (panel === 'intro') {
+    if (value < 0.2) return 'archive';
+    if (value < 0.68) return 'disciplines';
+    return 'handoff';
+  }
+  if (panel === 'table-tennis') {
+    if (value < 0.18) return 'serve';
+    if (value < 0.48) return 'trajectory';
+    if (value < 0.82) return 'champion';
+    return 'handoff';
+  }
+  if (panel === 'karate') {
+    if (value < 0.24) return 'stillness';
+    if (value < 0.42) return 'impact';
+    if (value < 0.82) return 'discipline';
+    return 'handoff';
+  }
+  if (panel === 'chess') {
+    if (value < 0.22) return 'possibilities';
+    if (value < 0.55) return 'calculation';
+    if (value < 0.84) return 'decision';
+    return 'handoff';
+  }
+  if (panel === 'public-speaking') {
+    if (value < 0.3) return 'voice';
+    if (value < 0.62) return 'audience';
+    if (value < 0.84) return 'presence';
+    return 'handoff';
+  }
+  if (value < 0.3) return 'disciplines';
+  if (value < 0.58) return 'principles';
+  return 'statement';
+}
 
-  if (discipline === 'table-tennis') {
-    const travel = smoothstep(rangeProgress(value, 0.08, 0.5));
-    const resolve = smoothstep(rangeProgress(value, 0.3, 0.54));
+export function getAchievementMotion(panel: AchievementPanelKey, progress: number) {
+  const value = clamp01(progress);
+  const exit = smoothstep(rangeProgress(value, 0.84, 0.98));
+
+  if (panel === 'intro') {
+    const title = smoothstep(rangeProgress(value, 0.02, 0.2));
+    const split = smoothstep(rangeProgress(value, 0.24, 0.55));
     return {
       '--achievement-exit': exit,
-      '--tt-ball-x': -44 + travel * 88,
-      '--tt-ball-y': Math.sin(travel * Math.PI * 2.5) * -13,
-      '--tt-rule-turn': travel * -7,
-      '--tt-resolve': resolve,
+      '--intro-title': title,
+      '--intro-split': split,
+      '--intro-scale': 1.08 - title * 0.08 - split * 0.05,
     };
   }
 
-  if (discipline === 'karate') {
-    const lock = smoothstep(rangeProgress(value, 0.16, 0.34));
-    const impactIn = smoothstep(rangeProgress(value, 0.24, 0.31));
-    const impactOut = 1 - smoothstep(rangeProgress(value, 0.36, 0.47));
+  if (panel === 'table-tennis') {
+    const travel = smoothstep(rangeProgress(value, 0.06, 0.52));
+    return {
+      '--achievement-exit': exit,
+      '--tt-title': smoothstep(rangeProgress(value, 0.02, 0.2)),
+      '--tt-ball-x': -46 + travel * 92,
+      '--tt-ball-y': Math.sin(travel * Math.PI * 3) * -12,
+      '--tt-rule-turn': travel * -6,
+      '--tt-impact': pulse(value, 0.39, 0.45, 0.53),
+      '--tt-resolve': smoothstep(rangeProgress(value, 0.39, 0.58)),
+    };
+  }
+
+  if (panel === 'karate') {
+    const lock = smoothstep(rangeProgress(value, 0.13, 0.33));
     return {
       '--achievement-exit': exit,
       '--karate-lock': lock,
-      '--karate-impact': impactIn * impactOut,
-      '--karate-offset': 1 - lock,
+      '--karate-impact': pulse(value, 0.27, 0.34, 0.43),
+      '--karate-words': smoothstep(rangeProgress(value, 0.39, 0.66)),
     };
   }
 
-  if (discipline === 'chess') {
+  if (panel === 'chess') {
     return {
       '--achievement-exit': exit,
-      '--chess-grid': smoothstep(rangeProgress(value, 0.08, 0.25)),
-      '--chess-one': smoothstep(rangeProgress(value, 0.2, 0.36)),
-      '--chess-two': smoothstep(rangeProgress(value, 0.34, 0.5)),
-      '--chess-three': smoothstep(rangeProgress(value, 0.48, 0.64)),
+      '--chess-grid': smoothstep(rangeProgress(value, 0.03, 0.24)),
+      '--chess-path': smoothstep(rangeProgress(value, 0.16, 0.54)),
+      '--chess-one': smoothstep(rangeProgress(value, 0.18, 0.35)),
+      '--chess-two': smoothstep(rangeProgress(value, 0.34, 0.51)),
+      '--chess-three': smoothstep(rangeProgress(value, 0.5, 0.67)),
     };
   }
 
-  const speechesOut = smoothstep(rangeProgress(value, 0.36, 0.48));
-  const audience = smoothstep(rangeProgress(value, 0.49, 0.62));
-  const audiencePeak = smoothstep(rangeProgress(value, 0.62, 0.72));
-  const silence = smoothstep(rangeProgress(value, 0.76, 0.97));
+  if (panel === 'public-speaking') {
+    const audience = smoothstep(rangeProgress(value, 0.34, 0.61));
+    return {
+      '--achievement-exit': exit,
+      '--speaking-build': smoothstep(rangeProgress(value, 0.03, 0.23)),
+      '--speaking-audience': audience,
+      '--speaking-scale': 0.72 + audience * 0.28,
+      '--speaking-reach': smoothstep(rangeProgress(value, 0.54, 0.73)),
+    };
+  }
+
+  const concepts = smoothstep(rangeProgress(value, 0.22, 0.47));
+  const statement = smoothstep(rangeProgress(value, 0.48, 0.72));
   return {
     '--achievement-exit': 0,
-    '--speaking-build': smoothstep(rangeProgress(value, 0.03, 0.18)),
-    '--speaking-speeches-out': speechesOut,
-    '--speaking-audience': audience,
-    '--speaking-scale': 0.44 + audience * 0.5 + audiencePeak * 0.35,
-    '--speaking-silence': silence,
+    '--final-disciplines': 1 - smoothstep(rangeProgress(value, 0.2, 0.42)),
+    '--final-concepts': concepts * (1 - smoothstep(rangeProgress(value, 0.52, 0.69))),
+    '--final-statement': statement,
+    '--final-wash': smoothstep(rangeProgress(value, 0.65, 0.96)),
   };
 }

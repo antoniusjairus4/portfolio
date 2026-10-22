@@ -1,67 +1,73 @@
 'use client';
 
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { ReactNode, RefObject } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementsChapter.module.css';
 import {
+  type AchievementPanelKey,
   getAchievementBeat,
-  getDisciplineMotion,
+  getAchievementMotion,
 } from '@/components/achievements-kinetic/achievementsChoreography';
 import {
   type AchievementDisciplineKey,
   achievementDisciplines,
   chessPeakRatings,
 } from '@/content/achievementsKinetic';
-import { createChapterProgressController } from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
+gsap.registerPlugin(ScrollTrigger);
+
+const CHESS_CELLS = ['a1', 'b1', 'c1', 'd1', 'a2', 'b2', 'c2', 'd2', 'a3', 'b3', 'c3', 'd3'];
+
 interface KineticPanelProps {
-  discipline: AchievementDisciplineKey;
+  panel: AchievementPanelKey;
   reducedMotion: boolean;
   children: ReactNode;
 }
 
-function useDisciplineProgress(
+function usePanelProgress(
   sectionRef: RefObject<HTMLElement | null>,
-  discipline: AchievementDisciplineKey,
+  panel: AchievementPanelKey,
   reducedMotion: boolean,
 ) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section || reducedMotion) return;
 
-    const controller = createChapterProgressController(sectionRef);
-    const update = () => {
-      const progress = controller.progress.current;
-      section.style.setProperty('--achievement-progress', progress.toFixed(4));
-      section.dataset.achievementBeat = getAchievementBeat(discipline, progress);
-      const motion = getDisciplineMotion(discipline, progress);
-      for (const [property, value] of Object.entries(motion)) {
-        section.style.setProperty(property, String(value));
-      }
-    };
+    const context = gsap.context(() => {
+      const update = (progress: number) => {
+        gsap.set(section, getAchievementMotion(panel, progress));
+        section.dataset.achievementBeat = getAchievementBeat(panel, progress);
+      };
+      const trigger = ScrollTrigger.create({
+        trigger: section,
+        start: 'top top',
+        end: 'bottom bottom',
+        invalidateOnRefresh: true,
+        onRefresh: (self) => update(self.progress),
+        onUpdate: (self) => update(self.progress),
+      });
+      update(trigger.progress);
+    }, section);
 
-    const unsubscribe = controller.subscribe(update);
-    update();
-    return () => {
-      unsubscribe();
-      controller.dispose();
-    };
-  }, [discipline, reducedMotion, sectionRef]);
+    return () => context.revert();
+  }, [panel, reducedMotion, sectionRef]);
 }
 
-function KineticPanel({ discipline, reducedMotion, children }: KineticPanelProps) {
+function KineticPanel({ panel, reducedMotion, children }: KineticPanelProps) {
   const sectionRef = useRef<HTMLElement>(null);
-  useDisciplineProgress(sectionRef, discipline, reducedMotion);
+  usePanelProgress(sectionRef, panel, reducedMotion);
 
   return (
     <article
       ref={sectionRef}
-      className={`${styles.panel} ${styles[discipline]}`}
-      data-achievement-discipline={discipline}
-      data-achievement-beat={reducedMotion ? 'static' : getAchievementBeat(discipline, 0)}
+      className={`${styles.panel} ${styles[panel]}`}
+      data-achievement-panel={panel}
+      data-achievement-beat={reducedMotion ? 'static' : getAchievementBeat(panel, 0)}
     >
       <div className={styles.stage}>{children}</div>
     </article>
@@ -102,62 +108,92 @@ export function AchievementsChapter() {
       id="achievements-section"
       aria-labelledby="achievements-title"
       className={`${styles.chapter} ${reducedMotion ? styles.static : ''}`}
-      data-achievements-mode={reducedMotion ? 'static' : 'kinetic'}
+      data-achievements-mode={reducedMotion ? 'static' : 'performance-archive'}
     >
       <h2 id="achievements-title" className={styles.srOnly}>
         Achievements
       </h2>
-      <div className={styles.inheritedRule} aria-hidden="true" />
 
-      <KineticPanel discipline="table-tennis" reducedMotion={reducedMotion}>
-        <DisciplineMeta discipline="table-tennis" />
-        <div className={styles.tableTrajectory} aria-hidden="true">
-          <i />
-          <b />
+      <KineticPanel panel="intro" reducedMotion={reducedMotion}>
+        <div className={styles.meta}>
+          <span>00 / 06</span>
+          <i aria-hidden="true" />
+          <span>THE PERFORMANCE ARCHIVE</span>
         </div>
-        <div className={styles.tableStatement}>
-          <p className={styles.eyebrow}>TABLE TENNIS</p>
-          <div className={styles.tableMass}>
-            <strong>2×</strong>
-            <h3>
-              STATE
-              <br />
-              CHAMPION
-            </h3>
-          </div>
+        <div className={styles.introStatement}>
+          <p>BEYOND THE CODE.</p>
+          <h3>ACHIEVEMENTS</h3>
+        </div>
+        <div className={styles.disciplineIndex}>
+          {achievementDisciplines.map((discipline) => (
+            <span key={discipline.key}>{discipline.title}</span>
+          ))}
         </div>
       </KineticPanel>
 
-      <KineticPanel discipline="karate" reducedMotion={reducedMotion}>
+      <KineticPanel panel="table-tennis" reducedMotion={reducedMotion}>
+        <DisciplineMeta discipline="table-tennis" />
+        <div className={styles.tableCourt} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
+        <div className={styles.tableTrajectory} aria-hidden="true">
+          <i />
+          <b />
+          <em />
+        </div>
+        <div className={styles.tableTitle} aria-hidden="true">
+          <span>TABLE</span>
+          <span>TENNIS</span>
+        </div>
+        <div className={styles.tableStatement}>
+          <strong>2×</strong>
+          <h3>
+            STATE
+            <br />
+            CHAMPION
+          </h3>
+        </div>
+      </KineticPanel>
+
+      <KineticPanel panel="karate" reducedMotion={reducedMotion}>
         <DisciplineMeta discipline="karate" />
-        <div className={styles.karateRule} aria-hidden="true" />
+        <div className={styles.karateDivisions} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
         <div className={styles.karateStatement}>
-          <p className={styles.eyebrow}>KARATE</p>
+          <p>KARATE</p>
           <h3>
             <span>BLACK</span>
             <span>BELT</span>
           </h3>
-          <p className={styles.karateClaim} data-publication-status="pending-confirmation">
-            <strong>3×</strong>
-            <span>NATIONAL CHAMPION</span>
-          </p>
-          <p className={styles.verificationNote}>
-            National-title wording pending final confirmation.
-          </p>
+        </div>
+        <div className={styles.karatePrinciples}>
+          <span>CONTROL</span>
+          <span>POWER</span>
+          <span>DISCIPLINE</span>
         </div>
       </KineticPanel>
 
-      <KineticPanel discipline="chess" reducedMotion={reducedMotion}>
+      <KineticPanel panel="chess" reducedMotion={reducedMotion}>
         <DisciplineMeta discipline="chess" />
-        <div className={styles.chessGrid} aria-hidden="true" />
+        <div className={styles.chessGrid} aria-hidden="true">
+          {CHESS_CELLS.map((cell) => (
+            <i key={cell} />
+          ))}
+        </div>
+        <div className={styles.chessPath} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </div>
         <div className={styles.chessStatement}>
-          <div>
-            <p className={styles.eyebrow}>CHESS</p>
-            <h3>
-              PEAK
-              <br />
-              RATINGS
-            </h3>
+          <div className={styles.chessTitle}>
+            <p>CALCULATION / PRECISION / DECISION</p>
+            <h3>CHESS</h3>
           </div>
           <dl className={styles.ratings}>
             {chessPeakRatings.map((rating) => (
@@ -170,11 +206,11 @@ export function AchievementsChapter() {
         </div>
       </KineticPanel>
 
-      <KineticPanel discipline="public-speaking" reducedMotion={reducedMotion}>
+      <KineticPanel panel="public-speaking" reducedMotion={reducedMotion}>
         <DisciplineMeta discipline="public-speaking" />
-        <div className={styles.speakingBaseline} aria-hidden="true" />
+        <div className={styles.audienceField} aria-hidden="true" />
         <div className={styles.speakingStatement}>
-          <p className={styles.eyebrow}>PUBLIC SPEAKING / LEADERSHIP</p>
+          <p>PUBLIC SPEAKING</p>
           <div className={styles.speeches}>
             <strong>15+</strong>
             <h3>
@@ -183,13 +219,34 @@ export function AchievementsChapter() {
               SPEECHES
             </h3>
           </div>
-          <div className={styles.audience}>
-            <strong>15,000+</strong>
-            <p>AUDIENCE</p>
+          <div className={styles.audienceReach}>
+            <strong>15,000</strong>
+            <span>PEOPLE ADDRESSED</span>
           </div>
         </div>
-        <div className={styles.silence} aria-hidden="true">
-          <i />
+        <div className={styles.speakingLight} aria-hidden="true" />
+      </KineticPanel>
+
+      <KineticPanel panel="finale" reducedMotion={reducedMotion}>
+        <div className={styles.meta}>
+          <span>06 / 06</span>
+          <i aria-hidden="true" />
+          <span>ONE PRACTICE</span>
+        </div>
+        <div className={styles.finalDisciplines} aria-hidden="true">
+          {achievementDisciplines.map((discipline) => (
+            <span key={discipline.key}>{discipline.title}</span>
+          ))}
+        </div>
+        <div className={styles.finalConcepts} aria-hidden="true">
+          <span>SPEED</span>
+          <span>DISCIPLINE</span>
+          <span>PRECISION</span>
+          <span>PRESENCE</span>
+        </div>
+        <div className={styles.finalStatement}>
+          <p>BUILT BEYOND</p>
+          <p>THE SCREEN.</p>
         </div>
       </KineticPanel>
     </section>
