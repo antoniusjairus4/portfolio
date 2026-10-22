@@ -8,8 +8,8 @@ import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
 import { KaiPalindromeBridgeScene } from '@/webgl/scenes/KaiPalindromeBridgeScene';
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
-import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
 import { PalindromeNeuroShieldBridgeScene } from '@/webgl/scenes/PalindromeNeuroShieldBridgeScene';
+import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
 import { SkillsScene } from '@/webgl/scenes/SkillsScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
@@ -27,6 +27,7 @@ interface ExperienceCanvasProps {
   dprCap: number;
   portrait: boolean;
   finePointer: boolean;
+  reducedMotion: boolean;
 }
 
 export function ExperienceCanvas({
@@ -35,6 +36,7 @@ export function ExperienceCanvas({
   dprCap,
   portrait,
   finePointer,
+  reducedMotion,
 }: ExperienceCanvasProps) {
   return (
     <Canvas
@@ -65,7 +67,12 @@ export function ExperienceCanvas({
       )}
       {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
       {scene === 'skills' && (
-        <SkillsScene controller={controller} portrait={portrait} finePointer={finePointer} />
+        <SkillsScene
+          controller={controller}
+          portrait={portrait}
+          finePointer={finePointer}
+          reducedMotion={reducedMotion}
+        />
       )}
     </Canvas>
   );

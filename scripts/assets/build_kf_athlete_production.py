@@ -482,7 +482,7 @@ def refine_temporary_paddle():
         (0, .017, .012), (.16, .0215, .0145), (.48, .0205, .014),
         (.78, .0185, .0125), (1, .0155, .0105),
     ], 0, "placeholder", sides=20)
-    replace_mesh_geometry(handle, surface.vertices, surface.faces)
+    replace_mesh_geometry(handle, surface.vertices,surface.faces)
     blade["kf_review_paddle"] = "temporary_refined_not_final"
     handle["kf_review_paddle"] = "temporary_refined_not_final"
     return handle

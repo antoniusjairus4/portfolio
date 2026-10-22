@@ -79,9 +79,9 @@ export function SkillsBoulevard({
       material.emissiveIntensity = index === domain ? 0.82 + hover.current * 0.22 : 0.16;
     });
     pool.current.position.set(...fixtures.lenses[domain].position);
-    pool.current.position.y -= portrait ? 2.8 : 3.4;
-    pool.current.intensity = (portrait ? 7 : 11) * (1 + hover.current * 0.16);
-    pool.current.distance = 9 + hover.current * 0.7;
+    pool.current.position.y -= portrait ? 2.35 : 2.85;
+    pool.current.intensity = (portrait ? 5.8 : 7.8) * (1 + hover.current * 0.16);
+    pool.current.distance = 13.5 + hover.current * 0.9;
   });
 
   return (
@@ -103,8 +103,8 @@ export function SkillsBoulevard({
         name="skills-streetlight-pool"
         color="#e8b773"
         intensity={0}
-        distance={9}
-        decay={2}
+        distance={13.5}
+        decay={1.72}
       />
     </group>
   );

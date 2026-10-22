@@ -295,6 +295,7 @@ export function ProjectExperienceProvider({
               dprCap={activeRegistration.dprCap}
               portrait={activeRegistration.portrait}
               finePointer={activeRegistration.finePointer ?? false}
+              reducedMotion={environment.reducedMotion}
             />
           </div>
         )}

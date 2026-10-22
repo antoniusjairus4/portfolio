@@ -10,6 +10,7 @@ import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { SkillIdentitySystem } from './skills/SkillIdentitySystem';
 import { SkillsArchitecture } from './skills/SkillsArchitecture';
+import { SkillsAtmosphere } from './skills/SkillsAtmosphere';
 import { SkillsEnvironment } from './skills/SkillsEnvironment';
 import { SkillsLighting } from './skills/SkillsLighting';
 import { SkillsMaterialProvider } from './skills/SkillsMaterials';
@@ -18,14 +19,20 @@ interface SkillsSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
   finePointer: boolean;
+  reducedMotion: boolean;
 }
 
-export function SkillsScene({ controller, portrait, finePointer }: SkillsSceneProps) {
+export function SkillsScene({
+  controller,
+  portrait,
+  finePointer,
+  reducedMotion,
+}: SkillsSceneProps) {
   const { camera, size, invalidate } = useThree();
   useEffect(() => {
     const perspective = camera as PerspectiveCamera;
     const previous = perspective.far;
-    perspective.far = 180;
+    perspective.far = 220;
     perspective.updateProjectionMatrix();
     return () => {
       perspective.far = previous;
@@ -130,7 +137,7 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
       );
       const distance = camera.position.distanceTo(inscription.anchor);
       const distanceFade = Math.max(0, Math.min(1, (94 - distance) / 72));
-      const opacity = inFrame ? distanceFade * (0.12 + recognition * 0.88) : 0;
+      const opacity = inFrame ? distanceFade * (0.04 + recognition * 0.96) : 0;
       element.style.setProperty('--skill-focus', recognition.toFixed(3));
       element.style.opacity = opacity.toFixed(3);
       if (opacity < 0.002) {
@@ -150,8 +157,9 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
   return (
     <>
       <color attach="background" args={['#07131d']} />
-      <fog attach="fog" args={['#0b1a24', 22, 122]} />
+      <fog attach="fog" args={['#183541', 34, 182]} />
       <SkillsEnvironment portrait={portrait} />
+      <SkillsAtmosphere portrait={portrait} reducedMotion={reducedMotion} />
       <SkillsLighting controller={controller} portrait={portrait} />
       <SkillsMaterialProvider>
         <SkillsArchitecture
@@ -159,6 +167,7 @@ export function SkillsScene({ controller, portrait, finePointer }: SkillsScenePr
           controller={controller}
           pointer={pointer}
           interactive={finePointer && !portrait}
+          reducedMotion={reducedMotion}
         />
         <SkillIdentitySystem
           portrait={portrait}

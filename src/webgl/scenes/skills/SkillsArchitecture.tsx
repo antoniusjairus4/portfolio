@@ -59,19 +59,22 @@ export function SkillsArchitecture({
   controller,
   pointer,
   interactive,
+  reducedMotion,
 }: {
   portrait: boolean;
   controller: ChapterProgressController;
   pointer: SkillsPointerState;
   interactive: boolean;
+  reducedMotion: boolean;
 }) {
+  const lastRegion = SKILLS_REGIONS[SKILLS_REGIONS.length - 1];
   const path = useMemo(
     (): Point[] => [
-      [0, -0.35, 20],
+      [0, -0.35, 24],
       ...SKILLS_REGIONS.map((region) => [region.x, region.y - 0.35, region.z + 8] as Point),
-      [0, 0.65, -115],
+      [lastRegion.x + 1.5, lastRegion.y - 0.35, lastRegion.z - 34],
     ],
-    [],
+    [lastRegion],
   );
 
   return (
@@ -113,7 +116,12 @@ export function SkillsArchitecture({
           portrait={portrait}
         />
       ))}
-      <SkillsLandscape portrait={portrait} pointer={pointer} interactive={interactive} />
+      <SkillsLandscape
+        portrait={portrait}
+        pointer={pointer}
+        interactive={interactive}
+        reducedMotion={reducedMotion}
+      />
       <SkillsBoulevard
         controller={controller}
         portrait={portrait}

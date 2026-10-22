@@ -60,7 +60,7 @@ export function SkillsLighting({
       ),
     );
     const localPool = smoothstep(focus);
-    if (sky.current) sky.current.intensity = 0.13 + localPool * 0.04;
+    if (sky.current) sky.current.intensity = 0.48 + localPool * 0.08;
     camera.getWorldDirection(ahead);
     target.position.copy(camera.position).addScaledVector(ahead, 12);
     target.position.y -= 1.8;
@@ -74,7 +74,7 @@ export function SkillsLighting({
         target.position.y + 11,
         target.position.z + 6,
       );
-      key.current.intensity = 0.12 + localPool * 0.28;
+      key.current.intensity = 0.42 + localPool * 0.16;
     }
     if (ceilingLight.current) {
       ceilingLight.current.intensity = 0.4 + localPool * 1.6;
@@ -92,7 +92,7 @@ export function SkillsLighting({
         target.position.y - 0.7,
         target.position.z + 3,
       );
-      floorBounce.current.intensity = 3 + localPool * (portrait ? 14 : 18);
+      floorBounce.current.intensity = 2 + localPool * (portrait ? 8 : 10);
     }
     if (aperture.current) {
       aperture.current.position.set(
@@ -100,7 +100,7 @@ export function SkillsLighting({
         target.position.y + 11,
         target.position.z - 9,
       );
-      aperture.current.intensity = 8 + localPool * 12;
+      aperture.current.intensity = 9 + localPool * 9;
     }
     if (routeResponse.current) {
       const region = SKILLS_REGIONS[domain];
@@ -111,15 +111,15 @@ export function SkillsLighting({
   });
   return (
     <>
-      <hemisphereLight ref={sky} args={['#183040', '#211913', 0.13]} />
-      <ambientLight color="#293540" intensity={0.018} />
+      <hemisphereLight ref={sky} args={['#426a82', '#17231f', 0.48]} />
+      <ambientLight color="#33556b" intensity={0.08} />
       <primitive object={target} />
       <primitive object={pool} />
       <directionalLight
         ref={key}
         target={target}
-        color="#e8c38e"
-        intensity={0.12}
+        color="#8eb8ce"
+        intensity={0.42}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}
         shadow-camera-left={-17}

@@ -72,7 +72,7 @@ function IdentityMark({
   domain: number;
   skill: number;
   atlasIndex: number;
-  atlas: Texture;
+  atlas: Texture | null;
   portrait: boolean;
   controller: ChapterProgressController;
   pointer: SkillsPointerState;
@@ -91,12 +91,16 @@ function IdentityMark({
     backing.envMapIntensity = 0.04;
     backing.roughness = 0.76;
     backing.transparent = true;
+    backing.emissive.set('#141d23');
     const mounting = resources.surfaces.metal.clone();
     mounting.color.set('#756f65');
     mounting.metalness = 0.32;
     mounting.roughness = 0.46;
     mounting.transparent = true;
+    mounting.emissive.set('#6f5437');
     const light = resources.surfaces.light.clone();
+    light.color.set('#2d241a');
+    light.emissive.set('#d8aa68');
     light.transparent = true;
     return { backing, mounting, light };
   }, [resources]);
@@ -183,13 +187,13 @@ function IdentityMark({
       }
     }
     hover.current = MathUtils.damp(hover.current, pointerNear, 10, delta);
-    casing.light.emissive.set('#ffd59a');
-    casing.light.emissiveIntensity = 0.06 + focus * 1.87;
-    casing.backing.emissive.set('#5a422a');
-    casing.backing.emissiveIntensity = 0.002 + focus * 0.007;
-    material.opacity = 0.28 + focus * 0.72;
-    material.emissiveIntensity = 0.12 + focus * 0.96 + hover.current * 0.08;
-    material.color.setScalar(0);
+    casing.light.emissive.set('#d8aa68');
+    casing.light.emissiveIntensity = 0.05 + focus * 1.34;
+    casing.backing.emissiveIntensity = 0.1 + focus * 0.16;
+    casing.mounting.emissiveIntensity = 0.015 + focus * 0.22;
+    material.opacity = atlas ? 0.18 + focus * 0.82 : 0;
+    material.emissiveIntensity = 0.12 + focus * 1.38 + hover.current * 0.08;
+    material.color.setScalar(1);
   });
 
   const width = (portrait ? 3.45 : 3.7) * billboardScale;
@@ -202,7 +206,7 @@ function IdentityMark({
         <mesh
           geometry={resources.geometry}
           material={casing.backing}
-          position={[label[0], label[1] + 0.85 * billboardScale, label[2] - 0.26 * billboardScale]}
+          position={[label[0], label[1] + 0.85 * billboardScale, label[2] - 0.18 * billboardScale]}
           scale={[width, 4 * billboardScale, 0.36 * billboardScale]}
           receiveShadow
           dispose={null}
@@ -211,13 +215,13 @@ function IdentityMark({
           <mesh
             key={`side-${side}`}
             geometry={resources.geometry}
-            material={casing.mounting}
+            material={casing.light}
             position={[
               label[0] + side * (width / 2 + 0.045 * billboardScale),
               label[1] + 0.85 * billboardScale,
-              label[2] - 0.3 * billboardScale,
+              label[2] + 0.05 * billboardScale,
             ]}
-            scale={[0.09 * billboardScale, 4.14 * billboardScale, 0.46 * billboardScale]}
+            scale={[0.055 * billboardScale, 4.14 * billboardScale, 0.46 * billboardScale]}
             dispose={null}
           />
         ))}
@@ -225,13 +229,13 @@ function IdentityMark({
           <mesh
             key={`edge-${edge}`}
             geometry={resources.geometry}
-            material={edge < 0 ? casing.light : casing.mounting}
+            material={casing.light}
             position={[
               label[0],
               label[1] + 0.85 * billboardScale + edge * 2.045 * billboardScale,
-              label[2] - 0.3 * billboardScale,
+              label[2] + 0.05 * billboardScale,
             ]}
-            scale={[width + 0.16 * billboardScale, 0.08 * billboardScale, 0.46 * billboardScale]}
+            scale={[width + 0.1 * billboardScale, 0.05 * billboardScale, 0.46 * billboardScale]}
             dispose={null}
           />
         ))}
@@ -243,7 +247,7 @@ function IdentityMark({
             position={[
               label[0] + side * width * 0.31,
               floor + supportHeight / 2,
-              label[2] - 0.5 * billboardScale,
+              label[2] - 0.28 * billboardScale,
             ]}
             scale={[0.1 * billboardScale, supportHeight, 0.16 * billboardScale]}
             dispose={null}
@@ -275,6 +279,7 @@ export function SkillIdentitySystem({
 }) {
   const atlas = useIdentityAtlas(portrait);
   const response = useRef<PointLight>(null);
+  const groundSpill = useRef<PointLight>(null);
   const destinationHint = useRef<PointLight>(null);
   const identities = useMemo(() => {
     let atlasIndex = 0;
@@ -290,8 +295,9 @@ export function SkillIdentitySystem({
   }, []);
   useFrame(() => {
     const light = response.current;
+    const spill = groundSpill.current;
     const hint = destinationHint.current;
-    if (!light || !hint) return;
+    if (!light || !spill || !hint) return;
     const p = controller.progress.current;
     let strongest = 0;
     for (const entry of identities) {
@@ -310,9 +316,15 @@ export function SkillIdentitySystem({
           position[2] + (portrait ? 0.2 : 1.4),
         );
         light.color.set('#ffe7c4');
+        spill.position.set(
+          position[0],
+          SKILLS_REGIONS[entry.domain].y - 0.18,
+          position[2] + (portrait ? 0.18 : 0.7),
+        );
       }
     }
     light.intensity = strongest * (portrait ? 18 : 28);
+    spill.intensity = strongest * (portrait ? 3.8 : 6.5);
 
     const next = identities.find((entry) => entry.progress > p + 0.008);
     if (next) {
@@ -331,19 +343,25 @@ export function SkillIdentitySystem({
   return (
     <>
       <pointLight ref={response} color="#ffd39a" intensity={0} distance={8.5} decay={2} />
+      <pointLight
+        ref={groundSpill}
+        color="#e5b675"
+        intensity={0}
+        distance={portrait ? 4.5 : 6.5}
+        decay={1.8}
+      />
       <pointLight ref={destinationHint} color="#dfb278" intensity={0} distance={6} decay={2} />
-      {atlas &&
-        identities.map((entry) => (
-          <IdentityMark
-            key={entry.identity.id}
-            {...entry}
-            atlas={atlas}
-            portrait={portrait}
-            controller={controller}
-            pointer={pointer}
-            interactive={interactive}
-          />
-        ))}
+      {identities.map((entry) => (
+        <IdentityMark
+          key={entry.identity.id}
+          {...entry}
+          atlas={atlas}
+          portrait={portrait}
+          controller={controller}
+          pointer={pointer}
+          interactive={interactive}
+        />
+      ))}
     </>
   );
 }

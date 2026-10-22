@@ -122,9 +122,9 @@ function createResources() {
   surfaces.floor.color.set('#151d23');
   surfaces.floor.emissive.set('#0d151a');
   surfaces.floor.emissiveIntensity = 0.28;
-  surfaces.landscape.color.set('#111b17');
-  surfaces.landscape.emissive.set('#07130d');
-  surfaces.landscape.emissiveIntensity = 0.34;
+  surfaces.landscape.color.set('#182821');
+  surfaces.landscape.emissive.set('#0a1814');
+  surfaces.landscape.emissiveIntensity = 0.3;
   return {
     surfaces,
     geometry: new BoxGeometry(),

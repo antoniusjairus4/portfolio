@@ -6,11 +6,11 @@ import { clamp01, SKILLS_CENTERS, smoothstep } from './skillsChoreography';
 // neither the route nor the buildings reset at a domain boundary.
 export const SKILLS_REGIONS = [
   { x: 0, y: 0, z: 0 },
-  { x: 1.6, y: 0.2, z: -16 },
-  { x: 0.4, y: -1.6, z: -32 },
-  { x: -1.1, y: -1.2, z: -48 },
-  { x: 0.8, y: -0.2, z: -64 },
-  { x: 0, y: 1, z: -80 },
+  { x: 4.8, y: 0.2, z: -23 },
+  { x: -3.4, y: -1.6, z: -46 },
+  { x: 4.3, y: -1.2, z: -69 },
+  { x: -4, y: -0.2, z: -92 },
+  { x: 1.4, y: 1, z: -115 },
 ] as const;
 
 const ROUTE_TIMES = [0, ...SKILLS_CENTERS, 1];
@@ -19,14 +19,25 @@ export function createSkillsRoute(portrait: boolean) {
   const positions = SKILLS_REGIONS.map(
     (region, index) =>
       new Vector3(
-        region.x + (portrait ? 0 : [0.35, -0.55, 0.35, 0, -0.45, 0.3][index]),
+        region.x + (portrait ? 0 : [0.35, -0.35, 0.25, -0.2, 0.3, -0.1][index]),
         region.y + (portrait ? 3.15 : 2.65),
         region.z + (portrait ? 12.8 : 10.5),
       ),
   );
-  const targets = SKILLS_REGIONS.map(
-    (region) => new Vector3(region.x, region.y + (portrait ? 2.1 : 2.2), region.z - 5),
-  );
+  const targets = positions.map((position, index) => {
+    const neighbor = positions[Math.min(index + 1, positions.length - 1)];
+    const direction =
+      index === positions.length - 1
+        ? position
+            .clone()
+            .sub(positions[index - 1])
+            .normalize()
+        : neighbor.clone().sub(position).normalize();
+    return position
+      .clone()
+      .addScaledVector(direction, portrait ? 10.5 : 13.5)
+      .add(new Vector3(0, portrait ? -0.8 : -0.45, 0));
+  });
   return {
     camera: new CatmullRomCurve3(
       [
@@ -80,7 +91,7 @@ export function skillFocusProgress(domain: number, skill: number) {
 }
 
 export function skillBillboardScale(portrait: boolean) {
-  return portrait ? 0.078 : 0.296;
+  return portrait ? 0.09 : 0.32;
 }
 
 const routes = [createSkillsRoute(false), createSkillsRoute(true)];
