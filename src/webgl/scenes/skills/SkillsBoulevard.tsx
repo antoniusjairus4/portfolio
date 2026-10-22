@@ -9,6 +9,7 @@ import { skillCategories } from '@/content/skills';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { useSkillsMaterials } from './SkillsMaterials';
 import { type Member, Members, member } from './SkillsStructure';
+import { useSkillsWind } from './SkillsWind';
 import type { SkillsPointerState } from './skillsInteraction';
 
 const METAL = '#242b2b';
@@ -28,6 +29,7 @@ export function SkillsBoulevard({
   const hover = useRef(0);
   const projection = useMemo(() => new Vector3(), []);
   const resources = useSkillsMaterials();
+  const wind = useSkillsWind();
   const fixtures = useMemo(() => {
     const pieces: Member[] = [];
     const lenses: { key: string; position: [number, number, number] }[] = [];
@@ -75,12 +77,14 @@ export function SkillsBoulevard({
     const nextHover = MathUtils.damp(hover.current, pointerNear, 9, delta);
     if (Math.abs(nextHover - hover.current) > 0.00001) state.invalidate();
     hover.current = nextHover;
+    const lightBreath =
+      1 + Math.sin(wind.current.time * 0.19 + domain * 0.73) * 0.014 * wind.current.strength;
     lensMaterials.forEach((material, index) => {
-      material.emissiveIntensity = index === domain ? 0.82 + hover.current * 0.22 : 0.16;
+      material.emissiveIntensity =
+        (index === domain ? 0.82 + hover.current * 0.22 : 0.16) * lightBreath;
     });
     pool.current.position.set(...fixtures.lenses[domain].position);
-    pool.current.position.y -= portrait ? 2.35 : 2.85;
-    pool.current.intensity = (portrait ? 5.8 : 7.8) * (1 + hover.current * 0.16);
+    pool.current.intensity = (portrait ? 5.8 : 7.8) * (1 + hover.current * 0.16) * lightBreath;
     pool.current.distance = 13.5 + hover.current * 0.9;
   });
 

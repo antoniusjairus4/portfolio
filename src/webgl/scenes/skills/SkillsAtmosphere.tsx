@@ -19,6 +19,7 @@ import {
   SphereGeometry,
 } from 'three';
 import { SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
+import { useSkillsWind } from './SkillsWind';
 
 const SKY_VERTEX = /* glsl */ `
   varying vec2 vUv;
@@ -119,6 +120,7 @@ export function SkillsAtmosphere({
 }) {
   const sky = useRef<Group>(null);
   const cloudMeshes = useRef<(Group | null)[]>([]);
+  const wind = useSkillsWind();
   const resources = useMemo(() => {
     const skyGeometry = new SphereGeometry(145, portrait ? 18 : 28, portrait ? 10 : 16);
     const skyMaterial = new ShaderMaterial({
@@ -181,13 +183,13 @@ export function SkillsAtmosphere({
     );
     const clouds: Cloud[] = [
       { x: -17, y: 8.4, z: -12, width: 34, height: 7.6, rotation: -0.08, layer: 0, speed: 0.075 },
-      { x: 18, y: 7.3, z: -34, width: 16, height: 3.8, rotation: 0.1, layer: 1, speed: 0.105 },
-      { x: -8, y: 8.6, z: -55, width: 18, height: 4.2, rotation: 0.035, layer: 0, speed: 0.065 },
-      { x: 22, y: 6.8, z: -76, width: 14, height: 3.2, rotation: -0.12, layer: 2, speed: 0.13 },
-      { x: -23, y: 8.2, z: -97, width: 17, height: 3.8, rotation: 0.08, layer: 1, speed: 0.095 },
-      { x: 7, y: 9.1, z: -118, width: 36, height: 7.8, rotation: -0.025, layer: 0, speed: 0.06 },
-      { x: -17, y: 7.1, z: -139, width: 15, height: 3.4, rotation: 0.13, layer: 2, speed: 0.12 },
-      { x: 20, y: 8.2, z: -158, width: 18, height: 4, rotation: -0.09, layer: 1, speed: 0.085 },
+      { x: 18, y: 7.3, z: -38, width: 16, height: 3.8, rotation: 0.1, layer: 1, speed: 0.105 },
+      { x: -8, y: 8.6, z: -62, width: 18, height: 4.2, rotation: 0.035, layer: 0, speed: 0.065 },
+      { x: 22, y: 6.8, z: -86, width: 14, height: 3.2, rotation: -0.12, layer: 2, speed: 0.13 },
+      { x: -23, y: 8.2, z: -110, width: 17, height: 3.8, rotation: 0.08, layer: 1, speed: 0.095 },
+      { x: 7, y: 9.1, z: -134, width: 36, height: 7.8, rotation: -0.025, layer: 0, speed: 0.06 },
+      { x: -17, y: 7.1, z: -157, width: 15, height: 3.4, rotation: 0.13, layer: 2, speed: 0.12 },
+      { x: 20, y: 8.2, z: -179, width: 18, height: 4, rotation: -0.09, layer: 1, speed: 0.085 },
     ].filter((_, index) => !portrait || index % 2 === 0);
     const ridgeGeometry = new DodecahedronGeometry(1, 0);
     const ridgeMaterial = new MeshStandardMaterial({
@@ -305,14 +307,23 @@ export function SkillsAtmosphere({
 
   useFrame((state) => {
     if (sky.current) sky.current.position.set(state.camera.position.x, 0, state.camera.position.z);
-    const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    const travel = wind.current.travel;
     resources.clouds.forEach((cloud, index) => {
       const mesh = cloudMeshes.current[index];
       if (!mesh) return;
       const span = 88;
-      const moved = cloud.x + time * cloud.speed;
-      mesh.position.x = ((((moved + span / 2) % span) + span) % span) - span / 2;
+      const drift = ((((travel * cloud.speed + span / 2) % span) + span) % span) - span / 2;
+      mesh.position.x = cloud.x + drift * wind.current.directionX;
+      mesh.position.z = cloud.z + drift * wind.current.directionZ;
+      const deformation = Math.sin(wind.current.time * 0.07 + index * 1.43);
+      mesh.scale.set(1 + deformation * 0.018, 1 - deformation * 0.012, 1);
+      mesh.rotation.z = cloud.rotation + deformation * 0.006;
     });
+    resources.starMaterials[2].opacity = reducedMotion
+      ? 0.94
+      : 0.92 +
+        Math.sin(wind.current.time * 0.17) * 0.018 +
+        Math.sin(wind.current.time * 0.43) * 0.012;
   });
 
   return (

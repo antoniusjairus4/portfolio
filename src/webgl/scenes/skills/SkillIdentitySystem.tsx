@@ -24,6 +24,7 @@ import {
 import { type SkillIdentity, skillIdentities } from '@/content/skillIdentities';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { useSkillsMaterials } from './SkillsMaterials';
+import { useSkillsWind } from './SkillsWind';
 import type { SkillsPointerState } from './skillsInteraction';
 
 function useIdentityAtlas(portrait: boolean) {
@@ -79,10 +80,12 @@ function IdentityMark({
   interactive: boolean;
 }) {
   const mark = useRef<Group>(null);
+  const board = useRef<Group>(null);
   const installation = useRef<Group>(null);
   const hover = useRef(0);
   const projection = useMemo(() => new Vector3(), []);
   const resources = useSkillsMaterials();
+  const wind = useSkillsWind();
   const label = useMemo(() => skillAnchor(domain, skill, portrait), [domain, skill, portrait]);
   const casing = useMemo(() => {
     const backing = resources.surfaces.technical.clone();
@@ -187,8 +190,20 @@ function IdentityMark({
       }
     }
     hover.current = MathUtils.damp(hover.current, pointerNear, 10, delta);
+    const distance = state.camera.position.distanceTo(projection.set(...position));
+    const distant = MathUtils.clamp((distance - 5) / 42, 0, 1);
+    const gustResponse = Math.max(0, (wind.current.gust - 0.18) / 0.82);
+    const windAmount = (0.00018 + distant * 0.00125) * gustResponse * gustResponse;
+    const windPhase = domain * 1.71 + skill * 0.83;
+    if (board.current) {
+      board.current.rotation.z = Math.sin(wind.current.time * 0.54 + windPhase) * windAmount;
+      board.current.rotation.y =
+        Math.sin(wind.current.time * 0.39 + windPhase * 1.4) * windAmount * 0.55;
+    }
+    const lightVariation =
+      1 + Math.sin(wind.current.time * 0.27 + windPhase) * (0.006 + wind.current.strength * 0.01);
     casing.light.emissive.set('#d8aa68');
-    casing.light.emissiveIntensity = 0.05 + focus * 1.34;
+    casing.light.emissiveIntensity = (0.05 + focus * 1.34) * lightVariation;
     casing.backing.emissiveIntensity = 0.1 + focus * 0.16;
     casing.mounting.emissiveIntensity = 0.015 + focus * 0.22;
     material.opacity = atlas ? 0.18 + focus * 0.82 : 0;
@@ -203,42 +218,52 @@ function IdentityMark({
   return (
     <group name={`skills-exhibit-${domain}-${skill}`} ref={installation}>
       <group name="skills-exhibit-structure">
-        <mesh
-          geometry={resources.geometry}
-          material={casing.backing}
-          position={[label[0], label[1] + 0.85 * billboardScale, label[2] - 0.18 * billboardScale]}
-          scale={[width, 4 * billboardScale, 0.36 * billboardScale]}
-          receiveShadow
-          dispose={null}
-        />
-        {[-1, 1].map((side) => (
+        <group
+          ref={board}
+          name={`skills-billboard-panel-${domain}-${skill}`}
+          position={[label[0], bottom, label[2]]}
+        >
           <mesh
-            key={`side-${side}`}
             geometry={resources.geometry}
-            material={casing.light}
-            position={[
-              label[0] + side * (width / 2 + 0.045 * billboardScale),
-              label[1] + 0.85 * billboardScale,
-              label[2] + 0.05 * billboardScale,
-            ]}
-            scale={[0.055 * billboardScale, 4.14 * billboardScale, 0.46 * billboardScale]}
+            material={casing.backing}
+            position={[0, 2 * billboardScale, -0.18 * billboardScale]}
+            scale={[width, 4 * billboardScale, 0.36 * billboardScale]}
+            receiveShadow
             dispose={null}
           />
-        ))}
-        {[-1, 1].map((edge) => (
-          <mesh
-            key={`edge-${edge}`}
-            geometry={resources.geometry}
-            material={casing.light}
-            position={[
-              label[0],
-              label[1] + 0.85 * billboardScale + edge * 2.045 * billboardScale,
-              label[2] + 0.05 * billboardScale,
-            ]}
-            scale={[width + 0.1 * billboardScale, 0.05 * billboardScale, 0.46 * billboardScale]}
-            dispose={null}
-          />
-        ))}
+          {[-1, 1].map((side) => (
+            <mesh
+              key={`side-${side}`}
+              geometry={resources.geometry}
+              material={casing.light}
+              position={[
+                side * (width / 2 + 0.045 * billboardScale),
+                2 * billboardScale,
+                0.05 * billboardScale,
+              ]}
+              scale={[0.055 * billboardScale, 4.14 * billboardScale, 0.46 * billboardScale]}
+              dispose={null}
+            />
+          ))}
+          {[-1, 1].map((edge) => (
+            <mesh
+              key={`edge-${edge}`}
+              geometry={resources.geometry}
+              material={casing.light}
+              position={[0, (2 + edge * 2.045) * billboardScale, 0.05 * billboardScale]}
+              scale={[width + 0.1 * billboardScale, 0.05 * billboardScale, 0.46 * billboardScale]}
+              dispose={null}
+            />
+          ))}
+          <group ref={mark} position={[0, 2.8 * billboardScale, 0]}>
+            <mesh
+              name={`skills-logo-${domain}-${skill}`}
+              geometry={face}
+              material={material}
+              dispose={null}
+            />
+          </group>
+        </group>
         {[-1, 1].map((side) => (
           <mesh
             key={`post-${side}`}
@@ -253,14 +278,6 @@ function IdentityMark({
             dispose={null}
           />
         ))}
-      </group>
-      <group ref={mark} position={position}>
-        <mesh
-          name={`skills-logo-${domain}-${skill}`}
-          geometry={face}
-          material={material}
-          dispose={null}
-        />
       </group>
     </group>
   );
@@ -278,6 +295,7 @@ export function SkillIdentitySystem({
   interactive: boolean;
 }) {
   const atlas = useIdentityAtlas(portrait);
+  const wind = useSkillsWind();
   const response = useRef<PointLight>(null);
   const groundSpill = useRef<PointLight>(null);
   const destinationHint = useRef<PointLight>(null);
@@ -318,13 +336,15 @@ export function SkillIdentitySystem({
         light.color.set('#ffe7c4');
         spill.position.set(
           position[0],
-          SKILLS_REGIONS[entry.domain].y - 0.18,
-          position[2] + (portrait ? 0.18 : 0.7),
+          position[1] - (portrait ? 0.08 : 0.45),
+          position[2] + (portrait ? 0.12 : 0.5),
         );
       }
     }
-    light.intensity = strongest * (portrait ? 18 : 28);
-    spill.intensity = strongest * (portrait ? 3.8 : 6.5);
+    const lightBreath =
+      1 + Math.sin(wind.current.time * 0.23 + 0.8) * 0.012 * wind.current.strength;
+    light.intensity = strongest * (portrait ? 18 : 28) * lightBreath;
+    spill.intensity = strongest * (portrait ? 3.8 : 6.5) * lightBreath;
 
     const next = identities.find((entry) => entry.progress > p + 0.008);
     if (next) {

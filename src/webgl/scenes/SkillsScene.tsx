@@ -2,7 +2,7 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { type PerspectiveCamera, Vector2, Vector3 } from 'three';
+import { MathUtils, type PerspectiveCamera, Vector2, Vector3 } from 'three';
 import { getSkillRecognition } from '@/components/skills/skillsChoreography';
 import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
 import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
@@ -14,6 +14,7 @@ import { SkillsAtmosphere } from './skills/SkillsAtmosphere';
 import { SkillsEnvironment } from './skills/SkillsEnvironment';
 import { SkillsLighting } from './skills/SkillsLighting';
 import { SkillsMaterialProvider } from './skills/SkillsMaterials';
+import { SkillsWindProvider } from './skills/SkillsWind';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -43,6 +44,8 @@ export function SkillsScene({
   const pointer = useRef({ active: false, ndc: new Vector2() });
   const target = useMemo(() => new Vector3(), []);
   const projection = useMemo(() => new Vector3(), []);
+  const tangentBefore = useMemo(() => new Vector3(), []);
+  const tangentAfter = useMemo(() => new Vector3(), []);
   const inscriptions = useMemo(
     () =>
       skillCategories.flatMap((category, domain) =>
@@ -116,6 +119,11 @@ export function SkillsScene({
     target.y += pointer.current.ndc.y * 0.12 * agency;
     camera.up.set(0, 1, 0);
     camera.lookAt(target);
+    route.camera.getTangent(Math.max(0, parameter - 0.018), tangentBefore);
+    route.camera.getTangent(Math.min(1, parameter + 0.018), tangentAfter);
+    const turn = tangentBefore.x * tangentAfter.z - tangentBefore.z * tangentAfter.x;
+    const bank = MathUtils.clamp(turn * 0.42, -0.032, 0.032);
+    camera.rotateZ(-bank);
     camera.updateMatrixWorld();
 
     // DOM text shares immutable world anchors and the same authored camera.
@@ -158,24 +166,25 @@ export function SkillsScene({
     <>
       <color attach="background" args={['#07131d']} />
       <fog attach="fog" args={['#183541', 34, 182]} />
-      <SkillsEnvironment portrait={portrait} />
-      <SkillsAtmosphere portrait={portrait} reducedMotion={reducedMotion} />
-      <SkillsLighting controller={controller} portrait={portrait} />
-      <SkillsMaterialProvider>
-        <SkillsArchitecture
-          portrait={portrait}
-          controller={controller}
-          pointer={pointer}
-          interactive={finePointer && !portrait}
-          reducedMotion={reducedMotion}
-        />
-        <SkillIdentitySystem
-          portrait={portrait}
-          controller={controller}
-          pointer={pointer}
-          interactive={finePointer && !portrait}
-        />
-      </SkillsMaterialProvider>
+      <SkillsWindProvider reducedMotion={reducedMotion}>
+        <SkillsEnvironment portrait={portrait} />
+        <SkillsAtmosphere portrait={portrait} reducedMotion={reducedMotion} />
+        <SkillsLighting controller={controller} portrait={portrait} />
+        <SkillsMaterialProvider>
+          <SkillsArchitecture
+            portrait={portrait}
+            controller={controller}
+            pointer={pointer}
+            interactive={finePointer && !portrait}
+          />
+          <SkillIdentitySystem
+            portrait={portrait}
+            controller={controller}
+            pointer={pointer}
+            interactive={finePointer && !portrait}
+          />
+        </SkillsMaterialProvider>
+      </SkillsWindProvider>
     </>
   );
 }

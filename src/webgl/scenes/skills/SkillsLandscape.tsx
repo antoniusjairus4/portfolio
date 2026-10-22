@@ -17,6 +17,7 @@ import {
   Vector3,
 } from 'three';
 import { SKILLS_REGIONS } from '@/components/skills/skillsSpatial';
+import { useSkillsWind } from './SkillsWind';
 import type { SkillsPointerState } from './skillsInteraction';
 
 type Tree = {
@@ -42,8 +43,16 @@ type Pond = {
   rotation: number;
 };
 
+type DriftParticle = {
+  origin: [number, number, number];
+  phase: number;
+  speed: number;
+  scale: number;
+};
+
 const POND_VERTEX = /* glsl */ `
   uniform float uSkillsPondTime;
+  uniform float uSkillsPondWind;
   varying vec2 vSkillsPondUv;
 
   void main() {
@@ -51,13 +60,14 @@ const POND_VERTEX = /* glsl */ `
     vec3 displaced = position;
     float waveA = sin(position.x * 3.7 + uSkillsPondTime * 0.32);
     float waveB = cos(position.y * 4.6 - uSkillsPondTime * 0.23);
-    displaced.z += (waveA + waveB) * 0.008;
+    displaced.z += (waveA + waveB) * (0.004 + uSkillsPondWind * 0.007);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(displaced, 1.0);
   }
 `;
 
 const POND_FRAGMENT = /* glsl */ `
   uniform float uSkillsPondTime;
+  uniform float uSkillsPondWind;
   varying vec2 vSkillsPondUv;
 
   void main() {
@@ -66,7 +76,11 @@ const POND_FRAGMENT = /* glsl */ `
     float edge = 1.0 - smoothstep(0.82, 1.0, radius);
     float ripple = sin(radius * 31.0 - uSkillsPondTime * 0.38 + centered.x * 4.0);
     float crossRipple = sin(centered.y * 17.0 + uSkillsPondTime * 0.21);
-    float sheen = smoothstep(0.68, 0.98, ripple * 0.44 + crossRipple * 0.16 + 0.52);
+    float sheen = smoothstep(
+      0.68,
+      0.98,
+      ripple * (0.36 + uSkillsPondWind * 0.12) + crossRipple * 0.16 + 0.52
+    );
     vec3 deepWater = vec3(0.025, 0.105, 0.145);
     vec3 reflectedSky = vec3(0.18, 0.34, 0.42);
     vec3 color = mix(deepWater, reflectedSky, 0.2 + sheen * 0.22);
@@ -161,14 +175,16 @@ export function SkillsLandscape({
   portrait,
   pointer,
   interactive,
-  reducedMotion,
 }: {
   portrait: boolean;
   pointer: SkillsPointerState;
   interactive: boolean;
-  reducedMotion: boolean;
 }) {
+  const wind = useSkillsWind();
+  const trunkMesh = useRef<InstancedMesh>(null);
+  const branchMesh = useRef<InstancedMesh>(null);
   const crownMesh = useRef<InstancedMesh>(null);
+  const leafMesh = useRef<InstancedMesh>(null);
   const projection = useMemo(() => new Vector3(), []);
   const transform = useMemo(() => new Object3D(), []);
   const resources = useMemo(() => {
@@ -197,6 +213,18 @@ export function SkillsLandscape({
         tone: index % 4 === 0 ? '#223b2b' : tree.tone,
       },
     ]);
+    const branches: LandscapeInstance[] = trees.flatMap((tree, index) =>
+      [-1, 1].map((side) => ({
+        position: [
+          tree.x + side * tree.crown * 0.22,
+          tree.y + tree.height * (0.66 + (index % 2) * 0.04),
+          tree.z + Math.cos(tree.rotation + side) * tree.crown * 0.08,
+        ] as [number, number, number],
+        scale: [0.075, tree.crown * 0.6, 0.075] as [number, number, number],
+        rotation: [side * 0.22, tree.rotation, side * 0.72] as [number, number, number],
+        tone: '#211e18',
+      })),
+    );
     const rocks: LandscapeInstance[] = SKILLS_REGIONS.flatMap((region, domain) => {
       const side = domain % 2 ? -1 : 1;
       const count = portrait ? (domain % 2 ? 0 : 1) : domain % 3 === 1 ? 0 : domain % 2 ? 1 : 3;
@@ -275,7 +303,19 @@ export function SkillsLandscape({
         },
       ] satisfies Pond[]
     ).filter((_, index) => !portrait || index === 0);
-    return { trees, trunks, crowns, rocks, hills, grass, ponds };
+    const leaves: DriftParticle[] = SKILLS_REGIONS.flatMap((region, domain) =>
+      Array.from({ length: portrait ? 1 : domain % 2 ? 2 : 3 }, (_, index) => ({
+        origin: [
+          region.x + (index - 1) * 2.4,
+          region.y + 1.1 + seededGrass(domain + 3, 1, index) * 1.5,
+          region.z + 6 - index * 4.7,
+        ],
+        phase: seededGrass(domain + 5, -1, index + 2) * 12,
+        speed: 0.45 + seededGrass(domain + 9, 1, index + 4) * 0.35,
+        scale: 0.045 + (index % 2) * 0.025,
+      })),
+    );
+    return { trees, trunks, branches, crowns, rocks, hills, grass, ponds, leaves };
   }, [portrait]);
   const treeMotion = useRef(resources.trees.map(() => ({ lift: 0, pitch: 0, roll: 0 })));
   useLayoutEffect(() => {
@@ -285,16 +325,22 @@ export function SkillsLandscape({
   const geometry = useMemo(
     () => ({
       trunk: new CylinderGeometry(1, 1.15, 1, 6),
+      branch: new CylinderGeometry(1, 1.08, 1, 5),
       crown: new IcosahedronGeometry(1, 0),
       rock: new DodecahedronGeometry(1, 0),
       hill: new DodecahedronGeometry(1, 0),
       grass: new ConeGeometry(1, 1, 3),
       pond: new CircleGeometry(1, portrait ? 24 : 40),
+      leaf: new DodecahedronGeometry(1, 0),
     }),
     [portrait],
   );
   const grassTime = useMemo(() => ({ value: 0 }), []);
+  const grassStrength = useMemo(() => ({ value: 0 }), []);
+  const grassDirection = useMemo(() => ({ value: 0 }), []);
+  const grassDirectionZ = useMemo(() => ({ value: 0 }), []);
   const pondTime = useMemo(() => ({ value: 0 }), []);
+  const pondStrength = useMemo(() => ({ value: 0 }), []);
   const materials = useMemo(() => {
     const grass = new MeshStandardMaterial({
       color: '#ffffff',
@@ -303,24 +349,40 @@ export function SkillsLandscape({
     });
     grass.onBeforeCompile = (shader) => {
       shader.uniforms.uSkillsGrassTime = grassTime;
+      shader.uniforms.uSkillsGrassStrength = grassStrength;
+      shader.uniforms.uSkillsGrassDirection = grassDirection;
+      shader.uniforms.uSkillsGrassDirectionZ = grassDirectionZ;
       shader.vertexShader = shader.vertexShader.replace(
         '#include <common>',
-        '#include <common>\nuniform float uSkillsGrassTime;',
+        `#include <common>
+          uniform float uSkillsGrassTime;
+          uniform float uSkillsGrassStrength;
+          uniform float uSkillsGrassDirection;
+          uniform float uSkillsGrassDirectionZ;`,
       );
       shader.vertexShader = shader.vertexShader.replace(
         '#include <begin_vertex>',
         `
             vec3 transformed = vec3(position);
             #ifdef USE_INSTANCING
-              float bladeWeight = smoothstep(-0.5, 0.5, position.y);
-              float bladePhase = instanceMatrix[3].x * 0.47 + instanceMatrix[3].z * 0.31;
-              transformed.x += sin(uSkillsGrassTime * 0.55 + bladePhase) * 0.11 * bladeWeight;
-              transformed.z += cos(uSkillsGrassTime * 0.43 + bladePhase * 1.31) * 0.045 * bladeWeight;
+              float rootToTip = clamp(position.y + 0.5, 0.0, 1.0);
+              float bladeWeight = rootToTip * rootToTip;
+              float worldX = instanceMatrix[3].x;
+              float worldZ = instanceMatrix[3].z;
+              float bladePhase = worldX * 0.47 + worldZ * 0.31;
+              float stiffness = 0.72 + fract(sin(bladePhase * 17.13) * 43758.5453) * 0.48;
+              float travellingWave = sin(
+                uSkillsGrassTime * 0.72 - worldX * 0.36 - worldZ * 0.21 + bladePhase
+              );
+              float bend = travellingWave * (0.025 + uSkillsGrassStrength * 0.15) *
+                bladeWeight / stiffness;
+              transformed.x += bend * uSkillsGrassDirection;
+              transformed.z += bend * uSkillsGrassDirectionZ;
             #endif
           `,
       );
     };
-    grass.customProgramCacheKey = () => 'skills-grass-breeze-v1';
+    grass.customProgramCacheKey = () => 'skills-grass-breeze-v2';
     return {
       trunk: new MeshStandardMaterial({
         color: '#ffffff',
@@ -328,6 +390,13 @@ export function SkillsLandscape({
         flatShading: true,
         emissive: '#110e0b',
         emissiveIntensity: 0.1,
+      }),
+      branch: new MeshStandardMaterial({
+        color: '#ffffff',
+        roughness: 0.97,
+        flatShading: true,
+        emissive: '#0d0b08',
+        emissiveIntensity: 0.08,
       }),
       crown: new MeshStandardMaterial({
         color: '#ffffff',
@@ -342,12 +411,19 @@ export function SkillsLandscape({
       pond: new ShaderMaterial({
         vertexShader: POND_VERTEX,
         fragmentShader: POND_FRAGMENT,
-        uniforms: { uSkillsPondTime: pondTime },
+        uniforms: { uSkillsPondTime: pondTime, uSkillsPondWind: pondStrength },
         transparent: true,
         depthWrite: false,
       }),
+      leaf: new MeshStandardMaterial({
+        color: '#7b6b43',
+        roughness: 0.92,
+        flatShading: true,
+        transparent: true,
+        opacity: 0.62,
+      }),
     };
-  }, [grassTime, pondTime]);
+  }, [grassDirection, grassDirectionZ, grassStrength, grassTime, pondStrength, pondTime]);
 
   useLayoutEffect(
     () => () => {
@@ -362,15 +438,25 @@ export function SkillsLandscape({
   );
 
   useFrame((state, delta) => {
-    const time = reducedMotion ? 0 : state.clock.elapsedTime;
+    const time = wind.current.time;
     grassTime.value = time;
+    grassStrength.value = wind.current.strength;
+    grassDirection.value = wind.current.directionX;
+    grassDirectionZ.value = wind.current.directionZ;
     pondTime.value = time;
+    pondStrength.value = wind.current.strength;
     const mesh = crownMesh.current;
-    if (!mesh) return;
+    const trunks = trunkMesh.current;
+    const branches = branchMesh.current;
+    const leaves = leafMesh.current;
+    if (!mesh || !trunks || !branches || !leaves) return;
     const perRegion = portrait ? 1 : 3;
     let changed = false;
     resources.trees.forEach((tree, index) => {
-      projection.set(tree.x, tree.y + tree.height * 0.8, tree.z).project(state.camera);
+      projection.set(tree.x, tree.y + tree.height * 0.8, tree.z);
+      const distance = projection.distanceTo(state.camera.position);
+      const nearby = 1 - MathUtils.clamp((distance - 4) / 22, 0, 1);
+      projection.project(state.camera);
       const inFrame = projection.z > -1 && projection.z < 1;
       const dx = pointer.current.ndc.x - projection.x;
       const dy = pointer.current.ndc.y - projection.y;
@@ -379,7 +465,9 @@ export function SkillsLandscape({
           ? Math.max(0, 1 - Math.hypot(dx, dy) / 0.38)
           : 0;
       const motion = treeMotion.current[index];
-      const ambient = reducedMotion ? 0 : Math.sin(time * 0.24 + index * 1.73) * 0.008;
+      const irregular =
+        Math.sin(time * 0.42 + index * 1.73) * 0.72 + Math.sin(time * 0.19 + index * 0.91) * 0.28;
+      const ambient = irregular * (0.002 + nearby * 0.0048) * wind.current.strength;
       const nextPitch = MathUtils.damp(
         motion.pitch,
         ambient + Math.sign(dy) * proximity * 0.045,
@@ -404,9 +492,9 @@ export function SkillsLandscape({
       transform.position.set(tree.x, tree.y + tree.height * 0.72 + motion.lift, tree.z);
       transform.scale.set(tree.crown, tree.crown * 0.72, tree.crown * 0.92);
       transform.rotation.set(
-        0.08 + motion.pitch,
+        0.08 + motion.pitch * wind.current.directionZ,
         tree.rotation,
-        (index % 2 ? 0.1 : -0.08) + motion.roll,
+        (index % 2 ? 0.1 : -0.08) + motion.roll * wind.current.directionX,
       );
       transform.updateMatrix();
       mesh.setMatrixAt(index * 2, transform.matrix);
@@ -418,21 +506,80 @@ export function SkillsLandscape({
       );
       transform.scale.set(tree.crown * 0.74, tree.crown * 0.8, tree.crown * 0.7);
       transform.rotation.set(
-        -0.08 + motion.pitch * 0.8,
+        -0.08 + motion.pitch * 1.18 * wind.current.directionZ,
         tree.rotation + 0.8,
-        (index % 2 ? -0.12 : 0.1) + motion.roll * 0.8,
+        (index % 2 ? -0.12 : 0.1) + motion.roll * 1.18 * wind.current.directionX,
       );
       transform.updateMatrix();
       mesh.setMatrixAt(index * 2 + 1, transform.matrix);
+
+      const trunkSway = ambient * wind.current.gust * 0.065;
+      transform.position.set(tree.x, tree.y + tree.height * 0.34, tree.z);
+      transform.scale.set(0.16 + tree.crown * 0.025, tree.height * 0.68, 0.16 + tree.crown * 0.025);
+      transform.rotation.set(trunkSway, tree.rotation, trunkSway * 0.65);
+      transform.updateMatrix();
+      trunks.setMatrixAt(index, transform.matrix);
+
+      for (const side of [-1, 1]) {
+        const branchIndex = index * 2 + (side === 1 ? 1 : 0);
+        const delayed =
+          Math.sin(time * 0.34 + index * 1.73 - 0.32) *
+          (0.0012 + nearby * 0.0022) *
+          wind.current.strength;
+        transform.position.set(
+          tree.x + side * tree.crown * 0.22,
+          tree.y + tree.height * (0.66 + (index % 2) * 0.04),
+          tree.z + Math.cos(tree.rotation + side) * tree.crown * 0.08,
+        );
+        transform.scale.set(0.075, tree.crown * 0.6, 0.075);
+        transform.rotation.set(
+          side * 0.22 + delayed * wind.current.directionZ,
+          tree.rotation,
+          side * 0.72 + delayed * wind.current.directionX,
+        );
+        transform.updateMatrix();
+        branches.setMatrixAt(branchIndex, transform.matrix);
+      }
     });
-    if (changed) mesh.instanceMatrix.needsUpdate = true;
+    if (changed) {
+      mesh.instanceMatrix.needsUpdate = true;
+      trunks.instanceMatrix.needsUpdate = true;
+      branches.instanceMatrix.needsUpdate = true;
+    }
+
+    resources.leaves.forEach((leaf, index) => {
+      const span = portrait ? 7 : 11;
+      const drift = (wind.current.travel * leaf.speed + leaf.phase) % span;
+      const fallSpan = portrait ? 2.1 : 2.8;
+      const fall = (wind.current.travel * leaf.speed * 0.42 + leaf.phase) % fallSpan;
+      transform.position.set(
+        leaf.origin[0] - span / 2 + drift * wind.current.directionX,
+        leaf.origin[1] + fallSpan * 0.35 - fall + Math.sin(time * 0.7 + leaf.phase) * 0.1,
+        leaf.origin[2] +
+          drift * wind.current.directionZ +
+          Math.cos(time * 0.31 + leaf.phase) * 0.24,
+      );
+      const particleScale = leaf.scale * (0.65 + wind.current.strength * 0.35);
+      transform.scale.set(particleScale, particleScale * 0.45, particleScale * 0.8);
+      transform.rotation.set(
+        time * 0.22 + leaf.phase,
+        time * 0.17 + index,
+        Math.sin(time * 0.4 + leaf.phase),
+      );
+      transform.updateMatrix();
+      leaves.setMatrixAt(index, transform.matrix);
+    });
+    leaves.instanceMatrix.needsUpdate = true;
   });
 
   return (
     <group name="skills-roadside-landscape">
       <instancedMesh
         name="skills-tree-trunks"
-        ref={(mesh) => setInstances(mesh, resources.trunks)}
+        ref={(mesh) => {
+          trunkMesh.current = mesh;
+          setInstances(mesh, resources.trunks);
+        }}
         args={[geometry.trunk, materials.trunk, resources.trunks.length]}
         castShadow={!portrait}
         receiveShadow
@@ -444,6 +591,16 @@ export function SkillsLandscape({
           setInstances(mesh, resources.crowns);
         }}
         args={[geometry.crown, materials.crown, resources.crowns.length]}
+        castShadow={!portrait}
+        receiveShadow
+      />
+      <instancedMesh
+        name="skills-tree-branches"
+        ref={(mesh) => {
+          branchMesh.current = mesh;
+          setInstances(mesh, resources.branches);
+        }}
+        args={[geometry.branch, materials.branch, resources.branches.length]}
         castShadow={!portrait}
         receiveShadow
       />
@@ -477,6 +634,11 @@ export function SkillsLandscape({
           renderOrder={2}
         />
       ))}
+      <instancedMesh
+        name="skills-drifting-leaves"
+        ref={leafMesh}
+        args={[geometry.leaf, materials.leaf, resources.leaves.length]}
+      />
     </group>
   );
 }

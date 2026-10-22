@@ -59,13 +59,11 @@ export function SkillsArchitecture({
   controller,
   pointer,
   interactive,
-  reducedMotion,
 }: {
   portrait: boolean;
   controller: ChapterProgressController;
   pointer: SkillsPointerState;
   interactive: boolean;
-  reducedMotion: boolean;
 }) {
   const lastRegion = SKILLS_REGIONS[SKILLS_REGIONS.length - 1];
   const path = useMemo(
@@ -116,12 +114,7 @@ export function SkillsArchitecture({
           portrait={portrait}
         />
       ))}
-      <SkillsLandscape
-        portrait={portrait}
-        pointer={pointer}
-        interactive={interactive}
-        reducedMotion={reducedMotion}
-      />
+      <SkillsLandscape portrait={portrait} pointer={pointer} interactive={interactive} />
       <SkillsBoulevard
         controller={controller}
         portrait={portrait}

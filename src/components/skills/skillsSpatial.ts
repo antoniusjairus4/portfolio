@@ -6,11 +6,11 @@ import { clamp01, SKILLS_CENTERS, smoothstep } from './skillsChoreography';
 // neither the route nor the buildings reset at a domain boundary.
 export const SKILLS_REGIONS = [
   { x: 0, y: 0, z: 0 },
-  { x: 4.8, y: 0.2, z: -23 },
-  { x: -3.4, y: -1.6, z: -46 },
-  { x: 4.3, y: -1.2, z: -69 },
-  { x: -4, y: -0.2, z: -92 },
-  { x: 1.4, y: 1, z: -115 },
+  { x: 4.8, y: 0.2, z: -26 },
+  { x: -3.4, y: -1.6, z: -52 },
+  { x: 4.3, y: -1.2, z: -78 },
+  { x: -4, y: -0.2, z: -104 },
+  { x: 1.4, y: 1, z: -130 },
 ] as const;
 
 const ROUTE_TIMES = [0, ...SKILLS_CENTERS, 1];
