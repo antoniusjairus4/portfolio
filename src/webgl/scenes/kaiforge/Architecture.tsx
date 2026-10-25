@@ -8,6 +8,7 @@ import {
 } from './architectureLayout';
 import { boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
+import { WallDesign } from './WallDesign';
 
 /** Face and depth tint for the architectural slabs. */
 function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') {
@@ -68,6 +69,7 @@ export function Architecture({ portrait }: { portrait: boolean }) {
       <mesh geometry={outerGeometry}>
         <primitive attach="material" object={materials.mineral} />
       </mesh>
+      <WallDesign />
     </group>
   );
 }

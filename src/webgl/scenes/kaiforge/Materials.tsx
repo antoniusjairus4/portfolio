@@ -1,17 +1,17 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo } from 'react';
 import {
   DataTexture,
-  LineBasicMaterial,
   LinearFilter,
   LinearMipmapLinearFilter,
+  LineBasicMaterial,
   MeshBasicMaterial,
   MeshStandardMaterial,
   RepeatWrapping,
   RGBAFormat,
   SRGBColorSpace,
 } from 'three';
-import { PALETTE } from './staging';
 import { withGroundContactShadows } from './groundContactShadows';
+import { PALETTE } from './staging';
 
 function parchmentGrain() {
   const size = 128;
@@ -95,17 +95,17 @@ function createMaterials() {
       bumpScale: 0.00008,
     }),
     architecture: new MeshStandardMaterial({
-      color: PALETTE.parchment,
-      roughness: 0.94,
+      color: '#7d817d',
+      roughness: 0.97,
       vertexColors: true,
       map: grain,
       roughnessMap: finish,
       bumpMap: finish,
-      bumpScale: 0.012,
+      bumpScale: 0.003,
     }),
     ground: withGroundContactShadows(
       new MeshStandardMaterial({
-        color: '#c9bfad',
+        color: '#aeaea8',
         roughness: 0.91,
         vertexColors: true,
         map: grain,
@@ -115,13 +115,37 @@ function createMaterials() {
       }),
     ),
     mineral: new MeshStandardMaterial({
-      color: '#b2a895',
-      roughness: 0.88,
+      color: '#666c68',
+      roughness: 0.9,
       vertexColors: true,
       map: grain,
       roughnessMap: finish,
       bumpMap: finish,
-      bumpScale: 0.018,
+      bumpScale: 0.004,
+    }),
+    wallPanel: new MeshStandardMaterial({
+      color: '#737a76',
+      roughness: 0.94,
+      emissive: '#171b19',
+      emissiveIntensity: 0.18,
+    }),
+    wallInset: new MeshStandardMaterial({
+      color: '#353b39',
+      roughness: 0.98,
+      emissive: '#111514',
+      emissiveIntensity: 0.12,
+    }),
+    wallLedge: new MeshStandardMaterial({
+      color: '#727873',
+      metalness: 0.22,
+      roughness: 0.65,
+    }),
+    wallTrim: new MeshStandardMaterial({ color: '#b4b5ac', metalness: 0.12, roughness: 0.72 }),
+    wallAccent: new MeshStandardMaterial({
+      color: '#a3293e',
+      emissive: PALETTE.crimson,
+      emissiveIntensity: 0.85,
+      roughness: 0.55,
     }),
     ink: new MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.78, metalness: 0.12 }),
     skin: new MeshStandardMaterial({ color: '#ad9c87', roughness: 0.95 }),

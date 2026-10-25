@@ -28,6 +28,7 @@ import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
 import { CAMERAS, sampleCamera } from './kaiforge/staging';
 import { TrainingProps } from './kaiforge/TrainingProps';
+import { WallDesign } from './kaiforge/WallDesign';
 import { DomesticRoom } from './palindrome/DomesticRoom';
 import { InformationField } from './palindrome/InformationField';
 import { ROOM_PALETTE } from './palindrome/palette';
@@ -50,15 +51,12 @@ function createSlabs(portrait: boolean): Slab[] {
   const vanish: Triple = [0.001, 0.001, 0.001];
   const outer = portrait ? OUTER_PORTRAIT_BOXES : OUTER_DESKTOP_BOXES;
   return [
-    slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], '#c9bfad', ROOM_PALETTE.floor),
-    slab(WALL_BOXES[0], [0, 2.65, -2.8], [9, 5.3, 0.18], '#c1b5a1', ROOM_PALETTE.plaster),
-    slab(WALL_BOXES[1], [-4.2, 2.65, -2.6], vanish, '#b8ad9b', ROOM_PALETTE.plaster),
-    slab(WALL_BOXES[2], [4.2, 2.65, -2.6], vanish, '#b8ad9b', ROOM_PALETTE.plaster),
-    slab(WALL_BOXES[3], WALL_BOXES[3][0], vanish, '#ddd2be', ROOM_PALETTE.plaster),
-    slab(WALL_BOXES[4], [-4.15, 2.65, -0.45], [0.16, 5.3, 4.6], '#d0c4af', ROOM_PALETTE.parchment),
-    slab(WALL_BOXES[5], [0, 0.12, -2.68], [8.3, 0.24, 0.07], '#bdb19e', ROOM_PALETTE.timber),
-    slab(WALL_BOXES[6], WALL_BOXES[6][0], vanish, '#9f9587', ROOM_PALETTE.plaster),
-    ...outer.map((box) => slab(box, box[0], vanish, '#b2a895', ROOM_PALETTE.charcoal)),
+    slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], '#aeaea8', ROOM_PALETTE.floor),
+    slab(WALL_BOXES[0], [0, 2.65, -2.8], [9, 5.3, 0.18], '#696e6a', ROOM_PALETTE.plaster),
+    slab(WALL_BOXES[1], [-4.15, 2.65, -0.45], [0.16, 5.3, 4.6], '#696e6a', ROOM_PALETTE.parchment),
+    slab(WALL_BOXES[2], [4.2, 2.65, -2.6], vanish, '#696e6a', ROOM_PALETTE.plaster),
+    ...outer.slice(0, 2).map((box) => slab(box, box[0], vanish, '#666c68', ROOM_PALETTE.charcoal)),
+    slab(outer[2], [0, 0.12, -2.68], [8.3, 0.24, 0.07], '#666c68', ROOM_PALETTE.timber),
   ];
 }
 
@@ -225,6 +223,7 @@ function TransitionWorld({
         decay={2}
       />
       <ArchitecturalMorph progress={progress} portrait={portrait} />
+      <WallDesign bridgeProgress={progress} />
       <Equipment bridgeProgress={progress} bridgePortrait={portrait} />
       <TrainingProps bridgeProgress={progress} />
       <group ref={robot}>

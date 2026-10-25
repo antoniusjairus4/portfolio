@@ -13,25 +13,25 @@ import { type Box, boxes, mergeOwned } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
 
 const BASKET_POSITIONS = [
-  [-3.65, 0, -1.85],
-  [3.5, 0, -1.9],
+  [-3.4, 0, -2],
+  [3.4, 0, -2],
 ] as const;
-const PICKER_POSITION = [3.05, 0, 0.7] as const;
+const PICKER_POSITION = [3.35, 0, -1.1] as const;
 // Both holders read at roughly 4:6 of the robot's visible height.
 const BASKET_SCALE = 0.9;
 const PICKER_SCALE = 0.65;
 // Reduce the casters independently so the cart remains substantial.
 const WHEEL_SCALE = 2 / 3;
 
-const BALL_OFFSETS = Array.from({ length: 2 * 9 * 7 }, (_, index) => {
-  const layer = Math.floor(index / 63);
-  const slot = index % 63;
-  const column = slot % 9;
-  const row = Math.floor(slot / 9);
+const BALL_OFFSETS = Array.from({ length: 2 * 7 * 5 }, (_, index) => {
+  const layer = Math.floor(index / 35);
+  const slot = index % 35;
+  const column = slot % 7;
+  const row = Math.floor(slot / 7);
   return [
-    (column - 4) * 0.068 + (layer ? 0.025 : 0) + Math.sin(index * 5.7) * 0.004,
+    (column - 3) * 0.08 + (layer ? 0.025 : 0) + Math.sin(index * 5.7) * 0.004,
     0.9875 + layer * 0.043,
-    (row - 3) * 0.068 + (layer ? 0.016 : 0) + Math.cos(index * 3.9) * 0.004,
+    (row - 2) * 0.08 + (layer ? 0.016 : 0) + Math.cos(index * 3.9) * 0.004,
   ] as const;
 });
 
@@ -50,9 +50,9 @@ function makeCartFrame() {
       [0, 1.075, z],
       [0.74, 0.014, 0.014],
     ]);
-    for (let i = -3; i <= 3; i++) {
+    for (let i = -2; i <= 2; i++) {
       parts.push([
-        [i * 0.09, 1.065, z],
+        [i * 0.125, 1.065, z],
         [0.009, 0.2, 0.009],
       ]);
     }
@@ -62,9 +62,9 @@ function makeCartFrame() {
       [x, 1.075, 0],
       [0.014, 0.014, 0.54],
     ]);
-    for (let i = -2; i <= 2; i++) {
+    for (let i = -1; i <= 1; i++) {
       parts.push([
-        [x, 1.065, i * 0.09],
+        [x, 1.065, i * 0.14],
         [0.009, 0.2, 0.009],
       ]);
     }
@@ -246,19 +246,19 @@ export function TrainingProps({ bridgeProgress }: { bridgeProgress?: MutableRefO
         cage: makePickerCage(),
         ball: new SphereGeometry(0.02, 8, 6),
         metal: new MeshStandardMaterial({
-          color: '#363631',
+          color: '#303533',
           metalness: 0.52,
           roughness: 0.64,
           ...fadeSettings,
         }),
         edge: new MeshStandardMaterial({
-          color: '#a49a82',
+          color: '#89928b',
           metalness: 0.52,
           roughness: 0.5,
           ...fadeSettings,
         }),
         dark: new MeshStandardMaterial({
-          color: '#252723',
+          color: '#1c211f',
           metalness: 0.22,
           roughness: 0.82,
           ...fadeSettings,
