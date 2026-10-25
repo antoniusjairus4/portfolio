@@ -235,9 +235,9 @@ function TransitionWorld({
       ball.current.position.y += Math.sin(Math.PI * move) * 0.28;
     }
     const roomLight = ramp(0.42, 0.88, p);
-    if (ambient.current) ambient.current.intensity = 0.24 * roomLight;
-    if (domesticAmbient.current) domesticAmbient.current.intensity = 0.58 * roomLight;
-    if (domesticKey.current) domesticKey.current.intensity = 1.9 * roomLight;
+    if (ambient.current) ambient.current.intensity = 0.33 * roomLight;
+    if (domesticAmbient.current) domesticAmbient.current.intensity = 0.67 * roomLight;
+    if (domesticKey.current) domesticKey.current.intensity = 1.7 * roomLight;
     if (domesticFill.current) domesticFill.current.intensity = 1.45 * roomLight;
     if (information.current) {
       const reveal = ramp(0.91, 1, p);

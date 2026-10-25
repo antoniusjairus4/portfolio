@@ -7,21 +7,21 @@ function Niche({ z, children }: { z: number; children: ReactNode }) {
     <group position={[4.42, 2.75, z]} rotation={[0, -Math.PI / 2, 0]}>
       <mesh position={[0, 0, 0.006]} receiveShadow>
         <planeGeometry args={[0.82, 2.07]} />
-        <meshStandardMaterial color="#252A27" roughness={0.96} />
+        <meshStandardMaterial color="#2B302D" roughness={0.94} />
       </mesh>
       <mesh position={[0, 1.005, 0.034]}>
         <boxGeometry args={[0.58, 0.012, 0.012]} />
         <meshStandardMaterial
           color="#8D8069"
           emissive="#C9AD83"
-          emissiveIntensity={0.16}
+          emissiveIntensity={0.22}
           roughness={0.86}
         />
       </mesh>
       <pointLight
         position={[0, 0.86, 0.04]}
         color="#E9D8BD"
-        intensity={0.42}
+        intensity={0.55}
         distance={1.55}
         decay={2}
       />

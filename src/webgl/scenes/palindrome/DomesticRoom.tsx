@@ -1,6 +1,13 @@
 import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, type ReactNode, useMemo, useRef } from 'react';
-import { type Group, Object3D, type SpotLight } from 'three';
+import { type MutableRefObject, type ReactNode, useEffect, useMemo, useRef } from 'react';
+import {
+  BoxGeometry,
+  Color,
+  Float32BufferAttribute,
+  type Group,
+  Object3D,
+  type SpotLight,
+} from 'three';
 import { FinancialMemoryWall } from './FinancialMemoryWall';
 import { GardenWindow } from './GardenWindow';
 import {
@@ -36,12 +43,53 @@ function Block({
   position: Point;
   size: Point;
   color: string;
-  finish?: 'wood' | 'plaster' | 'paper' | 'fabric' | 'ceramic' | 'metal';
+  finish?: 'wood' | 'plaster' | 'paper' | 'fabric' | 'ceramic' | 'metal' | 'stone';
 }) {
   return (
     <mesh position={position} castShadow receiveShadow>
       <boxGeometry args={size} />
       <Surface color={color} finish={finish} />
+    </mesh>
+  );
+}
+
+function GradientWall({
+  position,
+  size,
+  color,
+  side,
+}: {
+  position: Point;
+  size: Point;
+  color: string;
+  side: 'back' | 'left' | 'right';
+}) {
+  const geometry = useMemo(() => {
+    const wall = new BoxGeometry(...size);
+    const vertices = wall.getAttribute('position');
+    const colors = new Float32Array(vertices.count * 3);
+    for (let i = 0; i < vertices.count; i++) {
+      const y = Math.max(0, Math.min(1, (position[1] + vertices.getY(i)) / 5.35));
+      const horizontal =
+        side === 'back'
+          ? (position[0] + vertices.getX(i) + 4.5) / 9
+          : (position[2] + vertices.getZ(i) + 2.8) / 10;
+      const center = Math.max(0, 1 - Math.abs(horizontal - 0.5) * 2);
+      const tone = 0.8 + y * 0.16 + center * 0.055;
+      const tint = new Color().setRGB(
+        tone * (side === 'left' ? 1.025 : side === 'right' ? 0.985 : 1),
+        tone,
+        tone * (side === 'left' ? 0.985 : side === 'right' ? 1.015 : 1),
+      );
+      tint.toArray(colors, i * 3);
+    }
+    wall.setAttribute('color', new Float32BufferAttribute(colors, 3));
+    return wall;
+  }, [position, size, side]);
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  return (
+    <mesh position={position} geometry={geometry} castShadow receiveShadow>
+      <Surface color={color} finish="plaster" vertexColors />
     </mesh>
   );
 }
@@ -125,6 +173,76 @@ function CeilingWash({ transitionProgress }: { transitionProgress?: MutableRefOb
   );
 }
 
+function InteriorLighting({
+  transitionProgress,
+}: {
+  transitionProgress?: MutableRefObject<number>;
+}) {
+  const left = useRef<SpotLight>(null);
+  const right = useRef<SpotLight>(null);
+  const desk = useRef<SpotLight>(null);
+  const targets = useMemo(() => {
+    const points: Point[] = [
+      [-4.2, 2.85, -0.1],
+      [4.2, 2.75, -0.1],
+      [-0.65, 1.45, -0.45],
+    ];
+    return points.map(([x, y, z]) => {
+      const target = new Object3D();
+      target.position.set(x, y, z);
+      return target;
+    });
+  }, []);
+  useFrame(() => {
+    if (!transitionProgress) return;
+    const t = Math.min(1, Math.max(0, (transitionProgress.current - 0.64) / 0.31));
+    const reveal = t * t * (3 - 2 * t);
+    if (left.current) left.current.intensity = 1.65 * reveal;
+    if (right.current) right.current.intensity = 1.45 * reveal;
+    if (desk.current) desk.current.intensity = 2.15 * reveal;
+  });
+  return (
+    <>
+      {targets.map((target) => (
+        <primitive key={target.uuid} object={target} />
+      ))}
+      <spotLight
+        ref={left}
+        position={[-3.25, 4.35, 0.5]}
+        target={targets[0]}
+        color="#E8D8C2"
+        intensity={transitionProgress ? 0 : 1.65}
+        angle={0.78}
+        penumbra={1}
+        distance={4.5}
+        decay={2}
+      />
+      <spotLight
+        ref={right}
+        position={[3.25, 4.35, 0.5]}
+        target={targets[1]}
+        color="#DCCFBD"
+        intensity={transitionProgress ? 0 : 1.45}
+        angle={0.78}
+        penumbra={1}
+        distance={4.5}
+        decay={2}
+      />
+      <spotLight
+        ref={desk}
+        position={[-0.8, 4.15, 0.35]}
+        target={targets[2]}
+        color="#F0E2CC"
+        intensity={transitionProgress ? 0 : 2.15}
+        angle={1.05}
+        penumbra={1}
+        distance={5.5}
+        decay={2}
+      />
+    </>
+  );
+}
+
 export function DomesticRoom({
   portrait,
   transitionProgress,
@@ -142,34 +260,35 @@ export function DomesticRoom({
     <DomesticSurfaces>
       <group scale={[portrait ? 0.76 : 1, 1, 1]}>
         <CeilingWash transitionProgress={transitionProgress} />
+        <InteriorLighting transitionProgress={transitionProgress} />
         {bridgeShell && (
           <>
             <Block
               position={[0, -0.09, -0.1]}
               size={[9, 0.18, 7.4]}
               color={ROOM_PALETTE.floor}
-              finish="plaster"
+              finish="stone"
             />
             {BACK_WALL_BOXES.map(([position, size]) => (
-              <Block
+              <GradientWall
                 key={position.join(':')}
                 position={position}
                 size={size}
                 color={ROOM_PALETTE.plaster}
-                finish="plaster"
+                side="back"
               />
             ))}
             {[SIDE_WALL_BOXES[0]].map(([position, size]) => (
-              <Block
+              <GradientWall
                 key={position[0]}
                 position={position}
                 size={size}
                 color={ROOM_PALETTE.sideWall}
-                finish="plaster"
+                side="left"
               />
             ))}
             {RIGHT_WALL_BOXES.map(([position, size], index) => (
-              <Block
+              <GradientWall
                 key={position.join(':')}
                 position={position}
                 size={size}
@@ -178,7 +297,7 @@ export function DomesticRoom({
                     ? ROOM_PALETTE.sideWall
                     : ROOM_PALETTE.charcoal
                 }
-                finish="plaster"
+                side="right"
               />
             ))}
             <Block
@@ -240,7 +359,7 @@ export function DomesticRoom({
         <BridgeReveal progress={transitionProgress} start={0.51} end={0.79}>
           {/* Quiet floor joints and a small woven mat establish human scale. */}
           {[-3, -1.5, 0, 1.5, 3].map((x) => (
-            <Block key={x} position={[x, 0.001, -0.1]} size={[0.008, 0.002, 7.2]} color="#766D5E" />
+            <Block key={x} position={[x, 0.001, -0.1]} size={[0.008, 0.002, 7.2]} color="#918D85" />
           ))}
           <Block
             position={[-0.8, 0.012, -0.15]}

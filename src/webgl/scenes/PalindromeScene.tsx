@@ -43,9 +43,9 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
 
   useFrame(() => {
     const p = controller.progress.current;
-    if (ambient.current) ambient.current.intensity = 0.24;
-    if (hemisphere.current) hemisphere.current.intensity = 0.58;
-    if (key.current) key.current.intensity = 1.9;
+    if (ambient.current) ambient.current.intensity = 0.33;
+    if (hemisphere.current) hemisphere.current.intensity = 0.67;
+    if (key.current) key.current.intensity = 1.7;
     const relationships = getRelationshipProgress(p);
     const organization = getOrganizationProgress(p);
     const attention =
@@ -75,12 +75,12 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
   return (
     <>
       <color attach="background" args={[ROOM_PALETTE.ink]} />
-      <ambientLight ref={ambient} intensity={0.24} color="#F3F0E9" />
-      <hemisphereLight ref={hemisphere} args={['#E5EBE7', '#686E64', 0.58]} />
+      <ambientLight ref={ambient} intensity={0.33} color="#F3F0E9" />
+      <hemisphereLight ref={hemisphere} args={['#E5EBE7', '#686E64', 0.67]} />
       <directionalLight
         ref={key}
         position={[-3.8, 4.2, 1.5]}
-        intensity={1.9}
+        intensity={1.7}
         color={ROOM_PALETTE.parchment}
         castShadow={!portrait}
         shadow-mapSize={[1024, 1024]}

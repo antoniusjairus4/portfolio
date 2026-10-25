@@ -67,7 +67,7 @@ export function LeftWallGallery() {
           </mesh>
           <mesh position={[0, 0, 0.097]}>
             <planeGeometry args={[ART_WIDTH, ART_HEIGHT]} />
-            <meshBasicMaterial map={paintings[index]} color="#d0c9bc" toneMapped={false} />
+            <meshStandardMaterial map={paintings[index]} color="#E6DED1" roughness={0.89} />
           </mesh>
         </group>
       ))}

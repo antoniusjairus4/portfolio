@@ -4,7 +4,7 @@ export const ROOM_PALETTE = {
   crimson: '#8B1E2D',
   plaster: '#292D2B',
   sideWall: '#676A62',
-  floor: '#B3AB95',
+  floor: '#CFCBC3',
   timber: '#76513D',
   ceramic: '#E4D7BF',
   charcoal: '#1B1E1D',
