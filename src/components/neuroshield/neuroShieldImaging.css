@@ -299,6 +299,71 @@
   border-right: 1px solid rgba(157, 195, 206, 0.09);
 }
 
+.ns-panel-observation::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 13, 0.38), rgba(2, 7, 13, 0.08) 56%),
+    url("/research/neuroshield/observation-background.png");
+  background-position: center, center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.ns-panel-hypothesis::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 13, 0.42), rgba(2, 7, 13, 0.06) 58%),
+    url("/research/neuroshield/hypothesis-background.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.ns-panel-experiment::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 13, 0.42), rgba(2, 7, 13, 0.06) 58%),
+    url("/research/neuroshield/experiment-background.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.ns-panel-evidence::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 13, 0.42), rgba(2, 7, 13, 0.06) 58%),
+    url("/research/neuroshield/evidence-background.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.ns-panel-uncertainty::before {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  content: "";
+  background-image:
+    linear-gradient(90deg, rgba(2, 7, 13, 0.42), rgba(2, 7, 13, 0.06) 58%),
+    url("/research/neuroshield/uncertainty-background.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
 .ns-research-topline,
 .ns-research-progress,
 .ns-panel-kicker,
@@ -378,6 +443,14 @@
   right: clamp(1.5rem, 6vw, 8rem);
   width: min(43vw, 42rem);
   height: 70%;
+}
+
+.ns-panel-observation .ns-panel-visual,
+.ns-panel-hypothesis .ns-panel-visual,
+.ns-panel-experiment .ns-panel-visual,
+.ns-panel-evidence .ns-panel-visual,
+.ns-panel-uncertainty .ns-panel-visual {
+  z-index: 1;
 }
 
 .ns-scan {
@@ -609,6 +682,43 @@
 }
 
 @media (orientation: portrait) {
+  .ns-panel-observation::before {
+    background-image:
+      linear-gradient(180deg, rgba(2, 7, 13, 0.67), rgba(2, 7, 13, 0.14) 58%),
+      url("/research/neuroshield/observation-background.png");
+    background-position:
+      center,
+      68% center;
+  }
+
+  .ns-panel-hypothesis::before {
+    background-image:
+      linear-gradient(180deg, rgba(2, 7, 13, 0.68), rgba(2, 7, 13, 0.15) 58%),
+      url("/research/neuroshield/hypothesis-background.png");
+    background-position: 58% center;
+  }
+
+  .ns-panel-experiment::before {
+    background-image:
+      linear-gradient(180deg, rgba(2, 7, 13, 0.68), rgba(2, 7, 13, 0.15) 58%),
+      url("/research/neuroshield/experiment-background.png");
+    background-position: 65% center;
+  }
+
+  .ns-panel-evidence::before {
+    background-image:
+      linear-gradient(180deg, rgba(2, 7, 13, 0.68), rgba(2, 7, 13, 0.15) 58%),
+      url("/research/neuroshield/evidence-background.png");
+    background-position: 68% center;
+  }
+
+  .ns-panel-uncertainty::before {
+    background-image:
+      linear-gradient(180deg, rgba(2, 7, 13, 0.68), rgba(2, 7, 13, 0.15) 58%),
+      url("/research/neuroshield/uncertainty-background.png");
+    background-position: 65% center;
+  }
+
   .neuroshield-chapter.ns-redesign {
     height: 780svh;
   }
