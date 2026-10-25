@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, type ReactNode, useRef } from 'react';
-import type { Group } from 'three';
+import { type MutableRefObject, type ReactNode, useMemo, useRef } from 'react';
+import { type Group, Object3D, type SpotLight } from 'three';
+import { GardenWindow } from './GardenWindow';
 import {
   Book,
   HouseholdObjects,
@@ -9,6 +10,7 @@ import {
   ShelfBowl,
 } from './HouseholdObjects';
 import { ROOM_PALETTE } from './palette';
+import { BACK_WALL_BOXES, CEILING_BOX, SIDE_WALL_BOXES } from './roomLayout';
 import { SeatedFigure } from './SeatedFigure';
 import { ContactPatch, DomesticSurfaces, Surface } from './Surfaces';
 
@@ -84,6 +86,36 @@ function BridgeReveal({
   );
 }
 
+function CeilingWash({ transitionProgress }: { transitionProgress?: MutableRefObject<number> }) {
+  const light = useRef<SpotLight>(null);
+  const target = useMemo(() => {
+    const object = new Object3D();
+    object.position.set(0, 5.25, -1.2);
+    return object;
+  }, []);
+  useFrame(() => {
+    if (!light.current || !transitionProgress) return;
+    const t = Math.min(1, Math.max(0, (transitionProgress.current - 0.72) / 0.2));
+    light.current.intensity = 7 * t * t * (3 - 2 * t);
+  });
+  return (
+    <>
+      <primitive object={target} />
+      <spotLight
+        ref={light}
+        position={[0, 3.05, 0.2]}
+        target={target}
+        color="#e8e4d8"
+        intensity={transitionProgress ? 0 : 7}
+        angle={1.15}
+        penumbra={1}
+        distance={9}
+        decay={2}
+      />
+    </>
+  );
+}
+
 export function DomesticRoom({
   portrait,
   transitionProgress,
@@ -100,6 +132,7 @@ export function DomesticRoom({
   return (
     <DomesticSurfaces>
       <group scale={[portrait ? 0.76 : 1, 1, 1]}>
+        <CeilingWash transitionProgress={transitionProgress} />
         {bridgeShell && (
           <>
             <Block
@@ -108,16 +141,28 @@ export function DomesticRoom({
               color={ROOM_PALETTE.floor}
               finish="plaster"
             />
+            {BACK_WALL_BOXES.map(([position, size]) => (
+              <Block
+                key={position.join(':')}
+                position={position}
+                size={size}
+                color={ROOM_PALETTE.plaster}
+                finish="plaster"
+              />
+            ))}
+            {SIDE_WALL_BOXES.map(([position, size]) => (
+              <Block
+                key={position[0]}
+                position={position}
+                size={size}
+                color={ROOM_PALETTE.sideWall}
+                finish="plaster"
+              />
+            ))}
             <Block
-              position={[0, 2.65, -2.8]}
-              size={[9, 5.3, 0.18]}
-              color={ROOM_PALETTE.plaster}
-              finish="plaster"
-            />
-            <Block
-              position={[-4.15, 2.65, -0.45]}
-              size={[0.16, 5.3, 4.6]}
-              color={ROOM_PALETTE.parchment}
+              position={CEILING_BOX[0]}
+              size={CEILING_BOX[1]}
+              color={ROOM_PALETTE.ceiling}
               finish="plaster"
             />
             <Block
@@ -126,6 +171,21 @@ export function DomesticRoom({
               color={ROOM_PALETTE.timber}
             />
           </>
+        )}
+        {!bridgeShell && (
+          <BridgeReveal
+            progress={transitionProgress}
+            start={0.72}
+            end={0.92}
+            anchor={CEILING_BOX[0]}
+          >
+            <Block
+              position={CEILING_BOX[0]}
+              size={CEILING_BOX[1]}
+              color={ROOM_PALETTE.ceiling}
+              finish="plaster"
+            />
+          </BridgeReveal>
         )}
         <BridgeReveal progress={transitionProgress} start={0.51} end={0.79}>
           {/* Quiet floor joints and a small woven mat establish human scale. */}
@@ -153,28 +213,48 @@ export function DomesticRoom({
           end={0.81}
           anchor={[-2.75, 2.65, -2.55]}
         >
-          {/* A recessed domestic window, not an emissive screen. */}
-          <Block
-            position={[-2.75, 2.64, -2.64]}
-            size={[1.34, 1.85, 0.14]}
-            color={ROOM_PALETTE.timber}
-          />
-          <Block
-            position={[-2.75, 2.65, -2.55]}
-            size={[1.19, 1.69, 0.025]}
-            color={ROOM_PALETTE.parchment}
-            finish="plaster"
-          />
-          <Block
-            position={[-2.75, 2.65, -2.52]}
-            size={[0.045, 1.69, 0.04]}
-            color={ROOM_PALETTE.timber}
-          />
-          <Block
-            position={[-2.75, 2.52, -2.52]}
-            size={[1.19, 0.045, 0.04]}
-            color={ROOM_PALETTE.timber}
-          />
+          <GardenWindow transitionProgress={transitionProgress} />
+          {[-3.385, -2.115].map((x) => (
+            <Block
+              key={x}
+              position={[x, 2.65, -2.63]}
+              size={[0.07, 1.85, 0.15]}
+              color={ROOM_PALETTE.timber}
+            />
+          ))}
+          {[1.77, 3.53].map((y) => (
+            <Block
+              key={y}
+              position={[-2.75, y, -2.63]}
+              size={[1.34, 0.09, 0.15]}
+              color={ROOM_PALETTE.timber}
+            />
+          ))}
+          {/* One unglazed casement swings outward and leaves the garden in view. */}
+          <group position={[-3.35, 2.65, -2.55]} rotation={[0, 0.82, 0]}>
+            {[0.025, 0.585].map((x) => (
+              <Block
+                key={x}
+                position={[x, 0, 0]}
+                size={[0.045, 1.62, 0.055]}
+                color={ROOM_PALETTE.timber}
+              />
+            ))}
+            {[-0.79, 0.79].map((y) => (
+              <Block
+                key={y}
+                position={[0.305, y, 0]}
+                size={[0.61, 0.045, 0.055]}
+                color={ROOM_PALETTE.timber}
+              />
+            ))}
+            <Block
+              position={[0.54, -0.03, 0.055]}
+              size={[0.025, 0.12, 0.04]}
+              color={ROOM_PALETTE.ceramic}
+              finish="metal"
+            />
+          </group>
           <Block
             position={[-2.75, 1.71, -2.46]}
             size={[1.51, 0.09, 0.38]}

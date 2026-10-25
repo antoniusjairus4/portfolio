@@ -32,6 +32,7 @@ import { WallDesign } from './kaiforge/WallDesign';
 import { DomesticRoom } from './palindrome/DomesticRoom';
 import { InformationField } from './palindrome/InformationField';
 import { ROOM_PALETTE } from './palindrome/palette';
+import { BACK_WALL_BOXES, SIDE_WALL_BOXES, WINDOW_FILL_BOX } from './palindrome/roomLayout';
 
 type Triple = readonly [number, number, number];
 type Slab = {
@@ -47,14 +48,47 @@ function slab(box: Box, to: Triple, finalSize: Triple, start: string, end: strin
   return { from: box[0], size: box[1], to, finalSize, start, end };
 }
 
+function backWallSourcePiece([position, size]: Box): Box {
+  const [sourcePosition, sourceSize] = WALL_BOXES[0];
+  return [
+    [
+      sourcePosition[0] + (position[0] / 9) * sourceSize[0],
+      sourcePosition[1] + ((position[1] - 2.65) / 5.3) * sourceSize[1],
+      sourcePosition[2],
+    ],
+    [(size[0] / 9) * sourceSize[0], (size[1] / 5.3) * sourceSize[1], sourceSize[2]],
+  ];
+}
+
 function createSlabs(portrait: boolean): Slab[] {
   const vanish: Triple = [0.001, 0.001, 0.001];
   const outer = portrait ? OUTER_PORTRAIT_BOXES : OUTER_DESKTOP_BOXES;
   return [
     slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], PALETTE.courtFloor, ROOM_PALETTE.floor),
-    slab(WALL_BOXES[0], [0, 2.65, -2.8], [9, 5.3, 0.18], '#696e6a', ROOM_PALETTE.plaster),
-    slab(WALL_BOXES[1], [-4.15, 2.65, -0.45], [0.16, 5.3, 4.6], '#696e6a', ROOM_PALETTE.parchment),
-    slab(WALL_BOXES[2], [4.2, 2.65, -2.6], vanish, '#696e6a', ROOM_PALETTE.plaster),
+    ...BACK_WALL_BOXES.map((box) =>
+      slab(backWallSourcePiece(box), box[0], box[1], '#696e6a', ROOM_PALETTE.plaster),
+    ),
+    slab(
+      backWallSourcePiece(WINDOW_FILL_BOX),
+      WINDOW_FILL_BOX[0],
+      vanish,
+      '#696e6a',
+      ROOM_PALETTE.plaster,
+    ),
+    slab(
+      WALL_BOXES[1],
+      SIDE_WALL_BOXES[0][0],
+      SIDE_WALL_BOXES[0][1],
+      '#696e6a',
+      ROOM_PALETTE.sideWall,
+    ),
+    slab(
+      WALL_BOXES[2],
+      SIDE_WALL_BOXES[1][0],
+      SIDE_WALL_BOXES[1][1],
+      '#696e6a',
+      ROOM_PALETTE.sideWall,
+    ),
     ...outer.slice(0, 2).map((box) => slab(box, box[0], vanish, '#666c68', ROOM_PALETTE.charcoal)),
     slab(outer[2], [0, 0.12, -2.68], [8.3, 0.24, 0.07], '#666c68', ROOM_PALETTE.timber),
   ];
@@ -110,6 +144,7 @@ function ArchitecturalMorph({
           }}
           position={[...slab.from]}
           scale={[...slab.size]}
+          castShadow={index > 0 && index <= BACK_WALL_BOXES.length + 3}
           receiveShadow
         >
           <boxGeometry args={[1, 1, 1]} />

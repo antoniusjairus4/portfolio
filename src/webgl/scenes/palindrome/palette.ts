@@ -3,6 +3,8 @@ export const ROOM_PALETTE = {
   parchment: '#F2E8D5',
   crimson: '#8B1E2D',
   plaster: '#292D2B',
+  sideWall: '#676A62',
+  ceiling: '#676A62',
   floor: '#B3AB95',
   timber: '#76513D',
   ceramic: '#E4D7BF',
