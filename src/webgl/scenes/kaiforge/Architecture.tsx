@@ -3,9 +3,9 @@ import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
 import { type BufferGeometry, Float32BufferAttribute, type Group } from 'three';
 import { type Box, boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
-import { impactPulse, releaseProgress } from './staging';
+import { impactPulse } from './staging';
 
-/** Face and depth tint for the existing slabs; no new geometry or texture download. */
+/** Face and depth tint for the architectural slabs. */
 function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') {
   const positions = geometry.getAttribute('position');
   const normals = geometry.getAttribute('normal');
@@ -45,23 +45,14 @@ export function Architecture({
   portrait: boolean;
 }) {
   const materials = useKaiForgeMaterials();
-  const outer = useRef<Group>(null);
   const register = useRef<Group>(null);
   const ground = useMemo(
     () =>
       tintSlabs(
         boxes([
           [
-            [-0.6, -0.18, 0.1],
-            [8.4, 0.36, 7.2],
-          ],
-          [
-            [-5.7, -0.34, -3],
-            [1.35, 0.68, 13],
-          ],
-          [
-            [5.3, -0.5, -5],
-            [2.4, 1, 15],
+            [0, -0.18, 5.1],
+            [15.2, 0.36, 23.8],
           ],
         ]),
         'ground',
@@ -72,6 +63,20 @@ export function Architecture({
     () =>
       tintSlabs(
         boxes([
+          // A continuous, thick room shell overlaps the floor below its top face.
+          // The original offset slabs retain their positions as architectural detailing.
+          [
+            [0, 6, -6.3],
+            [15.2, 12.36, 0.8],
+          ],
+          [
+            [-7, 6, 5.1],
+            [0.8, 12.36, 23.8],
+          ],
+          [
+            [7, 6, 5.1],
+            [0.8, 12.36, 23.8],
+          ],
           [
             [-4.4, 3.5, -4.3],
             [2.1, 7, 0.48],
@@ -136,11 +141,6 @@ export function Architecture({
     [ground, walls, outerGeometry],
   );
   useFrame(() => {
-    const release = releaseProgress(progress.current);
-    if (outer.current) {
-      outer.current.position.z = -release * 4;
-      outer.current.visible = release < 0.99;
-    }
     // One restrained registration shift on the contact axis; no idle motion.
     if (register.current) register.current.position.x = -0.07 * impactPulse(progress.current);
   });
@@ -149,14 +149,12 @@ export function Architecture({
       <mesh geometry={ground} receiveShadow>
         <primitive attach="material" object={materials.ground} />
       </mesh>
-      <mesh geometry={walls}>
+      <mesh geometry={walls} receiveShadow>
         <primitive attach="material" object={materials.architecture} />
       </mesh>
-      <group ref={outer}>
-        <mesh geometry={outerGeometry}>
-          <primitive attach="material" object={materials.mineral} />
-        </mesh>
-      </group>
+      <mesh geometry={outerGeometry}>
+        <primitive attach="material" object={materials.mineral} />
+      </mesh>
       <group ref={register} position={[0, 0, 0]}>
         <mesh position={[0.08, 2.8, -5.45]}>
           <boxGeometry args={[0.13, 5.6, 0.14]} />

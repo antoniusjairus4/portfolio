@@ -26,22 +26,51 @@
 }
 
 .intro {
+  --intro-title: 1;
+  --intro-split: 1;
+  --intro-scale: 1;
   height: 128svh;
 }
 
+.table-tennis {
+  --tt-title: 1;
+  --tt-ball-x: 0;
+  --tt-ball-y: 0;
+  --tt-rule-turn: 0;
+  --tt-impact: 0;
+  --tt-resolve: 1;
+}
+
 .karate {
+  --karate-lock: 1;
+  --karate-title: 1;
+  --karate-impact: 0;
+  --karate-words: 1;
   height: 138svh;
 }
 
 .chess {
+  --chess-grid: 1;
+  --chess-path: 1;
+  --chess-one: 1;
+  --chess-two: 1;
+  --chess-three: 1;
   height: 164svh;
 }
 
 .public-speaking {
+  --speaking-build: 1;
+  --speaking-audience: 1;
+  --speaking-scale: 1;
+  --speaking-reach: 1;
   height: 178svh;
 }
 
 .finale {
+  --final-disciplines: 0;
+  --final-concepts: 0;
+  --final-statement: 1;
+  --final-wash: 1;
   height: 136svh;
 }
 
@@ -252,7 +281,8 @@
   justify-content: center;
   gap: clamp(1.2rem, 3.5vw, 4rem);
   opacity: calc(var(--tt-resolve, 0) * (1 - var(--achievement-exit)));
-  transform: translateX(calc((1 - var(--tt-resolve, 0)) * -9vw));
+  transform: translateX(calc((1 - var(--tt-resolve, 1)) * -28vw))
+    skewX(calc((1 - var(--tt-resolve, 1)) * -5deg));
 }
 
 .tableStatement strong,
@@ -330,6 +360,8 @@
 
 .karateStatement > p {
   color: #6a6258;
+  opacity: var(--karate-title, 1);
+  transform: translateY(calc((1 - var(--karate-title, 1)) * -12vh));
 }
 
 .karateStatement h3 {
@@ -540,6 +572,13 @@
   z-index: 4;
   padding: 13vh 5vw 7vh;
   opacity: calc(1 - var(--achievement-exit));
+}
+
+.speakingStatement > p {
+  opacity: var(--speaking-build, 1);
+  letter-spacing: calc(0.19em + (1 - var(--speaking-build, 1)) * 0.38em);
+  transform: scale(calc(0.72 + var(--speaking-build, 1) * 0.28));
+  transform-origin: left center;
 }
 
 .speeches {

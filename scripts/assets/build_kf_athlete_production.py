@@ -490,7 +490,8 @@ def refine_temporary_paddle():
 
 def add_court_shoes(collection, rig, material):
     surface = r4.Surface()
-    for side, sign in (("R", 1), ("L", -1)):
+    for side, sign in (("R"
+                        , 1), ("L", -1)):
         bone = "KF_foot_" + side
         center_y = sign * .220
         surface.segment((-.135, center_y, .052), (.145, center_y, .044), [

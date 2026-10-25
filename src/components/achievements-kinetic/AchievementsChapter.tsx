@@ -38,36 +38,61 @@ function usePanelProgress(
     const section = sectionRef.current;
     if (!section || reducedMotion) return;
 
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const bounds = section.getBoundingClientRect();
+      const distance = Math.max(1, bounds.height + window.innerHeight);
+      const progress = Math.min(1, Math.max(0, (window.innerHeight - bounds.top) / distance));
+      gsap.set(section, getAchievementMotion(panel, progress));
+      section.dataset.achievementBeat = getAchievementBeat(panel, progress);
+      section.dataset.achievementProgress = progress.toFixed(4);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
     const context = gsap.context(() => {
-      const update = (progress: number) => {
-        gsap.set(section, getAchievementMotion(panel, progress));
-        section.dataset.achievementBeat = getAchievementBeat(panel, progress);
-      };
-      const trigger = ScrollTrigger.create({
+      ScrollTrigger.create({
         trigger: section,
-        start: 'top top',
-        end: 'bottom bottom',
+        // Drive the handoff across the complete viewport crossing. The outgoing
+        // stage stays visible until the incoming stage already occupies the gap.
+        start: 'top bottom',
+        end: 'bottom top',
         invalidateOnRefresh: true,
-        onRefresh: (self) => update(self.progress),
-        onUpdate: (self) => update(self.progress),
+        onRefresh: (self) => {
+          section.dataset.achievementStart = self.start.toFixed(2);
+          section.dataset.achievementEnd = self.end.toFixed(2);
+          schedule();
+        },
+        onUpdate: schedule,
       });
-      update(trigger.progress);
     }, section);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
 
-    return () => context.revert();
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      context.revert();
+    };
   }, [panel, reducedMotion, sectionRef]);
 }
 
 function KineticPanel({ panel, reducedMotion, children }: KineticPanelProps) {
   const sectionRef = useRef<HTMLElement>(null);
   usePanelProgress(sectionRef, panel, reducedMotion);
+  const discipline = panel === 'intro' || panel === 'finale' ? undefined : panel;
+  const staticBeat = discipline ? 'static' : `${panel}-static`;
 
   return (
     <article
       ref={sectionRef}
       className={`${styles.panel} ${styles[panel]}`}
       data-achievement-panel={panel}
-      data-achievement-beat={reducedMotion ? 'static' : getAchievementBeat(panel, 0)}
+      data-achievement-discipline={discipline}
+      data-achievement-beat={reducedMotion ? staticBeat : getAchievementBeat(panel, 0)}
     >
       <div className={styles.stage}>{children}</div>
     </article>
@@ -102,13 +127,47 @@ export function AchievementsChapter() {
 
   useEffect(() => () => setGlobalEtherMode('enabled'), [setGlobalEtherMode]);
 
+  useLayoutEffect(() => {
+    if (reducedMotion) return;
+    const chapter = chapterRef.current;
+    if (!chapter) return;
+    let frame = 0;
+    let disposed = false;
+    const refresh = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        if (!disposed) ScrollTrigger.refresh();
+      });
+    };
+    const observer = new ResizeObserver(refresh);
+    observer.observe(document.documentElement);
+    observer.observe(document.body);
+    const intersection = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) refresh();
+      },
+      { rootMargin: '150% 0px' },
+    );
+    intersection.observe(chapter);
+    window.addEventListener('load', refresh);
+    document.fonts?.ready.then(refresh);
+    refresh();
+    return () => {
+      disposed = true;
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+      intersection.disconnect();
+      window.removeEventListener('load', refresh);
+    };
+  }, [reducedMotion]);
+
   return (
     <section
       ref={chapterRef}
       id="achievements-section"
       aria-labelledby="achievements-title"
       className={`${styles.chapter} ${reducedMotion ? styles.static : ''}`}
-      data-achievements-mode={reducedMotion ? 'static' : 'performance-archive'}
+      data-achievements-mode={reducedMotion ? 'static' : 'kinetic'}
     >
       <h2 id="achievements-title" className={styles.srOnly}>
         Achievements

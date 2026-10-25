@@ -32,30 +32,34 @@ export function getAchievementBeat(panel: AchievementPanelKey, progress: number)
   if (panel === 'table-tennis') {
     if (value < 0.18) return 'serve';
     if (value < 0.48) return 'trajectory';
-    if (value < 0.82) return 'champion';
+    if (value < 0.82) return 'peak';
     return 'handoff';
   }
   if (panel === 'karate') {
     if (value < 0.24) return 'stillness';
     if (value < 0.42) return 'impact';
-    if (value < 0.82) return 'discipline';
+    if (value < 0.82) return 'stillness';
     return 'handoff';
   }
   if (panel === 'chess') {
     if (value < 0.22) return 'possibilities';
     if (value < 0.55) return 'calculation';
-    if (value < 0.84) return 'decision';
+    if (value < 0.84) return 'ratings';
     return 'handoff';
   }
   if (panel === 'public-speaking') {
     if (value < 0.3) return 'voice';
-    if (value < 0.62) return 'audience';
-    if (value < 0.84) return 'presence';
-    return 'handoff';
+    if (value < 0.78) return 'audience';
+    if (value < 0.9) return 'presence';
+    return 'silence';
   }
   if (value < 0.3) return 'disciplines';
   if (value < 0.58) return 'principles';
   return 'statement';
+}
+
+export function getDisciplineMotion(panel: AchievementDisciplineKey, progress: number) {
+  return getAchievementMotion(panel, progress);
 }
 
 export function getAchievementMotion(panel: AchievementPanelKey, progress: number) {
@@ -63,7 +67,7 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   const exit = smoothstep(rangeProgress(value, 0.84, 0.98));
 
   if (panel === 'intro') {
-    const title = smoothstep(rangeProgress(value, 0.02, 0.2));
+    const title = 0.16 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.84;
     const split = smoothstep(rangeProgress(value, 0.24, 0.55));
     return {
       '--achievement-exit': exit,
@@ -77,20 +81,21 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     const travel = smoothstep(rangeProgress(value, 0.06, 0.52));
     return {
       '--achievement-exit': exit,
-      '--tt-title': smoothstep(rangeProgress(value, 0.02, 0.2)),
+      '--tt-title': 0.18 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.82,
       '--tt-ball-x': -46 + travel * 92,
       '--tt-ball-y': Math.sin(travel * Math.PI * 3) * -12,
       '--tt-rule-turn': travel * -6,
       '--tt-impact': pulse(value, 0.39, 0.45, 0.53),
-      '--tt-resolve': smoothstep(rangeProgress(value, 0.39, 0.58)),
+      '--tt-resolve': 0.1 + smoothstep(rangeProgress(value, 0.39, 0.58)) * 0.9,
     };
   }
 
   if (panel === 'karate') {
-    const lock = smoothstep(rangeProgress(value, 0.13, 0.33));
+    const lock = 0.16 + smoothstep(rangeProgress(value, 0.13, 0.33)) * 0.84;
     return {
       '--achievement-exit': exit,
       '--karate-lock': lock,
+      '--karate-title': 0.16 + smoothstep(rangeProgress(value, 0.05, 0.25)) * 0.84,
       '--karate-impact': pulse(value, 0.27, 0.34, 0.43),
       '--karate-words': smoothstep(rangeProgress(value, 0.39, 0.66)),
     };
@@ -101,7 +106,7 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
       '--achievement-exit': exit,
       '--chess-grid': smoothstep(rangeProgress(value, 0.03, 0.24)),
       '--chess-path': smoothstep(rangeProgress(value, 0.16, 0.54)),
-      '--chess-one': smoothstep(rangeProgress(value, 0.18, 0.35)),
+      '--chess-one': 0.12 + smoothstep(rangeProgress(value, 0.18, 0.35)) * 0.88,
       '--chess-two': smoothstep(rangeProgress(value, 0.34, 0.51)),
       '--chess-three': smoothstep(rangeProgress(value, 0.5, 0.67)),
     };
@@ -111,7 +116,7 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     const audience = smoothstep(rangeProgress(value, 0.34, 0.61));
     return {
       '--achievement-exit': exit,
-      '--speaking-build': smoothstep(rangeProgress(value, 0.03, 0.23)),
+      '--speaking-build': 0.14 + smoothstep(rangeProgress(value, 0.03, 0.23)) * 0.86,
       '--speaking-audience': audience,
       '--speaking-scale': 0.72 + audience * 0.28,
       '--speaking-reach': smoothstep(rangeProgress(value, 0.54, 0.73)),
