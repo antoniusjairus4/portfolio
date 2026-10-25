@@ -26,7 +26,7 @@ import { Equipment } from './kaiforge/Equipment';
 import type { Box } from './kaiforge/geometry';
 import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
-import { CAMERAS, sampleCamera } from './kaiforge/staging';
+import { CAMERAS, PALETTE, sampleCamera } from './kaiforge/staging';
 import { TrainingProps } from './kaiforge/TrainingProps';
 import { WallDesign } from './kaiforge/WallDesign';
 import { DomesticRoom } from './palindrome/DomesticRoom';
@@ -51,7 +51,7 @@ function createSlabs(portrait: boolean): Slab[] {
   const vanish: Triple = [0.001, 0.001, 0.001];
   const outer = portrait ? OUTER_PORTRAIT_BOXES : OUTER_DESKTOP_BOXES;
   return [
-    slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], '#aeaea8', ROOM_PALETTE.floor),
+    slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], PALETTE.courtFloor, ROOM_PALETTE.floor),
     slab(WALL_BOXES[0], [0, 2.65, -2.8], [9, 5.3, 0.18], '#696e6a', ROOM_PALETTE.plaster),
     slab(WALL_BOXES[1], [-4.15, 2.65, -0.45], [0.16, 5.3, 4.6], '#696e6a', ROOM_PALETTE.parchment),
     slab(WALL_BOXES[2], [4.2, 2.65, -2.6], vanish, '#696e6a', ROOM_PALETTE.plaster),

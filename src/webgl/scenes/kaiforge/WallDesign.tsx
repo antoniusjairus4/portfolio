@@ -67,7 +67,7 @@ export function WallDesign({ bridgeProgress }: { bridgeProgress?: MutableRefObje
       }
     }
     materials.accent.emissiveIntensity = 0.45 * remaining;
-    if (wash.current) wash.current.intensity = 4.6 * remaining;
+    if (wash.current) wash.current.intensity = 5.5 * remaining;
     if (root.current) root.current.visible = remaining > 0.001;
   });
 
@@ -84,10 +84,10 @@ export function WallDesign({ bridgeProgress }: { bridgeProgress?: MutableRefObje
         position={[0, 3.05, -3.9]}
         target={washTarget}
         color="#f0ebe1"
-        intensity={4.6}
-        angle={0.72}
+        intensity={5.5}
+        angle={0.82}
         penumbra={0.9}
-        distance={3.4}
+        distance={4.2}
         decay={2}
       />
     </group>

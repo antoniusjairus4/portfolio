@@ -107,11 +107,12 @@ export const PhotoCoverSplit: React.FC = () => {
     const setHeroState = (progress: number) => {
       const state = getHeroChoreographyState(progress);
       const { holdEnd, collapseEnd } = SCROLL_STORY.beats;
+      const ease = (value: number) => {
+        const t = Math.min(1, Math.max(0, value));
+        return t * t * (3 - 2 * t);
+      };
       const openingStart = holdEnd + 0.04;
-      const openingProgress = Math.min(
-        Math.max((progress - openingStart) / (collapseEnd - openingStart), 0),
-        1,
-      );
+      const openingProgress = ease((progress - openingStart) / (collapseEnd - openingStart));
       const accentTravel = reducedMotion ? 0 : Math.min(
         Math.max((progress - (holdEnd - 0.02)) / 0.06, 0),
         1,
@@ -120,10 +121,6 @@ export const PhotoCoverSplit: React.FC = () => {
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
       // Portrait first, then the complete identity, then the existing KaiForge
       // rupture. The portrait is fully retired before readable type appears.
-      const ease = (value: number) => {
-        const t = Math.min(1, Math.max(0, value));
-        return t * t * (3 - 2 * t);
-      };
       const portraitOpacity = reducedMotion ? 0 : 1 - ease((progress - 0.04) / 0.14);
       const identityOpacity = reducedMotion ? 1 : ease((progress - 0.18) / 0.06);
       container.style.setProperty('--hero-portrait-opacity', portraitOpacity.toFixed(4));
@@ -311,7 +308,7 @@ export const PhotoCoverSplit: React.FC = () => {
       >
         <div
           ref={contentWrapperRef}
-          className="flex max-w-full flex-col items-center justify-center will-change-transform"
+          className="hero-editorial-copy-inner flex max-w-full flex-col items-center justify-center will-change-transform"
         >
           <h1
             id="hero-name"

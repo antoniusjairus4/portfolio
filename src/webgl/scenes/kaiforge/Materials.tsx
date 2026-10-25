@@ -105,13 +105,14 @@ function createMaterials() {
     }),
     ground: withGroundContactShadows(
       new MeshStandardMaterial({
-        color: '#aeaea8',
-        roughness: 0.91,
+        color: PALETTE.courtFloor,
+        roughness: 0.84,
+        metalness: 0,
         vertexColors: true,
         map: grain,
         roughnessMap: finish,
         bumpMap: finish,
-        bumpScale: 0.006,
+        bumpScale: 0.002,
       }),
     ),
     mineral: new MeshStandardMaterial({
