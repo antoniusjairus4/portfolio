@@ -1,193 +1,237 @@
-/* Skills architectural exhibition. Chapter height/sticky ownership stay in globals. */
-.skills-chapter {
-  color: #f2e8d5;
+/* The visible cards are physical meshes in the shared 3D scene. */
+.project-experience-layer[data-project-scene="skills"] {
+  background: #090c10;
 }
 
-.skills-chapter:not(.skills-static) .skills-sticky::after {
-  background: #111111;
-  opacity: clamp(0, calc((var(--skills-progress) - 0.975) * 50), 1);
-}
-
-.skills-chapter .skills-render-placeholder {
-  background: #111111;
-}
-
-.skills-chapter .skills-intro h2,
-.skills-chapter .skills-category h3 {
-  color: #f2e8d5;
-}
-
-.skills-chapter:not(.skills-static) .skills-intro {
-  max-width: 46rem;
-}
-
-.skills-chapter:not(.skills-static) .skills-category {
-  top: 8svh;
-  right: auto;
-  bottom: auto;
-  left: clamp(1.5rem, 5vw, 6rem);
-  width: min(46rem, 72vw);
-  text-align: left;
+.skills-ether-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  opacity: 0.84;
   pointer-events: none;
 }
 
-.skills-chapter:not(.skills-static) .skills-category h3 {
-  max-width: 14ch;
-  font-size: clamp(2.3rem, 3.6vw, 4.5rem);
-  line-height: 0.94;
-  letter-spacing: -0.055em;
+.skills-ether-backdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: radial-gradient(ellipse at 50% 48%, rgba(9, 12, 16, 0.43), transparent 73%);
+  pointer-events: none;
 }
 
-.skills-chapter:not(.skills-static) .skills-category p {
-  max-width: 37ch;
-  font-size: clamp(0.75rem, 0.95vw, 0.95rem);
-  color: #b9afa0;
+.skills-chapter.capability-landscape {
+  height: 820svh;
+  background: transparent;
+  color: #ece9e1;
+  pointer-events: none;
 }
 
-.skills-chapter .skills-category > span,
-.skills-chapter .skills-intro > p:first-child {
-  color: #b9afa0;
+.capability-landscape .skills-sticky {
+  background: transparent;
 }
 
-.skills-chapter .skills-category .skills-semantic-list {
+.capability-landscape .skills-sticky::after {
+  z-index: 7;
+  background: #090b0e;
+  opacity: var(--skills-exit-opacity, 0);
+}
+
+.capability-landscape .skills-render-placeholder {
+  background: #090b0e;
+}
+
+.capability-semantic {
   position: absolute;
   width: 1px;
   height: 1px;
+  margin: -1px;
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
-  padding: 0;
-  margin: -1px;
 }
 
-.skills-spatial-labels {
+.capability-entry-veil {
   position: absolute;
   inset: 0;
-  z-index: 3;
+  z-index: 6;
+  background: #090b0e;
+  opacity: var(--skills-entry-opacity, 1);
   pointer-events: none;
-  overflow: hidden;
 }
 
-.skills-inscription {
+.capability-chapter-mark,
+.capability-scroll-cue {
   position: absolute;
-  top: 0;
-  left: 0;
-  display: block;
-  width: max-content;
-  max-width: 24vw;
-  opacity: 0;
-  color: #f2e8d5;
-  font-family: var(--font-secondary);
-  font-size: clamp(1.05rem, 1.7vw, 2.15rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.035em;
-  white-space: nowrap;
-  text-shadow:
-    0 1px 3px #05090d,
-    0 0 9px #05090d;
-  will-change: transform, opacity;
+  z-index: 5;
+  color: #a5acae;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.59rem, 0.7vw, 0.76rem);
+  letter-spacing: 0.2em;
+  line-height: 1.5;
+  pointer-events: none;
 }
 
-.skills-inscription > i {
-  display: block;
-  width: 1.5rem;
-  height: 1px;
-  margin-bottom: 0.4rem;
-  background: currentColor;
-  opacity: calc(0.3 + var(--skill-focus, 0) * 0.55);
-  transform: scaleX(calc(0.6 + var(--skill-focus, 0) * 0.4));
-  transform-origin: left;
-}
-
-.skills-inscription-foundation {
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 2.5vw, 3rem);
-}
-
-.skills-chapter:not(.skills-static) .skills-travel-note {
-  color: #b9afa0;
-}
-
-.skills-chapter:not(.skills-static) .skills-exit-axis {
-  background: #f2e8d5;
-}
-
-@media (orientation: portrait) {
-  .skills-chapter:not(.skills-static) .skills-category {
-    top: 8svh;
-    left: 1.25rem;
-    right: 1.25rem;
-    bottom: auto;
-    width: auto;
-  }
-
-  .skills-chapter:not(.skills-static) .skills-category h3 {
-    font-size: clamp(1.9rem, 8vw, 3.2rem);
-    max-width: 15ch;
-  }
-
-  .skills-chapter:not(.skills-static) .skills-category p {
-    max-width: 30ch;
-    font-size: 0.75rem;
-    margin-top: 0.7rem;
-  }
-
-  .skills-inscription {
-    max-width: 76vw;
-    font-size: clamp(1.05rem, 5.8vw, 1.9rem);
-  }
-
-  .skills-inscription > i {
-    width: 1rem;
-    margin-bottom: 0.25rem;
-  }
-
-  .skills-inscription-foundation {
-    font-size: clamp(1.55rem, 7.6vw, 2.3rem);
-  }
-}
-
-.skills-fallback-category li {
+.capability-chapter-mark {
+  top: clamp(1.4rem, 3vw, 2.8rem);
+  right: clamp(1.25rem, 4vw, 4rem);
+  left: clamp(1.25rem, 4vw, 4rem);
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-.skills-fallback-category li::before {
-  display: none;
-}
-.skills-fallback-mark {
-  display: inline-block;
-  flex: 0 0 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  background-image: url("/skills/marks/identities.webp");
-  background-size: 400% 800%;
-  background-repeat: no-repeat;
+  justify-content: space-between;
 }
 
-.skills-inscription {
-  text-align: center;
+.capability-scroll-cue {
+  bottom: clamp(1.35rem, 3vw, 2.6rem);
+  left: clamp(1.25rem, 4vw, 4rem);
+  color: #7e8d92;
 }
-.skills-inscription > i {
+
+.skills-chapter.capability-landscape.skills-static {
+  height: auto;
+  min-height: 100svh;
+  background: #090b0e;
+  pointer-events: auto;
+}
+
+.capability-landscape.skills-static .skills-sticky {
+  position: relative;
+  height: auto;
+  overflow: visible;
+  background: radial-gradient(ellipse at 50% 36%, rgba(39, 58, 67, 0.34), transparent 58%), #090b0e;
+}
+
+.capability-landscape.skills-static .skills-sticky::after {
+  content: none;
+}
+
+.capability-fallback {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(5rem, 12svh, 9rem);
+  max-width: 118rem;
+  margin: 0 auto;
+  padding: clamp(5rem, 12svh, 9rem) clamp(1.25rem, 7vw, 7rem) 12svh;
+  perspective: 1400px;
+}
+
+.capability-fallback-card {
+  position: relative;
+  width: min(56vw, 40rem);
+  min-height: min(74svh, 45rem);
+  padding: clamp(2.1rem, 4vw, 4rem);
+  border: 1px solid rgba(207, 218, 219, 0.24);
+  border-left: 3px solid #91a9ae;
+  background: linear-gradient(112deg, rgba(255, 255, 255, 0.035), transparent 56%), #171c21;
+  box-shadow: 1.5rem 2rem 4rem rgba(0, 0, 0, 0.44);
+  transform: rotateY(-5deg);
+}
+
+.capability-fallback-card.is-right {
   margin-left: auto;
+  transform: rotateY(-6deg);
+}
+
+.capability-fallback-card.is-left {
   margin-right: auto;
+  transform: rotateY(6deg);
 }
-.skills-inscription small {
+
+.capability-fallback-intro {
+  margin: 0 auto;
+  border-left-color: #e0d8c8;
+  transform: none;
+}
+
+.capability-fallback-card > span,
+.capability-fallback-card > strong {
   display: block;
-  margin-top: 0.45rem;
-  font-size: clamp(0.7rem, 0.85vw, 0.88rem);
-  font-weight: 400;
-  letter-spacing: 0;
-  color: #b9afa0;
+  color: #a9b6b8;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.62rem, 0.8vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.18em;
 }
-.skills-chapter:not(.skills-static) .skills-category {
-  text-shadow:
-    0 1px 4px #05090d,
-    0 0 16px #05090dcc;
+
+.capability-fallback-card h2,
+.capability-fallback-card h3 {
+  max-width: 12ch;
+  margin: 2.5rem 0 1.2rem;
+  color: #f0ede4;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5vw, 6rem);
+  font-weight: 600;
+  line-height: 0.91;
+  letter-spacing: -0.055em;
 }
+
+.capability-fallback-card h2 {
+  font-size: clamp(5rem, 10vw, 10rem);
+}
+
+.capability-fallback-card p {
+  max-width: 26rem;
+  margin-top: 2.2rem;
+  color: #c3c8c6;
+  font-family: var(--font-secondary);
+  font-size: clamp(1rem, 1.25vw, 1.25rem);
+  line-height: 1.5;
+}
+
+.capability-fallback-card ul {
+  display: grid;
+  gap: 0.8rem;
+  margin: 2rem 0 0;
+  padding: 1.5rem 0 0;
+  border-top: 1px solid rgba(207, 218, 219, 0.18);
+  list-style: none;
+  color: #e3e6e1;
+  font-family: var(--font-secondary);
+  font-size: clamp(1.1rem, 1.7vw, 1.55rem);
+}
+
 @media (orientation: portrait) {
-  .skills-inscription small {
-    font-size: 0.72rem;
+  .skills-chapter.capability-landscape {
+    height: 760svh;
+  }
+
+  .capability-chapter-mark span:last-child {
+    display: none;
+  }
+
+  .capability-fallback {
+    gap: 5rem;
+    padding: 5rem 1.25rem 6rem;
+  }
+
+  .capability-fallback-card {
+    width: calc(100% - 0.55rem);
+    min-height: 72svh;
+    padding: 2rem 1.6rem;
+    transform: none;
+  }
+
+  .capability-fallback-card.is-right {
+    margin-left: 0.55rem;
+    transform: none;
+  }
+
+  .capability-fallback-card.is-left {
+    margin-right: 0.55rem;
+    transform: none;
+  }
+
+  .capability-fallback-card h2,
+  .capability-fallback-card h3 {
+    font-size: clamp(2.9rem, 10vw, 4.7rem);
+  }
+
+  .capability-fallback-card h2 {
+    font-size: clamp(4.6rem, 17vw, 7rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .capability-fallback-card {
+    transform: none;
   }
 }

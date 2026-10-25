@@ -56,28 +56,232 @@
 }
 
 .ns-research {
+  --ns-light-primary: 0.35;
+  --ns-light-secondary: 0.04;
+  --ns-ghost-axial: 0.035;
+  --ns-ghost-series: 0;
+  --ns-ghost-coronal: 0;
+  --ns-grid-strength: 0.28;
+  --ns-guide-strength: 0.24;
   z-index: 4;
-  background: #061019;
+  background: #02070d;
   opacity: 0;
   pointer-events: none;
   will-change: opacity;
 }
 
-.ns-research::before {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  background: linear-gradient(
-    180deg,
-    rgba(1, 8, 13, 0.32),
-    transparent 17% 79%,
-    rgba(1, 8, 13, 0.38)
-  );
-  content: "";
+.ns-research[data-active-panel="1"] {
+  --ns-light-primary: 0.5;
+  --ns-light-secondary: 0.36;
+  --ns-ghost-axial: 0.05;
+  --ns-ghost-series: 0.025;
+  --ns-ghost-coronal: 0;
+  --ns-grid-strength: 0.38;
+  --ns-guide-strength: 0.38;
+}
+
+.ns-research[data-active-panel="2"] {
+  --ns-light-primary: 0.52;
+  --ns-light-secondary: 0.4;
+  --ns-ghost-axial: 0.045;
+  --ns-ghost-series: 0.04;
+  --ns-ghost-coronal: 0.025;
+  --ns-grid-strength: 0.62;
+  --ns-guide-strength: 0.65;
+}
+
+.ns-research[data-active-panel="3"] {
+  --ns-light-primary: 0.72;
+  --ns-light-secondary: 0.53;
+  --ns-ghost-axial: 0.07;
+  --ns-ghost-series: 0.055;
+  --ns-ghost-coronal: 0.05;
+  --ns-grid-strength: 0.65;
+  --ns-guide-strength: 0.62;
+}
+
+.ns-research[data-active-panel="4"] {
+  --ns-light-primary: 0.24;
+  --ns-light-secondary: 0.16;
+  --ns-ghost-axial: 0;
+  --ns-ghost-series: 0;
+  --ns-ghost-coronal: 0.045;
+  --ns-grid-strength: 0.2;
+  --ns-guide-strength: 0.22;
+}
+
+.ns-research-background,
+.ns-research-background * {
   pointer-events: none;
 }
 
+.ns-research-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse 88% 82% at 54% 46%,
+    #10314a 0%,
+    #0b2235 31%,
+    #07131f 64%,
+    #02070d 100%
+  );
+}
+
+.ns-research-background > * {
+  position: absolute;
+}
+
+.ns-bg-light {
+  border-radius: 50%;
+  transition: opacity 1.1s ease;
+  will-change: transform, opacity;
+}
+
+.ns-bg-light-primary {
+  top: 6%;
+  right: -13%;
+  width: 82vw;
+  height: 82vh;
+  background: radial-gradient(ellipse at center, rgba(45, 123, 138, 0.19), transparent 68%);
+  opacity: var(--ns-light-primary);
+  transform: translate3d(calc(var(--ns-horizontal, 0) * -5vw), 0, 0);
+}
+
+.ns-bg-light-secondary {
+  bottom: -23%;
+  left: -16%;
+  width: 76vw;
+  height: 83vh;
+  background: radial-gradient(ellipse at center, rgba(28, 94, 120, 0.19), transparent 70%);
+  opacity: var(--ns-light-secondary);
+  transform: translate3d(calc(var(--ns-horizontal, 0) * 4vw), 0, 0);
+}
+
+.ns-bg-ghost {
+  width: min(68vw, 78rem);
+  height: 86vh;
+  mix-blend-mode: screen;
+  transition: opacity 1.15s ease;
+  will-change: transform, opacity;
+}
+
+.ns-bg-ghost img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.08) blur(3px);
+}
+
+.ns-bg-ghost-axial {
+  top: -14%;
+  right: -19%;
+  opacity: var(--ns-ghost-axial);
+  transform: translate3d(calc(var(--ns-horizontal, 0) * -5vw), 0, 0) rotate(-12deg);
+}
+
+.ns-bg-ghost-series {
+  top: 11%;
+  left: 17%;
+  width: min(54vw, 64rem);
+  opacity: var(--ns-ghost-series);
+  transform: translate3d(calc(var(--ns-horizontal, 0) * 3vw), 0, 0) rotate(7deg);
+}
+
+.ns-bg-ghost-coronal {
+  bottom: -28%;
+  left: -21%;
+  width: min(65vw, 76rem);
+  opacity: var(--ns-ghost-coronal);
+  transform: translate3d(calc(var(--ns-horizontal, 0) * 5vw), 0, 0) rotate(-6deg);
+}
+
+.ns-bg-grid {
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(143, 198, 207, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(143, 198, 207, 0.09) 1px, transparent 1px);
+  background-size: 7.5rem 7.5rem;
+  mask-image: radial-gradient(ellipse 72% 68% at 50% 48%, #000 8%, transparent 100%);
+  opacity: var(--ns-grid-strength);
+  transition: opacity 1.1s ease;
+}
+
+.ns-bg-guides {
+  inset: 0;
+  opacity: var(--ns-guide-strength);
+  transition: opacity 1.1s ease;
+}
+
+.ns-bg-guides::before {
+  position: absolute;
+  inset: 14% 7%;
+  border: 1px solid rgba(162, 204, 211, 0.08);
+  content: "";
+}
+
+.ns-bg-guides::after {
+  position: absolute;
+  top: 52%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(162, 204, 211, 0.075), transparent);
+  content: "";
+}
+
+.ns-bg-mark {
+  position: absolute;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.ns-bg-mark::before,
+.ns-bg-mark::after {
+  position: absolute;
+  background: rgba(170, 214, 220, 0.09);
+  content: "";
+}
+
+.ns-bg-mark::before {
+  top: 50%;
+  width: 100%;
+  height: 1px;
+}
+
+.ns-bg-mark::after {
+  left: 50%;
+  width: 1px;
+  height: 100%;
+}
+
+.ns-bg-mark-one {
+  top: 18%;
+  left: 10%;
+}
+
+.ns-bg-mark-two {
+  top: 73%;
+  right: 12%;
+}
+
+.ns-bg-mark-three {
+  right: 32%;
+  bottom: 12%;
+}
+
+.ns-bg-grain {
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='2' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: soft-light;
+  opacity: 0.035;
+}
+
 .ns-research-track {
+  position: relative;
+  z-index: 1;
   display: flex;
   width: 500%;
   height: 100%;
@@ -91,16 +295,8 @@
   width: 20%;
   height: 100%;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse at 76% 43%, rgba(33, 79, 103, 0.33), transparent 44%),
-    linear-gradient(110deg, #050c13 7%, #0a1b29 65%, #07121c);
-  border-right: 1px solid rgba(157, 195, 206, 0.2);
-}
-
-.ns-panel:nth-child(2n) {
-  background:
-    radial-gradient(ellipse at 71% 54%, rgba(33, 95, 121, 0.29), transparent 48%),
-    linear-gradient(110deg, #07111b 7%, #0b2030 72%, #06111a);
+  background: transparent;
+  border-right: 1px solid rgba(157, 195, 206, 0.09);
 }
 
 .ns-research-topline,
@@ -415,6 +611,30 @@
 @media (orientation: portrait) {
   .neuroshield-chapter.ns-redesign {
     height: 780svh;
+  }
+
+  .ns-bg-ghost {
+    width: 110vw;
+    height: 72vh;
+  }
+
+  .ns-bg-ghost-axial {
+    top: -6%;
+    right: -42%;
+  }
+
+  .ns-bg-ghost-series {
+    left: 2%;
+    width: 102vw;
+  }
+
+  .ns-bg-ghost-coronal {
+    left: -53%;
+    width: 116vw;
+  }
+
+  .ns-bg-guides::before {
+    inset: 11% 5%;
   }
 
   .ns-brain-stage {

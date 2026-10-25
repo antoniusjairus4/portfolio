@@ -400,6 +400,26 @@ export function NeuroShieldChapter() {
           aria-label="NeuroShield research sequence"
           inert={!staticExperience}
         >
+          <div className="ns-research-background" aria-hidden="true">
+            <div className="ns-bg-light ns-bg-light-primary" />
+            <div className="ns-bg-light ns-bg-light-secondary" />
+            <div className="ns-bg-ghost ns-bg-ghost-axial">
+              <Image src={NEURO_IMAGE_URLS[0]} width={702} height={706} alt="" sizes="65vw" />
+            </div>
+            <div className="ns-bg-ghost ns-bg-ghost-series">
+              <Image src={NEURO_IMAGE_URLS[1]} width={538} height={625} alt="" sizes="56vw" />
+            </div>
+            <div className="ns-bg-ghost ns-bg-ghost-coronal">
+              <Image src={NEURO_IMAGE_URLS[3]} width={673} height={465} alt="" sizes="62vw" />
+            </div>
+            <div className="ns-bg-grid" />
+            <div className="ns-bg-guides">
+              <span className="ns-bg-mark ns-bg-mark-one" />
+              <span className="ns-bg-mark ns-bg-mark-two" />
+              <span className="ns-bg-mark ns-bg-mark-three" />
+            </div>
+            <div className="ns-bg-grain" />
+          </div>
           <div className="ns-research-topline" aria-hidden="true">
             <span>NS / RESEARCH SEQUENCE</span>
             <span>OBSERVE · TEST · REVISE</span>

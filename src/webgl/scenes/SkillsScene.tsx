@@ -2,19 +2,24 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useMemo, useRef } from 'react';
-import { MathUtils, type PerspectiveCamera, Vector2, Vector3 } from 'three';
-import { getSkillRecognition } from '@/components/skills/skillsChoreography';
-import { getSkillLabel, skillLabelId } from '@/components/skills/skillsLabels';
-import { createSkillsRoute, routeParameter, skillAnchor } from '@/components/skills/skillsSpatial';
-import { skillCategories } from '@/content/skills';
+import {
+  Color,
+  type Group,
+  MathUtils,
+  type Mesh,
+  type PerspectiveCamera,
+  type PointLight,
+  Raycaster,
+  Vector2,
+  Vector3,
+} from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { SkillIdentitySystem } from './skills/SkillIdentitySystem';
-import { SkillsArchitecture } from './skills/SkillsArchitecture';
-import { SkillsAtmosphere } from './skills/SkillsAtmosphere';
-import { SkillsEnvironment } from './skills/SkillsEnvironment';
-import { SkillsLighting } from './skills/SkillsLighting';
-import { SkillsMaterialProvider } from './skills/SkillsMaterials';
-import { SkillsWindProvider } from './skills/SkillsWind';
+import { CapabilityTerrain } from './skills/CapabilityTerrain';
+import {
+  CAPABILITY_CARDS,
+  createCapabilityTexture,
+  paintCapabilityCard,
+} from './skills/capabilityCards';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -23,168 +28,245 @@ interface SkillsSceneProps {
   reducedMotion: boolean;
 }
 
+type CardPlacement = { x: number; y: number; z: number; rotation: number };
+const STOPS = [0.065, 0.215, 0.365, 0.515, 0.665, 0.815, 0.96] as const;
+const BASE = new Color('#090c10');
+
+function smooth(value: number) {
+  const t = Math.max(0, Math.min(1, value));
+  return t * t * (3 - 2 * t);
+}
+
+function makePlacements(portrait: boolean): CardPlacement[] {
+  return CAPABILITY_CARDS.map((_, index) => {
+    const side = index === 0 ? 0 : index % 2 === 1 ? 1 : -1;
+    return {
+      x: side * (portrait ? 0.78 : 3.15),
+      y: -0.1 + Math.sin(index * 1.7) * 0.045,
+      z: index * -21.5,
+      rotation: side * -0.085,
+    };
+  });
+}
+
+function stopPose(placement: CardPlacement, portrait: boolean) {
+  return {
+    eye: new Vector3(
+      placement.x * 0.1,
+      portrait ? 0.12 : 0.23,
+      placement.z + (portrait ? 7.4 : 8.8),
+    ),
+    look: new Vector3(placement.x * 0.38, -0.15, placement.z),
+  };
+}
+
 export function SkillsScene({
   controller,
   portrait,
   finePointer,
   reducedMotion,
 }: SkillsSceneProps) {
-  const { camera, size, invalidate } = useThree();
-  useEffect(() => {
-    const perspective = camera as PerspectiveCamera;
-    const previous = perspective.far;
-    perspective.far = 220;
-    perspective.updateProjectionMatrix();
-    return () => {
-      perspective.far = previous;
-      perspective.updateProjectionMatrix();
-    };
-  }, [camera]);
-  const route = useMemo(() => createSkillsRoute(portrait), [portrait]);
-  const pointer = useRef({ active: false, ndc: new Vector2() });
-  const target = useMemo(() => new Vector3(), []);
-  const projection = useMemo(() => new Vector3(), []);
-  const tangentBefore = useMemo(() => new Vector3(), []);
-  const tangentAfter = useMemo(() => new Vector3(), []);
-  const inscriptions = useMemo(
-    () =>
-      skillCategories.flatMap((category, domain) =>
-        category.skills.map((_, skill) => ({
-          id: skillLabelId(domain, skill),
-          domain,
-          skill,
-          count: category.skills.length,
-          anchor: new Vector3(...skillAnchor(domain, skill, portrait)),
-        })),
-      ),
-    [portrait],
+  const { camera, invalidate } = useThree();
+  const placements = useMemo(() => makePlacements(portrait), [portrait]);
+  const poses = useMemo(
+    () => placements.map((placement) => stopPose(placement, portrait)),
+    [placements, portrait],
   );
+  const textures = useMemo(() => CAPABILITY_CARDS.map(createCapabilityTexture), []);
+  const groups = useRef<(Group | null)[]>([]);
+  const slabs = useRef<(Mesh | null)[]>([]);
+  const focusLight = useRef<PointLight>(null);
+  const pointer = useRef({ active: false, ndc: new Vector2() });
+  const raycaster = useMemo(() => new Raycaster(), []);
+  const eye = useMemo(() => new Vector3(), []);
+  const look = useMemo(() => new Vector3(), []);
+  const activeColor = useMemo(() => new Color(), []);
 
   useEffect(() => {
-    // The shared canvas doesn't capture events. Listen passively only while this
-    // scene owns it; no orbit controls, scroll capture or idle animation loop.
-    if (!finePointer || portrait || window.matchMedia('(prefers-reduced-motion: reduce)').matches)
-      return;
+    const perspective = camera as PerspectiveCamera;
+    const previous = { fov: perspective.fov, near: perspective.near, far: perspective.far };
+    perspective.fov = portrait ? 52 : 42;
+    perspective.near = 0.1;
+    perspective.far = 180;
+    perspective.updateProjectionMatrix();
+    invalidate();
+    return () => {
+      perspective.fov = previous.fov;
+      perspective.near = previous.near;
+      perspective.far = previous.far;
+      perspective.updateProjectionMatrix();
+    };
+  }, [camera, portrait, invalidate]);
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([
+      document.fonts.load('600 120px "Clash Display"'),
+      document.fonts.load('500 50px "Satoshi"'),
+    ])
+      .then(() => {
+        if (!active) return;
+        textures.forEach((texture, index) => {
+          paintCapabilityCard(texture.image as HTMLCanvasElement, CAPABILITY_CARDS[index]);
+          texture.needsUpdate = true;
+        });
+        invalidate();
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+      textures.forEach((texture) => {
+        texture.dispose();
+      });
+    };
+  }, [textures, invalidate]);
+
+  useEffect(() => {
+    if (!finePointer || portrait || reducedMotion) return;
     const move = (event: PointerEvent) => {
       if (event.pointerType !== 'mouse' && event.pointerType !== 'pen') return;
       pointer.current.active = true;
       pointer.current.ndc.set(
-        Math.max(-1, Math.min(1, (event.clientX / window.innerWidth) * 2 - 1)),
-        Math.max(-1, Math.min(1, 1 - (event.clientY / window.innerHeight) * 2)),
+        (event.clientX / window.innerWidth) * 2 - 1,
+        1 - (event.clientY / window.innerHeight) * 2,
       );
       invalidate();
     };
     const reset = () => {
       pointer.current.active = false;
-      pointer.current.ndc.set(0, 0);
       invalidate();
     };
     window.addEventListener('pointermove', move, { passive: true });
-    document.documentElement.addEventListener('pointerleave', reset);
     window.addEventListener('blur', reset);
+    document.documentElement.addEventListener('pointerleave', reset);
     return () => {
       window.removeEventListener('pointermove', move);
-      document.documentElement.removeEventListener('pointerleave', reset);
       window.removeEventListener('blur', reset);
-      pointer.current.active = false;
-      pointer.current.ndc.set(0, 0);
+      document.documentElement.removeEventListener('pointerleave', reset);
     };
-  }, [finePointer, portrait, invalidate]);
+  }, [finePointer, portrait, reducedMotion, invalidate]);
 
-  useEffect(
-    () => () => {
-      for (const inscription of inscriptions) {
-        const element = getSkillLabel(inscription.id);
-        if (element) element.style.opacity = '0';
-      }
-    },
-    [inscriptions],
-  );
-
-  useFrame(() => {
+  useFrame((_, delta) => {
     const progress = controller.progress.current;
-    const parameter = routeParameter(progress);
-    const perspective = camera as PerspectiveCamera;
-    const fov = portrait ? 58 : 52;
-    if (perspective.fov !== fov) {
-      perspective.fov = fov;
-      perspective.updateProjectionMatrix();
+    let from = 0;
+    while (from < STOPS.length - 2 && progress > STOPS[from + 1]) from += 1;
+    const beforeFirst = progress < STOPS[0];
+    const afterLast = progress > STOPS[STOPS.length - 1];
+    const local = (progress - STOPS[from]) / (STOPS[from + 1] - STOPS[from]);
+    const travel = smooth((local - 0.1) / 0.8);
+    eye.copy(poses[from].eye).lerp(poses[from + 1].eye, travel);
+    look.copy(poses[from].look).lerp(poses[from + 1].look, travel);
+    if (beforeFirst) {
+      eye.z += (1 - smooth(progress / STOPS[0])) * (portrait ? 3.3 : 5.4);
     }
-    route.camera.getPoint(parameter, camera.position);
-    route.target.getPoint(parameter, target);
-    const agency = !portrait && finePointer ? 1 : 0;
-    camera.position.x += pointer.current.ndc.x * 0.12 * agency;
-    camera.position.y += pointer.current.ndc.y * 0.07 * agency;
-    target.x += pointer.current.ndc.x * 0.25 * agency;
-    target.y += pointer.current.ndc.y * 0.12 * agency;
+    if (afterLast) {
+      eye.z -= smooth((progress - STOPS[STOPS.length - 1]) / 0.04) * 1.2;
+    }
+    camera.position.copy(eye);
     camera.up.set(0, 1, 0);
-    camera.lookAt(target);
-    route.camera.getTangent(Math.max(0, parameter - 0.018), tangentBefore);
-    route.camera.getTangent(Math.min(1, parameter + 0.018), tangentAfter);
-    const turn = tangentBefore.x * tangentAfter.z - tangentBefore.z * tangentAfter.x;
-    const bank = MathUtils.clamp(turn * 0.42, -0.032, 0.032);
-    camera.rotateZ(-bank);
+    camera.lookAt(look);
     camera.updateMatrixWorld();
 
-    // DOM text shares immutable world anchors and the same authored camera.
-    // No independent parallax and no React state updates on rendered frames.
-    for (const inscription of inscriptions) {
-      const element = getSkillLabel(inscription.id);
-      if (!element) continue;
-      projection.copy(inscription.anchor).project(camera);
-      const inFrame =
-        projection.z > -1 &&
-        projection.z < 1 &&
-        Math.abs(projection.x) < 0.96 &&
-        Math.abs(projection.y) < 0.94;
-      const recognition = getSkillRecognition(
-        progress,
-        inscription.domain,
-        inscription.skill,
-        inscription.count,
-      );
-      const distance = camera.position.distanceTo(inscription.anchor);
-      const distanceFade = Math.max(0, Math.min(1, (94 - distance) / 72));
-      const opacity = inFrame ? distanceFade * (0.04 + recognition * 0.96) : 0;
-      element.style.setProperty('--skill-focus', recognition.toFixed(3));
-      element.style.opacity = opacity.toFixed(3);
-      if (opacity < 0.002) {
-        element.style.transform = '';
-        continue;
+    let activeIndex = 0;
+    for (let index = 1; index < STOPS.length; index += 1) {
+      if (Math.abs(progress - STOPS[index]) < Math.abs(progress - STOPS[activeIndex])) {
+        activeIndex = index;
       }
-      const x = (projection.x * 0.5 + 0.5) * size.width;
-      const y = (-projection.y * 0.5 + 0.5) * size.height;
-      const scale = Math.max(
-        portrait ? 0.24 : 0.18,
-        Math.min(1.12, (portrait ? 0.93 : 3.5) / distance),
-      );
-      element.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) translate(-50%, -50%) scale(${scale.toFixed(3)})`;
     }
-  }, -2);
+    let hoveredIndex = -1;
+    if (pointer.current.active && finePointer && !portrait) {
+      raycaster.setFromCamera(pointer.current.ndc, camera);
+      const hit = raycaster.intersectObjects(
+        slabs.current.filter((slab): slab is Mesh => Boolean(slab)),
+        false,
+      )[0];
+      if (hit && Math.abs(progress - STOPS[activeIndex]) < 0.105) {
+        hoveredIndex = hit.object.userData.cardIndex === activeIndex ? activeIndex : -1;
+      }
+    }
+    const ease = 1 - Math.exp(-Math.min(delta, 0.05) * 9);
+    let settling = false;
+    groups.current.forEach((group, index) => {
+      if (!group) return;
+      const placement = placements[index];
+      const hover = hoveredIndex === index ? 1 : 0;
+      const targetX = hover ? -pointer.current.ndc.y * 0.025 : 0;
+      const targetY = placement.rotation + (hover ? pointer.current.ndc.x * 0.045 : 0);
+      const targetZ = placement.z + hover * 0.13;
+      group.rotation.x = MathUtils.lerp(group.rotation.x, targetX, ease);
+      group.rotation.y = MathUtils.lerp(group.rotation.y, targetY, ease);
+      group.position.z = MathUtils.lerp(group.position.z, targetZ, ease);
+      settling ||= Math.abs(group.rotation.x - targetX) > 0.001;
+      settling ||= Math.abs(group.rotation.y - targetY) > 0.001;
+      settling ||= Math.abs(group.position.z - targetZ) > 0.001;
+    });
+    if (focusLight.current) {
+      const active = placements[activeIndex];
+      focusLight.current.position.set(active.x - 1.5, active.y + 3.3, active.z + 3.8);
+      activeColor.set(CAPABILITY_CARDS[activeIndex].accent).lerp(BASE, 0.38);
+      focusLight.current.color.copy(activeColor);
+      focusLight.current.intensity = portrait ? 2.6 : 3.5;
+    }
+    if (settling) invalidate();
+  });
 
   return (
     <>
-      <color attach="background" args={['#07131d']} />
-      <fog attach="fog" args={['#183541', 34, 182]} />
-      <SkillsWindProvider reducedMotion={reducedMotion}>
-        <SkillsEnvironment portrait={portrait} />
-        <SkillsAtmosphere portrait={portrait} reducedMotion={reducedMotion} />
-        <SkillsLighting controller={controller} portrait={portrait} />
-        <SkillsMaterialProvider>
-          <SkillsArchitecture
-            portrait={portrait}
-            controller={controller}
-            pointer={pointer}
-            interactive={finePointer && !portrait}
-          />
-          <SkillIdentitySystem
-            portrait={portrait}
-            controller={controller}
-            pointer={pointer}
-            interactive={finePointer && !portrait}
-          />
-        </SkillsMaterialProvider>
-      </SkillsWindProvider>
+      <fog attach="fog" args={['#090c10', portrait ? 24 : 30, portrait ? 80 : 100]} />
+      <ambientLight color="#a8bac0" intensity={0.58} />
+      <hemisphereLight args={['#a7b5bd', '#111b1d', 0.7]} />
+      <directionalLight position={[-6, 12, 10]} intensity={1.35} color="#d6d8d1" />
+      <pointLight ref={focusLight} color="#c4c6c1" intensity={3.5} distance={17} decay={2} />
+      <CapabilityTerrain portrait={portrait} />
+      {CAPABILITY_CARDS.map((card, index) => {
+        const placement = placements[index];
+        const scale = portrait ? 0.76 : 1;
+        return (
+          <group
+            key={card.number}
+            ref={(node) => {
+              groups.current[index] = node;
+            }}
+            position={[placement.x, placement.y, placement.z]}
+            rotation={[0, placement.rotation, 0]}
+            scale={scale}
+          >
+            <mesh
+              ref={(node) => {
+                slabs.current[index] = node;
+              }}
+              userData={{ cardIndex: index }}
+              castShadow
+              receiveShadow
+            >
+              <boxGeometry args={[3.76, 5.18, 0.2]} />
+              <meshStandardMaterial color="#171d22" roughness={0.78} metalness={0.16} />
+            </mesh>
+            <mesh position={[0, 0, 0.111]}>
+              <planeGeometry args={[3.55, 4.98]} />
+              <meshBasicMaterial
+                map={textures[index]}
+                transparent
+                depthWrite={false}
+                toneMapped={false}
+              />
+            </mesh>
+            <mesh position={[-1.84, 0, 0.113]}>
+              <boxGeometry args={[0.022, 4.96, 0.022]} />
+              <meshStandardMaterial
+                color={card.accent}
+                emissive={card.accent}
+                emissiveIntensity={0.35}
+                roughness={0.58}
+              />
+            </mesh>
+            <mesh position={[0, -2.64, 0]} receiveShadow>
+              <boxGeometry args={[4.05, 0.12, 0.58]} />
+              <meshStandardMaterial color="#10161a" roughness={0.9} metalness={0.14} />
+            </mesh>
+          </group>
+        );
+      })}
     </>
   );
 }
