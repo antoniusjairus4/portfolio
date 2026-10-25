@@ -1,9 +1,9 @@
 .palindrome-chapter {
   --palindrome-text-primary: #f2e6cf;
-  --palindrome-text-secondary: #b9b1a3;
-  --palindrome-text-muted: #a79e90;
-  --palindrome-text-quiet: #91897d;
+  --palindrome-text-soft: #d8cdba;
+  --palindrome-text-muted: #a59d90;
   --palindrome-text-accent: #8e2230;
+  --palindrome-text-green: #60715a;
   color: var(--palindrome-text-primary);
 }
 
@@ -14,24 +14,49 @@
 }
 
 .palindrome-chapter .palindrome-semantic-header .palindrome-title-accent,
-.palindrome-chapter .palindrome-disclosure a > span {
+.palindrome-chapter .palindrome-disclosure-arrow {
   color: var(--palindrome-text-accent);
 }
 
+.palindrome-chapter .palindrome-heading-primary {
+  color: var(--palindrome-text-primary);
+}
+
+.palindrome-chapter .palindrome-heading-soft {
+  color: var(--palindrome-text-soft);
+}
+
+.palindrome-chapter .palindrome-heading-crimson {
+  color: var(--palindrome-text-accent);
+}
+
+.palindrome-chapter .palindrome-heading-green {
+  color: var(--palindrome-text-green);
+}
+
 .palindrome-chapter .palindrome-semantic-header > p:nth-of-type(2),
+.palindrome-chapter .palindrome-purpose,
 .palindrome-chapter .palindrome-beat small {
-  color: var(--palindrome-text-secondary);
+  color: var(--palindrome-text-muted);
 }
 
 .palindrome-chapter .palindrome-semantic-header > p:first-child,
-.palindrome-chapter .palindrome-purpose,
-.palindrome-chapter .palindrome-beat > span,
+.palindrome-chapter .palindrome-beat-label,
 .palindrome-chapter .palindrome-chapter-index {
   color: var(--palindrome-text-muted);
 }
 
+.palindrome-chapter .beat-fragmentation .palindrome-beat-label {
+  color: var(--palindrome-text-accent);
+}
+
+.palindrome-chapter .beat-organization .palindrome-beat-label,
+.palindrome-chapter .beat-control .palindrome-beat-label {
+  color: var(--palindrome-text-green);
+}
+
 .palindrome-chapter .palindrome-disclosure p {
-  color: var(--palindrome-text-quiet);
+  color: var(--palindrome-text-muted);
 }
 
 .palindrome-demo-note {
@@ -40,7 +65,7 @@
   left: clamp(1.5rem, 3vw, 3rem);
   bottom: 1.5rem;
   margin: 0;
-  color: var(--palindrome-text-quiet);
+  color: var(--palindrome-text-muted);
   font-family: "JetBrains Mono Variable", monospace;
   font-size: 0.58rem;
   line-height: 1.6;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { PalindromeFallback } from '@/components/palindrome/PalindromeFallback';
 import { getBeatOpacity, getPalindromeBeat } from '@/components/palindrome/palindromeChoreography';
 import { palindromeBeats, palindromeContent } from '@/content/palindrome';
@@ -21,6 +21,17 @@ const BEAT_PRESENTATION = [
   { center: 0.735, width: 0.15 },
   { center: 0.92, width: 0.14 },
 ] as const;
+
+type BeatKey = (typeof palindromeBeats)[number]['key'];
+type HeadlineTone = 'primary' | 'soft' | 'crimson' | 'green';
+
+const HEADLINE_TONES: Record<BeatKey, Record<string, HeadlineTone>> = {
+  ordinary: { THE: 'soft', ROOM: 'primary', 'STAYS.': 'green' },
+  fragmentation: { TOTALS: 'primary', WITHOUT: 'crimson', 'CONTEXT.': 'primary' },
+  relationships: { WHAT: 'primary', MADE: 'crimson', THE: 'soft', 'TOTAL?': 'primary' },
+  organization: { PATTERNS: 'primary', FIND: 'green', THEIR: 'soft', 'PLACE.': 'primary' },
+  control: { THE: 'soft', NOISE: 'crimson', 'CHANGES.': 'primary' },
+};
 
 export function PalindromeChapter() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -140,13 +151,25 @@ export function PalindromeChapter() {
                 }}
                 className={`palindrome-beat beat-${beat.key}`}
               >
-                <span>
+                <span className="palindrome-beat-label">
                   {beat.index} / {beat.label}
                 </span>
                 <strong>
-                  {beat.headline[0]}
-                  <br />
-                  {beat.headline[1]}
+                  {beat.headline.map((line, lineIndex) => (
+                    <Fragment key={line}>
+                      {lineIndex > 0 && <br />}
+                      {line.split(' ').map((word, wordIndex) => (
+                        <Fragment key={word}>
+                          {wordIndex > 0 ? ' ' : null}
+                          <span
+                            className={`palindrome-heading-${HEADLINE_TONES[beat.key][word] ?? 'primary'}`}
+                          >
+                            {word}
+                          </span>
+                        </Fragment>
+                      ))}
+                    </Fragment>
+                  ))}
                 </strong>
                 <small>{beat.detail}</small>
               </div>
@@ -169,7 +192,10 @@ export function PalindromeChapter() {
         <div className="palindrome-disclosure">
           <p>{palindromeContent.disclosure}</p>
           <a href={palindromeContent.destination} target="_blank" rel="noopener noreferrer">
-            Visit Palindrome <span aria-hidden="true">↗</span>
+            Visit Palindrome{' '}
+            <span className="palindrome-disclosure-arrow" aria-hidden="true">
+              ↗
+            </span>
           </a>
         </div>
       </div>

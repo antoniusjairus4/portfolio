@@ -28,6 +28,24 @@ const BEAT_PRESENTATION = [
   { center: 0.91, width: 0.14, hold: 0.03 },
 ] as const;
 
+function BrandWordmark() {
+  return (
+    <>
+      <span className="kaiforge-tone-ivory">Kai</span>
+      <span className="kaiforge-tone-green">Forge</span>
+    </>
+  );
+}
+
+function BeatLabel({ number, name }: { number: string; name: string }) {
+  return (
+    <span>
+      <span className="kaiforge-tone-grey">{number} /</span>{' '}
+      <span className="kaiforge-tone-soft">{name}</span>
+    </span>
+  );
+}
+
 export function KaiForgeChapter() {
   const sectionRef = useRef<HTMLElement>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -143,9 +161,9 @@ export function KaiForgeChapter() {
             }}
             className="kaiforge-beat beat-recognition"
           >
-            <span>01 / Recognition</span>
+            <BeatLabel number="01" name="Recognition" />
             <h2 id="kaiforge-title" className="kaiforge-recognition-title">
-              {kaiForgeContent.name}
+              <BrandWordmark />
             </h2>
           </div>
           {!staticPresentation && (
@@ -157,11 +175,14 @@ export function KaiForgeChapter() {
                 className="kaiforge-beat beat-approach"
                 aria-hidden="true"
               >
-                <span>02 / Approach</span>
+                <BeatLabel number="02" name="Approach" />
                 <strong>
-                  READ THE MOMENT
+                  <span className="kaiforge-tone-ivory">READ</span>{' '}
+                  <span className="kaiforge-tone-soft">THE</span>{' '}
+                  <span className="kaiforge-tone-ivory">MOMENT</span>
                   <br />
-                  BEFORE CONTACT.
+                  <span className="kaiforge-tone-soft">BEFORE</span>{' '}
+                  <span className="kaiforge-tone-green">CONTACT.</span>
                 </strong>
               </div>
               <div
@@ -171,11 +192,13 @@ export function KaiForgeChapter() {
                 className="kaiforge-beat beat-impact"
                 aria-hidden="true"
               >
-                <span>03 / Impact</span>
+                <BeatLabel number="03" name="Impact" />
                 <strong>
-                  ONE POINT.
+                  <span className="kaiforge-tone-soft">ONE</span>{' '}
+                  <span className="kaiforge-tone-ivory">POINT.</span>
                   <br />
-                  ONE DECISION.
+                  <span className="kaiforge-tone-soft">ONE</span>{' '}
+                  <span className="kaiforge-tone-green">DECISION.</span>
                 </strong>
               </div>
               <div
@@ -185,11 +208,12 @@ export function KaiForgeChapter() {
                 className="kaiforge-beat beat-understanding"
                 aria-hidden="true"
               >
-                <span>04 / Understanding</span>
+                <BeatLabel number="04" name="Understanding" />
                 <strong>
-                  THE POINT,
+                  <span className="kaiforge-tone-soft">THE</span>{' '}
+                  <span className="kaiforge-tone-green">POINT,</span>
                   <br />
-                  UNDERSTOOD.
+                  <span className="kaiforge-tone-ivory">UNDERSTOOD.</span>
                 </strong>
                 <small>{kaiForgeContent.traceNote}</small>
               </div>
@@ -200,11 +224,13 @@ export function KaiForgeChapter() {
                 className="kaiforge-beat beat-release"
                 aria-hidden="true"
               >
-                <span>05 / Release</span>
+                <BeatLabel number="05" name="Release" />
                 <strong>
-                  FROM MOTION
+                  <span className="kaiforge-tone-soft">FROM</span>{' '}
+                  <span className="kaiforge-tone-ivory">MOTION</span>
                   <br />
-                  TO PATTERN.
+                  <span className="kaiforge-tone-soft">TO</span>{' '}
+                  <span className="kaiforge-tone-green">PATTERN.</span>
                 </strong>
               </div>
             </>
@@ -223,7 +249,13 @@ export function KaiForgeChapter() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Visit KaiForge <span aria-hidden="true">↗</span>
+          <span className="kaiforge-destination-copy">
+            <span className="kaiforge-tone-grey">Visit</span>{' '}
+            <BrandWordmark />
+          </span>
+          <span className="kaiforge-destination-arrow kaiforge-tone-green" aria-hidden="true">
+            ↗
+          </span>
         </a>
       </div>
     </section>

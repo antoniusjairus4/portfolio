@@ -10,7 +10,7 @@ import {
   ShelfBowl,
 } from './HouseholdObjects';
 import { ROOM_PALETTE } from './palette';
-import { BACK_WALL_BOXES, HEADER_BOX, SIDE_WALL_BOXES } from './roomLayout';
+import { BACK_WALL_BOXES, HEADER_BOX, HEADER_SEAL_BOX, SIDE_WALL_BOXES } from './roomLayout';
 import { SeatedFigure } from './SeatedFigure';
 import { ContactPatch, DomesticSurfaces, Surface } from './Surfaces';
 
@@ -166,6 +166,12 @@ export function DomesticRoom({
               finish="plaster"
             />
             <Block
+              position={HEADER_SEAL_BOX[0]}
+              size={HEADER_SEAL_BOX[1]}
+              color={ROOM_PALETTE.plaster}
+              finish="plaster"
+            />
+            <Block
               position={[0, 0.12, -2.68]}
               size={[8.3, 0.24, 0.07]}
               color={ROOM_PALETTE.timber}
@@ -183,6 +189,12 @@ export function DomesticRoom({
               position={HEADER_BOX[0]}
               size={HEADER_BOX[1]}
               color={ROOM_PALETTE.sideWall}
+              finish="plaster"
+            />
+            <Block
+              position={HEADER_SEAL_BOX[0]}
+              size={HEADER_SEAL_BOX[1]}
+              color={ROOM_PALETTE.plaster}
               finish="plaster"
             />
           </BridgeReveal>

@@ -1586,11 +1586,11 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   pointer-events: auto;
 }
 
-.kaiforge-destination span {
+.kaiforge-destination .kaiforge-destination-arrow {
   transition: transform 180ms ease;
 }
 
-.kaiforge-destination:hover span {
+.kaiforge-destination:hover .kaiforge-destination-arrow {
   transform: translate(0.2rem, -0.2rem);
 }
 

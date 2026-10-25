@@ -1,4 +1,11 @@
 /* Only KaiForge: legibility over the new physical parchment architecture. */
+.kaiforge-chapter {
+  --kaiforge-text-ivory: #f2e6cf;
+  --kaiforge-text-soft: #d8cdba;
+  --kaiforge-text-grey: #a59d90;
+  --kaiforge-text-green: #5e7f5a;
+}
+
 .kaiforge-chapter:not(.kaiforge-static) {
   /* One viewport remains pinned; the scrub distance grows from 420 to 756svh. */
   height: 856svh;
@@ -27,7 +34,7 @@
 .kaiforge-chapter .kaiforge-beat > span {
   width: fit-content;
   padding: 0;
-  color: rgba(242, 232, 213, 0.88);
+  color: var(--kaiforge-text-grey);
   background: none;
   border: 0;
   box-shadow: none;
@@ -115,7 +122,7 @@
 
 .kaiforge-chapter .kaiforge-beat strong {
   display: table;
-  color: #111111;
+  color: var(--kaiforge-text-ivory);
   font-size: clamp(2.8rem, 4.5vw, 5.5rem);
 }
 
@@ -131,15 +138,18 @@
 }
 
 .kaiforge-chapter .kaiforge-semantic-header h2,
+.kaiforge-chapter .beat-understanding strong {
+  color: var(--kaiforge-text-ivory);
+}
+
 .kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
-.kaiforge-chapter .beat-understanding strong,
-.kaiforge-chapter .beat-understanding small {
-  color: #f2e8d5;
+.kaiforge-chapter .kaiforge-beat small {
+  color: var(--kaiforge-text-grey);
 }
 
 /* Upper copy sits against the arena recess; lower beat copy sits over lit stone. */
 .kaiforge-chapter .beat-approach strong {
-  color: #f2e8d5;
+  color: var(--kaiforge-text-ivory);
 }
 
 .kaiforge-chapter .kaiforge-beat {
@@ -165,14 +175,14 @@
   text-align: right;
   text-transform: uppercase;
   white-space: nowrap;
-  color: #111;
+  color: var(--kaiforge-text-ivory);
   opacity: var(--kaiforge-title-arrival, 0);
   transform: translate3d(0, var(--kaiforge-title-offset, -8vh), 0);
   will-change: transform, opacity;
 }
 
 .kaiforge-static .beat-recognition .kaiforge-recognition-title {
-  color: #f2e8d5;
+  color: var(--kaiforge-text-ivory);
 }
 
 .kaiforge-chapter .beat-impact strong {
@@ -197,10 +207,13 @@
 
   /* The narrower framing places the upper typography against the Ink recess. */
   .kaiforge-chapter .kaiforge-semantic-header h2,
+  .kaiforge-chapter .beat-understanding strong {
+    color: var(--kaiforge-text-ivory);
+  }
+
   .kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
-  .kaiforge-chapter .beat-understanding strong,
   .kaiforge-chapter .beat-understanding small {
-    color: #f2e8d5;
+    color: var(--kaiforge-text-grey);
   }
 
   .kaiforge-chapter .kaiforge-beat strong {
@@ -237,6 +250,28 @@
 
 .kaiforge-chapter .kaiforge-fallback-stage {
   top: 57%;
+}
+
+.kaiforge-chapter .kaiforge-chapter-index,
+.kaiforge-chapter .kaiforge-destination {
+  color: var(--kaiforge-text-grey);
+}
+
+.kaiforge-chapter .kaiforge-tone-ivory {
+  color: var(--kaiforge-text-ivory);
+}
+
+.kaiforge-chapter .kaiforge-tone-soft {
+  color: var(--kaiforge-text-soft);
+}
+
+.kaiforge-chapter .kaiforge-tone-grey {
+  color: var(--kaiforge-text-grey);
+}
+
+.kaiforge-chapter .kaiforge-tone-green {
+  color: var(--kaiforge-text-green);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55);
 }
 
 /* Pass 1: real athlete hair/legs occupy more of the accepted overlay envelope. */

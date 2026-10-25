@@ -32,13 +32,14 @@ const BLOOMS = [
 ] as const;
 
 function createSky() {
-  const geometry = new PlaneGeometry(13, 8, 1, 16);
+  const skyHeight = 4.6;
+  const geometry = new PlaneGeometry(13, skyHeight, 1, 12);
   const positions = geometry.getAttribute('position');
   const colors: number[] = [];
   const low = new Color('#f3e9c9');
   const high = new Color('#8ec2dc');
   for (let i = 0; i < positions.count; i++) {
-    const t = Math.min(1, Math.max(0, (positions.getY(i) + 4) / 8));
+    const t = Math.min(1, Math.max(0, (positions.getY(i) + skyHeight / 2) / skyHeight));
     const color = low.clone().lerp(high, t ** 0.78);
     colors.push(color.r, color.g, color.b);
   }
@@ -99,7 +100,7 @@ export function GardenWindow({
   return (
     <group name="PL_DaylightGarden">
       {/* The backdrop stays far enough behind the real aperture for camera parallax. */}
-      <mesh geometry={sky} position={[-3.55, 2.7, -9.5]}>
+      <mesh geometry={sky} position={[-3.55, 2.55, -9.5]}>
         <meshBasicMaterial vertexColors toneMapped={false} />
       </mesh>
       <mesh position={[-4.3, 1.45, -8.1]} scale={[2.5, 0.66, 0.45]}>

@@ -44,3 +44,9 @@ export const HEADER_BOX: Box = [
   [0, 5.21, -2.65],
   [9, 0.28, 0.12],
 ];
+
+// Closes the narrow sightline above the lintel without extending into the room.
+export const HEADER_SEAL_BOX: Box = [
+  [0, 5.43, -2.8],
+  [9, 0.28, 0.18],
+];
