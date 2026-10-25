@@ -1,4 +1,4 @@
-import { type MutableRefObject, useEffect, useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { type BufferGeometry, Float32BufferAttribute } from 'three';
 import {
   GROUND_BOXES,
@@ -42,13 +42,7 @@ function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') 
 }
 
 /** Unequal, inhabited architectural cuts, rather than a repeated rectangle tunnel. */
-export function Architecture({
-  portrait,
-  progress,
-}: {
-  portrait: boolean;
-  progress: MutableRefObject<number>;
-}) {
+export function Architecture({ portrait }: { portrait: boolean }) {
   const materials = useKaiForgeMaterials();
   const ground = useMemo(() => tintSlabs(boxes(GROUND_BOXES), 'ground'), []);
   const walls = useMemo(() => tintSlabs(boxes(WALL_BOXES), 'wall'), []);
@@ -75,7 +69,7 @@ export function Architecture({
       <mesh geometry={outerGeometry}>
         <primitive attach="material" object={materials.mineral} />
       </mesh>
-      <WallDesign chapterProgress={progress} />
+      <WallDesign />
     </group>
   );
 }

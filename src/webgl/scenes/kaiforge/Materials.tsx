@@ -142,9 +142,9 @@ function createMaterials() {
     }),
     wallTrim: new MeshStandardMaterial({ color: '#b4b5ac', metalness: 0.12, roughness: 0.72 }),
     wallAccent: new MeshStandardMaterial({
-      color: '#a3293e',
+      color: PALETTE.crimson,
       emissive: PALETTE.crimson,
-      emissiveIntensity: 0.85,
+      emissiveIntensity: 0.45,
       roughness: 0.55,
     }),
     ink: new MeshStandardMaterial({ color: PALETTE.ink, roughness: 0.78, metalness: 0.12 }),

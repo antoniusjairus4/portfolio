@@ -1,12 +1,6 @@
 import { useFrame } from '@react-three/fiber';
 import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
-import {
-  type Group,
-  type MeshStandardMaterial,
-  Object3D,
-  type PointLight,
-  type SpotLight,
-} from 'three';
+import { type Group, type MeshStandardMaterial, Object3D, type SpotLight } from 'three';
 import {
   DISPLAY_INSET_BOXES,
   DISPLAY_LEDGE_BOXES,
@@ -16,20 +10,11 @@ import {
 } from './architectureLayout';
 import { boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
-import { impactPulse } from './staging';
 
-export function WallDesign({
-  chapterProgress,
-  bridgeProgress,
-}: {
-  chapterProgress?: MutableRefObject<number>;
-  bridgeProgress?: MutableRefObject<number>;
-}) {
+export function WallDesign({ bridgeProgress }: { bridgeProgress?: MutableRefObject<number> }) {
   const shared = useKaiForgeMaterials();
   const root = useRef<Group>(null);
   const wash = useRef<SpotLight>(null);
-  const leftGlow = useRef<PointLight>(null);
-  const rightGlow = useRef<PointLight>(null);
   const washTarget = useMemo(() => {
     const target = new Object3D();
     target.position.set(0, 2.25, -5.7);
@@ -76,16 +61,13 @@ export function WallDesign({
   useFrame(() => {
     const t = bridgeProgress ? Math.min(1, Math.max(0, (bridgeProgress.current - 0.25) / 0.35)) : 0;
     const remaining = 1 - t * t * (3 - 2 * t);
-    const pulse = chapterProgress ? impactPulse(chapterProgress.current) : 0;
     if (bridgeProgress) {
       for (const material of Object.values(materials) as MeshStandardMaterial[]) {
         material.opacity = remaining;
       }
     }
-    materials.accent.emissiveIntensity = (0.85 + 0.28 * pulse) * remaining;
+    materials.accent.emissiveIntensity = 0.45 * remaining;
     if (wash.current) wash.current.intensity = 4.6 * remaining;
-    if (leftGlow.current) leftGlow.current.intensity = (0.68 + 0.14 * pulse) * remaining;
-    if (rightGlow.current) rightGlow.current.intensity = (0.68 + 0.14 * pulse) * remaining;
     if (root.current) root.current.visible = remaining > 0.001;
   });
 
@@ -106,22 +88,6 @@ export function WallDesign({
         angle={0.72}
         penumbra={0.9}
         distance={3.4}
-        decay={2}
-      />
-      <pointLight
-        ref={leftGlow}
-        position={[-4.05, 2.3, -5.08]}
-        color="#a3293e"
-        intensity={0.68}
-        distance={1.6}
-        decay={2}
-      />
-      <pointLight
-        ref={rightGlow}
-        position={[4.05, 2.3, -5.08]}
-        color="#a3293e"
-        intensity={0.68}
-        distance={1.6}
         decay={2}
       />
     </group>

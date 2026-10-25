@@ -23,13 +23,15 @@
   font-size: clamp(5rem, 8.5vw, 10rem);
 }
 
-.kaiforge-chapter .kaiforge-semantic-header > p,
-.kaiforge-chapter .kaiforge-beat > span,
-.kaiforge-chapter .kaiforge-beat small {
+.kaiforge-chapter .kaiforge-semantic-header > p:first-child,
+.kaiforge-chapter .kaiforge-beat > span {
   width: fit-content;
-  padding: 0.25em 0.5em;
-  color: #e2d8c5;
-  background: #242522;
+  padding: 0;
+  color: rgba(242, 232, 213, 0.88);
+  background: none;
+  border: 0;
+  box-shadow: none;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.9);
 }
 
 .kaiforge-chapter .kaiforge-semantic-header > p:nth-of-type(2) {
@@ -106,7 +108,7 @@
   }
 }
 
-/* Type sits directly on the existing surfaces; labels keep their small tabs. */
+/* Type and chapter labels sit directly on the scene surfaces. */
 .kaiforge-chapter .kaiforge-semantic-header h2 {
   width: fit-content;
 }
@@ -132,12 +134,12 @@
 .kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
 .kaiforge-chapter .beat-understanding strong,
 .kaiforge-chapter .beat-understanding small {
-  color: #F2E8D5;
+  color: #f2e8d5;
 }
 
 /* Upper copy sits against the arena recess; lower beat copy sits over lit stone. */
 .kaiforge-chapter .beat-approach strong {
-  color: #F2E8D5;
+  color: #f2e8d5;
 }
 
 .kaiforge-chapter .kaiforge-beat {
@@ -176,7 +178,7 @@
   .kaiforge-chapter .kaiforge-semantic-header > p:not(:first-child),
   .kaiforge-chapter .beat-understanding strong,
   .kaiforge-chapter .beat-understanding small {
-    color: #F2E8D5;
+    color: #f2e8d5;
   }
 
   .kaiforge-chapter .kaiforge-beat strong {
