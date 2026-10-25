@@ -1,9 +1,7 @@
-import { useFrame } from '@react-three/fiber';
-import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
-import { type BufferGeometry, Float32BufferAttribute, type Group } from 'three';
+import { useEffect, useMemo } from 'react';
+import { type BufferGeometry, Float32BufferAttribute } from 'three';
 import { type Box, boxes } from './geometry';
 import { useKaiForgeMaterials } from './Materials';
-import { impactPulse } from './staging';
 
 /** Face and depth tint for the architectural slabs. */
 function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') {
@@ -37,15 +35,8 @@ function tintSlabs(geometry: BufferGeometry, kind: 'ground' | 'wall' | 'outer') 
 }
 
 /** Unequal, inhabited architectural cuts, rather than a repeated rectangle tunnel. */
-export function Architecture({
-  progress,
-  portrait,
-}: {
-  progress: MutableRefObject<number>;
-  portrait: boolean;
-}) {
+export function Architecture({ portrait }: { portrait: boolean }) {
   const materials = useKaiForgeMaterials();
-  const register = useRef<Group>(null);
   const ground = useMemo(
     () =>
       tintSlabs(
@@ -140,10 +131,6 @@ export function Architecture({
     },
     [ground, walls, outerGeometry],
   );
-  useFrame(() => {
-    // One restrained registration shift on the contact axis; no idle motion.
-    if (register.current) register.current.position.x = -0.07 * impactPulse(progress.current);
-  });
   return (
     <group name="KF_Architecture">
       <mesh geometry={ground} receiveShadow>
@@ -155,12 +142,6 @@ export function Architecture({
       <mesh geometry={outerGeometry}>
         <primitive attach="material" object={materials.mineral} />
       </mesh>
-      <group ref={register} position={[0, 0, 0]}>
-        <mesh position={[0.08, 2.8, -5.45]}>
-          <boxGeometry args={[0.13, 5.6, 0.14]} />
-          <primitive attach="material" object={materials.ink} />
-        </mesh>
-      </group>
     </group>
   );
 }

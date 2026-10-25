@@ -113,7 +113,7 @@ function ProductionScene({
     <>
       <color attach="background" args={['#111111']} />
       <ArenaLighting portrait={portrait} progress={controller.progress} />
-      <Architecture progress={controller.progress} portrait={portrait} />
+      <Architecture portrait={portrait} />
       <Equipment />
       <ProceduralRobot progress={controller.progress} />
       <Trajectory progress={controller.progress} portrait={portrait} />
