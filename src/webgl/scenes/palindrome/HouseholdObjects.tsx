@@ -350,7 +350,7 @@ function TableLamp() {
     return object;
   }, []);
   return (
-    <group position={[0.56, 1.14, -0.91]}>
+    <group position={[0.7, 1.14, -1]}>
       <mesh position={[0, 0.025, 0]} castShadow>
         <cylinderGeometry args={[0.16, 0.18, 0.05, 32]} />
         <Surface color={ROOM_PALETTE.forest} finish="metal" />

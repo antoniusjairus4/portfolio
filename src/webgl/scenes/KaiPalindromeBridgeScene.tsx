@@ -32,7 +32,13 @@ import { WallDesign } from './kaiforge/WallDesign';
 import { DomesticRoom } from './palindrome/DomesticRoom';
 import { InformationField } from './palindrome/InformationField';
 import { ROOM_PALETTE } from './palindrome/palette';
-import { BACK_WALL_BOXES, SIDE_WALL_BOXES, WINDOW_FILL_BOX } from './palindrome/roomLayout';
+import {
+  BACK_WALL_BOXES,
+  RIGHT_WALL_BOXES,
+  RIGHT_WALL_FRONT_BOXES,
+  SIDE_WALL_BOXES,
+  WINDOW_FILL_BOX,
+} from './palindrome/roomLayout';
 
 type Triple = readonly [number, number, number];
 type Slab = {
@@ -60,6 +66,18 @@ function backWallSourcePiece([position, size]: Box): Box {
   ];
 }
 
+function rightWallSourcePiece([position, size]: Box): Box {
+  const [sourcePosition, sourceSize] = WALL_BOXES[2];
+  return [
+    [
+      sourcePosition[0],
+      sourcePosition[1] + ((position[1] - 2.65) / 5.4) * sourceSize[1],
+      sourcePosition[2] + ((position[2] - 2.2) / 10) * sourceSize[2],
+    ],
+    [sourceSize[0], (size[1] / 5.4) * sourceSize[1], (size[2] / 10) * sourceSize[2]],
+  ];
+}
+
 function createSlabs(portrait: boolean): Slab[] {
   const vanish: Triple = [0.001, 0.001, 0.001];
   const outer = portrait ? OUTER_PORTRAIT_BOXES : OUTER_DESKTOP_BOXES;
@@ -82,12 +100,14 @@ function createSlabs(portrait: boolean): Slab[] {
       '#696e6a',
       ROOM_PALETTE.sideWall,
     ),
-    slab(
-      WALL_BOXES[2],
-      SIDE_WALL_BOXES[1][0],
-      SIDE_WALL_BOXES[1][1],
-      '#696e6a',
-      ROOM_PALETTE.sideWall,
+    ...RIGHT_WALL_BOXES.map((box, index) =>
+      slab(
+        rightWallSourcePiece(box),
+        box[0],
+        box[1],
+        '#696e6a',
+        index < RIGHT_WALL_FRONT_BOXES.length ? ROOM_PALETTE.sideWall : ROOM_PALETTE.charcoal,
+      ),
     ),
     ...outer.slice(0, 2).map((box) => slab(box, box[0], vanish, '#666c68', ROOM_PALETTE.charcoal)),
     slab(outer[2], [0, 0.12, -2.68], [8.3, 0.24, 0.07], '#666c68', ROOM_PALETTE.timber),
@@ -144,7 +164,7 @@ function ArchitecturalMorph({
           }}
           position={[...slab.from]}
           scale={[...slab.size]}
-          castShadow={index > 0 && index <= BACK_WALL_BOXES.length + 3}
+          castShadow={index > 0 && index <= BACK_WALL_BOXES.length + 2 + RIGHT_WALL_BOXES.length}
           receiveShadow
         >
           <boxGeometry args={[1, 1, 1]} />

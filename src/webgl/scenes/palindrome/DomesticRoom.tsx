@@ -1,6 +1,7 @@
 import { useFrame } from '@react-three/fiber';
 import { type MutableRefObject, type ReactNode, useMemo, useRef } from 'react';
 import { type Group, Object3D, type SpotLight } from 'three';
+import { FinancialMemoryWall } from './FinancialMemoryWall';
 import { GardenWindow } from './GardenWindow';
 import {
   Book,
@@ -9,8 +10,16 @@ import {
   RoundedSolid,
   ShelfBowl,
 } from './HouseholdObjects';
+import { LeftWallGallery } from './LeftWallGallery';
 import { ROOM_PALETTE } from './palette';
-import { BACK_WALL_BOXES, HEADER_BOX, HEADER_SEAL_BOX, SIDE_WALL_BOXES } from './roomLayout';
+import {
+  BACK_WALL_BOXES,
+  HEADER_BOX,
+  HEADER_SEAL_BOX,
+  RIGHT_WALL_BOXES,
+  RIGHT_WALL_FRONT_BOXES,
+  SIDE_WALL_BOXES,
+} from './roomLayout';
 import { SeatedFigure } from './SeatedFigure';
 import { ContactPatch, DomesticSurfaces, Surface } from './Surfaces';
 
@@ -150,12 +159,25 @@ export function DomesticRoom({
                 finish="plaster"
               />
             ))}
-            {SIDE_WALL_BOXES.map(([position, size]) => (
+            {[SIDE_WALL_BOXES[0]].map(([position, size]) => (
               <Block
                 key={position[0]}
                 position={position}
                 size={size}
                 color={ROOM_PALETTE.sideWall}
+                finish="plaster"
+              />
+            ))}
+            {RIGHT_WALL_BOXES.map(([position, size], index) => (
+              <Block
+                key={position.join(':')}
+                position={position}
+                size={size}
+                color={
+                  index < RIGHT_WALL_FRONT_BOXES.length
+                    ? ROOM_PALETTE.sideWall
+                    : ROOM_PALETTE.charcoal
+                }
                 finish="plaster"
               />
             ))}
@@ -199,6 +221,22 @@ export function DomesticRoom({
             />
           </BridgeReveal>
         )}
+        <BridgeReveal
+          progress={transitionProgress}
+          start={0.72}
+          end={0.92}
+          anchor={[-4.34, 2.85, -0.1]}
+        >
+          <LeftWallGallery />
+        </BridgeReveal>
+        <BridgeReveal
+          progress={transitionProgress}
+          start={0.82}
+          end={0.97}
+          anchor={[4.42, 2.75, -0.1]}
+        >
+          <FinancialMemoryWall />
+        </BridgeReveal>
         <BridgeReveal progress={transitionProgress} start={0.51} end={0.79}>
           {/* Quiet floor joints and a small woven mat establish human scale. */}
           {[-3, -1.5, 0, 1.5, 3].map((x) => (
@@ -318,7 +356,7 @@ export function DomesticRoom({
               progress={transitionProgress}
               start={0.67}
               end={0.84}
-              anchor={[0.56, 1.14, -0.91]}
+              anchor={[0.7, 1.14, -1]}
             >
               <HouseholdObjects kind="lamp" />
             </BridgeReveal>

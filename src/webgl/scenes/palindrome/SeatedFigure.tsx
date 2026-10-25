@@ -1,14 +1,16 @@
-import { useEffect, useMemo } from 'react';
+import { useFrame } from '@react-three/fiber';
+import { useEffect, useMemo, useRef } from 'react';
 import {
   BufferGeometry,
   CatmullRomCurve3,
   Color,
   Float32BufferAttribute,
+  type Group,
   TubeGeometry,
   Vector3,
 } from 'three';
+import { HUMAN_SKIN, HumanHead } from './HumanHead';
 import { ROOM_PALETTE } from './palette';
-import { HumanHead, HUMAN_SKIN } from './HumanHead';
 
 type Point = [number, number, number];
 type Section = { y: number; x?: number; z: number; width: number; depth: number };
@@ -97,18 +99,19 @@ function clothPlanes(geometry: BufferGeometry, shadow: string, light: string) {
 }
 
 export function SeatedFigure() {
+  const upperBody = useRef<Group>(null);
   const forms = useMemo(() => {
     const torso = clothPlanes(
       silhouette(
         [
-          { y: 0.73, z: -0.065, width: 0.22, depth: 0.15 },
-          { y: 0.83, z: -0.055, width: 0.205, depth: 0.145 },
-          { y: 0.99, z: -0.025, width: 0.19, depth: 0.13 },
-          { y: 1.17, z: 0.025, width: 0.225, depth: 0.15 },
-          { y: 1.34, z: 0.065, width: 0.255, depth: 0.155 },
-          { y: 1.415, z: 0.085, width: 0.245, depth: 0.135 },
-          { y: 1.465, z: 0.095, width: 0.155, depth: 0.11 },
-          { y: 1.485, z: 0.1, width: 0.09, depth: 0.09 },
+          { y: 0.73, x: 0.005, z: -0.065, width: 0.22, depth: 0.15 },
+          { y: 0.83, x: 0.012, z: -0.055, width: 0.205, depth: 0.145 },
+          { y: 0.99, x: 0.015, z: -0.025, width: 0.19, depth: 0.13 },
+          { y: 1.17, x: 0.006, z: 0.025, width: 0.225, depth: 0.15 },
+          { y: 1.34, x: -0.012, z: 0.065, width: 0.255, depth: 0.155 },
+          { y: 1.415, x: -0.018, z: 0.085, width: 0.245, depth: 0.135 },
+          { y: 1.465, x: -0.01, z: 0.095, width: 0.155, depth: 0.11 },
+          { y: 1.485, x: -0.008, z: 0.1, width: 0.09, depth: 0.09 },
         ],
         20,
       ),
@@ -130,52 +133,128 @@ export function SeatedFigure() {
     );
     const neck = limb(
       [
-        [0, 1.435, 0.09],
-        [0, 1.535, 0.115],
-        [-0.008, 1.65, 0.14],
+        [-0.008, 1.435, 0.09],
+        [-0.012, 1.535, 0.115],
+        [-0.018, 1.65, 0.14],
       ],
       [0.08, 0.067, 0.074],
     );
     const arms = [
       limb(
         [
-          [-0.23, 1.405, 0.09],
-          [-0.305, 1.31, 0.12],
-          [-0.36, 1.19, 0.2],
-          [-0.365, 1.2, 0.37],
-          [-0.34, 1.2, 0.54],
+          [-0.24, 1.405, 0.09],
+          [-0.305, 1.315, 0.125],
+          [-0.355, 1.2, 0.205],
+          [-0.35, 1.19, 0.37],
+          [-0.34, 1.195, 0.535],
         ],
-        [0.105, 0.093, 0.083, 0.074, 0.056],
+        [0.112, 0.101, 0.084, 0.071, 0.053],
       ),
       limb(
         [
-          [0.23, 1.4, 0.09],
-          [0.33, 1.32, 0.15],
-          [0.39, 1.2, 0.25],
-          [0.33, 1.205, 0.4],
-          [0.245, 1.2, 0.55],
+          [0.23, 1.385, 0.095],
+          [0.315, 1.28, 0.155],
+          [0.375, 1.19, 0.26],
+          [0.315, 1.195, 0.405],
+          [0.24, 1.205, 0.545],
         ],
-        [0.105, 0.093, 0.083, 0.074, 0.056],
+        [0.108, 0.098, 0.082, 0.07, 0.052],
       ),
     ].map((geometry) => clothPlanes(geometry, '#191F22', '#39464D'));
     const hands = [
       limb(
         [
           [-0.34, 1.2, 0.535],
-          [-0.345, 1.19, 0.61],
-          [-0.34, 1.185, 0.695],
+          [-0.35, 1.185, 0.6],
+          [-0.345, 1.175, 0.66],
         ],
-        [0.052, 0.066, 0.014],
-        0.48,
+        [0.049, 0.06, 0.035],
+        0.5,
       ),
       limb(
         [
           [0.245, 1.2, 0.545],
-          [0.21, 1.19, 0.62],
-          [0.185, 1.185, 0.7],
+          [0.215, 1.19, 0.6],
+          [0.195, 1.18, 0.65],
         ],
-        [0.052, 0.066, 0.014],
-        0.48,
+        [0.048, 0.06, 0.036],
+        0.5,
+      ),
+    ];
+    const fingers = [
+      ...[-0.39, -0.365, -0.34, -0.315].map((x, index) =>
+        limb(
+          [
+            [x, 1.175, 0.65],
+            [x + (index - 1.5) * 0.004, 1.168, 0.705],
+            [x + (index - 1.5) * 0.007, 1.162, 0.75 - Math.abs(index - 1.5) * 0.01],
+          ],
+          [0.011, 0.01, 0.0035],
+          0.78,
+        ),
+      ),
+      ...[0.155, 0.18, 0.205, 0.23].map((x, index) =>
+        limb(
+          [
+            [x, 1.18, 0.64],
+            [x + (index - 1.5) * 0.004, 1.171, 0.69],
+            [x + (index - 1.5) * 0.006, 1.163, 0.735 - Math.abs(index - 1.5) * 0.012],
+          ],
+          [0.011, 0.01, 0.0035],
+          0.78,
+        ),
+      ),
+      limb(
+        [
+          [-0.295, 1.182, 0.595],
+          [-0.26, 1.175, 0.62],
+          [-0.245, 1.165, 0.66],
+        ],
+        [0.019, 0.017, 0.004],
+        0.8,
+      ),
+      limb(
+        [
+          [0.155, 1.188, 0.575],
+          [0.125, 1.178, 0.6],
+          [0.11, 1.168, 0.635],
+        ],
+        [0.019, 0.017, 0.004],
+        0.8,
+      ),
+    ];
+    const clothFolds = [
+      limb(
+        [
+          [-0.265, 1.375, 0.185],
+          [-0.29, 1.335, 0.215],
+          [-0.315, 1.31, 0.23],
+        ],
+        [0.003, 0.005, 0.002],
+      ),
+      limb(
+        [
+          [0.26, 1.35, 0.18],
+          [0.295, 1.31, 0.21],
+          [0.315, 1.29, 0.225],
+        ],
+        [0.003, 0.005, 0.002],
+      ),
+      limb(
+        [
+          [-0.36, 1.205, 0.295],
+          [-0.355, 1.195, 0.325],
+          [-0.35, 1.2, 0.35],
+        ],
+        [0.002, 0.004, 0.002],
+      ),
+      limb(
+        [
+          [0.365, 1.205, 0.3],
+          [0.345, 1.195, 0.33],
+          [0.325, 1.2, 0.36],
+        ],
+        [0.002, 0.004, 0.002],
       ),
     ];
     const legs = [-1, 1].map((side) =>
@@ -205,13 +284,22 @@ export function SeatedFigure() {
         0.6,
       ),
     );
-    return { torso, pelvis, neck, arms, hands, legs, shoes };
+    return { torso, pelvis, neck, arms, hands, fingers, clothFolds, legs, shoes };
   }, []);
+
+  useFrame(({ clock }) => {
+    if (!upperBody.current) return;
+    upperBody.current.scale.y = 1 + Math.sin(clock.elapsedTime * 1.05) * 0.006;
+    upperBody.current.rotation.z = -0.006 + Math.sin(clock.elapsedTime * 0.42) * 0.004;
+  });
 
   useEffect(
     () => () => {
       for (const value of Object.values(forms)) {
-        if (Array.isArray(value)) value.forEach((geometry) => geometry.dispose());
+        if (Array.isArray(value))
+          value.forEach((geometry) => {
+            geometry.dispose();
+          });
         else value.dispose();
       }
     },
@@ -220,20 +308,34 @@ export function SeatedFigure() {
 
   return (
     <group>
-      {[forms.pelvis, forms.torso, ...forms.arms, ...forms.legs].map((geometry) => (
+      {[forms.pelvis, ...forms.legs].map((geometry) => (
         <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
           <meshStandardMaterial vertexColors roughness={0.9} />
         </mesh>
       ))}
-      <mesh geometry={forms.neck} castShadow receiveShadow>
-        <meshStandardMaterial color={HUMAN_SKIN} roughness={0.92} />
-      </mesh>
-      <HumanHead />
-      {forms.hands.map((geometry) => (
-        <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
-          <meshStandardMaterial color={HUMAN_SKIN} roughness={0.92} />
-        </mesh>
-      ))}
+      <group ref={upperBody} position={[0, 1.12, 0]}>
+        <group position={[0, -1.12, 0]}>
+          {[forms.torso, ...forms.arms].map((geometry) => (
+            <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
+              <meshStandardMaterial vertexColors roughness={0.9} />
+            </mesh>
+          ))}
+          {forms.clothFolds.map((geometry) => (
+            <mesh key={geometry.uuid} geometry={geometry} receiveShadow>
+              <meshStandardMaterial color="#435054" roughness={1} />
+            </mesh>
+          ))}
+          <mesh geometry={forms.neck} castShadow receiveShadow>
+            <meshStandardMaterial color="#AD8D79" roughness={0.92} />
+          </mesh>
+          <HumanHead />
+          {[...forms.hands, ...forms.fingers].map((geometry) => (
+            <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
+              <meshStandardMaterial color={HUMAN_SKIN} roughness={0.92} />
+            </mesh>
+          ))}
+        </group>
+      </group>
       {forms.shoes.map((geometry) => (
         <mesh key={geometry.uuid} geometry={geometry} castShadow receiveShadow>
           <meshStandardMaterial color={ROOM_PALETTE.ink} roughness={0.86} />
