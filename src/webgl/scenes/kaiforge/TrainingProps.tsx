@@ -17,6 +17,11 @@ const BASKET_POSITIONS = [
   [3.5, 0, -1.9],
 ] as const;
 const PICKER_POSITION = [3.05, 0, 0.7] as const;
+// Both holders read at roughly 4:6 of the robot's visible height.
+const BASKET_SCALE = 0.9;
+const PICKER_SCALE = 0.65;
+// Reduce the casters independently so the cart remains substantial.
+const WHEEL_SCALE = 2 / 3;
 
 const BALL_OFFSETS = Array.from({ length: 2 * 9 * 7 }, (_, index) => {
   const layer = Math.floor(index / 63);
@@ -97,10 +102,13 @@ function makeCartRim() {
 }
 
 function makeCartWheels() {
+  const radius = 0.064 * WHEEL_SCALE;
   return mergeOwned(
     [-0.32, 0.32].flatMap((x) =>
       [-0.22, 0.22].map((z) =>
-        new CylinderGeometry(0.064, 0.064, 0.035, 10).rotateX(Math.PI / 2).translate(x, 0.065, z),
+        new CylinderGeometry(radius, radius, 0.035 * WHEEL_SCALE, 10)
+          .rotateX(Math.PI / 2)
+          .translate(x, radius + 0.001, z),
       ),
     ),
   );
@@ -129,6 +137,7 @@ function BasketCart({
   edge,
   dark,
   rubber,
+  ballMaterial,
 }: {
   frame: ReturnType<typeof makeCartFrame>;
   rim: ReturnType<typeof makeCartRim>;
@@ -139,8 +148,8 @@ function BasketCart({
   edge: MeshStandardMaterial;
   dark: MeshStandardMaterial;
   rubber: MeshStandardMaterial;
+  ballMaterial: MeshStandardMaterial;
 }) {
-  const { ball: ballMaterial } = useKaiForgeMaterials();
   const balls = useRef<InstancedMesh>(null);
   useLayoutEffect(() => {
     if (!balls.current) return;
@@ -171,14 +180,15 @@ function BallPicker({
   metal,
   edge,
   dark,
+  ballMaterial,
 }: {
   cage: ReturnType<typeof makePickerCage>;
   ball: SphereGeometry;
   metal: MeshStandardMaterial;
   edge: MeshStandardMaterial;
   dark: MeshStandardMaterial;
+  ballMaterial: MeshStandardMaterial;
 }) {
-  const { ball: ballMaterial } = useKaiForgeMaterials();
   return (
     <group name="KF_BallPicker">
       <mesh material={dark} position={[0, 0.045, 0]} castShadow>
@@ -219,22 +229,44 @@ function ease(a: number, b: number, value: number) {
 }
 
 export function TrainingProps({ bridgeProgress }: { bridgeProgress?: MutableRefObject<number> }) {
-  const groups = useRef<(Group | null)[]>([]);
-  const { frame, rim, wheels, pan, cage, ball, metal, edge, dark, rubber } = useMemo(
-    () => ({
-      frame: makeCartFrame(),
-      rim: makeCartRim(),
-      wheels: makeCartWheels(),
-      pan: new BoxGeometry(0.72, 0.025, 0.5),
-      cage: makePickerCage(),
-      ball: new SphereGeometry(0.02, 8, 6),
-      metal: new MeshStandardMaterial({ color: '#363631', metalness: 0.52, roughness: 0.64 }),
-      edge: new MeshStandardMaterial({ color: '#a49a82', metalness: 0.52, roughness: 0.5 }),
-      dark: new MeshStandardMaterial({ color: '#252723', metalness: 0.22, roughness: 0.82 }),
-      rubber: new MeshStandardMaterial({ color: '#171817', roughness: 0.94 }),
-    }),
-    [],
-  );
+  const { ball: sharedBallMaterial } = useKaiForgeMaterials();
+  const root = useRef<Group>(null);
+  const fadesInBridge = bridgeProgress !== undefined;
+  const { frame, rim, wheels, pan, cage, ball, metal, edge, dark, rubber, ballMaterial } =
+    useMemo(() => {
+      const fadeSettings = { transparent: fadesInBridge, depthWrite: !fadesInBridge };
+      const practiceBallMaterial = sharedBallMaterial.clone();
+      practiceBallMaterial.transparent = fadesInBridge;
+      practiceBallMaterial.depthWrite = !fadesInBridge;
+      return {
+        frame: makeCartFrame(),
+        rim: makeCartRim(),
+        wheels: makeCartWheels(),
+        pan: new BoxGeometry(0.72, 0.025, 0.5),
+        cage: makePickerCage(),
+        ball: new SphereGeometry(0.02, 8, 6),
+        metal: new MeshStandardMaterial({
+          color: '#363631',
+          metalness: 0.52,
+          roughness: 0.64,
+          ...fadeSettings,
+        }),
+        edge: new MeshStandardMaterial({
+          color: '#a49a82',
+          metalness: 0.52,
+          roughness: 0.5,
+          ...fadeSettings,
+        }),
+        dark: new MeshStandardMaterial({
+          color: '#252723',
+          metalness: 0.22,
+          roughness: 0.82,
+          ...fadeSettings,
+        }),
+        rubber: new MeshStandardMaterial({ color: '#171817', roughness: 0.94, ...fadeSettings }),
+        ballMaterial: practiceBallMaterial,
+      };
+    }, [fadesInBridge, sharedBallMaterial]);
   useEffect(
     () => () => {
       frame.dispose();
@@ -247,29 +279,25 @@ export function TrainingProps({ bridgeProgress }: { bridgeProgress?: MutableRefO
       edge.dispose();
       dark.dispose();
       rubber.dispose();
+      ballMaterial.dispose();
     },
-    [frame, rim, wheels, pan, cage, ball, metal, edge, dark, rubber],
+    [frame, rim, wheels, pan, cage, ball, metal, edge, dark, rubber, ballMaterial],
   );
   useFrame(() => {
     if (!bridgeProgress) return;
-    const remaining = 1 - ease(0.18, 0.54, bridgeProgress.current);
-    groups.current.forEach((group) => {
-      if (!group) return;
-      group.scale.setScalar(Math.max(0.001, remaining));
-      group.visible = remaining > 0.001;
-    });
+    const opacity = 1 - ease(0.25, 0.62, bridgeProgress.current);
+    for (const material of [metal, edge, dark, rubber, ballMaterial]) material.opacity = opacity;
+    if (root.current) root.current.visible = opacity > 0.001;
   });
 
   return (
-    <group name="KF_TrainingProps">
+    <group ref={root} name="KF_TrainingProps">
       {BASKET_POSITIONS.map((position, index) => (
         <group
           key={position[0]}
-          ref={(node) => {
-            groups.current[index] = node;
-          }}
           position={[...position]}
           rotation={[0, index === 0 ? -0.12 : 0.16, 0]}
+          scale={BASKET_SCALE}
         >
           <BasketCart
             frame={frame}
@@ -281,16 +309,19 @@ export function TrainingProps({ bridgeProgress }: { bridgeProgress?: MutableRefO
             edge={edge}
             dark={dark}
             rubber={rubber}
+            ballMaterial={ballMaterial}
           />
         </group>
       ))}
-      <group
-        ref={(node) => {
-          groups.current[2] = node;
-        }}
-        position={[...PICKER_POSITION]}
-      >
-        <BallPicker cage={cage} ball={ball} metal={metal} edge={edge} dark={dark} />
+      <group position={[...PICKER_POSITION]} scale={PICKER_SCALE}>
+        <BallPicker
+          cage={cage}
+          ball={ball}
+          metal={metal}
+          edge={edge}
+          dark={dark}
+          ballMaterial={ballMaterial}
+        />
       </group>
     </group>
   );
