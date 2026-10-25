@@ -1,24 +1,37 @@
 .palindrome-chapter {
-  color: #f2e8d5;
+  --palindrome-text-primary: #f2e6cf;
+  --palindrome-text-secondary: #b9b1a3;
+  --palindrome-text-muted: #a79e90;
+  --palindrome-text-quiet: #91897d;
+  --palindrome-text-accent: #8e2230;
+  color: var(--palindrome-text-primary);
 }
 
-.palindrome-semantic-header h2,
-.palindrome-beat strong,
-.palindrome-disclosure a {
-  color: #f2e8d5;
+.palindrome-chapter .palindrome-semantic-header h2,
+.palindrome-chapter .palindrome-beat strong,
+.palindrome-chapter .palindrome-disclosure a {
+  color: var(--palindrome-text-primary);
 }
 
-.palindrome-semantic-header > p:first-child,
-.palindrome-semantic-header > p:nth-of-type(2),
-.palindrome-purpose,
-.palindrome-beat > span,
-.palindrome-beat small,
-.palindrome-chapter-index {
-  color: #d4cbb9;
+.palindrome-chapter .palindrome-semantic-header .palindrome-title-accent,
+.palindrome-chapter .palindrome-disclosure a > span {
+  color: var(--palindrome-text-accent);
 }
 
-.palindrome-disclosure p {
-  color: #b3aa98;
+.palindrome-chapter .palindrome-semantic-header > p:nth-of-type(2),
+.palindrome-chapter .palindrome-beat small {
+  color: var(--palindrome-text-secondary);
+}
+
+.palindrome-chapter .palindrome-semantic-header > p:first-child,
+.palindrome-chapter .palindrome-purpose,
+.palindrome-chapter .palindrome-beat > span,
+.palindrome-chapter .palindrome-chapter-index {
+  color: var(--palindrome-text-muted);
+}
+
+.palindrome-chapter .palindrome-disclosure p {
+  color: var(--palindrome-text-quiet);
 }
 
 .palindrome-demo-note {
@@ -27,7 +40,7 @@
   left: clamp(1.5rem, 3vw, 3rem);
   bottom: 1.5rem;
   margin: 0;
-  color: #b3aa98;
+  color: var(--palindrome-text-quiet);
   font-family: "JetBrains Mono Variable", monospace;
   font-size: 0.58rem;
   line-height: 1.6;

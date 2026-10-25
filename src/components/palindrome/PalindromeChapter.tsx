@@ -123,7 +123,9 @@ export function PalindromeChapter() {
 
         <header ref={headerRef} className="palindrome-semantic-header">
           <p>{palindromeContent.eyebrow}</p>
-          <h2 id="palindrome-title">{palindromeContent.name}</h2>
+          <h2 id="palindrome-title">
+            PALINDR<span className="palindrome-title-accent">O</span>ME
+          </h2>
           <p>{palindromeContent.description}</p>
           <p className="palindrome-purpose">{palindromeContent.purpose}</p>
         </header>
