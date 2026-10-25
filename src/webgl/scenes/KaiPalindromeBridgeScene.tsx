@@ -15,8 +15,15 @@ import {
 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { ArenaLighting } from './kaiforge/ArenaLighting';
+import {
+  GROUND_BOXES,
+  OUTER_DESKTOP_BOXES,
+  OUTER_PORTRAIT_BOXES,
+  WALL_BOXES,
+} from './kaiforge/architectureLayout';
 import { sampleBallPosition } from './kaiforge/ballSequence';
 import { Equipment } from './kaiforge/Equipment';
+import type { Box } from './kaiforge/geometry';
 import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
 import { CAMERAS, sampleCamera } from './kaiforge/staging';
@@ -33,72 +40,26 @@ type Slab = {
   start: string;
   end: string;
 };
-const SLABS: readonly Slab[] = [
-  {
-    from: [-0.6, -0.18, 0.1],
-    size: [8.4, 0.36, 7.2],
-    to: [0, -0.09, -0.1],
-    finalSize: [9, 0.18, 7.4],
-    start: '#c9bfad',
-    end: ROOM_PALETTE.floor,
-  },
-  {
-    from: [-5.7, -0.34, -3],
-    size: [1.35, 0.68, 13],
-    to: [-3.8, -0.09, -0.1],
-    finalSize: [0.001, 0.001, 0.001],
-    start: '#aa9f8d',
-    end: ROOM_PALETTE.floor,
-  },
-  {
-    from: [5.3, -0.5, -5],
-    size: [2.4, 1, 15],
-    to: [3.8, -0.09, -0.1],
-    finalSize: [0.001, 0.001, 0.001],
-    start: '#a79d8d',
-    end: ROOM_PALETTE.floor,
-  },
-  {
-    from: [-4.4, 3.5, -4.3],
-    size: [2.1, 7, 0.48],
-    to: [0, 2.65, -2.8],
-    finalSize: [9, 5.3, 0.18],
-    start: '#ddd2be',
-    end: ROOM_PALETTE.plaster,
-  },
-  {
-    from: [2.9, 3, -5.8],
-    size: [3.4, 6, 0.65],
-    to: [-4.15, 2.65, -0.45],
-    finalSize: [0.16, 5.3, 4.6],
-    start: '#d0c4af',
-    end: ROOM_PALETTE.parchment,
-  },
-  {
-    from: [-0.9, 5.8, -7.8],
-    size: [8, 0.48, 0.8],
-    to: [0, 0.12, -2.68],
-    finalSize: [8.3, 0.24, 0.07],
-    start: '#bdb19e',
-    end: ROOM_PALETTE.timber,
-  },
-  {
-    from: [-6.5, 2.6, -8],
-    size: [0.5, 5.2, 6],
-    to: [-4.2, 2.65, -2.6],
-    finalSize: [0.001, 0.001, 0.001],
-    start: '#9f9587',
-    end: ROOM_PALETTE.plaster,
-  },
-  {
-    from: [0.08, 2.8, -5.45],
-    size: [0.13, 5.6, 0.14],
-    to: [0, 0, -2.68],
-    finalSize: [0.001, 0.001, 0.001],
-    start: '#111111',
-    end: ROOM_PALETTE.charcoal,
-  },
-];
+
+function slab(box: Box, to: Triple, finalSize: Triple, start: string, end: string): Slab {
+  return { from: box[0], size: box[1], to, finalSize, start, end };
+}
+
+function createSlabs(portrait: boolean): Slab[] {
+  const vanish: Triple = [0.001, 0.001, 0.001];
+  const outer = portrait ? OUTER_PORTRAIT_BOXES : OUTER_DESKTOP_BOXES;
+  return [
+    slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], '#c9bfad', ROOM_PALETTE.floor),
+    slab(WALL_BOXES[0], [0, 2.65, -2.8], [9, 5.3, 0.18], '#c1b5a1', ROOM_PALETTE.plaster),
+    slab(WALL_BOXES[1], [-4.2, 2.65, -2.6], vanish, '#b8ad9b', ROOM_PALETTE.plaster),
+    slab(WALL_BOXES[2], [4.2, 2.65, -2.6], vanish, '#b8ad9b', ROOM_PALETTE.plaster),
+    slab(WALL_BOXES[3], WALL_BOXES[3][0], vanish, '#ddd2be', ROOM_PALETTE.plaster),
+    slab(WALL_BOXES[4], [-4.15, 2.65, -0.45], [0.16, 5.3, 4.6], '#d0c4af', ROOM_PALETTE.parchment),
+    slab(WALL_BOXES[5], [0, 0.12, -2.68], [8.3, 0.24, 0.07], '#bdb19e', ROOM_PALETTE.timber),
+    slab(WALL_BOXES[6], WALL_BOXES[6][0], vanish, '#9f9587', ROOM_PALETTE.plaster),
+    ...outer.map((box) => slab(box, box[0], vanish, '#b2a895', ROOM_PALETTE.charcoal)),
+  ];
+}
 
 function ramp(a: number, b: number, p: number) {
   const t = Math.min(1, Math.max(0, (p - a) / (b - a)));
@@ -113,13 +74,14 @@ function ArchitecturalMorph({
   portrait: boolean;
 }) {
   const meshes = useRef<(Mesh | null)[]>([]);
+  const slabs = useMemo(() => createSlabs(portrait), [portrait]);
   const colors = useMemo(
-    () => SLABS.map((slab) => [new Color(slab.start), new Color(slab.end)] as const),
-    [],
+    () => slabs.map((item) => [new Color(item.start), new Color(item.end)] as const),
+    [slabs],
   );
   useFrame(() => {
     const p = ramp(0.32, 0.82, progress.current);
-    SLABS.forEach((slab, index) => {
+    slabs.forEach((slab, index) => {
       const mesh = meshes.current[index];
       if (!mesh) return;
       const portraitX = portrait ? 0.76 : 1;
@@ -141,7 +103,7 @@ function ArchitecturalMorph({
   });
   return (
     <group name="KF_to_PL_Architecture">
-      {SLABS.map((slab, index) => (
+      {slabs.map((slab, index) => (
         <mesh
           key={slab.from.join(':')}
           ref={(node) => {
