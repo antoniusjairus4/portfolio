@@ -26,8 +26,7 @@ export const WINDOW_FILL_BOX: Box = [
   [1.22, 1.7, 0.18],
 ];
 
-// These overlap the floor and the back wall slightly, then continue past the
-// camera's edge rays so neither side nor the roof can reveal the world beyond.
+// These overlap the floor and back wall slightly and close the side view.
 export const SIDE_WALL_BOXES: Box[] = [
   [
     [-4.42, 2.65, 2.2],
@@ -39,7 +38,9 @@ export const SIDE_WALL_BOXES: Box[] = [
   ],
 ];
 
-export const CEILING_BOX: Box = [
-  [0, 5.315, 0.65],
-  [9, 0.07, 9.7],
+// A separate, shallow lintel replaces the former full-depth ceiling slab.
+// Its front face sits just ahead of the back wall and meets both side walls.
+export const HEADER_BOX: Box = [
+  [0, 5.21, -2.65],
+  [9, 0.28, 0.12],
 ];
