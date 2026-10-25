@@ -1,22 +1,16 @@
 /* The visible cards are physical meshes in the shared 3D scene. */
 .project-experience-layer[data-project-scene="skills"] {
-  background: #090c10;
+  background:
+    radial-gradient(ellipse 62% 36% at 50% 57%, rgba(16, 38, 52, 0.7), transparent 76%),
+    linear-gradient(180deg, #030507 0%, #07111a 38%, #0b1822 62%, #05090d 100%);
 }
 
-.skills-ether-backdrop {
+.project-experience-layer[data-project-scene="skills"]::before {
   position: absolute;
   inset: 0;
   z-index: 0;
-  overflow: hidden;
-  opacity: 0.84;
-  pointer-events: none;
-}
-
-.skills-ether-backdrop::after {
-  position: absolute;
-  inset: 0;
   content: "";
-  background: radial-gradient(ellipse at 50% 48%, rgba(9, 12, 16, 0.43), transparent 73%);
+  background: radial-gradient(ellipse 56% 9% at 50% 62%, rgba(45, 78, 99, 0.18), transparent 78%);
   pointer-events: none;
 }
 

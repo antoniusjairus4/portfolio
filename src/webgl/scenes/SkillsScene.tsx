@@ -14,6 +14,7 @@ import {
   Vector3,
 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
+import { CapabilityAtmosphere, ENVIRONMENT_ACCENTS } from './skills/CapabilityAtmosphere';
 import { CapabilityTerrain } from './skills/CapabilityTerrain';
 import {
   CAPABILITY_CARDS,
@@ -30,8 +31,6 @@ interface SkillsSceneProps {
 
 type CardPlacement = { x: number; y: number; z: number; rotation: number };
 const STOPS = [0.065, 0.215, 0.365, 0.515, 0.665, 0.815, 0.96] as const;
-const BASE = new Color('#090c10');
-
 function smooth(value: number) {
   const t = Math.max(0, Math.min(1, value));
   return t * t * (3 - 2 * t);
@@ -76,11 +75,14 @@ export function SkillsScene({
   const groups = useRef<(Group | null)[]>([]);
   const slabs = useRef<(Mesh | null)[]>([]);
   const focusLight = useRef<PointLight>(null);
+  const groundLight = useRef<PointLight>(null);
   const pointer = useRef({ active: false, ndc: new Vector2() });
   const raycaster = useMemo(() => new Raycaster(), []);
   const eye = useMemo(() => new Vector3(), []);
   const look = useMemo(() => new Vector3(), []);
   const activeColor = useMemo(() => new Color(), []);
+  const neutralLight = useMemo(() => new Color('#1b3543'), []);
+  const nextColor = useMemo(() => new Color(), []);
 
   useEffect(() => {
     const perspective = camera as PerspectiveCamera;
@@ -200,24 +202,40 @@ export function SkillsScene({
       settling ||= Math.abs(group.rotation.y - targetY) > 0.001;
       settling ||= Math.abs(group.position.z - targetZ) > 0.001;
     });
-    if (focusLight.current) {
-      const active = placements[activeIndex];
-      focusLight.current.position.set(active.x - 1.5, active.y + 3.3, active.z + 3.8);
-      activeColor.set(CAPABILITY_CARDS[activeIndex].accent).lerp(BASE, 0.38);
-      focusLight.current.color.copy(activeColor);
-      focusLight.current.intensity = portrait ? 2.6 : 3.5;
+    if (focusLight.current || groundLight.current) {
+      const lightX = MathUtils.lerp(placements[from].x, placements[from + 1].x, travel);
+      const lightZ = MathUtils.lerp(placements[from].z, placements[from + 1].z, travel);
+      if (travel < 0.5) {
+        activeColor.set(ENVIRONMENT_ACCENTS[from]).lerp(neutralLight, travel * 2);
+      } else {
+        nextColor.set(ENVIRONMENT_ACCENTS[from + 1]);
+        activeColor.copy(neutralLight).lerp(nextColor, (travel - 0.5) * 2);
+      }
+      const lightStrength = 1 - Math.sin(travel * Math.PI) * 0.25;
+      if (focusLight.current) {
+        focusLight.current.position.set(lightX - 1.5, 3.2, lightZ + 3.8);
+        focusLight.current.color.copy(activeColor);
+        focusLight.current.intensity = (portrait ? 2.6 : 3.5) * lightStrength;
+      }
+      if (groundLight.current) {
+        groundLight.current.position.set(lightX, -1.8, lightZ + 1.2);
+        groundLight.current.color.copy(activeColor);
+        groundLight.current.intensity = (portrait ? 0.8 : 1.25) * lightStrength;
+      }
     }
     if (settling) invalidate();
   });
 
   return (
     <>
-      <fog attach="fog" args={['#090c10', portrait ? 24 : 30, portrait ? 80 : 100]} />
-      <ambientLight color="#a8bac0" intensity={0.58} />
-      <hemisphereLight args={['#a7b5bd', '#111b1d', 0.7]} />
+      <fog attach="fog" args={['#08131b', portrait ? 20 : 24, portrait ? 75 : 92]} />
+      <ambientLight color="#b3c8cf" intensity={0.64} />
+      <hemisphereLight args={['#8daab8', '#101c24', 0.82]} />
       <directionalLight position={[-6, 12, 10]} intensity={1.35} color="#d6d8d1" />
       <pointLight ref={focusLight} color="#c4c6c1" intensity={3.5} distance={17} decay={2} />
+      <pointLight ref={groundLight} color="#7694a8" intensity={1.25} distance={11} decay={2} />
       <CapabilityTerrain portrait={portrait} />
+      <CapabilityAtmosphere portrait={portrait} placements={placements} />
       {CAPABILITY_CARDS.map((card, index) => {
         const placement = placements[index];
         const scale = portrait ? 0.76 : 1;

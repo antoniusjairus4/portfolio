@@ -33,7 +33,7 @@ export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
   }, [portrait]);
   const contours = useMemo(() => {
     const count = portrait ? 7 : 15;
-    return Array.from({ length: count }, (_, index) => {
+    const longitudinal = Array.from({ length: count }, (_, index) => {
       const strand = (index - (count - 1) / 2) * (portrait ? 2.6 : 3.1);
       const points: number[] = [];
       for (let step = 0; step <= 86; step += 1) {
@@ -44,12 +44,32 @@ export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
       const geometry = new BufferGeometry();
       geometry.setAttribute('position', new Float32BufferAttribute(points, 3));
       const material = new LineBasicMaterial({
-        color: '#5d7680',
+        color: '#304754',
         transparent: true,
-        opacity: index % 3 === 0 ? 0.2 : 0.1,
+        opacity: index % 3 === 0 ? 0.34 : 0.22,
+        toneMapped: false,
       });
       return { key: strand, object: new Line(geometry, material) };
     });
+    const transverse = Array.from({ length: portrait ? 9 : 17 }, (_, index) => {
+      const z = 18 - index * (portrait ? 18 : 10);
+      const width = portrait ? 15 : 32;
+      const points: number[] = [];
+      for (let step = 0; step <= 28; step += 1) {
+        const x = -width + (step / 28) * width * 2;
+        points.push(x, -2.685 + terrainHeight(x, z), z);
+      }
+      const geometry = new BufferGeometry();
+      geometry.setAttribute('position', new Float32BufferAttribute(points, 3));
+      const material = new LineBasicMaterial({
+        color: '#233441',
+        transparent: true,
+        opacity: index % 4 === 0 ? 0.24 : 0.13,
+        toneMapped: false,
+      });
+      return { key: `cross-${index}`, object: new Line(geometry, material) };
+    });
+    return [...longitudinal, ...transverse];
   }, [portrait]);
   useEffect(
     () => () => {
@@ -71,7 +91,7 @@ export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
         receiveShadow
       >
         <meshStandardMaterial
-          color="#141b1f"
+          color="#1b2831"
           roughness={1}
           metalness={0.06}
           side={DoubleSide}

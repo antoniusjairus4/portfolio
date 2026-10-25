@@ -3,7 +3,6 @@
 import { Canvas, useThree } from '@react-three/fiber';
 import { useEffect } from 'react';
 import { PCFShadowMap } from 'three';
-import LiquidEther from '@/components/backgrounds/LiquidEther';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
@@ -12,8 +11,6 @@ import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeNeuroShieldBridgeScene } from '@/webgl/scenes/PalindromeNeuroShieldBridgeScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
 import { SkillsScene } from '@/webgl/scenes/SkillsScene';
-
-const SKILLS_ETHER_COLORS = ['#1b1017', '#50202a', '#79293a', '#a24555'];
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
   const invalidate = useThree((state) => state.invalidate);
@@ -44,63 +41,43 @@ export function ExperienceCanvas({
   const isSkillsScene = scene === 'skills';
 
   return (
-    <>
-      {isSkillsScene && (
-        <div className="skills-ether-backdrop" aria-hidden="true">
-          <LiquidEther
-            colors={SKILLS_ETHER_COLORS}
-            mouseForce={26}
-            cursorSize={135}
-            resolution={0.42}
-            iterationsPoisson={20}
-            autoDemo
-            autoSpeed={0.38}
-            autoIntensity={2.75}
-            autoResumeDelay={1800}
-            backgroundColor="transparent"
-          />
-        </div>
+    <Canvas
+      key={isSkillsScene ? 'skills-alpha' : 'opaque'}
+      data-experience-renderer="shared"
+      frameloop="demand"
+      dpr={[1, dprCap]}
+      camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
+      gl={{ antialias: true, alpha: isSkillsScene, powerPreference: 'high-performance' }}
+      style={isSkillsScene ? { position: 'relative', zIndex: 1 } : undefined}
+      shadows={
+        portrait
+          ? false
+          : scene === 'kaiforge' || scene === 'kai-palindrome-bridge'
+            ? { type: PCFShadowMap }
+            : 'basic'
+      }
+      onCreated={({ gl }) => {
+        gl.setClearColor(isSkillsScene ? '#090c10' : '#0b0908', isSkillsScene ? 0 : 1);
+      }}
+    >
+      <ProgressInvalidator controller={controller} />
+      {scene === 'kaiforge' && <KaiForgeScene controller={controller} portrait={portrait} />}
+      {scene === 'kai-palindrome-bridge' && (
+        <KaiPalindromeBridgeScene controller={controller} portrait={portrait} />
       )}
-      <Canvas
-        key={isSkillsScene ? 'skills-alpha' : 'opaque'}
-        data-experience-renderer="shared"
-        frameloop="demand"
-        dpr={[1, dprCap]}
-        camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
-        gl={{ antialias: true, alpha: isSkillsScene, powerPreference: 'high-performance' }}
-        style={isSkillsScene ? { position: 'relative', zIndex: 1 } : undefined}
-        shadows={
-          portrait
-            ? false
-            : scene === 'kaiforge' || scene === 'kai-palindrome-bridge'
-              ? { type: PCFShadowMap }
-              : 'basic'
-        }
-        onCreated={({ gl }) => {
-          gl.setClearColor(isSkillsScene ? '#090c10' : '#0b0908', isSkillsScene ? 0 : 1);
-        }}
-      >
-        <ProgressInvalidator controller={controller} />
-        {scene === 'kaiforge' && <KaiForgeScene controller={controller} portrait={portrait} />}
-        {scene === 'kai-palindrome-bridge' && (
-          <KaiPalindromeBridgeScene controller={controller} portrait={portrait} />
-        )}
-        {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
-        {scene === 'palindrome-neuroshield-bridge' && (
-          <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
-        )}
-        {scene === 'neuroshield' && (
-          <NeuroShieldScene controller={controller} portrait={portrait} />
-        )}
-        {scene === 'skills' && (
-          <SkillsScene
-            controller={controller}
-            portrait={portrait}
-            finePointer={finePointer}
-            reducedMotion={reducedMotion}
-          />
-        )}
-      </Canvas>
-    </>
+      {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
+      {scene === 'palindrome-neuroshield-bridge' && (
+        <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
+      )}
+      {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
+      {scene === 'skills' && (
+        <SkillsScene
+          controller={controller}
+          portrait={portrait}
+          finePointer={finePointer}
+          reducedMotion={reducedMotion}
+        />
+      )}
+    </Canvas>
   );
 }
