@@ -1,5 +1,6 @@
 import { createContext, type ReactNode, useContext, useEffect, useMemo } from 'react';
 import {
+  Color,
   DataTexture,
   LinearFilter,
   LinearMipmapLinearFilter,
@@ -7,6 +8,7 @@ import {
   RGBAFormat,
   SRGBColorSpace,
 } from 'three';
+import { ROOM_PALETTE } from './palette';
 
 type Finish = 'plaster' | 'wood' | 'paper' | 'ceramic' | 'fabric' | 'metal' | 'stone';
 type Maps = Record<Finish, DataTexture> & { woodTone: DataTexture; stoneTone: DataTexture };
@@ -31,23 +33,35 @@ function stoneNoise(x: number, y: number) {
 function stoneMap(albedo: boolean) {
   const size = 256;
   const pixels = new Uint8Array(size * size * 4);
+  const base = new Color(ROOM_PALETTE.floor);
+  const secondary = new Color(ROOM_PALETTE.stoneSecondary);
+  const veinColor = new Color(ROOM_PALETTE.stoneVein);
+  const warmVein = new Color(ROOM_PALETTE.stoneWarmVein);
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       const u = x / (size - 1);
       const v = y / (size - 1);
-      const cloud = stoneNoise(u * 5.2, v * 4.2) * 0.7 + stoneNoise(u * 13, v * 11) * 0.3;
-      const flow = v * 1.85 + u * 0.43 + (stoneNoise(u * 4.5, v * 4.5) - 0.5) * 0.33;
+      const cloud = stoneNoise(u * 3.2, v * 2.8);
+      const flow = v * 1.65 + u * 0.38 + (stoneNoise(u * 3.5, v * 3.5) - 0.5) * 0.27;
       const distance = Math.abs(flow - Math.round(flow));
-      const vein = Math.exp(-((distance / 0.025) ** 2));
-      const branch = Math.exp(-(((distance - 0.075) / 0.018) ** 2)) * 0.28;
-      const shade = (cloud - 0.5) * 15 - vein * 17 - branch * 7;
+      const vein = Math.exp(-((distance / 0.015) ** 2));
+      const branch = Math.exp(-(((distance - 0.07) / 0.012) ** 2)) * 0.3;
       const offset = (y * size + x) * 4;
       if (albedo) {
-        pixels[offset] = Math.round(239 + shade);
-        pixels[offset + 1] = Math.round(236 + shade);
-        pixels[offset + 2] = Math.round(229 + shade);
+        const stone = base.clone().lerp(secondary, Math.max(0, (0.64 - cloud) * 1.5));
+        stone.lerp(warmVein, branch);
+        stone.lerp(veinColor, vein * 0.78);
+        // The albedo map multiplies the base material: encode the ratio so the
+        // visible stone reaches the palette colours instead of washing them out.
+        stone.r /= base.r;
+        stone.g /= base.g;
+        stone.b /= base.b;
+        stone.convertLinearToSRGB();
+        pixels[offset] = Math.round(Math.min(1, stone.r) * 255);
+        pixels[offset + 1] = Math.round(Math.min(1, stone.g) * 255);
+        pixels[offset + 2] = Math.round(Math.min(1, stone.b) * 255);
       } else {
-        const height = Math.round(132 + (cloud - 0.5) * 20 - vein * 12);
+        const height = Math.round(132 + (cloud - 0.5) * 15 - vein * 10);
         pixels[offset] = height;
         pixels[offset + 1] = height;
         pixels[offset + 2] = height;
@@ -87,7 +101,9 @@ function grain(finish: Finish, albedo = false) {
       pixels[at + 3] = 255;
       if (albedo) {
         const tone = Math.round(237 + structure * 0.48 + noise * 6);
-        pixels[at] = pixels[at + 1] = pixels[at + 2] = tone;
+        pixels[at] = tone;
+        pixels[at + 1] = Math.max(0, tone - 6);
+        pixels[at + 2] = Math.max(0, tone - 12);
       }
     }
   }
@@ -155,7 +171,7 @@ export function Surface({
     ceramic: 0.6,
     fabric: 1,
     metal: 0.58,
-    stone: 0.73,
+    stone: 0.64,
   }[finish];
   return (
     <meshStandardMaterial

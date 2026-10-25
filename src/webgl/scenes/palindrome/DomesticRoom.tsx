@@ -6,6 +6,7 @@ import {
   Float32BufferAttribute,
   type Group,
   Object3D,
+  type PointLight,
   type SpotLight,
 } from 'three';
 import { FinancialMemoryWall } from './FinancialMemoryWall';
@@ -62,30 +63,43 @@ function GradientWall({
   position: Point;
   size: Point;
   color: string;
-  side: 'back' | 'left' | 'right';
+  side: 'back' | 'left' | 'right' | 'cavity';
 }) {
   const geometry = useMemo(() => {
-    const wall = new BoxGeometry(...size);
+    const wall = new BoxGeometry(size[0], size[1], size[2], 1, 8, 1);
     const vertices = wall.getAttribute('position');
+    const normals = wall.getAttribute('normal');
     const colors = new Float32Array(vertices.count * 3);
+    const shades = {
+      back: [ROOM_PALETTE.backWallLower, ROOM_PALETTE.backWallMiddle, ROOM_PALETTE.plaster],
+      left: [ROOM_PALETTE.leftWallLower, ROOM_PALETTE.leftWallMiddle, ROOM_PALETTE.leftWallUpper],
+      right: [
+        ROOM_PALETTE.rightWallLower,
+        ROOM_PALETTE.rightWallMiddle,
+        ROOM_PALETTE.rightWallUpper,
+      ],
+      cavity: [ROOM_PALETTE.nicheCavity, ROOM_PALETTE.nicheCavity, ROOM_PALETTE.nicheCavity],
+    }[side].map((shade) => new Color(shade));
+    const base = new Color(color);
     for (let i = 0; i < vertices.count; i++) {
       const y = Math.max(0, Math.min(1, (position[1] + vertices.getY(i)) / 5.35));
-      const horizontal =
-        side === 'back'
-          ? (position[0] + vertices.getX(i) + 4.5) / 9
-          : (position[2] + vertices.getZ(i) + 2.8) / 10;
-      const center = Math.max(0, 1 - Math.abs(horizontal - 0.5) * 2);
-      const tone = 0.8 + y * 0.16 + center * 0.055;
-      const tint = new Color().setRGB(
-        tone * (side === 'left' ? 1.025 : side === 'right' ? 0.985 : 1),
-        tone,
-        tone * (side === 'left' ? 0.985 : side === 'right' ? 1.015 : 1),
-      );
-      tint.toArray(colors, i * 3);
+      const lowerHalf = y < 0.5;
+      const desired = shades[lowerHalf ? 0 : 1]
+        .clone()
+        .lerp(shades[lowerHalf ? 1 : 2], lowerHalf ? y * 2 : (y - 0.5) * 2);
+      // Recess returns have their own material colour rather than the wall face colour.
+      if (side === 'right' && Math.abs(normals.getX(i)) < 0.5) {
+        desired.copy(new Color(ROOM_PALETTE.nicheFrame));
+      }
+      // Three multiplies vertex colours by material colour. Divide by the
+      // actual material base so the visible gradient reaches the specified shades.
+      colors[i * 3] = desired.r / base.r;
+      colors[i * 3 + 1] = desired.g / base.g;
+      colors[i * 3 + 2] = desired.b / base.b;
     }
     wall.setAttribute('color', new Float32BufferAttribute(colors, 3));
     return wall;
-  }, [position, size, side]);
+  }, [position, size, side, color]);
   useEffect(() => () => geometry.dispose(), [geometry]);
   return (
     <mesh position={position} geometry={geometry} castShadow receiveShadow>
@@ -181,6 +195,7 @@ function InteriorLighting({
   const left = useRef<SpotLight>(null);
   const right = useRef<SpotLight>(null);
   const desk = useRef<SpotLight>(null);
+  const floorBounce = useRef<PointLight>(null);
   const targets = useMemo(() => {
     const points: Point[] = [
       [-4.2, 2.85, -0.1],
@@ -200,6 +215,7 @@ function InteriorLighting({
     if (left.current) left.current.intensity = 1.65 * reveal;
     if (right.current) right.current.intensity = 1.45 * reveal;
     if (desk.current) desk.current.intensity = 2.15 * reveal;
+    if (floorBounce.current) floorBounce.current.intensity = 0.55 * reveal;
   });
   return (
     <>
@@ -210,7 +226,7 @@ function InteriorLighting({
         ref={left}
         position={[-3.25, 4.35, 0.5]}
         target={targets[0]}
-        color="#E8D8C2"
+        color="#E8CFA8"
         intensity={transitionProgress ? 0 : 1.65}
         angle={0.78}
         penumbra={1}
@@ -221,7 +237,7 @@ function InteriorLighting({
         ref={right}
         position={[3.25, 4.35, 0.5]}
         target={targets[1]}
-        color="#DCCFBD"
+        color="#F0D8AE"
         intensity={transitionProgress ? 0 : 1.45}
         angle={0.78}
         penumbra={1}
@@ -237,6 +253,14 @@ function InteriorLighting({
         angle={1.05}
         penumbra={1}
         distance={5.5}
+        decay={2}
+      />
+      <pointLight
+        ref={floorBounce}
+        position={[0.1, 0.45, 0.9]}
+        color="#E6D8BD"
+        intensity={transitionProgress ? 0 : 0.55}
+        distance={4.3}
         decay={2}
       />
     </>
@@ -274,7 +298,7 @@ export function DomesticRoom({
                 key={position.join(':')}
                 position={position}
                 size={size}
-                color={ROOM_PALETTE.plaster}
+                color={ROOM_PALETTE.backWallMiddle}
                 side="back"
               />
             ))}
@@ -283,7 +307,7 @@ export function DomesticRoom({
                 key={position[0]}
                 position={position}
                 size={size}
-                color={ROOM_PALETTE.sideWall}
+                color={ROOM_PALETTE.leftWallMiddle}
                 side="left"
               />
             ))}
@@ -294,16 +318,16 @@ export function DomesticRoom({
                 size={size}
                 color={
                   index < RIGHT_WALL_FRONT_BOXES.length
-                    ? ROOM_PALETTE.sideWall
-                    : ROOM_PALETTE.charcoal
+                    ? ROOM_PALETTE.rightWallMiddle
+                    : ROOM_PALETTE.nicheCavity
                 }
-                side="right"
+                side={index < RIGHT_WALL_FRONT_BOXES.length ? 'right' : 'cavity'}
               />
             ))}
             <Block
               position={HEADER_BOX[0]}
               size={HEADER_BOX[1]}
-              color={ROOM_PALETTE.sideWall}
+              color={ROOM_PALETTE.backWallMiddle}
               finish="plaster"
             />
             <Block
@@ -329,7 +353,7 @@ export function DomesticRoom({
             <Block
               position={HEADER_BOX[0]}
               size={HEADER_BOX[1]}
-              color={ROOM_PALETTE.sideWall}
+              color={ROOM_PALETTE.backWallMiddle}
               finish="plaster"
             />
             <Block
@@ -372,7 +396,7 @@ export function DomesticRoom({
               key={z}
               position={[-0.8, 0.023, z]}
               size={[4.48, 0.003, 0.035]}
-              color="#A69B86"
+              color={ROOM_PALETTE.rugHighlight}
             />
           ))}
         </BridgeReveal>

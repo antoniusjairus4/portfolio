@@ -84,21 +84,21 @@ function createSlabs(portrait: boolean): Slab[] {
   return [
     slab(GROUND_BOXES[0], [0, -0.09, -0.1], [9, 0.18, 7.4], PALETTE.courtFloor, ROOM_PALETTE.floor),
     ...BACK_WALL_BOXES.map((box) =>
-      slab(backWallSourcePiece(box), box[0], box[1], '#696e6a', ROOM_PALETTE.plaster),
+      slab(backWallSourcePiece(box), box[0], box[1], '#696e6a', ROOM_PALETTE.backWallMiddle),
     ),
     slab(
       backWallSourcePiece(WINDOW_FILL_BOX),
       WINDOW_FILL_BOX[0],
       vanish,
       '#696e6a',
-      ROOM_PALETTE.plaster,
+      ROOM_PALETTE.backWallMiddle,
     ),
     slab(
       WALL_BOXES[1],
       SIDE_WALL_BOXES[0][0],
       SIDE_WALL_BOXES[0][1],
       '#696e6a',
-      ROOM_PALETTE.sideWall,
+      ROOM_PALETTE.leftWallMiddle,
     ),
     ...RIGHT_WALL_BOXES.map((box, index) =>
       slab(
@@ -106,7 +106,9 @@ function createSlabs(portrait: boolean): Slab[] {
         box[0],
         box[1],
         '#696e6a',
-        index < RIGHT_WALL_FRONT_BOXES.length ? ROOM_PALETTE.sideWall : ROOM_PALETTE.charcoal,
+        index < RIGHT_WALL_FRONT_BOXES.length
+          ? ROOM_PALETTE.rightWallMiddle
+          : ROOM_PALETTE.nicheCavity,
       ),
     ),
     ...outer.slice(0, 2).map((box) => slab(box, box[0], vanish, '#666c68', ROOM_PALETTE.charcoal)),

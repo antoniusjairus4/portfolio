@@ -1,5 +1,6 @@
 import { Line } from '@react-three/drei';
 import type { ReactNode } from 'react';
+import { ROOM_PALETTE } from './palette';
 import { RIGHT_NICHE_CENTERS } from './roomLayout';
 
 function Niche({ z, children }: { z: number; children: ReactNode }) {
@@ -7,22 +8,34 @@ function Niche({ z, children }: { z: number; children: ReactNode }) {
     <group position={[4.42, 2.75, z]} rotation={[0, -Math.PI / 2, 0]}>
       <mesh position={[0, 0, 0.006]} receiveShadow>
         <planeGeometry args={[0.82, 2.07]} />
-        <meshStandardMaterial color="#2B302D" roughness={0.94} />
+        <meshStandardMaterial color={ROOM_PALETTE.nicheCavity} roughness={0.94} />
       </mesh>
+      {[-0.405, 0.405].map((x) => (
+        <mesh key={x} position={[x, 0, 0.025]}>
+          <boxGeometry args={[0.012, 2.04, 0.015]} />
+          <meshStandardMaterial color={ROOM_PALETTE.nicheTrim} roughness={0.8} />
+        </mesh>
+      ))}
+      {[-1.015, 1.015].map((y) => (
+        <mesh key={y} position={[0, y, 0.025]}>
+          <boxGeometry args={[0.82, 0.012, 0.015]} />
+          <meshStandardMaterial color={ROOM_PALETTE.nicheTrim} roughness={0.8} />
+        </mesh>
+      ))}
       <mesh position={[0, 1.005, 0.034]}>
         <boxGeometry args={[0.58, 0.012, 0.012]} />
         <meshStandardMaterial
-          color="#8D8069"
-          emissive="#C9AD83"
-          emissiveIntensity={0.22}
+          color={ROOM_PALETTE.nicheTrim}
+          emissive="#F0D8AE"
+          emissiveIntensity={0.16}
           roughness={0.86}
         />
       </mesh>
       <pointLight
-        position={[0, 0.86, 0.04]}
-        color="#E9D8BD"
-        intensity={0.55}
-        distance={1.55}
+        position={[0, 0.86, 0.16]}
+        color="#F0D8AE"
+        intensity={1.45}
+        distance={1.9}
         decay={2}
       />
       {children}

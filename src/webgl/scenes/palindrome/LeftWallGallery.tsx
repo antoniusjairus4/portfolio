@@ -43,6 +43,13 @@ export function LeftWallGallery() {
     <group name="PL_LeftWallGallery">
       {PAINTING_PLACEMENTS.map(([y, z], index) => (
         <group key={`${y}:${z}`} position={[-4.34, y, z]} rotation={[0, Math.PI / 2, 0]}>
+          <pointLight
+            position={[0, ART_HEIGHT / 2 + 0.42, 0.34]}
+            color="#E8CFA8"
+            intensity={1.15}
+            distance={1.8}
+            decay={2}
+          />
           <mesh position={[0, ART_HEIGHT / 2 + 0.29, 0.04]}>
             <sphereGeometry args={[0.025, 8, 6]} />
             <meshStandardMaterial color="#8c7658" metalness={0.45} roughness={0.6} />
