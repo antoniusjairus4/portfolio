@@ -1,6 +1,12 @@
 import { useFrame } from '@react-three/fiber';
 import { type MutableRefObject, useEffect, useMemo, useRef } from 'react';
-import { type Group, type MeshStandardMaterial, Object3D, type PointLight, type SpotLight } from 'three';
+import {
+  type Group,
+  type MeshStandardMaterial,
+  Object3D,
+  type PointLight,
+  type SpotLight,
+} from 'three';
 import {
   DISPLAY_INSET_BOXES,
   DISPLAY_LEDGE_BOXES,
@@ -68,9 +74,7 @@ export function WallDesign({
     [fadesInBridge, geometries, materials],
   );
   useFrame(() => {
-    const t = bridgeProgress
-      ? Math.min(1, Math.max(0, (bridgeProgress.current - 0.25) / 0.35))
-      : 0;
+    const t = bridgeProgress ? Math.min(1, Math.max(0, (bridgeProgress.current - 0.25) / 0.35)) : 0;
     const remaining = 1 - t * t * (3 - 2 * t);
     const pulse = chapterProgress ? impactPulse(chapterProgress.current) : 0;
     if (bridgeProgress) {
