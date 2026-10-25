@@ -27,6 +27,7 @@ import type { Box } from './kaiforge/geometry';
 import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
 import { CAMERAS, sampleCamera } from './kaiforge/staging';
+import { TrainingProps } from './kaiforge/TrainingProps';
 import { DomesticRoom } from './palindrome/DomesticRoom';
 import { InformationField } from './palindrome/InformationField';
 import { ROOM_PALETTE } from './palindrome/palette';
@@ -225,6 +226,7 @@ function TransitionWorld({
       />
       <ArchitecturalMorph progress={progress} portrait={portrait} />
       <Equipment bridgeProgress={progress} bridgePortrait={portrait} />
+      <TrainingProps bridgeProgress={progress} />
       <group ref={robot}>
         <ProceduralRobot progress={release} />
       </group>

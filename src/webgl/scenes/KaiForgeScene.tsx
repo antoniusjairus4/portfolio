@@ -11,6 +11,7 @@ import { KaiForgeMaterials, useKaiForgeMaterials } from './kaiforge/Materials';
 import { ProceduralRobot } from './kaiforge/robot/ProceduralRobot';
 import { getRobotPose, ROBOT_ROOT } from './kaiforge/robot/pose';
 import { CAMERAS, CONTACT, sampleCamera } from './kaiforge/staging';
+import { TrainingProps } from './kaiforge/TrainingProps';
 import { Trajectory } from './kaiforge/Trajectory';
 
 function ProductionScene({
@@ -115,6 +116,7 @@ function ProductionScene({
       <ArenaLighting portrait={portrait} progress={controller.progress} />
       <Architecture portrait={portrait} />
       <Equipment />
+      <TrainingProps />
       <ProceduralRobot progress={controller.progress} />
       <Trajectory progress={controller.progress} portrait={portrait} />
       {/* Subtle low-tier contact impressions; no extra shadow renderer. */}
