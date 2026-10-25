@@ -1,8 +1,8 @@
 export const kaiForgeContent = {
   name: 'KaiForge',
-  eyebrow: 'Selected work · Table tennis',
+  eyebrow: 'Selected work',
   description:
-    'A table-tennis performance and tracking platform built to make competitive play easier to understand.',
+    'A performance and tracking platform built to make competitive play easier to understand.',
   purpose:
     'KaiForge explores how the rhythm of a point—approach, contact, bounce, and repetition—can become a clearer picture of performance.',
   traceNote:

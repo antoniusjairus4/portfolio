@@ -4,7 +4,12 @@ import './kaiforgeProduction.css';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { KaiForgeFallback } from '@/components/kaiforge/KaiForgeFallback';
-import { getBeatOpacity, getKaiForgeBeat } from '@/components/kaiforge/kaiforgeChoreography';
+import {
+  getBeatOpacity,
+  getKaiForgeBeat,
+  rangeProgress,
+  smoothstep,
+} from '@/components/kaiforge/kaiforgeChoreography';
 import { kaiForgeContent } from '@/content/kaiforge';
 import {
   type ChapterProgressController,
@@ -25,7 +30,6 @@ const BEAT_PRESENTATION = [
 
 export function KaiForgeChapter() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
   const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const ownsEtherRef = useRef(false);
@@ -33,6 +37,7 @@ export function KaiForgeChapter() {
   const { setMode: setGlobalEtherMode } = useGlobalEther();
   const activity = useChapterActivity(sectionRef);
   const portraitComposition = ready && portrait;
+  const staticPresentation = reducedMotion || quality === 'fallback';
   const renderWebGL = ready && !reducedMotion && quality !== 'fallback';
   const rendererActive = renderWebGL && activity !== 'inactive';
   const sceneRegistration = useMemo(
@@ -62,14 +67,20 @@ export function KaiForgeChapter() {
       if (!section) return;
       const progress = next.progress.current;
       section.style.setProperty('--kaiforge-progress', progress.toFixed(4));
+      const titleArrival = staticPresentation ? 1 : smoothstep(rangeProgress(progress, 0, 0.075));
+      section.style.setProperty('--kaiforge-title-arrival', titleArrival.toFixed(4));
+      section.style.setProperty(
+        '--kaiforge-title-offset',
+        `${(-8 * (1 - titleArrival)).toFixed(3)}vh`,
+      );
       section.dataset.kaiforgeBeat = getKaiForgeBeat(progress);
-      if (headerRef.current && !reducedMotion && quality !== 'fallback') {
-        const headerOpacity = Math.max(0, Math.min(1, (0.24 - progress) / 0.09));
-        headerRef.current.style.opacity = headerOpacity.toFixed(3);
-        headerRef.current.style.removeProperty('transform');
-      }
       beatRefs.current.forEach((element, index) => {
         if (!element) return;
+        if (staticPresentation) {
+          element.style.opacity = index === 0 ? '1' : '0';
+          element.style.pointerEvents = 'none';
+          return;
+        }
         const presentation = BEAT_PRESENTATION[index];
         const opacity = getBeatOpacity(
           progress,
@@ -90,7 +101,7 @@ export function KaiForgeChapter() {
       next.dispose();
       setController(null);
     };
-  }, [quality, reducedMotion]);
+  }, [staticPresentation]);
 
   useEffect(() => {
     if (activity !== 'inactive') {
@@ -125,79 +136,80 @@ export function KaiForgeChapter() {
           <KaiForgeFallback reason={reducedMotion ? 'reduced-motion' : 'no-webgl'} />
         )}
 
-        <header ref={headerRef} className="kaiforge-semantic-header">
-          <p>{kaiForgeContent.eyebrow}</p>
-          <h2 id="kaiforge-title">{kaiForgeContent.name}</h2>
-          <p>{kaiForgeContent.description}</p>
-          <p className="kaiforge-purpose">{kaiForgeContent.purpose}</p>
-        </header>
-
-        {!reducedMotion && quality !== 'fallback' && (
-          <div className="kaiforge-beats" aria-hidden="true">
-            <div
-              ref={(node) => {
-                beatRefs.current[0] = node;
-              }}
-              className="kaiforge-beat beat-recognition"
-            >
-              <span>01 / Recognition</span>
-              <strong>TABLE TENNIS</strong>
-            </div>
-            <div
-              ref={(node) => {
-                beatRefs.current[1] = node;
-              }}
-              className="kaiforge-beat beat-approach"
-            >
-              <span>02 / Approach</span>
-              <strong>
-                READ THE MOMENT
-                <br />
-                BEFORE CONTACT.
-              </strong>
-            </div>
-            <div
-              ref={(node) => {
-                beatRefs.current[2] = node;
-              }}
-              className="kaiforge-beat beat-impact"
-            >
-              <span>03 / Impact</span>
-              <strong>
-                ONE POINT.
-                <br />
-                ONE DECISION.
-              </strong>
-            </div>
-            <div
-              ref={(node) => {
-                beatRefs.current[3] = node;
-              }}
-              className="kaiforge-beat beat-understanding"
-            >
-              <span>04 / Understanding</span>
-              <strong>
-                THE POINT,
-                <br />
-                UNDERSTOOD.
-              </strong>
-              <small>{kaiForgeContent.traceNote}</small>
-            </div>
-            <div
-              ref={(node) => {
-                beatRefs.current[4] = node;
-              }}
-              className="kaiforge-beat beat-release"
-            >
-              <span>05 / Release</span>
-              <strong>
-                FROM MOTION
-                <br />
-                TO PATTERN.
-              </strong>
-            </div>
+        <div className="kaiforge-beats">
+          <div
+            ref={(node) => {
+              beatRefs.current[0] = node;
+            }}
+            className="kaiforge-beat beat-recognition"
+          >
+            <span>01 / Recognition</span>
+            <h2 id="kaiforge-title" className="kaiforge-recognition-title">
+              {kaiForgeContent.name}
+            </h2>
           </div>
-        )}
+          {!staticPresentation && (
+            <>
+              <div
+                ref={(node) => {
+                  beatRefs.current[1] = node;
+                }}
+                className="kaiforge-beat beat-approach"
+                aria-hidden="true"
+              >
+                <span>02 / Approach</span>
+                <strong>
+                  READ THE MOMENT
+                  <br />
+                  BEFORE CONTACT.
+                </strong>
+              </div>
+              <div
+                ref={(node) => {
+                  beatRefs.current[2] = node;
+                }}
+                className="kaiforge-beat beat-impact"
+                aria-hidden="true"
+              >
+                <span>03 / Impact</span>
+                <strong>
+                  ONE POINT.
+                  <br />
+                  ONE DECISION.
+                </strong>
+              </div>
+              <div
+                ref={(node) => {
+                  beatRefs.current[3] = node;
+                }}
+                className="kaiforge-beat beat-understanding"
+                aria-hidden="true"
+              >
+                <span>04 / Understanding</span>
+                <strong>
+                  THE POINT,
+                  <br />
+                  UNDERSTOOD.
+                </strong>
+                <small>{kaiForgeContent.traceNote}</small>
+              </div>
+              <div
+                ref={(node) => {
+                  beatRefs.current[4] = node;
+                }}
+                className="kaiforge-beat beat-release"
+                aria-hidden="true"
+              >
+                <span>05 / Release</span>
+                <strong>
+                  FROM MOTION
+                  <br />
+                  TO PATTERN.
+                </strong>
+              </div>
+            </>
+          )}
+        </div>
 
         <div className="kaiforge-chapter-index" aria-hidden="true">
           <span>01</span>
