@@ -1,14 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { NeuroShieldFallback } from '@/components/neuroshield/NeuroShieldFallback';
-import {
-  getBeatOpacity,
-  getNeuroShieldBeat,
-  rangeProgress,
-  smoothstep,
-} from '@/components/neuroshield/neuroShieldChoreography';
+import { rangeProgress, smoothstep } from '@/components/neuroshield/neuroShieldChoreography';
 import { neuroShieldBeats, neuroShieldContent } from '@/content/neuroshield';
+import { NEURO_IMAGE_URLS } from '@/experience/assets/manifest';
 import {
   type ChapterProgressController,
   createChapterProgressController,
@@ -17,36 +13,178 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
+import { useLenis } from '@/motion/lenis/LenisProvider';
 import './neuroShieldImaging.css';
 
-const BEAT_PRESENTATION = [
-  { center: 0.08, width: 0.16 },
-  { center: 0.29, width: 0.15 },
-  { center: 0.52, width: 0.14 },
-  { center: 0.74, width: 0.15 },
-  { center: 0.92, width: 0.14 },
+const RESEARCH_START = 0.59;
+const RESEARCH_END = 0.995;
+const PANEL_COUNT = neuroShieldBeats.length;
+
+function inverseSmoothstep(value: number) {
+  if (value <= 0) return 0;
+  if (value >= 1) return 1;
+  let low = 0;
+  let high = 1;
+  for (let iteration = 0; iteration < 24; iteration += 1) {
+    const middle = (low + high) / 2;
+    if (smoothstep(middle) < value) low = middle;
+    else high = middle;
+  }
+  return (low + high) / 2;
+}
+
+const PANEL_STOPS = neuroShieldBeats.map(
+  (_, index) =>
+    RESEARCH_START + (RESEARCH_END - RESEARCH_START) * inverseSmoothstep(index / (PANEL_COUNT - 1)),
+);
+
+const SCANS = [
+  { src: NEURO_IMAGE_URLS[0], width: 702, height: 706, alt: 'Axial brain MRI slice' },
+  { src: NEURO_IMAGE_URLS[1], width: 538, height: 625, alt: 'Grid of axial brain scan slices' },
+  { src: NEURO_IMAGE_URLS[2], width: 652, height: 705, alt: 'Annotated lower brain MRI slice' },
+  { src: NEURO_IMAGE_URLS[3], width: 673, height: 465, alt: 'Six coronal brain MRI slices' },
 ] as const;
-const ANNOTATIONS = [
-  { label: 'CEREBRAL FORM', center: 0.14, width: 0.09 },
-  { label: 'TEMPORAL REGION', center: 0.24, width: 0.1 },
-  { label: 'INTERNAL SECTION', center: 0.32, width: 0.085 },
-  { label: 'SELECTED REGION', center: 0.36, width: 0.065 },
-] as const;
+
+function Scan({
+  index,
+  caption,
+  className = '',
+}: {
+  index: number;
+  caption: string;
+  className?: string;
+}) {
+  const scan = SCANS[index];
+  return (
+    <figure className={`ns-scan ${className}`}>
+      <div className="ns-scan-image">
+        <Image
+          src={scan.src}
+          width={scan.width}
+          height={scan.height}
+          alt={scan.alt}
+          sizes="(max-width: 720px) 72vw, 38vw"
+          loading="eager"
+        />
+        <span className="ns-scan-corner ns-scan-corner-tl" />
+        <span className="ns-scan-corner ns-scan-corner-br" />
+      </div>
+      <figcaption>{caption}</figcaption>
+    </figure>
+  );
+}
+
+function ResearchPanel({ index }: { index: number }) {
+  const beat = neuroShieldBeats[index];
+  return (
+    <article
+      className={`ns-panel ns-panel-${beat.key}`}
+      aria-label={`${beat.index}: ${beat.label}`}
+    >
+      <div className="ns-panel-copy">
+        <p className="ns-panel-kicker">
+          {beat.index} / {beat.label}
+        </p>
+        <h3>
+          {beat.headline[0]}
+          <br />
+          {beat.headline[1]}
+        </h3>
+        <p className="ns-panel-detail">
+          {index === 0 ? neuroShieldContent.description : beat.detail}
+        </p>
+        <span className="ns-panel-rule" />
+        <p className="ns-panel-index">NEUROSHIELD / RESEARCH NOTE {beat.index}</p>
+      </div>
+
+      {index === 0 && (
+        <div className="ns-panel-visual ns-visual-observation">
+          <Scan index={0} caption="AXIAL VIEW / SOURCE IMAGING" className="ns-scan-primary" />
+          <span className="ns-visual-coordinate">OBSERVATION 001 / UNCLASSIFIED</span>
+        </div>
+      )}
+      {index === 1 && (
+        <div className="ns-panel-visual ns-visual-hypothesis">
+          <Scan index={1} caption="SERIES A / MULTIPLE SLICES" />
+          <span className="ns-relationship-line" aria-hidden="true" />
+          <Scan index={2} caption="SERIES B / ANNOTATED VIEW" />
+          <span className="ns-visual-coordinate">CORRELATION IS A QUESTION, NOT A CONCLUSION</span>
+        </div>
+      )}
+      {index === 2 && (
+        <div className="ns-panel-visual ns-visual-experiment">
+          <Scan index={2} caption="ANATOMICAL REFERENCE / COMPARISON" />
+          <div className="ns-experiment-traces" aria-hidden="true">
+            <span>MODEL RUN / 01</span>
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+            <span>MODEL RUN / 02</span>
+            <i />
+            <i />
+            <i className="ns-trace-short" />
+            <i className="ns-trace-short" />
+            <i className="ns-trace-short" />
+            <span>COMPARE / REVISE / REPEAT</span>
+          </div>
+        </div>
+      )}
+      {index === 3 && (
+        <div className="ns-panel-visual ns-visual-evidence">
+          <Scan index={0} caption="01 / AXIAL" />
+          <Scan index={1} caption="02 / SERIES" />
+          <Scan index={2} caption="03 / ANNOTATED" />
+          <Scan index={3} caption="04 / CORONAL" />
+        </div>
+      )}
+      {index === 4 && (
+        <div className="ns-panel-visual ns-visual-uncertainty">
+          <Scan index={3} caption="CORONAL SERIES / ONGOING INTERPRETATION" />
+          <div className="ns-research-note">
+            <span>ONGOING / SIX-PERSON TEAM</span>
+            <p>{neuroShieldContent.role}</p>
+          </div>
+        </div>
+      )}
+      {index === 4 && (
+        <div className="ns-panel-disclosure">
+          <p>{neuroShieldContent.disclosure}</p>
+          <div>
+            <a href={neuroShieldContent.workPdf} target="_blank" rel="noopener noreferrer">
+              View work ↗
+            </a>
+            <a href={neuroShieldContent.destination} target="_blank" rel="noopener noreferrer">
+              View research project ↗
+            </a>
+            <a
+              href="https://dbarchive.biosciencedbc.jp/en/bodyparts3d/lic.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Anatomy: BodyParts3D / DBCLS · CC BY-SA 2.1 JP ↗
+            </a>
+          </div>
+        </div>
+      )}
+    </article>
+  );
+}
 
 export function NeuroShieldChapter() {
   const sectionRef = useRef<HTMLElement>(null);
-  const headerRef = useRef<HTMLElement>(null);
-  const presentationRef = useRef<HTMLDivElement>(null);
-  const beatRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const annotationRefs = useRef<(HTMLSpanElement | null)[]>([]);
+  const identityRef = useRef<HTMLHeadingElement>(null);
+  const researchRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const ownsEtherRef = useRef(false);
   const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
   const { setMode: setGlobalEtherMode } = useGlobalEther();
+  const { lenis } = useLenis();
   const activity = useChapterActivity(sectionRef);
-  const portraitComposition = ready && portrait;
-  const renderWebGL = ready && !reducedMotion && quality !== 'fallback';
-  const rendererActive = renderWebGL && activity !== 'inactive';
+  const staticExperience = ready && (reducedMotion || quality === 'fallback');
+  const rendererActive = ready && !staticExperience && activity !== 'inactive';
   const sceneRegistration = useMemo(
     () =>
       controller
@@ -55,68 +193,166 @@ export function NeuroShieldChapter() {
             sectionRef,
             activity,
             enabled: rendererActive,
-            portrait: portraitComposition,
+            portrait: ready && portrait,
             dprCap,
           }
         : null,
-    [activity, controller, dprCap, portraitComposition, rendererActive],
+    [activity, controller, dprCap, portrait, ready, rendererActive],
   );
   useProjectSceneRegistration('neuroshield', sceneRegistration);
 
   useEffect(() => {
     const next = createChapterProgressController(sectionRef);
     setController(next);
-
-    const updatePresentation = () => {
-      const section = sectionRef.current;
-      if (!section) return;
-      const progress = next.progress.current;
-      section.style.setProperty('--neuroshield-progress', progress.toFixed(4));
-      const imagingFocus =
-        smoothstep(rangeProgress(progress, 0.3, 0.38)) *
-        (1 - smoothstep(rangeProgress(progress, 0.65, 0.72)));
-      section.style.setProperty('--neuro-imaging-focus', imagingFocus.toFixed(4));
-      section.dataset.neuroshieldBeat = getNeuroShieldBeat(progress);
-      if (presentationRef.current) {
-        const t = Math.min(1, progress / 0.035);
-        const entry = section.getBoundingClientRect().top > 0 ? 0 : t * t * (3 - 2 * t);
-        presentationRef.current.style.opacity =
-          reducedMotion || quality === 'fallback' ? '1' : entry.toFixed(3);
+    const update = () => {
+      if (staticExperience) return;
+      const p = next.progress.current;
+      const titleIn = smoothstep(rangeProgress(p, 0.31, 0.41));
+      const titleOut = 1 - smoothstep(rangeProgress(p, 0.49, 0.57));
+      const title = titleIn * titleOut;
+      const research = smoothstep(rangeProgress(p, 0.5, 0.59));
+      const horizontal = smoothstep(rangeProgress(p, RESEARCH_START, RESEARCH_END));
+      if (identityRef.current) {
+        identityRef.current.style.opacity = title.toFixed(3);
+        identityRef.current.style.transform = `translate(-50%, -50%) scale(${(0.94 + titleIn * 0.06).toFixed(3)})`;
       }
-
-      if (headerRef.current && !reducedMotion && quality !== 'fallback') {
-        const headerOpacity = Math.max(0, Math.min(1, (0.23 - progress) / 0.09));
-        headerRef.current.style.opacity = headerOpacity.toFixed(3);
-        headerRef.current.style.transform = `translate3d(0, ${progress * -26}px, 0)`;
+      if (researchRef.current) {
+        researchRef.current.style.opacity = research.toFixed(3);
+        researchRef.current.style.pointerEvents = research > 0.94 ? 'auto' : 'none';
+        researchRef.current.inert = research <= 0.94;
+        researchRef.current.style.setProperty('--ns-horizontal', horizontal.toFixed(4));
+        researchRef.current.dataset.activePanel = String(Math.min(4, Math.round(horizontal * 4)));
+        researchRef.current.querySelectorAll('a').forEach((link) => {
+          link.tabIndex = horizontal > 0.92 ? 0 : -1;
+        });
       }
-
-      beatRefs.current.forEach((element, index) => {
-        if (!element) return;
-        const presentation = BEAT_PRESENTATION[index];
-        const opacity = getBeatOpacity(progress, presentation.center, presentation.width);
-        element.style.opacity = opacity.toFixed(3);
-        element.style.transform = `translate3d(0, ${(1 - opacity) * 18}px, 0)`;
-        element.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
-      });
-      annotationRefs.current.forEach((element, index) => {
-        if (!element) return;
-        const annotation = ANNOTATIONS[index];
-        element.style.opacity = getBeatOpacity(
-          progress,
-          annotation.center,
-          annotation.width,
-        ).toFixed(3);
-      });
+      if (trackRef.current) {
+        trackRef.current.style.transform = `translate3d(${(-80 * horizontal).toFixed(4)}%, 0, 0)`;
+      }
+      sectionRef.current?.style.setProperty('--neuroshield-progress', p.toFixed(4));
     };
-
-    const unsubscribe = next.subscribe(updatePresentation);
-    updatePresentation();
+    const unsubscribe = next.subscribe(update);
+    update();
     return () => {
       unsubscribe();
       next.dispose();
       setController(null);
     };
-  }, [quality, reducedMotion]);
+  }, [staticExperience]);
+
+  useEffect(() => {
+    if (staticExperience || !controller) return;
+    let settleTimer = 0;
+    let touchMoved = false;
+    let touchStartY = 0;
+    let gestureOrigin: number | null = null;
+    let gestureDirection = 0;
+
+    const noteGesture = (direction: number) => {
+      if (gestureOrigin === null) gestureOrigin = window.scrollY;
+      if (direction !== 0) gestureDirection = Math.sign(direction);
+    };
+
+    const settle = () => {
+      settleTimer = 0;
+      const origin = gestureOrigin;
+      const direction = gestureDirection;
+      gestureOrigin = null;
+      gestureDirection = 0;
+      const section = sectionRef.current;
+      if (!section) return;
+      const rect = section.getBoundingClientRect();
+      const distance = Math.max(1, rect.height - window.innerHeight);
+      const sectionTop = window.scrollY + rect.top;
+      const intendedScroll = lenis?.targetScroll ?? window.scrollY;
+      const intendedProgress = (intendedScroll - sectionTop) / distance;
+      if (intendedProgress < RESEARCH_START || intendedProgress >= RESEARCH_END) return;
+
+      const horizontal = smoothstep(rangeProgress(intendedProgress, RESEARCH_START, RESEARCH_END));
+      let panelIndex = Math.round(horizontal * (PANEL_COUNT - 1));
+      if (origin !== null && direction !== 0) {
+        const originProgress = (origin - sectionTop) / distance;
+        const originHorizontal = smoothstep(
+          rangeProgress(originProgress, RESEARCH_START, RESEARCH_END),
+        );
+        const originIndex = Math.round(originHorizontal * (PANEL_COUNT - 1));
+        const originStop = sectionTop + PANEL_STOPS[originIndex] * distance;
+        if (Math.abs(origin - originStop) < Math.max(32, window.innerHeight * 0.045)) {
+          panelIndex = Math.max(0, Math.min(PANEL_COUNT - 1, originIndex + direction));
+        }
+      }
+      const destination = sectionTop + PANEL_STOPS[panelIndex] * distance;
+      if (Math.abs(destination - intendedScroll) < 3) return;
+
+      if (lenis) {
+        lenis.scrollTo(destination, {
+          duration: 0.75,
+          easing: (time) => 1 - (1 - time) ** 3,
+        });
+      } else {
+        window.scrollTo({ top: destination, behavior: 'smooth' });
+      }
+    };
+
+    const scheduleSettle = (delay = 180) => {
+      window.clearTimeout(settleTimer);
+      settleTimer = window.setTimeout(settle, delay);
+    };
+    const onWheel = (event: WheelEvent) => {
+      if (event.deltaY === 0) return;
+      noteGesture(event.deltaY);
+      scheduleSettle();
+    };
+    const onScrollEnd = () => {
+      if (!settleTimer) scheduleSettle(0);
+    };
+    const onTouchStart = (event: TouchEvent) => {
+      touchMoved = false;
+      touchStartY = event.touches[0]?.clientY ?? 0;
+      gestureOrigin = window.scrollY;
+    };
+    const onTouchMove = () => {
+      touchMoved = true;
+    };
+    const onTouchEnd = (event: TouchEvent) => {
+      if (touchMoved) {
+        noteGesture(touchStartY - (event.changedTouches[0]?.clientY ?? touchStartY));
+        scheduleSettle(280);
+      } else {
+        gestureOrigin = null;
+      }
+    };
+    const isScrollKey = (event: KeyboardEvent) =>
+      ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', ' '].includes(event.key);
+    const isEditable = (event: KeyboardEvent) =>
+      event.target instanceof HTMLElement &&
+      Boolean(event.target.closest('input, textarea, select, [contenteditable]'));
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (isEditable(event) || !isScrollKey(event)) return;
+      noteGesture(event.key === 'ArrowUp' || event.key === 'PageUp' ? -1 : 1);
+    };
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (isEditable(event) || !isScrollKey(event)) return;
+      scheduleSettle();
+    };
+    window.addEventListener('wheel', onWheel, { passive: true });
+    window.addEventListener('scrollend', onScrollEnd);
+    window.addEventListener('touchstart', onTouchStart, { passive: true });
+    window.addEventListener('touchmove', onTouchMove, { passive: true });
+    window.addEventListener('touchend', onTouchEnd, { passive: true });
+    window.addEventListener('keydown', onKeyDown);
+    window.addEventListener('keyup', onKeyUp);
+    return () => {
+      window.clearTimeout(settleTimer);
+      window.removeEventListener('wheel', onWheel);
+      window.removeEventListener('scrollend', onScrollEnd);
+      window.removeEventListener('touchstart', onTouchStart);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('keydown', onKeyDown);
+      window.removeEventListener('keyup', onKeyUp);
+    };
+  }, [controller, lenis, staticExperience]);
 
   useEffect(() => {
     if (activity !== 'inactive') {
@@ -135,94 +371,50 @@ export function NeuroShieldChapter() {
     [setGlobalEtherMode],
   );
 
-  const staticExperience = reducedMotion || quality === 'fallback';
-
   return (
     <section
       ref={sectionRef}
       id="neuroshield"
       aria-labelledby="neuroshield-title"
-      data-neuroshield-beat="observation"
-      data-renderer-active={rendererActive ? 'true' : 'false'}
-      className={`neuroshield-chapter ${staticExperience ? 'neuroshield-static' : ''}`}
+      className={`neuroshield-chapter ns-redesign ${staticExperience ? 'neuroshield-static' : ''}`}
     >
-      <div ref={presentationRef} className="neuroshield-sticky">
-        {!rendererActive && <div className="neuroshield-render-placeholder" aria-hidden="true" />}
-
-        {ready && staticExperience && (
-          <NeuroShieldFallback reason={reducedMotion ? 'reduced-motion' : 'no-webgl'} />
-        )}
-
-        <header ref={headerRef} className="neuroshield-semantic-header">
-          <p>{neuroShieldContent.eyebrow}</p>
-          <h2 id="neuroshield-title">{neuroShieldContent.name}</h2>
-          <p>{neuroShieldContent.description}</p>
-          <p className="neuroshield-role">{neuroShieldContent.role}</p>
-        </header>
-
-        {!staticExperience && (
-          <div className="neuroshield-beats" aria-hidden="true">
+      <div className="neuroshield-sticky">
+        <div className="ns-opening">
+          {staticExperience && (
+            <Image
+              className="ns-static-brain-preview"
+              src="/models/neuroshield/anatomical-preview.png"
+              width={900}
+              height={780}
+              alt="Lateral anatomical model of a human brain showing its sculpted folds, cerebellum, and brainstem"
+              priority={false}
+            />
+          )}
+          <h2 id="neuroshield-title" ref={identityRef} className="ns-identity">
+            NEUROSHIELD
+          </h2>
+        </div>
+        <section
+          ref={researchRef}
+          className="ns-research"
+          aria-label="NeuroShield research sequence"
+          inert={!staticExperience}
+        >
+          <div className="ns-research-topline" aria-hidden="true">
+            <span>NS / RESEARCH SEQUENCE</span>
+            <span>OBSERVE · TEST · REVISE</span>
+          </div>
+          <div ref={trackRef} className="ns-research-track">
             {neuroShieldBeats.map((beat, index) => (
-              <div
-                key={beat.key}
-                ref={(node) => {
-                  beatRefs.current[index] = node;
-                }}
-                className={`neuroshield-beat beat-${beat.key}`}
-              >
-                <span>
-                  {beat.index} / {beat.label}
-                </span>
-                <strong>
-                  {beat.headline[0]}
-                  <br />
-                  {beat.headline[1]}
-                </strong>
-                <small>{beat.detail}</small>
-              </div>
+              <ResearchPanel key={beat.key} index={index} />
             ))}
           </div>
-        )}
-
-        {!staticExperience && (
-          <div className="neuroshield-annotations" aria-hidden="true">
-            {ANNOTATIONS.map((annotation, index) => (
-              <span
-                key={annotation.label}
-                ref={(node) => {
-                  annotationRefs.current[index] = node;
-                }}
-                className={`neuroshield-annotation annotation-${index + 1}`}
-              >
-                {annotation.label}
-              </span>
+          <div className="ns-research-progress" aria-hidden="true">
+            {neuroShieldBeats.map((beat) => (
+              <span key={beat.key} />
             ))}
           </div>
-        )}
-
-        <div className="neuroshield-metadata" aria-hidden="true">
-          <span>ANATOMY</span>
-          <span>IMAGING</span>
-          <span>RESEARCH</span>
-        </div>
-
-        <div className="neuroshield-chapter-index" aria-hidden="true">
-          <span>03</span>
-          <i />
-          <span>NS</span>
-        </div>
-
-        <div className="neuroshield-disclosure">
-          <p>{neuroShieldContent.disclosure}</p>
-          <div className="neuroshield-disclosure-links">
-            <a href={neuroShieldContent.workPdf} target="_blank" rel="noopener noreferrer">
-              View work <span aria-hidden="true">↗</span>
-            </a>
-            <a href={neuroShieldContent.destination} target="_blank" rel="noopener noreferrer">
-              View research project <span aria-hidden="true">↗</span>
-            </a>
-          </div>
-        </div>
+        </section>
       </div>
     </section>
   );

@@ -9,7 +9,6 @@ import {
   type PointLight,
   type SpotLight,
 } from 'three';
-import { FinancialMemoryWall } from './FinancialMemoryWall';
 import { GardenWindow } from './GardenWindow';
 import {
   Book,
@@ -20,6 +19,7 @@ import {
 } from './HouseholdObjects';
 import { LeftWallGallery } from './LeftWallGallery';
 import { ROOM_PALETTE } from './palette';
+import { RightWallWindows } from './RightWallWindows';
 import {
   BACK_WALL_BOXES,
   HEADER_BOX,
@@ -374,11 +374,11 @@ export function DomesticRoom({
         </BridgeReveal>
         <BridgeReveal
           progress={transitionProgress}
-          start={0.82}
-          end={0.97}
-          anchor={[4.42, 2.75, -0.1]}
+          start={0.61}
+          end={0.81}
+          anchor={[4.42, 3, -0.1]}
         >
-          <FinancialMemoryWall />
+          <RightWallWindows />
         </BridgeReveal>
         <BridgeReveal progress={transitionProgress} start={0.51} end={0.79}>
           {/* Quiet floor joints and a small woven mat establish human scale. */}

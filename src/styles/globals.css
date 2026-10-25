@@ -1340,6 +1340,12 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   pointer-events: none;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  .project-experience-layer[data-project-scene="neuroshield"] {
+    pointer-events: auto;
+  }
+}
+
 .project-experience-layer canvas {
   display: block;
   width: 100%;

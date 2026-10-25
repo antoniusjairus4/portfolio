@@ -1,180 +1,162 @@
 'use client';
 
+import { useGLTF } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useMemo, useRef } from 'react';
-import {
-  type AmbientLight,
-  type HemisphereLight,
-  Object3D,
-  type DirectionalLight,
-  type PerspectiveCamera,
-  type PointLight,
-  Vector3,
-} from 'three';
+import { Suspense, useMemo, useRef } from 'react';
+import { Color, MathUtils, type Mesh, type MeshStandardMaterial, Vector3 } from 'three';
 import { rangeProgress, smoothstep } from '@/components/neuroshield/neuroShieldChoreography';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
-import { AnatomicalEnvironment } from './neuroshield/AnatomicalEnvironment';
-import { AnatomicalSlices } from './neuroshield/AnatomicalSlices';
-import { BrainAnatomy } from './neuroshield/BrainAnatomy';
-import { ImagingSequence } from './neuroshield/ImagingSequence';
-import { SCAN_BACKGROUND } from './neuroshield/ScanVolume';
 
 interface NeuroShieldSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
 }
 
-const KEYS = [0, 0.18, 0.35, 0.45, 0.52, 0.6, 0.68, 0.78, 0.88, 1] as const;
-const CAMERA = [
-  [0.6, 2.45, 10.8],
-  [-1.45, 2.35, 6.7],
-  [0.15, 2.08, 2.6],
-  [0.1, 1.9, -0.4],
-  [-0.1, 1.88, -5.2],
-  [0.1, 1.83, -11.1],
-  [0.2, 1.82, -17.8],
-  [0.5, 2.05, -19.2],
-  [1.3, 2.65, -19.1],
-  [0.7, 2.8, -17.3],
-] as const;
-const TARGET = [
-  [0.65, 1.8, -2.2],
-  [0.8, 1.8, -2.2],
-  [0.45, 1.8, -4.4],
-  [0, 1.8, -7.2],
-  [0, 1.8, -10.9],
-  [0, 1.8, -16.7],
-  [0, 1.9, -25.8],
-  [0, 2.1, -27],
-  [0, 1.8, -30],
-  [0, 1.8, -30],
+const MODEL_URL = '/models/neuroshield/anatomical-brain.glb';
+const IVORY = new Color('#d9dcd8');
+const PARTS = [
+  { name: 'frontal', color: '#ae7770', offset: [-0.95, 0.18, 0.07] },
+  { name: 'parietal', color: '#b9a27c', offset: [0.2, 0.72, -0.06] },
+  { name: 'temporal', color: '#988da2', offset: [-0.58, -0.58, 0.18] },
+  { name: 'occipital', color: '#8599aa', offset: [0.9, 0.2, -0.1] },
+  { name: 'cerebellum', color: '#aa8171', offset: [0.93, -0.55, 0.12] },
+  { name: 'brainstem', color: '#8d8b9a', offset: [0.08, -0.78, 0.25] },
 ] as const;
 
-function samplePath(points: readonly (readonly number[])[], progress: number, out: Vector3) {
-  let index = KEYS.length - 2;
-  for (let key = 0; key < KEYS.length - 1; key++) {
-    if (progress <= KEYS[key + 1]) {
-      index = key;
-      break;
-    }
-  }
-  const t = smoothstep(rangeProgress(progress, KEYS[index], KEYS[index + 1]));
-  const a = points[index];
-  const b = points[index + 1];
-  out.set(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t);
-}
+function BrainModel({ controller, portrait }: NeuroShieldSceneProps) {
+  const { scene } = useGLTF(MODEL_URL);
+  const { camera, invalidate } = useThree();
+  const group = useRef<import('three').Group>(null);
+  const meshes = useRef<(Mesh | null)[]>([]);
+  const materials = useRef<(MeshStandardMaterial | null)[]>([]);
+  const core = useRef<Mesh>(null);
+  const coreMaterial = useRef<MeshStandardMaterial>(null);
+  const hovered = useRef<string | null>(null);
+  const sources = useMemo(
+    () =>
+      PARTS.map((part) => {
+        const mesh = scene.getObjectByName(part.name);
+        if (!mesh || !('geometry' in mesh)) {
+          throw new Error(`NeuroShield anatomical model is missing ${part.name}`);
+        }
+        return mesh as Mesh;
+      }),
+    [scene],
+  );
+  const coreSource = useMemo(() => scene.getObjectByName('core') as Mesh | undefined, [scene]);
+  const colors = useMemo(() => PARTS.map((part) => new Color(part.color)), []);
+  const basePositions = useMemo(() => sources.map((mesh) => mesh.position.clone()), [sources]);
+  const corePosition = useMemo(() => coreSource?.position.clone() ?? new Vector3(), [coreSource]);
 
-export function NeuroShieldScene({ controller, portrait }: NeuroShieldSceneProps) {
-  const { camera } = useThree();
-  const target = useMemo(() => new Vector3(), []);
-  const warm = useRef<DirectionalLight>(null);
-  const cool = useRef<PointLight>(null);
-  const violet = useRef<PointLight>(null);
-  const evidence = useRef<PointLight>(null);
-  const crimson = useRef<PointLight>(null);
-  const ambient = useRef<AmbientLight>(null);
-  const hemisphere = useRef<HemisphereLight>(null);
-  const lightTarget = useMemo(() => new Object3D(), []);
-
-  useFrame(() => {
+  useFrame((_, delta) => {
     const p = controller.progress.current;
-    samplePath(CAMERA, p, camera.position);
-    samplePath(TARGET, p, target);
-    if (portrait) {
-      camera.position.z += 1.6;
-      target.x += 0.12;
+    const focus = smoothstep(rangeProgress(p, 0.01, 0.09));
+    const split = smoothstep(rangeProgress(p, 0.09, 0.3));
+    const colour = smoothstep(rangeProgress(p, 0.15, 0.34));
+    const exit = 1 - smoothstep(rangeProgress(p, 0.48, 0.57));
+    const ease = 1 - Math.exp(-Math.min(delta, 0.05) * 10);
+    let moving = false;
+
+    if (group.current) {
+      group.current.visible = exit > 0.005;
+      const targetScale = (portrait ? 0.8 : 0.94) + focus * (portrait ? 0.12 : 0.12);
+      const nextScale = MathUtils.lerp(group.current.scale.x, targetScale, ease);
+      moving ||= Math.abs(nextScale - targetScale) > 0.001;
+      group.current.scale.setScalar(nextScale);
+      group.current.rotation.y = MathUtils.lerp(group.current.rotation.y, -0.045 * split, ease);
     }
-    camera.lookAt(target);
-    camera.updateMatrixWorld();
-    const perspective = camera as PerspectiveCamera;
-    const fov = portrait ? 53 : 40;
-    if (perspective.fov !== fov || perspective.near !== 0.1) {
-      perspective.fov = fov;
-      perspective.near = 0.1;
-      perspective.updateProjectionMatrix();
+
+    const targetDistance = (portrait ? 9.9 : 7.15) + split * (portrait ? 0.55 : 0.65);
+    camera.position.set(0, 0, MathUtils.lerp(camera.position.z, targetDistance, ease));
+    camera.lookAt(0, 0, 0);
+    moving ||= Math.abs(camera.position.z - targetDistance) > 0.002;
+
+    PARTS.forEach((part, index) => {
+      const mesh = meshes.current[index];
+      const material = materials.current[index];
+      if (!mesh || !material) return;
+      const hover = hovered.current === part.name && split > 0.8 && exit > 0.4 ? 1 : 0;
+      const offset = part.offset;
+      const base = basePositions[index];
+      const targetX = base.x + offset[0] * split;
+      const targetY = base.y + offset[1] * split;
+      const targetZ = base.z + offset[2] * split + hover * 0.13;
+      mesh.position.x = MathUtils.lerp(mesh.position.x, targetX, ease);
+      mesh.position.y = MathUtils.lerp(mesh.position.y, targetY, ease);
+      mesh.position.z = MathUtils.lerp(mesh.position.z, targetZ, ease);
+      mesh.rotation.y = MathUtils.lerp(mesh.rotation.y, hover * 0.14, ease);
+      mesh.rotation.x = MathUtils.lerp(mesh.rotation.x, hover * -0.065, ease);
+      material.color.copy(IVORY).lerp(colors[index], colour);
+      material.opacity = exit;
+      moving ||= Math.abs(mesh.position.x - targetX) > 0.002;
+      moving ||= Math.abs(mesh.position.y - targetY) > 0.002;
+      moving ||= Math.abs(mesh.position.z - targetZ) > 0.002;
+      moving ||= Math.abs(mesh.rotation.y - hover * 0.14) > 0.002;
+    });
+
+    if (core.current && coreMaterial.current) {
+      core.current.position.copy(corePosition);
+      core.current.visible = split < 0.99 && exit > 0.01;
+      coreMaterial.current.opacity = (1 - split) * exit;
     }
-    const hypothesis = smoothstep(rangeProgress(p, 0.18, 0.42));
-    const experiment = smoothstep(rangeProgress(p, 0.43, 0.68));
-    const clarity = smoothstep(rangeProgress(p, 0.65, 0.79));
-    const uncertainty = smoothstep(rangeProgress(p, 0.82, 1));
-    if (warm.current)
-      warm.current.intensity = 1.5 - hypothesis * 0.45 + clarity * 0.55 - uncertainty * 0.5;
-    if (cool.current)
-      cool.current.intensity = 1.8 + hypothesis * 0.8 + experiment * 0.55 - clarity * 0.4;
-    if (cool.current) cool.current.position.z = -0.2 - experiment * 9.8;
-    if (violet.current)
-      violet.current.intensity = 0.24 + hypothesis * 0.56 * (1 - uncertainty * 0.7);
-    if (violet.current) violet.current.position.z = -1.2 - experiment * 16.8;
-    if (evidence.current) evidence.current.intensity = clarity * 1.45 * (1 - uncertainty * 0.55);
-    if (crimson.current)
-      crimson.current.intensity =
-        smoothstep(rangeProgress(p, 0.27, 0.34)) *
-        (1 - smoothstep(rangeProgress(p, 0.38, 0.46))) *
-        0.16;
-    if (ambient.current) ambient.current.intensity = 0.43;
-    if (hemisphere.current) hemisphere.current.intensity = 0.42;
+    if (moving) invalidate();
   });
 
   return (
+    <group ref={group}>
+      {sources.map((source, index) => (
+        <mesh
+          key={PARTS[index].name}
+          ref={(mesh) => {
+            meshes.current[index] = mesh;
+          }}
+          geometry={source.geometry}
+          position={source.position}
+          rotation={source.rotation}
+          scale={source.scale}
+          onPointerOver={(event) => {
+            if (controller.progress.current < 0.26 || controller.progress.current > 0.52) return;
+            event.stopPropagation();
+            hovered.current = PARTS[index].name;
+            invalidate();
+          }}
+          onPointerOut={() => {
+            hovered.current = null;
+            invalidate();
+          }}
+        >
+          <meshStandardMaterial
+            ref={(material) => {
+              materials.current[index] = material;
+            }}
+            color={IVORY}
+            roughness={0.86}
+            metalness={0.015}
+            transparent
+            depthWrite
+          />
+        </mesh>
+      ))}
+      {coreSource && (
+        <mesh ref={core} geometry={coreSource.geometry} position={coreSource.position}>
+          <meshStandardMaterial ref={coreMaterial} color="#797d7c" roughness={1} transparent />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
+export function NeuroShieldScene({ controller, portrait }: NeuroShieldSceneProps) {
+  return (
     <>
-      <color attach="background" args={[SCAN_BACKGROUND]} />
-      <fog attach="fog" args={[SCAN_BACKGROUND, 24, 62]} />
-      <ambientLight ref={ambient} color="#B4CCD0" intensity={0.43} />
-      <hemisphereLight ref={hemisphere} args={['#C1DEE1', '#8698AA', 0.42]} />
-      <primitive object={lightTarget} />
-      <directionalLight
-        ref={warm}
-        target={lightTarget}
-        position={[-5, 7, 7]}
-        color="#F2E8D5"
-        intensity={1.5}
-        castShadow
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-5}
-        shadow-camera-right={5}
-        shadow-camera-top={5}
-        shadow-camera-bottom={-5}
-        shadow-normalBias={0.018}
-        shadow-radius={3}
-      />
-      <pointLight
-        ref={cool}
-        position={[3.2, 3.5, -0.2]}
-        color="#8BBCC6"
-        intensity={1.8}
-        distance={26}
-        decay={2}
-      />
-      <pointLight
-        ref={violet}
-        position={[-2.6, 2.7, -1.2]}
-        color="#9B90AF"
-        intensity={0.24}
-        distance={18}
-        decay={2}
-      />
-      <pointLight
-        ref={evidence}
-        position={[1, 5, -27]}
-        color="#F7F4E8"
-        intensity={0}
-        distance={15}
-        decay={2}
-      />
-      <pointLight
-        ref={crimson}
-        position={[1.5, 2.7, -0.5]}
-        color="#8B1E2D"
-        intensity={0}
-        distance={3}
-        decay={2}
-      />
-      <AnatomicalEnvironment progress={controller.progress} />
-      <BrainAnatomy progress={controller.progress} />
-      <AnatomicalSlices progress={controller.progress} />
-      <ImagingSequence progress={controller.progress} portrait={portrait} />
-      <BrainAnatomy progress={controller.progress} ending />
-      <AnatomicalSlices progress={controller.progress} ending />
+      <color attach="background" args={['#000000']} />
+      <ambientLight intensity={0.72} color="#dce3e0" />
+      <hemisphereLight args={['#edf0ea', '#465058', 1.1]} />
+      <directionalLight position={[-4, 5, 6]} intensity={2.0} color="#f8f3e9" />
+      <directionalLight position={[3, 2, -4]} intensity={1.25} color="#a5b9c3" />
+      <Suspense fallback={null}>
+        <BrainModel controller={controller} portrait={portrait} />
+      </Suspense>
     </>
   );
 }

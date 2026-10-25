@@ -1,35 +1,568 @@
-.neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header h2 {
-  font-size: clamp(3.8rem, 7.2vw, 8.2rem);
+.neuroshield-chapter.ns-redesign {
+  height: 880svh;
+  color: #f0ece3;
+  background: transparent;
+  pointer-events: none;
 }
 
-.neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header > p:nth-of-type(2),
-.neuroshield-chapter:not(.neuroshield-static) .neuroshield-role {
-  max-width: 25rem;
+.ns-redesign .neuroshield-sticky {
+  background: transparent;
 }
 
-.neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat strong {
-  font-size: clamp(1.4rem, calc(5.1vw - 3.4vw * var(--neuro-imaging-focus, 0)), 6rem);
+.ns-redesign .neuroshield-sticky::after {
+  content: none;
 }
 
-.neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat small {
-  opacity: calc(1 - 0.6 * var(--neuro-imaging-focus, 0));
+.ns-opening,
+.ns-research {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
-.neuroshield-render-placeholder {
-  background: #172e43;
+.ns-opening {
+  z-index: 1;
+  background: transparent;
+}
+
+.ns-static-brain-preview {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(72vw, 760px);
+  height: auto;
+  transform: translate(-50%, -50%);
+  object-fit: contain;
+}
+
+.ns-identity {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  width: 100%;
+  margin: 0;
+  color: #83c8bc;
+  font-family: var(--font-display);
+  font-size: clamp(3.4rem, 10vw, 10.5rem);
+  font-weight: 610;
+  line-height: 0.85;
+  letter-spacing: -0.075em;
+  text-align: center;
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.94);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.ns-research {
+  z-index: 4;
+  background: #061019;
+  opacity: 0;
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.ns-research::before {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: linear-gradient(
+    180deg,
+    rgba(1, 8, 13, 0.32),
+    transparent 17% 79%,
+    rgba(1, 8, 13, 0.38)
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.ns-research-track {
+  display: flex;
+  width: 500%;
+  height: 100%;
+  transform: translate3d(0, 0, 0);
+  will-change: transform;
+}
+
+.ns-panel {
+  position: relative;
+  flex: 0 0 20%;
+  width: 20%;
+  height: 100%;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse at 76% 43%, rgba(33, 79, 103, 0.33), transparent 44%),
+    linear-gradient(110deg, #050c13 7%, #0a1b29 65%, #07121c);
+  border-right: 1px solid rgba(157, 195, 206, 0.2);
+}
+
+.ns-panel:nth-child(2n) {
+  background:
+    radial-gradient(ellipse at 71% 54%, rgba(33, 95, 121, 0.29), transparent 48%),
+    linear-gradient(110deg, #07111b 7%, #0b2030 72%, #06111a);
+}
+
+.ns-research-topline,
+.ns-research-progress,
+.ns-panel-kicker,
+.ns-panel-index,
+.ns-scan figcaption,
+.ns-visual-coordinate,
+.ns-experiment-traces,
+.ns-research-note > span,
+.ns-panel-disclosure {
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.56rem, 0.67vw, 0.73rem);
+  letter-spacing: 0.15em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+
+.ns-research-topline {
+  position: absolute;
+  top: 2.25rem;
+  right: clamp(1.5rem, 4vw, 4.5rem);
+  left: clamp(1.5rem, 4vw, 4.5rem);
+  z-index: 6;
+  display: flex;
+  justify-content: space-between;
+  color: #b7d0d7;
+  pointer-events: none;
+}
+
+.ns-panel-copy {
+  position: absolute;
+  top: 23%;
+  left: clamp(1.5rem, 6vw, 8rem);
+  z-index: 3;
+  width: min(43vw, 43rem);
+}
+
+.ns-panel-kicker {
+  margin: 0 0 1.5rem;
+  color: #92bfca;
+}
+
+.ns-panel h3 {
+  margin: 0;
+  color: #f0ece3;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 6.5vw, 7.7rem);
+  font-weight: 590;
+  line-height: 0.88;
+  letter-spacing: -0.065em;
+}
+
+.ns-panel-detail {
+  max-width: 27rem;
+  margin: 1.55rem 0 0;
+  color: #c1d0d0;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.88rem, 1.1vw, 1.13rem);
+  line-height: 1.58;
+}
+
+.ns-panel-rule {
+  display: block;
+  width: min(17vw, 13rem);
+  height: 1px;
+  margin-top: 2.3rem;
+  background: linear-gradient(90deg, #8bbdcc, rgba(139, 189, 204, 0.08));
+}
+
+.ns-panel-index {
+  margin-top: 0.75rem;
+  color: #7795a0;
+}
+
+.ns-panel-visual {
+  position: absolute;
+  top: 15%;
+  right: clamp(1.5rem, 6vw, 8rem);
+  width: min(43vw, 42rem);
+  height: 70%;
+}
+
+.ns-scan {
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ns-scan-image {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(146, 188, 201, 0.38);
+  background: #020509;
+  box-shadow: 0 1.8rem 4rem rgba(0, 0, 0, 0.29);
+}
+
+.ns-scan-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: contrast(1.08) saturate(0.84);
+}
+
+.ns-scan-corner {
+  position: absolute;
+  z-index: 1;
+  width: 1.25rem;
+  height: 1.25rem;
+  pointer-events: none;
+}
+
+.ns-scan-corner-tl {
+  top: -0.5px;
+  left: -0.5px;
+  border-top: 2px solid #abd5df;
+  border-left: 2px solid #abd5df;
+}
+
+.ns-scan-corner-br {
+  right: -0.5px;
+  bottom: -0.5px;
+  border-right: 2px solid #abd5df;
+  border-bottom: 2px solid #abd5df;
+}
+
+.ns-scan figcaption {
+  margin-top: 0.6rem;
+  color: #91adb5;
+}
+
+.ns-visual-observation .ns-scan {
+  width: 76%;
+  height: 95%;
+  margin-left: auto;
+}
+
+.ns-visual-coordinate {
+  position: absolute;
+  bottom: 4%;
+  left: 0;
+  color: #88aab4;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+}
+
+.ns-visual-hypothesis {
+  display: flex;
+  align-items: center;
+  gap: 5%;
+}
+
+.ns-visual-hypothesis .ns-scan {
+  width: 47.5%;
+  height: 79%;
+}
+
+.ns-visual-hypothesis .ns-scan:nth-of-type(2) {
+  transform: translateY(9%);
+}
+
+.ns-relationship-line {
+  position: absolute;
+  top: 50%;
+  left: 45%;
+  width: 12%;
+  height: 1px;
+  background: #8bbdcc;
+  box-shadow: 0 0 1rem rgba(139, 189, 204, 0.48);
+}
+
+.ns-visual-hypothesis .ns-visual-coordinate {
+  bottom: 1%;
+  left: 7%;
+  writing-mode: initial;
+  transform: none;
+}
+
+.ns-visual-experiment .ns-scan {
+  width: 70%;
+  height: 92%;
+}
+
+.ns-experiment-traces {
+  position: absolute;
+  top: 16%;
+  right: 0;
+  display: grid;
+  width: 27%;
+  gap: 0.7rem;
+  color: #9bbdc6;
+}
+
+.ns-experiment-traces i {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #89b9c5;
+}
+
+.ns-experiment-traces i:nth-of-type(2n) {
+  width: 75%;
+  background: #668997;
+}
+
+.ns-experiment-traces i.ns-trace-short {
+  width: 42%;
+  background: #55717c;
+}
+
+.ns-experiment-traces span:last-child {
+  margin-top: 0.6rem;
+  color: #7595a0;
+}
+
+.ns-visual-evidence {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 1rem 1.15rem;
+}
+
+.ns-visual-evidence .ns-scan {
+  height: 100%;
+}
+
+.ns-visual-uncertainty .ns-scan {
+  width: 96%;
+  height: 61%;
+}
+
+.ns-research-note {
+  width: 93%;
+  margin-top: 1.6rem;
+  border-top: 1px solid rgba(139, 189, 204, 0.33);
+  padding-top: 0.85rem;
+}
+
+.ns-research-note > span {
+  color: #93bdc7;
+}
+
+.ns-research-note p {
+  max-width: 31rem;
+  margin: 0.55rem 0 0;
+  color: #b5c5c8;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.73rem, 0.88vw, 0.95rem);
+  line-height: 1.5;
+}
+
+.ns-panel-disclosure {
+  position: absolute;
+  right: 6vw;
+  bottom: 5%;
+  left: 6vw;
+  z-index: 4;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 3rem;
+  color: #9db6bd;
+  text-transform: none;
+  letter-spacing: 0.025em;
+}
+
+.ns-panel-disclosure p {
+  max-width: 34rem;
+  margin: 0;
+}
+
+.ns-panel-disclosure > div {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.ns-panel-disclosure a {
+  color: #f0ece3;
+  text-decoration-color: #8bbdcc;
+  text-underline-offset: 0.3em;
+  white-space: nowrap;
+}
+
+.ns-research-progress {
+  position: absolute;
+  right: 5vw;
+  bottom: 2.5rem;
+  z-index: 5;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.ns-research-progress span {
+  width: 1.5rem;
+  height: 2px;
+  background: rgba(163, 195, 202, 0.33);
+}
+
+.ns-research[data-active-panel="0"] .ns-research-progress span:nth-child(1),
+.ns-research[data-active-panel="1"] .ns-research-progress span:nth-child(2),
+.ns-research[data-active-panel="2"] .ns-research-progress span:nth-child(3),
+.ns-research[data-active-panel="3"] .ns-research-progress span:nth-child(4),
+.ns-research[data-active-panel="4"] .ns-research-progress span:nth-child(5) {
+  background: #b9d8dc;
 }
 
 @media (orientation: portrait) {
-  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header h2 {
-    font-size: clamp(2.3rem, 10vw, 4.5rem);
+  .neuroshield-chapter.ns-redesign {
+    height: 780svh;
   }
 
-  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-semantic-header > p:nth-of-type(2),
-  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-role {
+  .ns-brain-stage {
+    width: min(104vw, 570px);
+  }
+
+  .ns-identity {
+    font-size: clamp(2.4rem, 11vw, 5rem);
+  }
+
+  .ns-research-topline {
+    top: 1.35rem;
+    right: 1.2rem;
+    left: 1.2rem;
+    font-size: 0.55rem;
+  }
+
+  .ns-research-topline span:last-child {
+    display: none;
+  }
+
+  .ns-panel-copy {
+    top: 12%;
+    left: 1.25rem;
+    width: calc(100% - 2.5rem);
+  }
+
+  .ns-panel h3 {
+    font-size: clamp(2.6rem, 10vw, 4.8rem);
+  }
+
+  .ns-panel-detail {
+    max-width: 26rem;
+    margin-top: 0.9rem;
+    font-size: clamp(0.77rem, 3vw, 0.95rem);
+  }
+
+  .ns-panel-rule,
+  .ns-panel-index {
+    display: none;
+  }
+
+  .ns-panel-visual {
+    top: 43%;
+    right: 1.25rem;
+    left: 1.25rem;
+    width: auto;
+    height: 44%;
+  }
+
+  .ns-visual-observation .ns-scan {
+    width: 82%;
+  }
+
+  .ns-visual-hypothesis .ns-scan {
+    height: 80%;
+  }
+
+  .ns-visual-hypothesis .ns-visual-coordinate,
+  .ns-experiment-traces,
+  .ns-research-note {
+    display: none;
+  }
+
+  .ns-visual-experiment .ns-scan {
+    width: 100%;
+  }
+
+  .ns-visual-evidence {
+    gap: 0.5rem;
+  }
+
+  .ns-visual-uncertainty {
+    top: 38%;
+    height: 33%;
+  }
+
+  .ns-visual-uncertainty .ns-scan {
+    width: 100%;
+    height: 100%;
+  }
+
+  .ns-panel-disclosure {
+    right: 1.25rem;
+    bottom: 6%;
+    left: 1.25rem;
+    display: block;
+    font-size: 0.57rem;
+  }
+
+  .ns-panel-disclosure p {
     max-width: 100%;
   }
 
-  .neuroshield-chapter:not(.neuroshield-static) .neuroshield-beat strong {
-    font-size: clamp(1.15rem, calc(9vw - 4.2vw * var(--neuro-imaging-focus, 0)), 3.6rem);
+  .ns-panel-disclosure > div {
+    margin-top: 0.65rem;
   }
+
+  .ns-research-progress {
+    right: 1.25rem;
+    bottom: 1.3rem;
+  }
+}
+
+.neuroshield-chapter.ns-redesign.neuroshield-static {
+  height: auto;
+  min-height: 100svh;
+  background: #000;
+  pointer-events: auto;
+}
+
+.ns-redesign.neuroshield-static .neuroshield-sticky {
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
+
+.ns-redesign.neuroshield-static .ns-opening {
+  position: relative;
+  height: 100svh;
+}
+
+.ns-redesign.neuroshield-static .ns-identity {
+  top: 80%;
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+.ns-redesign.neuroshield-static .ns-research {
+  position: relative;
+  height: auto;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.ns-redesign.neuroshield-static .ns-research-track {
+  display: block;
+  width: 100%;
+  height: auto;
+  transform: none;
+}
+
+.ns-redesign.neuroshield-static .ns-panel {
+  width: 100%;
+  height: 100svh;
+  min-height: 35rem;
+}
+
+.ns-redesign.neuroshield-static .ns-research-progress {
+  display: none;
 }
