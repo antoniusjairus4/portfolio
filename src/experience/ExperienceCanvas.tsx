@@ -1,10 +1,11 @@
 'use client';
 
 import { Canvas, useThree } from '@react-three/fiber';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import { PCFShadowMap } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
+import { AchievementsScene } from '@/webgl/scenes/AchievementsScene';
 import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
 import { KaiPalindromeBridgeScene } from '@/webgl/scenes/KaiPalindromeBridgeScene';
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
@@ -56,6 +57,11 @@ export function ExperienceCanvas({ scene, controller, dprCap, portrait }: Experi
         <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
       )}
       {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
+      {scene === 'achievements' && (
+        <Suspense fallback={null}>
+          <AchievementsScene controller={controller} portrait={portrait} />
+        </Suspense>
+      )}
     </Canvas>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode, RefObject } from 'react';
-import { useEffect, useLayoutEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementsChapter.module.css';
 import {
   type AchievementPanelKey,
@@ -15,8 +15,13 @@ import {
   achievementDisciplines,
   chessPeakRatings,
 } from '@/content/achievementsKinetic';
+import {
+  type ChapterProgressController,
+  createChapterProgressController,
+} from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
+import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
 const CHESS_CELLS = Array.from({ length: 64 }, (_, index) => `square-${index + 1}`);
@@ -135,9 +140,33 @@ function DisciplineMeta({ discipline }: { discipline: AchievementDisciplineKey }
 
 export function AchievementsChapter() {
   const chapterRef = useRef<HTMLElement>(null);
-  const { reducedMotion } = useExperienceEnvironment();
+  const [controller, setController] = useState<ChapterProgressController | null>(null);
+  const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
   const activity = useChapterActivity(chapterRef);
   const { setMode: setGlobalEtherMode } = useGlobalEther();
+  const rendererActive =
+    ready && !reducedMotion && quality !== 'fallback' && activity !== 'inactive';
+  const sceneRegistration = useMemo(
+    () =>
+      controller
+        ? {
+            controller,
+            sectionRef: chapterRef,
+            activity,
+            enabled: rendererActive,
+            portrait: ready && portrait,
+            dprCap,
+          }
+        : null,
+    [activity, controller, dprCap, portrait, ready, rendererActive],
+  );
+  useProjectSceneRegistration('achievements', sceneRegistration);
+
+  useEffect(() => {
+    const next = createChapterProgressController(chapterRef);
+    setController(next);
+    return () => next.dispose();
+  }, []);
 
   useEffect(() => {
     const chapter = chapterRef.current;
@@ -154,7 +183,7 @@ export function AchievementsChapter() {
       ref={chapterRef}
       id="achievements-section"
       aria-labelledby="achievements-title"
-      className={`${styles.chapter} ${reducedMotion ? styles.static : ''}`}
+      className={`${styles.chapter} ${reducedMotion ? styles.static : ''} ${rendererActive ? styles.webgl : ''}`}
       data-achievements-mode={reducedMotion ? 'static' : 'performance-archive'}
     >
       <h2 id="achievements-title" className={styles.srOnly}>

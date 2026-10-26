@@ -36,7 +36,8 @@ export type ProjectSceneKey =
   | 'palindrome'
   | 'palindrome-neuroshield-bridge'
   | 'neuroshield'
-  | 'skills';
+  | 'skills'
+  | 'achievements';
 
 interface SceneRegistration {
   controller: ChapterProgressController;
@@ -170,9 +171,11 @@ export function ProjectExperienceProvider({
       const bridgeTop = bridge?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShield = registrations.neuroshield;
       const skills = registrations.skills;
+      const achievements = registrations.achievements;
       const palindromeTop = palindrome?.sectionRef.current?.getBoundingClientRect().top;
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
       const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
+      const achievementsTop = achievements?.sectionRef.current?.getBoundingClientRect().top;
       const viewportHeight = window.innerHeight;
       // The Hero exposes Recognition before the chapter enters the viewport.
       // Prepare its first frame after critical content is ready, while the Hero
@@ -235,24 +238,33 @@ export function ProjectExperienceProvider({
         skills.activity !== 'inactive' &&
         skillsTop !== undefined &&
         skillsTop <= window.innerHeight * 0.45;
+      const achievementsOwnsFrame =
+        achievements?.enabled &&
+        achievements.activity !== 'inactive' &&
+        achievementsTop !== undefined &&
+        achievementsTop <= window.innerHeight * 0.45;
 
-      const nextKey = skillsOwnsFrame
-        ? 'skills'
-        : neuroShieldOwnsFrame
-          ? 'neuroshield'
-          : researchHandoffOwnsFrame
-            ? 'palindrome-neuroshield-bridge'
-            : palindromeOwnsFrame
-              ? 'palindrome'
-              : bridgeOwnsFrame
-                ? 'kai-palindrome-bridge'
-                : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
-                  ? 'kaiforge'
-                  : neuroShield?.enabled && neuroShield.activity !== 'inactive'
-                    ? 'neuroshield'
-                    : skills?.enabled && skills.activity !== 'inactive'
-                      ? 'skills'
-                      : null;
+      const nextKey = achievementsOwnsFrame
+        ? 'achievements'
+        : skillsOwnsFrame
+          ? 'skills'
+          : neuroShieldOwnsFrame
+            ? 'neuroshield'
+            : researchHandoffOwnsFrame
+              ? 'palindrome-neuroshield-bridge'
+              : palindromeOwnsFrame
+                ? 'palindrome'
+                : bridgeOwnsFrame
+                  ? 'kai-palindrome-bridge'
+                  : kaiForge?.enabled && (prepareKaiForge || kaiForge.activity !== 'inactive')
+                    ? 'kaiforge'
+                    : neuroShield?.enabled && neuroShield.activity !== 'inactive'
+                      ? 'neuroshield'
+                      : skills?.enabled && skills.activity !== 'inactive'
+                        ? 'skills'
+                        : achievements?.enabled && achievements.activity !== 'inactive'
+                          ? 'achievements'
+                          : null;
       setActiveKey((current) => (current === nextKey ? current : nextKey));
     };
     const schedule = () => {

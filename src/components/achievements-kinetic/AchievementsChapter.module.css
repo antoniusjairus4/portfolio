@@ -1688,3 +1688,35 @@
     height: 60svh;
   }
 }
+
+/* The production GLB layer shares the portfolio renderer. These procedural
+   objects remain as the no-WebGL/reduced-motion fallback only. */
+.chapter.webgl {
+  background: transparent;
+}
+
+.chapter.webgl .narrative .stage,
+.chapter.webgl .karate .stage,
+.chapter.webgl .public-speaking .stage {
+  background: transparent;
+}
+
+.chapter.webgl .tableCourt,
+.chapter.webgl .karateBelt,
+.chapter.webgl .chessGrid,
+.chapter.webgl .speakingScene {
+  visibility: hidden;
+}
+
+.chapter.webgl .karate .stage {
+  color: #e5dac7;
+}
+
+.chapter.webgl .karate .meta,
+.chapter.webgl .karateStatement > p {
+  color: #968b7b;
+}
+
+.chapter.webgl .karateDivisions i {
+  border-color: rgba(229, 218, 199, 0.13);
+}
