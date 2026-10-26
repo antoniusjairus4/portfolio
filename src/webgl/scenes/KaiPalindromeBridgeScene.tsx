@@ -177,12 +177,14 @@ function ArchitecturalMorph({
   );
 }
 
-function TransitionWorld({
+export function KaiPalindromeBridgeWorld({
   controller,
   portrait,
+  active = true,
 }: {
   controller: ChapterProgressController;
   portrait: boolean;
+  active?: boolean;
 }) {
   const progress = controller.progress;
   const { camera } = useThree();
@@ -205,6 +207,7 @@ function TransitionWorld({
   const deskDetail = useMemo(() => new Vector3(portrait ? -0.9 : -1.18, 1.16, -0.1), [portrait]);
 
   useFrame(() => {
+    if (!active) return;
     const p = progress.current;
     const travel = ramp(0.18, 0.91, p);
     sampleCamera(portrait ? CAMERAS.portrait : CAMERAS.desktop, 1, start);
@@ -250,55 +253,57 @@ function TransitionWorld({
 
   return (
     <>
-      <color attach="background" args={[ROOM_PALETTE.ink]} />
-      <ArenaLighting portrait={portrait} progress={release} bridgeProgress={progress} />
-      <ambientLight ref={ambient} color="#F3F0E9" intensity={0} />
-      <hemisphereLight ref={domesticAmbient} args={['#E5EBE7', '#686E64', 0]} />
-      <directionalLight
-        ref={domesticKey}
-        position={[-3.8, 4.2, 1.5]}
-        color={ROOM_PALETTE.parchment}
-        intensity={0}
-        castShadow={!portrait}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-5}
-        shadow-camera-right={5}
-        shadow-camera-top={5}
-        shadow-camera-bottom={-3}
-        shadow-camera-near={0.5}
-        shadow-camera-far={16}
-        shadow-normalBias={0.018}
-        shadow-bias={-0.0001}
-        shadow-radius={5}
-      />
-      <pointLight
-        ref={domesticFill}
-        position={[1.3, 1.8, 1.1]}
-        color={ROOM_PALETTE.parchment}
-        intensity={0}
-        distance={4.6}
-        decay={2}
-      />
-      <ArchitecturalMorph progress={progress} portrait={portrait} />
-      <WallDesign bridgeProgress={progress} />
-      <Equipment bridgeProgress={progress} bridgePortrait={portrait} />
-      <TrainingProps bridgeProgress={progress} />
-      <group ref={robot}>
-        <ProceduralRobot progress={release} />
-      </group>
-      <mesh ref={ball} position={ballStart}>
-        <sphereGeometry args={[0.02, 16, 12]} />
-        <primitive attach="material" object={materials.ball} />
-      </mesh>
-      <DomesticRoom
-        portrait={portrait}
-        transitionProgress={progress}
-        bridgeShell={false}
-        bridgeDesk={false}
-        bridgeBall={false}
-      />
-      <group ref={information} scale={0.001} visible={false}>
-        <InformationField progress={ordinary} portrait={portrait} />
+      {active && <color attach="background" args={[ROOM_PALETTE.ink]} />}
+      <group visible={active}>
+        <ArenaLighting portrait={portrait} progress={release} bridgeProgress={progress} />
+        <ambientLight ref={ambient} color="#F3F0E9" intensity={0} />
+        <hemisphereLight ref={domesticAmbient} args={['#E5EBE7', '#686E64', 0]} />
+        <directionalLight
+          ref={domesticKey}
+          position={[-3.8, 4.2, 1.5]}
+          color={ROOM_PALETTE.parchment}
+          intensity={0}
+          castShadow={!portrait}
+          shadow-mapSize={[1024, 1024]}
+          shadow-camera-left={-5}
+          shadow-camera-right={5}
+          shadow-camera-top={5}
+          shadow-camera-bottom={-3}
+          shadow-camera-near={0.5}
+          shadow-camera-far={16}
+          shadow-normalBias={0.018}
+          shadow-bias={-0.0001}
+          shadow-radius={5}
+        />
+        <pointLight
+          ref={domesticFill}
+          position={[1.3, 1.8, 1.1]}
+          color={ROOM_PALETTE.parchment}
+          intensity={0}
+          distance={4.6}
+          decay={2}
+        />
+        <ArchitecturalMorph progress={progress} portrait={portrait} />
+        <WallDesign bridgeProgress={progress} />
+        <Equipment bridgeProgress={progress} bridgePortrait={portrait} />
+        <TrainingProps bridgeProgress={progress} />
+        <group ref={robot}>
+          <ProceduralRobot progress={release} />
+        </group>
+        <mesh ref={ball} position={ballStart}>
+          <sphereGeometry args={[0.02, 16, 12]} />
+          <primitive attach="material" object={materials.ball} />
+        </mesh>
+        <DomesticRoom
+          portrait={portrait}
+          transitionProgress={progress}
+          bridgeShell={false}
+          bridgeDesk={false}
+          bridgeBall={false}
+        />
+        <group ref={information} scale={0.001} visible={false}>
+          <InformationField progress={ordinary} portrait={portrait} />
+        </group>
       </group>
     </>
   );
@@ -310,7 +315,7 @@ export function KaiPalindromeBridgeScene(props: {
 }) {
   return (
     <KaiForgeMaterials>
-      <TransitionWorld {...props} />
+      <KaiPalindromeBridgeWorld {...props} />
     </KaiForgeMaterials>
   );
 }

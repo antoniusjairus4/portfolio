@@ -6,8 +6,9 @@ import { PCFShadowMap } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import type { ProjectSceneKey } from '@/experience/ProjectExperienceProvider';
 import { AchievementsScene } from '@/webgl/scenes/AchievementsScene';
-import { KaiForgeScene } from '@/webgl/scenes/KaiForgeScene';
-import { KaiPalindromeBridgeScene } from '@/webgl/scenes/KaiPalindromeBridgeScene';
+import { KaiForgeWorld } from '@/webgl/scenes/KaiForgeScene';
+import { KaiPalindromeBridgeWorld } from '@/webgl/scenes/KaiPalindromeBridgeScene';
+import { KaiForgeMaterials } from '@/webgl/scenes/kaiforge/Materials';
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeNeuroShieldBridgeScene } from '@/webgl/scenes/PalindromeNeuroShieldBridgeScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
@@ -21,14 +22,45 @@ function ProgressInvalidator({ controller }: { controller: ChapterProgressContro
   return null;
 }
 
+function SceneHandoffInvalidator({ scene }: { scene: ProjectSceneKey }) {
+  const invalidate = useThree((state) => state.invalidate);
+
+  useEffect(() => {
+    let frame = 0;
+    let remaining = 18;
+    const warmIncomingScene = () => {
+      invalidate();
+      remaining -= 1;
+      if (remaining > 0) frame = requestAnimationFrame(warmIncomingScene);
+    };
+    warmIncomingScene();
+    return () => cancelAnimationFrame(frame);
+  }, [invalidate, scene]);
+
+  return null;
+}
+
 interface ExperienceCanvasProps {
   scene: ProjectSceneKey;
   controller: ChapterProgressController;
+  kaiForgeController?: ChapterProgressController;
+  kaiPalindromeBridgeController?: ChapterProgressController;
+  palindromeController?: ChapterProgressController;
   dprCap: number;
   portrait: boolean;
 }
 
-export function ExperienceCanvas({ scene, controller, dprCap, portrait }: ExperienceCanvasProps) {
+export function ExperienceCanvas({
+  scene,
+  controller,
+  kaiForgeController,
+  kaiPalindromeBridgeController,
+  palindromeController,
+  dprCap,
+  portrait,
+}: ExperienceCanvasProps) {
+  const inKaiPalindromeContinuity =
+    scene === 'kaiforge' || scene === 'kai-palindrome-bridge' || scene === 'palindrome';
   return (
     <Canvas
       data-experience-renderer="shared"
@@ -48,11 +80,32 @@ export function ExperienceCanvas({ scene, controller, dprCap, portrait }: Experi
       }}
     >
       <ProgressInvalidator controller={controller} />
-      {scene === 'kaiforge' && <KaiForgeScene controller={controller} portrait={portrait} />}
-      {scene === 'kai-palindrome-bridge' && (
-        <KaiPalindromeBridgeScene controller={controller} portrait={portrait} />
+      <SceneHandoffInvalidator scene={scene} />
+      {inKaiPalindromeContinuity && (
+        <KaiForgeMaterials>
+          {kaiForgeController && (
+            <KaiForgeWorld
+              controller={kaiForgeController}
+              portrait={portrait}
+              active={scene === 'kaiforge'}
+            />
+          )}
+          {kaiPalindromeBridgeController && (
+            <KaiPalindromeBridgeWorld
+              controller={kaiPalindromeBridgeController}
+              portrait={portrait}
+              active={scene === 'kai-palindrome-bridge'}
+            />
+          )}
+          {palindromeController && (
+            <PalindromeScene
+              controller={palindromeController}
+              portrait={portrait}
+              active={scene === 'palindrome'}
+            />
+          )}
+        </KaiForgeMaterials>
       )}
-      {scene === 'palindrome' && <PalindromeScene controller={controller} portrait={portrait} />}
       {scene === 'palindrome-neuroshield-bridge' && (
         <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
       )}

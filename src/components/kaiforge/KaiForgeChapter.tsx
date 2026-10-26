@@ -25,7 +25,7 @@ const BEAT_PRESENTATION = [
   { center: 0.28, width: 0.15, hold: 0.025 },
   { center: 0.455, width: 0.12, hold: 0.04 },
   { center: 0.67, width: 0.19, hold: 0.035 },
-  { center: 0.91, width: 0.14, hold: 0.03 },
+  { center: 0.9, width: 0.09, hold: 0.025 },
 ] as const;
 
 function BrandWordmark() {
@@ -85,6 +85,8 @@ export function KaiForgeChapter() {
       if (!section) return;
       const progress = next.progress.current;
       section.style.setProperty('--kaiforge-progress', progress.toFixed(4));
+      const chromeOpacity = 1 - smoothstep(rangeProgress(progress, 0.94, 0.99));
+      section.style.setProperty('--kaiforge-chrome-opacity', chromeOpacity.toFixed(4));
       const titleArrival = staticPresentation ? 1 : smoothstep(rangeProgress(progress, 0, 0.075));
       section.style.setProperty('--kaiforge-title-arrival', titleArrival.toFixed(4));
       section.style.setProperty(

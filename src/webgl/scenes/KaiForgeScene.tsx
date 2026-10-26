@@ -14,17 +14,20 @@ import { CAMERAS, CONTACT, sampleCamera } from './kaiforge/staging';
 import { TrainingProps } from './kaiforge/TrainingProps';
 import { Trajectory } from './kaiforge/Trajectory';
 
-function ProductionScene({
+export function KaiForgeWorld({
   controller,
   portrait,
+  active = true,
 }: {
   controller: ChapterProgressController;
   portrait: boolean;
+  active?: boolean;
 }) {
   const materials = useKaiForgeMaterials();
   const { camera, scene, gl } = useThree();
   const target = useMemo(() => new Vector3(), []);
   useFrame(() => {
+    if (!active) return;
     const p = controller.progress.current;
     sampleCamera(portrait ? CAMERAS.portrait : CAMERAS.desktop, p, camera.position);
     sampleCamera(portrait ? CAMERAS.portraitTargets : CAMERAS.desktopTargets, p, target);
@@ -112,16 +115,17 @@ function ProductionScene({
   }, [scene, gl, controller, camera]);
   return (
     <>
-      <color attach="background" args={['#111111']} />
-      <ArenaLighting portrait={portrait} progress={controller.progress} />
-      <Architecture portrait={portrait} />
-      <Equipment />
-      <TrainingProps />
-      <ProceduralRobot progress={controller.progress} />
-      <Trajectory progress={controller.progress} portrait={portrait} />
-      {/* Subtle low-tier contact impressions; no extra shadow renderer. */}
-      {portrait && (
-        <group>
+      {active && <color attach="background" args={['#111111']} />}
+      <group visible={active}>
+        <ArenaLighting portrait={portrait} progress={controller.progress} />
+        <Architecture portrait={portrait} />
+        <Equipment />
+        <TrainingProps />
+        <ProceduralRobot progress={controller.progress} />
+        <Trajectory progress={controller.progress} portrait={portrait} />
+        {/* Subtle low-tier contact impressions; no extra shadow renderer. */}
+        {portrait && (
+          <group>
           <mesh position={[0, 0.001, 0]} rotation={[-Math.PI / 2, 0, 0]}>
             <planeGeometry args={[2.1, 1.05]} />
             <primitive attach="material" object={materials.contact} />
@@ -134,8 +138,9 @@ function ProductionScene({
             <circleGeometry args={[0.55, 24]} />
             <primitive attach="material" object={materials.contact} />
           </mesh>
-        </group>
-      )}
+          </group>
+        )}
+      </group>
     </>
   );
 }
@@ -143,7 +148,7 @@ function ProductionScene({
 export function KaiForgeScene(props: { controller: ChapterProgressController; portrait: boolean }) {
   return (
     <KaiForgeMaterials>
-      <ProductionScene {...props} />
+      <KaiForgeWorld {...props} />
     </KaiForgeMaterials>
   );
 }

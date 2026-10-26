@@ -137,8 +137,10 @@ export function Equipment({
   useFrame(() => {
     if (!bridgeProgress) return;
     const p = bridgeProgress.current;
-    const table = ease(0.2, 0.77, p);
-    const support = ease(0.25, 0.75, p);
+    // The table leads the handoff: its competition surface begins becoming the
+    // Palindrome desk before the surrounding room changes architecture.
+    const table = ease(0.04, 0.68, p);
+    const support = ease(0.08, 0.66, p);
     if (tabletopRef.current) {
       tabletopRef.current.position.set(
         -1.02 * (bridgePortrait ? 0.76 : 1) * table,
@@ -160,7 +162,7 @@ export function Equipment({
         Math.max(0.001, support),
       );
     if (markingsRef.current)
-      markingsRef.current.scale.setScalar(Math.max(0.001, 1 - ease(0.2, 0.5, p)));
+      markingsRef.current.scale.setScalar(Math.max(0.001, 1 - ease(0.04, 0.34, p)));
   });
   return (
     <group name="KF_RegulationTable">

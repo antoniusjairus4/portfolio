@@ -16,8 +16,9 @@
 }
 
 .kaiforge-chapter .kaiforge-sticky::after {
-  /* Keep the footer legible, without darkening the physical world. */
-  background: linear-gradient(0deg, rgba(25, 27, 25, 0.85), transparent 22%);
+  /* Keep editorial copy directly on the arena instead of inside a screen-like scrim. */
+  content: none;
+  background: none;
 }
 
 .kaiforge-chapter .kaiforge-semantic-header {
@@ -255,6 +256,8 @@
 .kaiforge-chapter .kaiforge-chapter-index,
 .kaiforge-chapter .kaiforge-destination {
   color: var(--kaiforge-text-grey);
+  opacity: var(--kaiforge-chrome-opacity, 1);
+  will-change: opacity;
 }
 
 .kaiforge-chapter .kaiforge-tone-ivory {

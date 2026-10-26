@@ -176,7 +176,6 @@ export function ProjectExperienceProvider({
       const neuroShieldTop = neuroShield?.sectionRef.current?.getBoundingClientRect().top;
       const skillsTop = skills?.sectionRef.current?.getBoundingClientRect().top;
       const achievementsTop = achievements?.sectionRef.current?.getBoundingClientRect().top;
-      const viewportHeight = window.innerHeight;
       // The Hero exposes Recognition before the chapter enters the viewport.
       // Prepare its first frame after critical content is ready, while the Hero
       // still covers it. Demand rendering keeps this idle preparation to one frame.
@@ -209,19 +208,20 @@ export function ProjectExperienceProvider({
           chapters: chapterSignals,
         });
       }
-      // Both boundaries are geometrically exact: the bridge starts on KaiForge's
-      // Release frame and ends on Palindrome's Ordinary room frame.
+      // Scene ownership changes only when the incoming sticky section reaches
+      // the viewport origin. The overlapping section geometry keeps the outgoing
+      // world full-frame until that exact handoff instead of pushing it upward.
       const bridgeOwnsFrame =
         bridge?.enabled &&
         bridge.activity !== 'inactive' &&
         bridgeTop !== undefined &&
-        bridgeTop <= viewportHeight &&
-        (palindromeTop === undefined || palindromeTop > viewportHeight);
+        bridgeTop <= 0 &&
+        (palindromeTop === undefined || palindromeTop > 0);
       const palindromeOwnsFrame =
         palindrome?.enabled &&
         palindrome.activity !== 'inactive' &&
         palindromeTop !== undefined &&
-        palindromeTop <= viewportHeight;
+        palindromeTop <= 0;
       const neuroShieldOwnsFrame =
         neuroShield?.enabled &&
         neuroShield.activity !== 'inactive' &&
@@ -327,6 +327,9 @@ export function ProjectExperienceProvider({
               <ExperienceCanvas
                 scene={activeKey}
                 controller={activeRegistration.controller}
+                kaiForgeController={registrations.kaiforge?.controller}
+                kaiPalindromeBridgeController={registrations['kai-palindrome-bridge']?.controller}
+                palindromeController={registrations.palindrome?.controller}
                 dprCap={activeRegistration.dprCap}
                 portrait={activeRegistration.portrait}
               />

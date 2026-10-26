@@ -7,6 +7,12 @@
   color: var(--palindrome-text-primary);
 }
 
+.palindrome-chapter .palindrome-sticky::after {
+  /* The room remains the canvas; typography overlays it without a dark screen layer. */
+  content: none;
+  background: none;
+}
+
 .palindrome-chapter .palindrome-semantic-header h2,
 .palindrome-chapter .palindrome-beat strong,
 .palindrome-chapter .palindrome-disclosure a {
@@ -57,6 +63,13 @@
 
 .palindrome-chapter .palindrome-disclosure p {
   color: var(--palindrome-text-muted);
+}
+
+.palindrome-chapter .palindrome-chapter-index,
+.palindrome-chapter .palindrome-demo-note,
+.palindrome-chapter .palindrome-disclosure {
+  opacity: var(--palindrome-chrome-opacity, 1);
+  will-change: opacity;
 }
 
 .palindrome-demo-note {

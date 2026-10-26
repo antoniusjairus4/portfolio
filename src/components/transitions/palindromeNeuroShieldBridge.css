@@ -2,6 +2,7 @@
   position: relative;
   z-index: 2;
   height: 160svh;
+  margin-top: -100svh;
   pointer-events: none;
 }
 
@@ -16,6 +17,10 @@
   height: 0;
   margin-top: 0;
   overflow: hidden;
+}
+
+.palindrome-neuroshield-bridge:not(.bridge-disabled) + .neuroshield-chapter {
+  margin-top: -100svh;
 }
 
 @media (orientation: portrait) {

@@ -1372,6 +1372,7 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   position: relative;
   z-index: 2;
   height: 370svh;
+  margin-top: -100svh;
   pointer-events: none;
 }
 
@@ -1384,7 +1385,14 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
 
 .kai-palindrome-bridge-disabled {
   height: 0;
+  margin-top: 0;
   overflow: hidden;
+}
+
+/* Hand scene ownership over at a full-frame boundary. The overlap removes the
+   one-viewport interval where the outgoing sticky scene used to slide upward. */
+.kai-palindrome-bridge:not(.kai-palindrome-bridge-disabled) + .palindrome-chapter {
+  margin-top: -100svh;
 }
 
 .kaiforge-chapter {

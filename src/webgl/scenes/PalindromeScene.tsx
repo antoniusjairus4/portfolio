@@ -24,9 +24,10 @@ import { InformationField } from './palindrome/InformationField';
 interface PalindromeSceneProps {
   controller: ChapterProgressController;
   portrait: boolean;
+  active?: boolean;
 }
 
-export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) {
+export function PalindromeScene({ controller, portrait, active = true }: PalindromeSceneProps) {
   const { camera } = useThree();
   const target = useMemo(() => new Vector3(0, 1.9, -0.55), []);
   const reflectedFill = useRef<PointLight>(null);
@@ -42,6 +43,7 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
   );
 
   useFrame(() => {
+    if (!active) return;
     const p = controller.progress.current;
     if (ambient.current) ambient.current.intensity = 0.33;
     if (hemisphere.current) hemisphere.current.intensity = 0.67;
@@ -74,36 +76,38 @@ export function PalindromeScene({ controller, portrait }: PalindromeSceneProps) 
 
   return (
     <>
-      <color attach="background" args={[ROOM_PALETTE.ink]} />
-      <ambientLight ref={ambient} intensity={0.33} color="#F3F0E9" />
-      <hemisphereLight ref={hemisphere} args={['#E5EBE7', '#686E64', 0.67]} />
-      <directionalLight
-        ref={key}
-        position={[-3.8, 4.2, 1.5]}
-        intensity={1.7}
-        color={ROOM_PALETTE.parchment}
-        castShadow={!portrait}
-        shadow-mapSize={[1024, 1024]}
-        shadow-camera-left={-5}
-        shadow-camera-right={5}
-        shadow-camera-top={5}
-        shadow-camera-bottom={-3}
-        shadow-camera-near={0.5}
-        shadow-camera-far={16}
-        shadow-normalBias={0.018}
-        shadow-bias={-0.0001}
-        shadow-radius={5}
-      />
-      <pointLight
-        ref={reflectedFill}
-        position={[1.3, 1.8, 1.1]}
-        intensity={1.45}
-        color={ROOM_PALETTE.parchment}
-        distance={4.6}
-        decay={2}
-      />
-      <DomesticRoom portrait={portrait} />
-      <InformationField progress={controller.progress} portrait={portrait} />
+      {active && <color attach="background" args={[ROOM_PALETTE.ink]} />}
+      <group visible={active}>
+        <ambientLight ref={ambient} intensity={0.33} color="#F3F0E9" />
+        <hemisphereLight ref={hemisphere} args={['#E5EBE7', '#686E64', 0.67]} />
+        <directionalLight
+          ref={key}
+          position={[-3.8, 4.2, 1.5]}
+          intensity={1.7}
+          color={ROOM_PALETTE.parchment}
+          castShadow={!portrait}
+          shadow-mapSize={[1024, 1024]}
+          shadow-camera-left={-5}
+          shadow-camera-right={5}
+          shadow-camera-top={5}
+          shadow-camera-bottom={-3}
+          shadow-camera-near={0.5}
+          shadow-camera-far={16}
+          shadow-normalBias={0.018}
+          shadow-bias={-0.0001}
+          shadow-radius={5}
+        />
+        <pointLight
+          ref={reflectedFill}
+          position={[1.3, 1.8, 1.1]}
+          intensity={1.45}
+          color={ROOM_PALETTE.parchment}
+          distance={4.6}
+          decay={2}
+        />
+        <DomesticRoom portrait={portrait} />
+        <InformationField progress={controller.progress} portrait={portrait} />
+      </group>
     </>
   );
 }

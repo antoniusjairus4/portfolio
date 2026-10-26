@@ -2,7 +2,12 @@
 
 import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import { PalindromeFallback } from '@/components/palindrome/PalindromeFallback';
-import { getBeatOpacity, getPalindromeBeat } from '@/components/palindrome/palindromeChoreography';
+import {
+  getBeatOpacity,
+  getPalindromeBeat,
+  rangeProgress,
+  smoothstep,
+} from '@/components/palindrome/palindromeChoreography';
 import { palindromeBeats, palindromeContent } from '@/content/palindrome';
 import {
   type ChapterProgressController,
@@ -19,7 +24,7 @@ const BEAT_PRESENTATION = [
   { center: 0.29, width: 0.15 },
   { center: 0.515, width: 0.14 },
   { center: 0.735, width: 0.15 },
-  { center: 0.92, width: 0.14 },
+  { center: 0.91, width: 0.075 },
 ] as const;
 
 type BeatKey = (typeof palindromeBeats)[number]['key'];
@@ -70,12 +75,14 @@ export function PalindromeChapter() {
       if (!section) return;
       const progress = next.progress.current;
       section.style.setProperty('--palindrome-progress', progress.toFixed(4));
+      const chromeOpacity = 1 - smoothstep(rangeProgress(progress, 0.93, 0.985));
+      section.style.setProperty('--palindrome-chrome-opacity', chromeOpacity.toFixed(4));
       section.dataset.palindromeBeat = getPalindromeBeat(progress);
 
       if (headerRef.current && !reducedMotion && quality !== 'fallback') {
         const headerOpacity = Math.max(0, Math.min(1, (0.23 - progress) / 0.09));
         headerRef.current.style.opacity = headerOpacity.toFixed(3);
-        headerRef.current.style.transform = `translate3d(0, ${progress * -28}px, 0)`;
+        headerRef.current.style.removeProperty('transform');
       }
 
       beatRefs.current.forEach((element, index) => {
@@ -83,7 +90,7 @@ export function PalindromeChapter() {
         const presentation = BEAT_PRESENTATION[index];
         const opacity = getBeatOpacity(progress, presentation.center, presentation.width);
         element.style.opacity = opacity.toFixed(3);
-        element.style.transform = `translate3d(0, ${(1 - opacity) * 20}px, 0)`;
+        element.style.removeProperty('transform');
         element.style.pointerEvents = opacity > 0.6 ? 'auto' : 'none';
       });
     };
