@@ -19,6 +19,12 @@
   pointer-events: none;
 }
 
+/* Let the archive title reach the viewport as the final Skills card dissolves.
+   A short overlap removes the otherwise empty sticky-release interval. */
+.skills-chapter.capability-landscape:not(.skills-static) + #achievements-section {
+  margin-top: -60svh;
+}
+
 .capability-landscape .skills-sticky {
   background: transparent;
 }

@@ -68,7 +68,7 @@ export function SkillsChapter() {
 
         // Smooth card stage entrance and graceful upward scroll departure
         const cardIn = smooth((progress - 0.27) / 0.06);
-        const cardOut = 1 - smooth((progress - 0.78) / 0.16);
+        const cardOut = 1 - smooth((progress - 0.92) / 0.16);
         const cardStageOpacity = cardIn * cardOut;
         const cardStageY = (1 - cardOut) * -70;
 
@@ -93,11 +93,11 @@ export function SkillsChapter() {
         section.style.setProperty('--skills-intro-rule-scale', opening.toFixed(4));
 
         // Fade out chapter mark and explore cue smoothly
-        const cueOpacity = 1 - smooth((progress - 0.78) / 0.14);
+        const cueOpacity = 1 - smooth((progress - 0.84) / 0.16);
         section.style.setProperty('--skills-cue-opacity', cueOpacity.toFixed(4));
 
         // Smoothly dissolve liquid chrome backdrop into #0b0908 for seamless merge into achievements
-        const chromeFade = 1 - smooth((progress - 0.80) / 0.16);
+        const chromeFade = 1 - smooth((progress - 0.92) / 0.16);
         document.documentElement.style.setProperty(
           '--skills-chrome-fade',
           chromeFade.toFixed(4),
