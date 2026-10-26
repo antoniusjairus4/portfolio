@@ -45,6 +45,111 @@
   white-space: nowrap;
 }
 
+.skills-intro-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 58% 48% at 50% 48%, rgba(31, 62, 79, 0.49), transparent 78%),
+    linear-gradient(180deg, #030608 0%, #07131b 59%, #03070a 100%);
+  opacity: var(--skills-stage-opacity, 1);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.skills-intro-stage::before {
+  position: absolute;
+  inset: 8% 4%;
+  content: "";
+  border-top: 1px solid rgba(172, 193, 199, 0.1);
+  border-bottom: 1px solid rgba(172, 193, 199, 0.1);
+}
+
+.skills-intro-content {
+  position: relative;
+  width: min(90vw, 92rem);
+  text-align: center;
+}
+
+.skills-intro-eyebrow,
+.skills-intro-next {
+  color: #91a8b0;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.58rem, 0.75vw, 0.78rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  line-height: 1.6;
+  opacity: var(--skills-intro-copy-opacity, 0);
+}
+
+.skills-intro-eyebrow {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.35rem;
+}
+
+.skills-intro-word {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  margin: clamp(2.2rem, 7vh, 5rem) 0 clamp(1.6rem, 5vh, 3.5rem);
+  color: #f0eee7;
+  font-family: var(--font-display);
+  font-size: clamp(5.1rem, 16.3vw, 17rem);
+  font-weight: 600;
+  letter-spacing: -0.075em;
+  line-height: 0.76;
+  perspective: 950px;
+  transform-style: preserve-3d;
+  white-space: nowrap;
+}
+
+.skills-intro-letter {
+  display: inline-block;
+  opacity: 0;
+  transform-origin: center 80%;
+  backface-visibility: hidden;
+  text-shadow: 0 0.07em 0.12em rgba(0, 0, 0, 0.28);
+  will-change: transform, opacity;
+}
+
+.skills-intro-rule {
+  width: min(11rem, 23vw);
+  height: 2px;
+  margin: 0 auto clamp(1.1rem, 2.7vh, 2rem);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    #b1cbd0 20%,
+    #e6e6de 50%,
+    #b1cbd0 80%,
+    transparent
+  );
+  box-shadow: 0 0 1.5rem rgba(159, 192, 199, 0.35);
+  transform: scaleX(var(--skills-intro-rule-scale, 0));
+}
+
+.skills-intro-content p {
+  margin: 0;
+  color: #c0cacf;
+  font-family: var(--font-secondary);
+  font-size: clamp(0.92rem, 1.2vw, 1.2rem);
+  opacity: var(--skills-intro-copy-opacity, 0);
+}
+
+.skills-intro-next {
+  margin-top: clamp(3rem, 10vh, 7rem);
+}
+
+.skills-intro-next span {
+  display: inline-block;
+  margin-left: 0.7em;
+  color: #dce9e7;
+}
+
 .capability-entry-veil {
   position: absolute;
   inset: 0;
@@ -131,9 +236,40 @@
 }
 
 .capability-fallback-intro {
-  margin: 0 auto;
-  border-left-color: #e0d8c8;
-  transform: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 70svh;
+  text-align: center;
+}
+
+.capability-fallback-intro > span,
+.capability-fallback-intro > strong {
+  color: #a9b6b8;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.62rem, 0.8vw, 0.82rem);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+.capability-fallback-intro h2 {
+  margin: 1.6rem 0;
+  color: #f0ede4;
+  font-family: var(--font-display);
+  font-size: clamp(5.1rem, 16.3vw, 17rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.075em;
+}
+
+.capability-fallback-intro p {
+  max-width: 26rem;
+  margin-top: 1.5rem;
+  color: #c3c8c6;
+  font-family: var(--font-secondary);
+  font-size: clamp(1rem, 1.25vw, 1.25rem);
+  line-height: 1.5;
 }
 
 .capability-fallback-card > span,
@@ -214,13 +350,29 @@
     transform: none;
   }
 
-  .capability-fallback-card h2,
   .capability-fallback-card h3 {
     font-size: clamp(2.9rem, 10vw, 4.7rem);
   }
 
-  .capability-fallback-card h2 {
-    font-size: clamp(4.6rem, 17vw, 7rem);
+  .skills-intro-eyebrow span:last-child {
+    display: none;
+  }
+
+  .skills-intro-eyebrow {
+    justify-content: center;
+  }
+
+  .skills-intro-word {
+    font-size: clamp(4.6rem, 17vw, 9rem);
+  }
+
+  .skills-intro-content p {
+    max-width: 18rem;
+    margin: 0 auto;
+  }
+
+  .capability-fallback-intro h2 {
+    font-size: clamp(4.6rem, 17vw, 9rem);
   }
 }
 

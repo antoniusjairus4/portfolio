@@ -7,28 +7,19 @@ export interface CapabilityCardCopy {
   statement: string;
   skills: readonly string[];
   accent: string;
-  intro?: boolean;
 }
 
 const ACCENTS = ['#aeb8bd', '#79b7be', '#83a58d', '#a5757b', '#bc9b69', '#9a91b9'] as const;
 
-export const CAPABILITY_CARDS: readonly CapabilityCardCopy[] = [
-  {
-    number: '00 / INTRODUCTION',
-    title: 'SKILLS',
-    statement: 'Different disciplines. One connected system.',
-    skills: [],
-    accent: '#ded8cb',
-    intro: true,
-  },
-  ...skillCategories.map((category, index) => ({
+export const CAPABILITY_CARDS: readonly CapabilityCardCopy[] = skillCategories.map(
+  (category, index) => ({
     number: `${category.index} / 06`,
     title: category.name,
     statement: category.statement,
     skills: category.skills,
     accent: ACCENTS[index],
-  })),
-];
+  }),
+);
 
 const WIDTH = 900;
 const HEIGHT = 1260;
@@ -85,43 +76,29 @@ export function paintCapabilityCard(canvas: HTMLCanvasElement, card: CapabilityC
   context.fillStyle = 'rgba(219, 226, 225, 0.25)';
   context.fillRect(LEFT, 175, RIGHT - LEFT, 2);
 
-  if (card.intro) {
-    fitFont(context, 'SKILLS', 188, RIGHT - LEFT);
+  const titleLines = card.title === 'BACKEND / DATABASE' ? ['BACKEND /', 'DATABASE'] : [card.title];
+  let baseline = titleLines.length === 2 ? 345 : 390;
+  for (const line of titleLines) {
+    const size = fitFont(context, line, titleLines.length === 2 ? 132 : 145, RIGHT - LEFT);
     context.fillStyle = '#f1eee5';
-    context.fillText('SKILLS', LEFT - 4, 490);
-    context.font = '600 47px "Clash Display", sans-serif';
-    context.fillStyle = card.accent;
-    context.fillText('CAPABILITY', LEFT, 590);
-    context.fillText('LANDSCAPE', LEFT, 648);
-    context.font = '400 38px "Satoshi", sans-serif';
-    context.fillStyle = '#c4cbc8';
-    drawWrapped(context, card.statement, LEFT, 790, RIGHT - LEFT - 20, 56);
-  } else {
-    const titleLines =
-      card.title === 'BACKEND / DATABASE' ? ['BACKEND /', 'DATABASE'] : [card.title];
-    let baseline = titleLines.length === 2 ? 345 : 390;
-    for (const line of titleLines) {
-      const size = fitFont(context, line, titleLines.length === 2 ? 132 : 145, RIGHT - LEFT);
-      context.fillStyle = '#f1eee5';
-      context.fillText(line, LEFT - 3, baseline);
-      baseline += size * 0.95;
-    }
-    context.font = '400 30px "Satoshi", sans-serif';
-    context.fillStyle = '#aab9b8';
-    drawWrapped(context, card.statement, LEFT, 520, RIGHT - LEFT - 30, 43);
-
-    context.fillStyle = 'rgba(219, 226, 225, 0.22)';
-    context.fillRect(LEFT, 603, RIGHT - LEFT, 2);
-    card.skills.forEach((skill, index) => {
-      const y = 685 + index * 76;
-      context.font = '500 27px "Satoshi", sans-serif';
-      context.fillStyle = card.accent;
-      context.fillText(String(index + 1).padStart(2, '0'), LEFT, y);
-      context.font = '500 49px "Satoshi", sans-serif';
-      context.fillStyle = '#e1e5e1';
-      context.fillText(skill, LEFT + 92, y);
-    });
+    context.fillText(line, LEFT - 3, baseline);
+    baseline += size * 0.95;
   }
+  context.font = '400 30px "Satoshi", sans-serif';
+  context.fillStyle = '#aab9b8';
+  drawWrapped(context, card.statement, LEFT, 520, RIGHT - LEFT - 30, 43);
+
+  context.fillStyle = 'rgba(219, 226, 225, 0.22)';
+  context.fillRect(LEFT, 603, RIGHT - LEFT, 2);
+  card.skills.forEach((skill, index) => {
+    const y = 685 + index * 76;
+    context.font = '500 27px "Satoshi", sans-serif';
+    context.fillStyle = card.accent;
+    context.fillText(String(index + 1).padStart(2, '0'), LEFT, y);
+    context.font = '500 49px "Satoshi", sans-serif';
+    context.fillStyle = '#e1e5e1';
+    context.fillText(skill, LEFT + 92, y);
+  });
 
   context.fillStyle = 'rgba(219, 226, 225, 0.22)';
   context.fillRect(LEFT, 1130, RIGHT - LEFT, 2);

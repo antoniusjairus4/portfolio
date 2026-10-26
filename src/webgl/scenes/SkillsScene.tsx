@@ -30,7 +30,7 @@ interface SkillsSceneProps {
 }
 
 type CardPlacement = { x: number; y: number; z: number; rotation: number };
-const STOPS = [0.065, 0.215, 0.365, 0.515, 0.665, 0.815, 0.96] as const;
+const STOPS = [0.28, 0.41, 0.54, 0.67, 0.8, 0.94] as const;
 function smooth(value: number) {
   const t = Math.max(0, Math.min(1, value));
   return t * t * (3 - 2 * t);
@@ -38,7 +38,7 @@ function smooth(value: number) {
 
 function makePlacements(portrait: boolean): CardPlacement[] {
   return CAPABILITY_CARDS.map((_, index) => {
-    const side = index === 0 ? 0 : index % 2 === 1 ? 1 : -1;
+    const side = index % 2 === 0 ? 1 : -1;
     return {
       x: side * (portrait ? 0.78 : 3.15),
       y: -0.1 + Math.sin(index * 1.7) * 0.045,

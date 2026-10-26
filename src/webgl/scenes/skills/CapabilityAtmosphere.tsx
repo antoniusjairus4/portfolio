@@ -5,9 +5,8 @@ import { CanvasTexture, LinearFilter, SRGBColorSpace } from 'three';
 
 type Placement = { x: number; y: number; z: number; rotation: number };
 
-const GHOST_WORDS = ['BUILD', 'CODE', 'WEB', 'SYSTEMS', 'SECURITY', 'TOOLS', 'INTELLIGENCE'];
+const GHOST_WORDS = ['CODE', 'WEB', 'SYSTEMS', 'SECURITY', 'TOOLS', 'INTELLIGENCE'];
 export const ENVIRONMENT_ACCENTS = [
-  '#7892a0',
   '#7694a8',
   '#4ea7b5',
   '#6f9478',
@@ -102,7 +101,7 @@ export function CapabilityAtmosphere({
   return (
     <group name="capability-atmosphere">
       {placements.map((placement, index) => {
-        const side = index === 0 || index % 2 === 1 ? -1 : 1;
+        const side = index % 2 === 0 ? -1 : 1;
         return (
           <group key={placement.z}>
             <mesh position={[placement.x, 0.4, placement.z - 1.6]}>

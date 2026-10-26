@@ -7,7 +7,7 @@ interface SkillsFallbackProps {
 export function SkillsFallback({ reason }: SkillsFallbackProps) {
   return (
     <div className="capability-fallback" data-fallback-reason={reason}>
-      <header className="capability-fallback-card capability-fallback-intro">
+      <header className="capability-fallback-intro">
         <span>00 / INTRODUCTION</span>
         <h2 id="skills-title">SKILLS</h2>
         <strong>CAPABILITY LANDSCAPE</strong>

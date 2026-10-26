@@ -13,8 +13,23 @@ import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvi
 import { useChapterActivity } from '@/experience/useChapterActivity';
 import './skills.css';
 
+function smooth(value: number) {
+  const t = Math.max(0, Math.min(1, value));
+  return t * t * (3 - 2 * t);
+}
+
+const TITLE_LETTERS = [
+  { id: 'first-s', letter: 'S' },
+  { id: 'k', letter: 'K' },
+  { id: 'i', letter: 'I' },
+  { id: 'first-l', letter: 'L' },
+  { id: 'second-l', letter: 'L' },
+  { id: 'last-s', letter: 'S' },
+] as const;
+
 export function SkillsChapter() {
   const sectionRef = useRef<HTMLElement>(null);
+  const titleLetters = useRef<(HTMLSpanElement | null)[]>([]);
   const ownsEtherRef = useRef(false);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const [rendererReleased, setRendererReleased] = useState(false);
@@ -50,12 +65,32 @@ export function SkillsChapter() {
       section?.style.setProperty('--skills-progress', progress.toFixed(4));
       section?.style.setProperty(
         '--skills-entry-opacity',
-        Math.max(0, 1 - progress * 18).toFixed(4),
+        Math.max(0, 0.28 - progress * 8).toFixed(4),
       );
       section?.style.setProperty(
         '--skills-exit-opacity',
         Math.max(0, Math.min(1, (progress - 0.982) * 55)).toFixed(4),
       );
+      if (section) {
+        const opening = smooth((progress + 0.04) / 0.065);
+        const departure = smooth((progress - 0.15) / 0.1);
+        section.style.setProperty(
+          '--skills-stage-opacity',
+          (1 - smooth((progress - 0.18) / 0.1)).toFixed(4),
+        );
+        section.style.setProperty(
+          '--skills-intro-copy-opacity',
+          (opening * (1 - departure)).toFixed(4),
+        );
+        section.style.setProperty('--skills-intro-rule-scale', opening.toFixed(4));
+        titleLetters.current.forEach((letter, index) => {
+          if (!letter) return;
+          const arrive = smooth((progress + 0.04 - index * 0.003) / 0.055);
+          const leave = smooth((progress - 0.145 - index * 0.002) / 0.09);
+          letter.style.opacity = (arrive * (1 - leave)).toFixed(4);
+          letter.style.transform = `translate3d(${((index - 2.5) * leave * 18).toFixed(1)}px, ${((1 - arrive) * (58 + (index % 2) * 18) - leave * 88).toFixed(1)}px, ${((1 - arrive) * -95 + leave * 120).toFixed(1)}px) rotateX(${((1 - arrive) * 26 - leave * 12).toFixed(1)}deg)`;
+        });
+      }
       setRendererReleased((current) => {
         const release = progress >= 0.999;
         return current === release ? current : release;
@@ -119,6 +154,32 @@ export function SkillsChapter() {
         )}
         {!staticExperience && (
           <>
+            <div className="skills-intro-stage" aria-hidden="true">
+              <div className="skills-intro-content">
+                <div className="skills-intro-eyebrow">
+                  <span>04 / CAPABILITY LANDSCAPE</span>
+                  <span>ANTONIUS JAIRUS</span>
+                </div>
+                <div className="skills-intro-word" role="presentation">
+                  {TITLE_LETTERS.map(({ id, letter }, index) => (
+                    <span
+                      key={id}
+                      ref={(node) => {
+                        titleLetters.current[index] = node;
+                      }}
+                      className="skills-intro-letter"
+                    >
+                      {letter}
+                    </span>
+                  ))}
+                </div>
+                <div className="skills-intro-rule" />
+                <p>Different disciplines. One connected system.</p>
+                <div className="skills-intro-next">
+                  SCROLL TO ENTER THE LANDSCAPE <span>↘</span>
+                </div>
+              </div>
+            </div>
             <div className="capability-entry-veil" aria-hidden="true" />
             <div className="capability-chapter-mark" aria-hidden="true">
               <span>04 / SKILLS</span>
