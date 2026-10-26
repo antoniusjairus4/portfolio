@@ -71,10 +71,10 @@ export default function Home() {
 
         {/* Phase 5: continuous spatial capability landscape */}
         <SkillsChapter />
-      </ProjectExperienceProvider>
 
-      {/* Phase 6: kinetic editorial achievements sequence */}
-      <AchievementsChapter />
+        {/* Phase 6: kinetic editorial achievements sequence */}
+        <AchievementsChapter />
+      </ProjectExperienceProvider>
 
       {/* Phase 7: quiet contact and document end */}
       <ContactFinale />

@@ -37,8 +37,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
-        <Script id="document-scroll-contract" strategy="beforeInteractive">
-          {`history.scrollRestoration = 'auto';
+        <Script
+          id="document-scroll-contract"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `history.scrollRestoration = 'auto';
 (() => {
   const navigation = performance.getEntriesByType('navigation')[0];
   const isHistoryTraversal = navigation && navigation.type === 'back_forward';
@@ -54,8 +57,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   window.addEventListener('pagehide', () => {
     history.replaceState({ ...history.state, __portfolioScrollY: window.scrollY }, '');
   });
-})();`}
-        </Script>
+})();`,
+          }}
+        />
         <ExperienceEnvironmentProvider>
           <LenisProvider>
             <GlobalEtherProvider>
