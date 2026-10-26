@@ -27,28 +27,9 @@ export function PalindromeNeuroShieldBridge() {
   useEffect(() => {
     const next = createChapterProgressController(sectionRef);
     setController(next);
-    const palindrome = document.getElementById('palindrome');
-    const update = () => {
-      const p = next.progress.current;
-      const ease = (value: number) => {
-        const t = Math.max(0, Math.min(1, value));
-        return t * t * (3 - 2 * t);
-      };
-      // Brief full coverage around the scene swap; no time-based animation.
-      const veil = ease(p / 0.44) * (1 - ease((p - 0.56) / 0.44));
-      sectionRef.current?.style.setProperty('--handoff-veil', enabled ? String(veil) : '0');
-      palindrome?.style.setProperty(
-        '--palindrome-exit-opacity',
-        enabled ? String(1 - ease(p / 0.44)) : '1',
-      );
-    };
-    const unsubscribe = next.subscribe(update);
-    update();
     return () => {
-      unsubscribe();
       next.dispose();
-      palindrome?.style.removeProperty('--palindrome-exit-opacity');
-      sectionRef.current?.style.removeProperty('--handoff-veil');
+      setController(null);
     };
   }, [enabled]);
 

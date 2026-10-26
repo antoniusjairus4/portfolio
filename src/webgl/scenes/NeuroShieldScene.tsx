@@ -146,6 +146,65 @@ function BrainModel({ controller, portrait }: NeuroShieldSceneProps) {
   );
 }
 
+export function IntactBrain({
+  position = [0, 0, 0],
+  rotation = [0, 0, 0],
+  scale = 1,
+  opacity = 1,
+}: {
+  position?: [number, number, number] | Vector3;
+  rotation?: [number, number, number];
+  scale?: number;
+  opacity?: number;
+}) {
+  const { scene } = useGLTF(MODEL_URL);
+  const sources = useMemo(
+    () =>
+      PARTS.map((part) => {
+        const mesh = scene.getObjectByName(part.name);
+        if (!mesh || !('geometry' in mesh)) {
+          throw new Error(`NeuroShield anatomical model is missing ${part.name}`);
+        }
+        return mesh as Mesh;
+      }),
+    [scene],
+  );
+  const coreSource = useMemo(() => scene.getObjectByName('core') as Mesh | undefined, [scene]);
+
+  return (
+    <group position={position} rotation={rotation} scale={scale}>
+      {sources.map((source, index) => (
+        <mesh
+          key={PARTS[index].name}
+          geometry={source.geometry}
+          position={source.position}
+          rotation={source.rotation}
+          scale={source.scale}
+        >
+          <meshStandardMaterial
+            color={IVORY}
+            roughness={0.86}
+            metalness={0.015}
+            transparent
+            opacity={opacity}
+            depthWrite={opacity > 0.8}
+          />
+        </mesh>
+      ))}
+      {coreSource && (
+        <mesh geometry={coreSource.geometry} position={coreSource.position}>
+          <meshStandardMaterial
+            color="#797d7c"
+            roughness={1}
+            transparent
+            opacity={opacity}
+          />
+        </mesh>
+      )}
+    </group>
+  );
+}
+
 export function NeuroShieldScene({ controller, portrait }: NeuroShieldSceneProps) {
   return (
     <>
