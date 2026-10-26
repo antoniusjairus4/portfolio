@@ -39,32 +39,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
         <Script
           id="document-scroll-contract"
+          src="/document-scroll-contract.js"
           strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `history.scrollRestoration = 'auto';
-(() => {
-  const navigation = performance.getEntriesByType('navigation')[0];
-  const isHistoryTraversal = navigation && navigation.type === 'back_forward';
-  const hasDirectTarget = window.location.hash.length > 1;
-
-  if (!isHistoryTraversal && !hasDirectTarget) {
-    window.scrollTo(0, 0);
-    window.addEventListener('pageshow', (event) => {
-      if (!event.persisted) window.scrollTo(0, 0);
-    }, { once: true });
-  }
-
-  window.addEventListener('pagehide', () => {
-    history.replaceState({ ...history.state, __portfolioScrollY: window.scrollY }, '');
-  });
-})();`,
-          }}
         />
         <ExperienceEnvironmentProvider>
           <LenisProvider>
-            <GlobalEtherProvider>
-              {children}
-            </GlobalEtherProvider>
+            <GlobalEtherProvider>{children}</GlobalEtherProvider>
           </LenisProvider>
         </ExperienceEnvironmentProvider>
       </body>
