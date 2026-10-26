@@ -143,6 +143,19 @@
   overflow-wrap: break-word;
 }
 
+.bounce-skills__card:is([data-category="programming"], [data-category="cybersecurity"])
+  .bounce-skills__title {
+  font-size: clamp(1.72rem, 2vw, 2rem);
+  letter-spacing: -0.07em;
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+.bounce-skills__card[data-category="ai-tools"] .bounce-skills__title {
+  word-spacing: 0.3em;
+  white-space: nowrap;
+}
+
 .bounce-skills__statement {
   display: block;
   min-height: 3.1rem;
@@ -213,6 +226,11 @@
   .bounce-skills__title {
     margin-top: 1.65rem;
     font-size: clamp(1.48rem, 6.6vw, 2rem);
+  }
+
+  .bounce-skills__card:is([data-category="programming"], [data-category="cybersecurity"])
+    .bounce-skills__title {
+    font-size: clamp(1.12rem, 4.8vw, 1.4rem);
   }
 
   .bounce-skills__statement {

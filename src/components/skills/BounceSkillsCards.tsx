@@ -240,6 +240,7 @@ export function BounceSkillsCards() {
           }}
           type="button"
           className="bounce-skills__card"
+          data-category={category.key}
           aria-label={`${category.name}: ${category.skills.join(', ')}`}
           onPointerEnter={() => {
             interaction.current.hovered = index;
