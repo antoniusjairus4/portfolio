@@ -1,7 +1,5 @@
 'use client';
 
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementsChapter.module.css';
@@ -21,20 +19,38 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
-gsap.registerPlugin(ScrollTrigger);
-
 const CHESS_CELLS = ['a1', 'b1', 'c1', 'd1', 'a2', 'b2', 'c2', 'd2', 'a3', 'b3', 'c3', 'd3'];
 const ARCHIVE_TILES: ChromaItem[] = [
   {
-    image: '/images/achievements/table-tennis/photo-1-1280.webp',
+    image: '/images/achievements/table-tennis/photo-1-640.webp',
     alt: 'Jairus holding a table tennis trophy, certificate, and medals',
     accent: '#c6a66e',
   },
-  { accent: '#987454' },
-  { accent: '#9c8a73' },
-  { accent: '#c6a66e' },
-  { accent: '#98856c' },
-  { accent: '#bdaf94' },
+  {
+    image: '/images/achievements/karate/photo-1-640.webp',
+    alt: 'Jairus competing in a karate match',
+    accent: '#987454',
+  },
+  {
+    image: '/images/achievements/chess/photo-1-640.webp',
+    alt: 'Chess trophies and awards on display',
+    accent: '#9c8a73',
+  },
+  {
+    image: '/images/achievements/music/photo-1-640.webp',
+    alt: 'Jairus speaking at a microphone in a suit',
+    accent: '#c6a66e',
+  },
+  {
+    image: '/images/achievements/public-speaking/photo-1-640.webp',
+    alt: 'Jairus addressing an audience on stage',
+    accent: '#98856c',
+  },
+  {
+    image: '/images/achievements/public-speaking/photo-2-640.webp',
+    alt: 'Jairus speaking from a lectern at an event',
+    accent: '#bdaf94',
+  },
 ];
 
 interface KineticPanelProps {
@@ -51,24 +67,33 @@ function usePanelProgress(
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section || reducedMotion) return;
-
-    const context = gsap.context(() => {
-      const update = (progress: number) => {
-        gsap.set(section, getAchievementMotion(panel, progress));
-        section.dataset.achievementBeat = getAchievementBeat(panel, progress);
-      };
-      const trigger = ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: 'bottom bottom',
-        invalidateOnRefresh: true,
-        onRefresh: (self) => update(self.progress),
-        onUpdate: (self) => update(self.progress),
-      });
-      update(trigger.progress);
-    }, section);
-
-    return () => context.revert();
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const rect = section.getBoundingClientRect();
+      const viewport = window.innerHeight;
+      const start = window.innerWidth <= 860 && panel !== 'intro' ? viewport * 0.4 : 0;
+      const distance = Math.max(1, rect.height - viewport + start);
+      const progress = Math.min(1, Math.max(0, (start - rect.top) / distance));
+      for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
+        section.style.setProperty(property, String(value));
+      }
+      section.dataset.achievementBeat = getAchievementBeat(panel, progress);
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(section);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    update();
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+    };
   }, [panel, reducedMotion, sectionRef]);
 }
 
@@ -169,9 +194,9 @@ export function AchievementsChapter() {
           <div className={styles.showcaseInner}>
             <ChromaGrid
               items={ARCHIVE_TILES}
-              columns={2}
-              minCardWidth={120}
-              gap={12}
+              columns={3}
+              minCardWidth={100}
+              gap={20}
               aspectRatio="1 / 1"
               radius={220}
               softness={0.7}

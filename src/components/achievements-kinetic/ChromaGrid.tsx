@@ -245,7 +245,7 @@ export const ChromaGrid = ({
                       alt={item.alt ?? item.title ?? ''}
                       fill
                       unoptimized
-                      sizes="(max-width: 860px) 18svh, 34svh"
+                      sizes="(max-width: 860px) 30vw, 25svh"
                       loading="lazy"
                     />
                     <Image
@@ -255,7 +255,7 @@ export const ChromaGrid = ({
                       aria-hidden="true"
                       fill
                       unoptimized
-                      sizes="(max-width: 860px) 18svh, 34svh"
+                      sizes="(max-width: 860px) 30vw, 25svh"
                       loading="lazy"
                     />
                   </>

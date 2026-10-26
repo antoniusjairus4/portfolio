@@ -67,7 +67,7 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   const exit = smoothstep(rangeProgress(value, 0.84, 0.98));
 
   if (panel === 'intro') {
-    const title = 0.16 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.84;
+    const title = 0.45 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.55;
     const split = smoothstep(rangeProgress(value, 0.24, 0.55));
     return {
       '--achievement-exit': exit,
@@ -81,7 +81,7 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     const travel = smoothstep(rangeProgress(value, 0.06, 0.52));
     return {
       '--achievement-exit': exit,
-      '--tt-title': 0.18 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.82,
+      '--tt-title': 0.58 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.42,
       '--tt-ball-x': -46 + travel * 92,
       '--tt-ball-y': Math.sin(travel * Math.PI * 3) * -12,
       '--tt-rule-turn': travel * -6,

@@ -928,7 +928,7 @@
   place-items: center;
   height: 100svh;
   min-width: 0;
-  padding: clamp(2rem, 5vw, 5rem);
+  padding: clamp(1rem, 1.5vw, 1.75rem);
   overflow: hidden;
   isolation: isolate;
   background:
@@ -962,31 +962,20 @@
 .showcaseInner {
   position: relative;
   z-index: 2;
-  width: min(100%, 50svh, 38rem);
+  width: min(100%, 92svh, 56rem);
 }
 
 .narrative .stage {
   width: 100%;
 }
 
+.introStatement h3 {
+  font-size: clamp(4rem, 11vw, 14rem);
+}
+
 .narrative .meta {
   right: 2.1vw;
   left: 2.1vw;
-}
-
-.narrative .introStatement h3 {
-  font-size: clamp(3rem, 4.9vw, 6.3rem);
-}
-
-.narrative .disciplineIndex {
-  right: 2vw;
-  left: 2vw;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.7rem;
-}
-
-.narrative .disciplineIndex span {
-  font-size: clamp(0.72rem, 1.2vw, 1rem);
 }
 
 .narrative .tableCourt {
@@ -1011,15 +1000,17 @@
 .narrative .tableStatement {
   right: 2vw;
   left: 2vw;
-  gap: 1.4vw;
+  justify-content: space-between;
+  gap: 0.75rem;
+  transform: translateX(calc((1 - var(--tt-resolve, 0)) * -2vw));
 }
 
 .narrative .tableStatement strong {
-  font-size: clamp(7rem, 12vw, 13rem);
+  font-size: clamp(6rem, 9.5vw, 10rem);
 }
 
 .narrative .tableStatement h3 {
-  font-size: clamp(2.4rem, 4vw, 4.8rem);
+  font-size: clamp(2.2rem, 3.35vw, 4rem);
 }
 
 .narrative .karateStatement {
@@ -1105,7 +1096,7 @@
     order: 0;
     width: 100%;
     height: 40svh;
-    padding: 1rem;
+    padding: 0.5rem;
     border-bottom: 1px solid rgba(229, 218, 199, 0.13);
   }
 
@@ -1125,16 +1116,11 @@
   }
 
   .narrative .panel,
-  .narrative .intro,
   .narrative .karate,
   .narrative .chess,
   .narrative .public-speaking,
   .narrative .finale {
     height: 170svh;
-  }
-
-  .narrative .introStatement h3 {
-    font-size: clamp(3rem, 10vw, 5.5rem);
   }
 
   .narrative .tableTitle {
@@ -1149,6 +1135,12 @@
   .narrative .tableStatement strong,
   .narrative .speeches strong {
     font-size: clamp(6rem, 26vw, 10rem);
+  }
+
+  .introStatement h3 {
+    font-size: min(10.5vw, 3.3rem);
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .narrative .tableStatement h3,
@@ -1170,6 +1162,18 @@
 
   .narrative .finalStatement {
     font-size: clamp(3rem, 9vw, 5rem);
+  }
+
+  .narrative .ratings div:first-child {
+    transform: translateX(calc((1 - var(--chess-one, 0)) * 3vw));
+  }
+
+  .narrative .ratings div:nth-child(2) {
+    transform: translateX(calc((1 - var(--chess-two, 0)) * -3vw));
+  }
+
+  .narrative .ratings div:last-child {
+    transform: translateX(calc((1 - var(--chess-three, 0)) * 3vw));
   }
 
   .static .narrative .panel {

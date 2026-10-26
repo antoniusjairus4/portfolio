@@ -211,8 +211,16 @@ a.chroma-card:focus-visible {
   transition-duration: 0.3s;
 }
 
+.achievement-chroma-grid .chroma-grid-inner {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.achievement-chroma-grid .chroma-card {
+  padding: 6px;
+}
+
 @media (max-width: 860px) {
   .achievement-chroma-grid .chroma-grid-inner {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
   }
 }
