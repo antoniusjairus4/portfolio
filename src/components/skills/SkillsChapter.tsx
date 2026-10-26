@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { BounceSkillsCards } from '@/components/skills/BounceSkillsCards';
 import { SkillsFallback } from '@/components/skills/SkillsFallback';
 import { skillCategories } from '@/content/skills';
 import {
@@ -33,6 +34,7 @@ export function SkillsChapter() {
   const ownsEtherRef = useRef(false);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const [rendererReleased, setRendererReleased] = useState(false);
+  const [cardsVisible, setCardsVisible] = useState(false);
   const { ready, reducedMotion, portrait, quality, dprCap, finePointer } =
     useExperienceEnvironment();
   const { setMode: setGlobalEtherMode } = useGlobalEther();
@@ -75,6 +77,10 @@ export function SkillsChapter() {
         const opening = smooth((progress + 0.04) / 0.065);
         const departure = smooth((progress - 0.15) / 0.1);
         section.style.setProperty(
+          '--skills-card-stage-opacity',
+          smooth((progress - 0.27) / 0.06).toFixed(4),
+        );
+        section.style.setProperty(
           '--skills-stage-opacity',
           (1 - smooth((progress - 0.18) / 0.1)).toFixed(4),
         );
@@ -91,6 +97,10 @@ export function SkillsChapter() {
           letter.style.transform = `translate3d(${((index - 2.5) * leave * 18).toFixed(1)}px, ${((1 - arrive) * (58 + (index % 2) * 18) - leave * 88).toFixed(1)}px, ${((1 - arrive) * -95 + leave * 120).toFixed(1)}px) rotateX(${((1 - arrive) * 26 - leave * 12).toFixed(1)}deg)`;
         });
       }
+      setCardsVisible((current) => {
+        const visible = progress >= 0.27 && progress < 0.999;
+        return current === visible ? current : visible;
+      });
       setRendererReleased((current) => {
         const release = progress >= 0.999;
         return current === release ? current : release;
@@ -154,6 +164,11 @@ export function SkillsChapter() {
         )}
         {!staticExperience && (
           <>
+            {cardsVisible && (
+              <div className="skills-bounce-stage">
+                <BounceSkillsCards />
+              </div>
+            )}
             <div className="skills-intro-stage" aria-hidden="true">
               <div className="skills-intro-content">
                 <div className="skills-intro-eyebrow">
@@ -186,7 +201,7 @@ export function SkillsChapter() {
               <span>CAPABILITY LANDSCAPE</span>
             </div>
             <div className="capability-scroll-cue" aria-hidden="true">
-              SCROLL TO TRAVERSE ↘
+              HOVER OR TAP TO EXPLORE ↗
             </div>
           </>
         )}

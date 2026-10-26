@@ -10,7 +10,6 @@ import { KaiPalindromeBridgeScene } from '@/webgl/scenes/KaiPalindromeBridgeScen
 import { NeuroShieldScene } from '@/webgl/scenes/NeuroShieldScene';
 import { PalindromeNeuroShieldBridgeScene } from '@/webgl/scenes/PalindromeNeuroShieldBridgeScene';
 import { PalindromeScene } from '@/webgl/scenes/PalindromeScene';
-import { SkillsScene } from '@/webgl/scenes/SkillsScene';
 
 function ProgressInvalidator({ controller }: { controller: ChapterProgressController }) {
   const invalidate = useThree((state) => state.invalidate);
@@ -26,33 +25,16 @@ interface ExperienceCanvasProps {
   controller: ChapterProgressController;
   dprCap: number;
   portrait: boolean;
-  finePointer: boolean;
-  reducedMotion: boolean;
 }
 
-export function ExperienceCanvas({
-  scene,
-  controller,
-  dprCap,
-  portrait,
-  finePointer,
-  reducedMotion,
-}: ExperienceCanvasProps) {
-  const isSkillsScene = scene === 'skills';
-
+export function ExperienceCanvas({ scene, controller, dprCap, portrait }: ExperienceCanvasProps) {
   return (
     <Canvas
-      key={isSkillsScene ? 'skills-alpha' : 'opaque'}
       data-experience-renderer="shared"
       frameloop="demand"
       dpr={[1, dprCap]}
       camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
-      gl={{ antialias: true, alpha: isSkillsScene, powerPreference: 'high-performance' }}
-      style={
-        isSkillsScene
-          ? { position: 'relative', zIndex: 1, opacity: 'var(--skills-scene-reveal, 0)' }
-          : undefined
-      }
+      gl={{ antialias: true, powerPreference: 'high-performance' }}
       shadows={
         portrait
           ? false
@@ -61,7 +43,7 @@ export function ExperienceCanvas({
             : 'basic'
       }
       onCreated={({ gl }) => {
-        gl.setClearColor(isSkillsScene ? '#090c10' : '#0b0908', isSkillsScene ? 0 : 1);
+        gl.setClearColor('#0b0908', 1);
       }}
     >
       <ProgressInvalidator controller={controller} />
@@ -74,14 +56,6 @@ export function ExperienceCanvas({
         <PalindromeNeuroShieldBridgeScene controller={controller} portrait={portrait} />
       )}
       {scene === 'neuroshield' && <NeuroShieldScene controller={controller} portrait={portrait} />}
-      {scene === 'skills' && (
-        <SkillsScene
-          controller={controller}
-          portrait={portrait}
-          finePointer={finePointer}
-          reducedMotion={reducedMotion}
-        />
-      )}
     </Canvas>
   );
 }

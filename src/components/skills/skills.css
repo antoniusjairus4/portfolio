@@ -1,4 +1,4 @@
-/* The visible cards are physical meshes in the shared 3D scene. */
+/* LiquidChrome remains the backdrop for the Skills title and card fan. */
 .project-experience-layer[data-project-scene="skills"] {
   background: #05070b;
 }
@@ -12,7 +12,7 @@
 }
 
 .skills-chapter.capability-landscape {
-  height: 820svh;
+  height: 300svh;
   background: transparent;
   color: #ece9e1;
   pointer-events: none;
@@ -40,6 +40,16 @@
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+.skills-bounce-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  opacity: var(--skills-card-stage-opacity, 0);
+  pointer-events: auto;
 }
 
 .skills-intro-stage {
@@ -316,7 +326,7 @@
 
 @media (orientation: portrait) {
   .skills-chapter.capability-landscape {
-    height: 760svh;
+    height: 260svh;
   }
 
   .capability-chapter-mark span:last-child {

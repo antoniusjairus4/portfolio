@@ -78,7 +78,6 @@ export function ProjectExperienceProvider({
   const [assetManager, setAssetManager] = useState<AssetLifecycleManager | null>(null);
   const assetManagerRef = useRef<AssetLifecycleManager | null>(null);
   const frameRef = useRef(0);
-  const experienceLayerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!environment.ready || assetManagerRef.current) return;
@@ -279,18 +278,6 @@ export function ProjectExperienceProvider({
   ]);
 
   const activeRegistration = activeKey ? registrations[activeKey] : null;
-  useEffect(() => {
-    const skills = registrations.skills;
-    if (activeKey !== 'skills' || !skills) return;
-    const updateReveal = () => {
-      const value = Math.max(0, Math.min(1, (skills.controller.progress.current - 0.28) / 0.05));
-      const eased = value * value * (3 - 2 * value);
-      experienceLayerRef.current?.style.setProperty('--skills-scene-reveal', eased.toFixed(4));
-    };
-    updateReveal();
-    return skills.controller.subscribe(updateReveal);
-  }, [activeKey, registrations.skills]);
-
   const contextValue = useMemo(
     () => ({ registerScene, assetManager }),
     [assetManager, registerScene],
@@ -301,7 +288,6 @@ export function ProjectExperienceProvider({
       <div className="project-experience-root">
         {activeKey && activeRegistration?.enabled && (
           <div
-            ref={experienceLayerRef}
             className="project-experience-layer"
             data-project-scene={activeKey}
             aria-hidden="true"
@@ -325,14 +311,14 @@ export function ProjectExperienceProvider({
                 maxDevicePixelRatio={1}
               />
             )}
-            <ExperienceCanvas
-              scene={activeKey}
-              controller={activeRegistration.controller}
-              dprCap={activeRegistration.dprCap}
-              portrait={activeRegistration.portrait}
-              finePointer={activeRegistration.finePointer ?? false}
-              reducedMotion={environment.reducedMotion}
-            />
+            {activeKey !== 'skills' && (
+              <ExperienceCanvas
+                scene={activeKey}
+                controller={activeRegistration.controller}
+                dprCap={activeRegistration.dprCap}
+                portrait={activeRegistration.portrait}
+              />
+            )}
           </div>
         )}
         {children}
