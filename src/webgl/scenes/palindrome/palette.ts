@@ -17,7 +17,7 @@ export const ROOM_PALETTE = {
   nicheTrim: '#6A6656',
   floor: '#D7D1C3',
   stoneSecondary: '#BBB5A8',
-  stoneVein: '#8C887F',
+  stoneVein: '#6C655D',
   stoneWarmVein: '#A89A86',
   timber: '#5A3826',
   timberHighlight: '#76513A',
