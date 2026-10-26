@@ -234,7 +234,7 @@ export function SkillsScene({
       <directionalLight position={[-6, 12, 10]} intensity={1.35} color="#d6d8d1" />
       <pointLight ref={focusLight} color="#c4c6c1" intensity={3.5} distance={17} decay={2} />
       <pointLight ref={groundLight} color="#7694a8" intensity={1.25} distance={11} decay={2} />
-      <CapabilityTerrain portrait={portrait} />
+      <CapabilityTerrain portrait={portrait} controller={controller} />
       <CapabilityAtmosphere portrait={portrait} placements={placements} />
       {CAPABILITY_CARDS.map((card, index) => {
         const placement = placements[index];

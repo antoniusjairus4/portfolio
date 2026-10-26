@@ -5,7 +5,6 @@ import { CanvasTexture, LinearFilter, SRGBColorSpace } from 'three';
 
 type Placement = { x: number; y: number; z: number; rotation: number };
 
-const GHOST_WORDS = ['CODE', 'WEB', 'SYSTEMS', 'SECURITY', 'TOOLS', 'INTELLIGENCE'];
 export const ENVIRONMENT_ACCENTS = [
   '#7694a8',
   '#4ea7b5',
@@ -29,21 +28,6 @@ function makeTexture(
   texture.colorSpace = SRGBColorSpace;
   texture.minFilter = LinearFilter;
   return texture;
-}
-
-function makeGhostTexture(word: string) {
-  return makeTexture(1024, 256, (context) => {
-    context.textAlign = 'center';
-    context.textBaseline = 'middle';
-    context.fillStyle = '#e4eced';
-    let size = 210;
-    do {
-      context.font = `600 ${size}px "Clash Display", sans-serif`;
-      if (context.measureText(word).width < 1010) break;
-      size -= 4;
-    } while (size > 100);
-    context.fillText(word, 512, 132);
-  });
 }
 
 function makeHaloTexture() {
@@ -85,17 +69,12 @@ export function CapabilityAtmosphere({
 }) {
   const halo = useMemo(makeHaloTexture, []);
   const shaft = useMemo(() => (portrait ? null : makeShaftTexture()), [portrait]);
-  const ghosts = useMemo(() => (portrait ? [] : GHOST_WORDS.map(makeGhostTexture)), [portrait]);
-
   useEffect(
     () => () => {
       halo.dispose();
       shaft?.dispose();
-      ghosts.forEach((texture) => {
-        texture.dispose();
-      });
     },
-    [halo, shaft, ghosts],
+    [halo, shaft],
   );
 
   return (
@@ -123,18 +102,6 @@ export function CapabilityAtmosphere({
                   color="#7694a8"
                   transparent
                   opacity={0.07}
-                  depthWrite={false}
-                  toneMapped={false}
-                />
-              </mesh>
-            )}
-            {!portrait && ghosts[index] && (
-              <mesh position={[side * 5.7, 1.5, placement.z - 7]}>
-                <planeGeometry args={[14, 3.5]} />
-                <meshBasicMaterial
-                  map={ghosts[index]}
-                  transparent
-                  opacity={0.055}
                   depthWrite={false}
                   toneMapped={false}
                 />

@@ -1,14 +1,9 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import {
-  BufferGeometry,
-  DoubleSide,
-  Float32BufferAttribute,
-  Line,
-  LineBasicMaterial,
-  PlaneGeometry,
-} from 'three';
+import { DoubleSide, PlaneGeometry } from 'three';
+import type { ChapterProgressController } from '@/experience/chapterProgress';
+import { CapabilityFluxFloor } from './CapabilityFluxFloor';
 
 function terrainHeight(x: number, z: number) {
   return (
@@ -18,7 +13,13 @@ function terrainHeight(x: number, z: number) {
   );
 }
 
-export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
+export function CapabilityTerrain({
+  portrait,
+  controller,
+}: {
+  portrait: boolean;
+  controller: ChapterProgressController;
+}) {
   const geometry = useMemo(() => {
     const plane = new PlaneGeometry(portrait ? 30 : 66, 172, portrait ? 16 : 32, 86);
     const positions = plane.getAttribute('position');
@@ -31,55 +32,11 @@ export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
     plane.computeVertexNormals();
     return plane;
   }, [portrait]);
-  const contours = useMemo(() => {
-    const count = portrait ? 7 : 15;
-    const longitudinal = Array.from({ length: count }, (_, index) => {
-      const strand = (index - (count - 1) / 2) * (portrait ? 2.6 : 3.1);
-      const points: number[] = [];
-      for (let step = 0; step <= 86; step += 1) {
-        const z = 23 - step * 2;
-        const x = strand + Math.sin(z * 0.036 + index * 0.63) * (portrait ? 0.2 : 0.46);
-        points.push(x, -2.685 + terrainHeight(x, z), z);
-      }
-      const geometry = new BufferGeometry();
-      geometry.setAttribute('position', new Float32BufferAttribute(points, 3));
-      const material = new LineBasicMaterial({
-        color: '#304754',
-        transparent: true,
-        opacity: index % 3 === 0 ? 0.34 : 0.22,
-        toneMapped: false,
-      });
-      return { key: strand, object: new Line(geometry, material) };
-    });
-    const transverse = Array.from({ length: portrait ? 9 : 17 }, (_, index) => {
-      const z = 18 - index * (portrait ? 18 : 10);
-      const width = portrait ? 15 : 32;
-      const points: number[] = [];
-      for (let step = 0; step <= 28; step += 1) {
-        const x = -width + (step / 28) * width * 2;
-        points.push(x, -2.685 + terrainHeight(x, z), z);
-      }
-      const geometry = new BufferGeometry();
-      geometry.setAttribute('position', new Float32BufferAttribute(points, 3));
-      const material = new LineBasicMaterial({
-        color: '#233441',
-        transparent: true,
-        opacity: index % 4 === 0 ? 0.24 : 0.13,
-        toneMapped: false,
-      });
-      return { key: `cross-${index}`, object: new Line(geometry, material) };
-    });
-    return [...longitudinal, ...transverse];
-  }, [portrait]);
   useEffect(
     () => () => {
       geometry.dispose();
-      contours.forEach(({ object }) => {
-        object.geometry.dispose();
-        object.material.dispose();
-      });
     },
-    [geometry, contours],
+    [geometry],
   );
 
   return (
@@ -98,9 +55,7 @@ export function CapabilityTerrain({ portrait }: { portrait: boolean }) {
           flatShading
         />
       </mesh>
-      {contours.map(({ key, object }) => (
-        <primitive key={key} object={object} />
-      ))}
+      <CapabilityFluxFloor controller={controller} portrait={portrait} geometry={geometry} />
     </group>
   );
 }
