@@ -38,42 +38,6 @@ const PANEL_STOPS = neuroShieldBeats.map(
     RESEARCH_START + (RESEARCH_END - RESEARCH_START) * inverseSmoothstep(index / (PANEL_COUNT - 1)),
 );
 
-const SCANS = [
-  { src: NEURO_IMAGE_URLS[0], width: 702, height: 706, alt: 'Axial brain MRI slice' },
-  { src: NEURO_IMAGE_URLS[1], width: 538, height: 625, alt: 'Grid of axial brain scan slices' },
-  { src: NEURO_IMAGE_URLS[2], width: 652, height: 705, alt: 'Annotated lower brain MRI slice' },
-  { src: NEURO_IMAGE_URLS[3], width: 673, height: 465, alt: 'Six coronal brain MRI slices' },
-] as const;
-
-function Scan({
-  index,
-  caption,
-  className = '',
-}: {
-  index: number;
-  caption: string;
-  className?: string;
-}) {
-  const scan = SCANS[index];
-  return (
-    <figure className={`ns-scan ${className}`}>
-      <div className="ns-scan-image">
-        <Image
-          src={scan.src}
-          width={scan.width}
-          height={scan.height}
-          alt={scan.alt}
-          sizes="(max-width: 720px) 72vw, 38vw"
-          loading="eager"
-        />
-        <span className="ns-scan-corner ns-scan-corner-tl" />
-        <span className="ns-scan-corner ns-scan-corner-br" />
-      </div>
-      <figcaption>{caption}</figcaption>
-    </figure>
-  );
-}
-
 function ResearchPanel({ index }: { index: number }) {
   const beat = neuroShieldBeats[index];
   return (
@@ -99,21 +63,17 @@ function ResearchPanel({ index }: { index: number }) {
 
       {index === 0 && (
         <div className="ns-panel-visual ns-visual-observation">
-          <Scan index={0} caption="AXIAL VIEW / SOURCE IMAGING" className="ns-scan-primary" />
           <span className="ns-visual-coordinate">OBSERVATION 001 / UNCLASSIFIED</span>
         </div>
       )}
       {index === 1 && (
         <div className="ns-panel-visual ns-visual-hypothesis">
-          <Scan index={1} caption="SERIES A / MULTIPLE SLICES" />
           <span className="ns-relationship-line" aria-hidden="true" />
-          <Scan index={2} caption="SERIES B / ANNOTATED VIEW" />
           <span className="ns-visual-coordinate">CORRELATION IS A QUESTION, NOT A CONCLUSION</span>
         </div>
       )}
       {index === 2 && (
         <div className="ns-panel-visual ns-visual-experiment">
-          <Scan index={2} caption="ANATOMICAL REFERENCE / COMPARISON" />
           <div className="ns-experiment-traces" aria-hidden="true">
             <span>MODEL RUN / 01</span>
             <i />
@@ -132,16 +92,10 @@ function ResearchPanel({ index }: { index: number }) {
         </div>
       )}
       {index === 3 && (
-        <div className="ns-panel-visual ns-visual-evidence">
-          <Scan index={0} caption="01 / AXIAL" />
-          <Scan index={1} caption="02 / SERIES" />
-          <Scan index={2} caption="03 / ANNOTATED" />
-          <Scan index={3} caption="04 / CORONAL" />
-        </div>
+        <div className="ns-panel-visual ns-visual-evidence" />
       )}
       {index === 4 && (
         <div className="ns-panel-visual ns-visual-uncertainty">
-          <Scan index={3} caption="CORONAL SERIES / ONGOING INTERPRETATION" />
           <div className="ns-research-note">
             <span>ONGOING / SIX-PERSON TEAM</span>
             <p>{neuroShieldContent.role}</p>
