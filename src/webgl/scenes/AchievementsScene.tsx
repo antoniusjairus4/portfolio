@@ -171,8 +171,8 @@ export function AchievementsScene({
     perspective.fov = portrait ? 49 : 40;
     perspective.near = 0.1;
     perspective.far = 45;
-    perspective.position.set(0, portrait ? 0.7 : 1.25, portrait ? 9.4 : 8.8);
-    perspective.lookAt(portrait ? 0 : -2.35, portrait ? -1.05 : -0.35, 0);
+    perspective.position.set(0, portrait ? 0.7 : 1.25, portrait ? 9.4 : 9.8);
+    perspective.lookAt(0, portrait ? -1.05 : -0.35, 0);
     perspective.updateProjectionMatrix();
     invalidate();
     return () => {
@@ -194,7 +194,10 @@ export function AchievementsScene({
     const beltPresence = presence(beltProgress);
     const chessPresence = presence(chessProgress);
     const speakingPresence = presence(speakingProgress);
-    const centerX = portrait ? 0 : -2.3;
+    // The achievements renderer is physically clipped to the narrative pane.
+    // Keep every model centered in that local viewport rather than offsetting
+    // it inside the full browser width.
+    const centerX = 0;
 
     setGroupPresence(table.current, tablePresence, portrait ? 0.92 : 1.2);
     if (table.current) {
@@ -318,7 +321,7 @@ export function AchievementsScene({
         </group>
       </group>
 
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[portrait ? 0 : -2.3, -1.7, 0]}>
+      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.7, 0]}>
         <planeGeometry args={[8, 7]} />
         <meshStandardMaterial color="#0c0a09" roughness={0.92} metalness={0.02} />
       </mesh>
