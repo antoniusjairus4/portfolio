@@ -39,7 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">
         <Script
           id="document-scroll-contract"
-          src="/document-scroll-contract.js"
+          src="/document-scroll-contract.js?v=scroll-restoration-2"
           strategy="beforeInteractive"
         />
         <ExperienceEnvironmentProvider>

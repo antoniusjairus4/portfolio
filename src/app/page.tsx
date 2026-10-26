@@ -14,6 +14,12 @@ import { PalindromeNeuroShieldBridge } from '@/components/transitions/Palindrome
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
+declare global {
+  interface Window {
+    __portfolioInitialScrollY?: number;
+  }
+}
+
 export default function Home() {
   const { refresh } = useLenis();
   const [criticalReady, setCriticalReady] = useState(false);
@@ -33,20 +39,24 @@ export default function Home() {
                 return;
               }
 
-              const navigation = performance.getEntriesByType(
-                'navigation',
-              )[0] as PerformanceNavigationTiming;
-              const state = history.state as { __portfolioScrollY?: unknown } | null;
-              if (navigation?.type === 'reload' || navigation?.type === 'navigate') {
-                window.scrollTo({ top: 0, behavior: 'instant' });
-                return;
-              }
-              if (
-                navigation?.type === 'back_forward' &&
-                typeof state?.__portfolioScrollY === 'number'
-              ) {
-                window.scrollTo({ top: state.__portfolioScrollY, behavior: 'instant' });
-              }
+              const savedScrollY = window.__portfolioInitialScrollY;
+              const targetScrollY =
+                typeof savedScrollY === 'number' && Number.isFinite(savedScrollY)
+                  ? Math.max(0, savedScrollY)
+                  : 0;
+              const restorationStartedAt = performance.now();
+
+              const restoreScrollPosition = () => {
+                window.scrollTo({ top: targetScrollY, behavior: 'instant' });
+                refresh();
+
+                const waitingForLayout =
+                  Math.abs(window.scrollY - targetScrollY) > 1 &&
+                  performance.now() - restorationStartedAt < 1500;
+                if (waitingForLayout) requestAnimationFrame(restoreScrollPosition);
+              };
+
+              restoreScrollPosition();
             });
           });
         }}

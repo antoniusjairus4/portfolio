@@ -1,22 +1,27 @@
-history.scrollRestoration = 'auto';
+history.scrollRestoration = 'manual';
 
 (() => {
   const navigation = performance.getEntriesByType('navigation')[0];
-  const isHistoryTraversal = navigation && navigation.type === 'back_forward';
+  const shouldRestore =
+    navigation && (navigation.type === 'reload' || navigation.type === 'back_forward');
   const hasDirectTarget = window.location.hash.length > 1;
+  const storageKey = `portfolio-scroll:${window.location.pathname}${window.location.search}`;
+  const historyScrollY = history.state?.__portfolioScrollY;
+  const storedScrollY = Number(sessionStorage.getItem(storageKey));
+  const savedScrollY =
+    typeof historyScrollY === 'number' && Number.isFinite(historyScrollY)
+      ? historyScrollY
+      : Number.isFinite(storedScrollY)
+        ? storedScrollY
+        : 0;
 
-  if (!isHistoryTraversal && !hasDirectTarget) {
-    window.scrollTo(0, 0);
-    window.addEventListener(
-      'pageshow',
-      (event) => {
-        if (!event.persisted) window.scrollTo(0, 0);
-      },
-      { once: true },
-    );
-  }
+  window.__portfolioInitialScrollY = !hasDirectTarget && shouldRestore ? savedScrollY : 0;
 
-  window.addEventListener('pagehide', () => {
+  const saveScrollPosition = () => {
+    sessionStorage.setItem(storageKey, String(window.scrollY));
     history.replaceState({ ...history.state, __portfolioScrollY: window.scrollY }, '');
-  });
+  };
+
+  window.addEventListener('pagehide', saveScrollPosition);
+  window.addEventListener('beforeunload', saveScrollPosition);
 })();
