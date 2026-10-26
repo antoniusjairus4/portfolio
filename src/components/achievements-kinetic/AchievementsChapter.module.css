@@ -372,12 +372,12 @@
 }
 
 .karate .stage {
-  background: #e5dac7;
-  color: #11100f;
+  background: linear-gradient(135deg, #e0d4c1 0%, #cbbba3 50%, #a58f73 100%);
+  color: #15120f;
 }
 
 .karate .meta {
-  color: #655d53;
+  color: #15120f;
 }
 
 .karateDivisions {
@@ -390,7 +390,7 @@
 }
 
 .karateDivisions i {
-  border-right: 1px solid rgba(17, 16, 15, 0.13);
+  border-right: 1px solid rgba(21, 18, 15, 0.16);
   transform: scaleY(var(--karate-lock, 0));
   transform-origin: top;
 }
@@ -518,7 +518,7 @@
   z-index: 2;
   height: clamp(0.35rem, 0.6vw, 0.65rem);
   content: "";
-  background: #8b1e2d;
+  background: #7e1f2c;
   transform: scaleX(var(--karate-impact, 0));
 }
 
@@ -533,7 +533,7 @@
 }
 
 .karateStatement > p {
-  color: #6a6258;
+  color: #15120f;
 }
 
 .karateStatement h3 {
@@ -1709,14 +1709,14 @@
 }
 
 .chapter.webgl .karate .stage {
-  color: #e5dac7;
+  color: #15120f;
 }
 
 .chapter.webgl .karate .meta,
 .chapter.webgl .karateStatement > p {
-  color: #968b7b;
+  color: #15120f;
 }
 
 .chapter.webgl .karateDivisions i {
-  border-color: rgba(229, 218, 199, 0.13);
+  border-color: rgba(21, 18, 15, 0.16);
 }

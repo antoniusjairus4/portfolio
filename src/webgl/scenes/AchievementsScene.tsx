@@ -2,7 +2,7 @@
 
 import { useGLTF } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { useEffect, useMemo, useRef } from 'react';
+import { type RefObject, useEffect, useMemo, useRef } from 'react';
 import {
   Color,
   type Group,
@@ -12,6 +12,7 @@ import {
   MeshStandardMaterial,
   type Object3D,
   type PerspectiveCamera,
+  type ShaderMaterial,
   type SpotLight,
 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
@@ -143,6 +144,55 @@ function ChessBoard() {
   );
 }
 
+function KarateBackdrop({ materialRef }: { materialRef: RefObject<ShaderMaterial | null> }) {
+  const uniforms = useMemo(
+    () => ({
+      uOpacity: { value: 0 },
+      uTopLeft: { value: new Color('#E0D4C1') },
+      uCenter: { value: new Color('#CBBBA3') },
+      uBottomRight: { value: new Color('#A58F73') },
+    }),
+    [],
+  );
+
+  return (
+    <mesh position={[0, 0, -5]} renderOrder={-100} frustumCulled={false}>
+      <planeGeometry args={[30, 20]} />
+      <shaderMaterial
+        ref={materialRef}
+        uniforms={uniforms}
+        transparent
+        depthTest
+        depthWrite={false}
+        vertexShader={`
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform float uOpacity;
+          uniform vec3 uTopLeft;
+          uniform vec3 uCenter;
+          uniform vec3 uBottomRight;
+          varying vec2 vUv;
+
+          void main() {
+            float diagonal = clamp((vUv.x + (1.0 - vUv.y)) * 0.5, 0.0, 1.0);
+            vec3 gradient = mix(uTopLeft, uBottomRight, smoothstep(0.0, 1.0, diagonal));
+            float centerWeight = 1.0 - smoothstep(0.0, 0.72, distance(vUv, vec2(0.5)));
+            gradient = mix(gradient, uCenter, centerWeight * 0.68);
+            gl_FragColor = vec4(gradient, uOpacity);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
 export function AchievementsScene({
   controller,
   portrait,
@@ -159,6 +209,8 @@ export function AchievementsScene({
   const beltLight = useRef<SpotLight>(null);
   const chessLight = useRef<SpotLight>(null);
   const speakingLight = useRef<SpotLight>(null);
+  const karateBackdrop = useRef<ShaderMaterial>(null);
+  const floorMaterial = useRef<MeshStandardMaterial>(null);
 
   useEffect(() => {
     const perspective = camera as PerspectiveCamera;
@@ -238,10 +290,13 @@ export function AchievementsScene({
     if (beltLight.current) beltLight.current.intensity = beltPresence * 44;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 50;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 58;
+    if (karateBackdrop.current) karateBackdrop.current.uniforms.uOpacity.value = beltPresence;
+    if (floorMaterial.current) floorMaterial.current.opacity = 1 - beltPresence;
   });
 
   return (
     <>
+      <KarateBackdrop materialRef={karateBackdrop} />
       <fog attach="fog" args={['#0b0908', 8, 24]} />
       <ambientLight color="#8d8477" intensity={0.42} />
       <hemisphereLight args={['#b9c6cb', '#120e0b', 0.72]} />
@@ -323,7 +378,14 @@ export function AchievementsScene({
 
       <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.7, 0]}>
         <planeGeometry args={[8, 7]} />
-        <meshStandardMaterial color="#0c0a09" roughness={0.92} metalness={0.02} />
+        <meshStandardMaterial
+          ref={floorMaterial}
+          color="#0c0a09"
+          roughness={0.92}
+          metalness={0.02}
+          transparent
+          depthWrite={false}
+        />
       </mesh>
     </>
   );
