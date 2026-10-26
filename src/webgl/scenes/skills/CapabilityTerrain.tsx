@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo } from 'react';
-import { DoubleSide, PlaneGeometry } from 'three';
+import { PlaneGeometry } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 import { CapabilityFluxFloor } from './CapabilityFluxFloor';
 
@@ -16,9 +16,11 @@ function terrainHeight(x: number, z: number) {
 export function CapabilityTerrain({
   portrait,
   controller,
+  placements,
 }: {
   portrait: boolean;
   controller: ChapterProgressController;
+  placements: readonly { x: number; z: number }[];
 }) {
   const geometry = useMemo(() => {
     const plane = new PlaneGeometry(portrait ? 30 : 66, 172, portrait ? 16 : 32, 86);
@@ -41,21 +43,12 @@ export function CapabilityTerrain({
 
   return (
     <group name="capability-terrain">
-      <mesh
-        position={[0, -2.72, -62]}
-        rotation={[-Math.PI / 2, 0, 0]}
+      <CapabilityFluxFloor
+        controller={controller}
+        portrait={portrait}
         geometry={geometry}
-        receiveShadow
-      >
-        <meshStandardMaterial
-          color="#1b2831"
-          roughness={1}
-          metalness={0.06}
-          side={DoubleSide}
-          flatShading
-        />
-      </mesh>
-      <CapabilityFluxFloor controller={controller} portrait={portrait} geometry={geometry} />
+        placements={placements}
+      />
     </group>
   );
 }

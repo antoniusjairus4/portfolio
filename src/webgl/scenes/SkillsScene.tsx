@@ -157,8 +157,7 @@ export function SkillsScene({
     while (from < SKILLS_STOPS.length - 2 && progress > SKILLS_STOPS[from + 1]) from += 1;
     const beforeFirst = progress < SKILLS_STOPS[0];
     const afterLast = progress > SKILLS_STOPS[SKILLS_STOPS.length - 1];
-    const local =
-      (progress - SKILLS_STOPS[from]) / (SKILLS_STOPS[from + 1] - SKILLS_STOPS[from]);
+    const local = (progress - SKILLS_STOPS[from]) / (SKILLS_STOPS[from + 1] - SKILLS_STOPS[from]);
     const travel = smooth((local - 0.1) / 0.8);
     eye.copy(poses[from].eye).lerp(poses[from + 1].eye, travel);
     look.copy(poses[from].look).lerp(poses[from + 1].look, travel);
@@ -176,8 +175,7 @@ export function SkillsScene({
     let activeIndex = 0;
     for (let index = 1; index < SKILLS_STOPS.length; index += 1) {
       if (
-        Math.abs(progress - SKILLS_STOPS[index]) <
-        Math.abs(progress - SKILLS_STOPS[activeIndex])
+        Math.abs(progress - SKILLS_STOPS[index]) < Math.abs(progress - SKILLS_STOPS[activeIndex])
       ) {
         activeIndex = index;
       }

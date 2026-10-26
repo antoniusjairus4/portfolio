@@ -2,24 +2,32 @@
 
 import { useFrame, useThree } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
-import { Color, type ShaderMaterial } from 'three';
+import { Color, type PlaneGeometry, type ShaderMaterial, Vector2 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
+import { SKILLS_STOPS } from './timeline';
 
 // The field and contour treatment come from the supplied React Bits FluxLines shader.
 // World-space UVs keep the animation attached to the 3D floor as the camera travels.
 const vertexShader = `
 varying vec2 vUv;
+varying vec3 vWorldPosition;
 void main() {
   vUv = uv;
+  vWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
 }`;
 
 const fragmentShader = `
 precision highp float;
 varying vec2 vUv;
+varying vec3 vWorldPosition;
 uniform float uTime;
 uniform float uWorldWidth;
 uniform float uOpacity;
+uniform float uCameraZ;
+uniform vec2 uCards[6];
+uniform vec2 uActiveCard;
+uniform float uActiveWeight;
 uniform vec3 uColorA;
 uniform vec3 uColorB;
 uniform vec3 uColorC;
@@ -81,19 +89,45 @@ void main() {
   float h = clamp(0.5 + (peaks - peaks2) * 0.8, 0.0, 1.0);
   vec3 tint = mix(uColorA, uColorB, smoothstep(0.1, 0.72, h));
   tint = mix(tint, uColorC, smoothstep(0.58, 0.95, h) * 0.36);
-  float distanceFade = 1.0 - 0.72 * smoothstep(0.64, 1.0, vUv.y);
-  float alpha = clamp(energy * uOpacity * distanceFade, 0.0, 0.68);
-  gl_FragColor = vec4(tint, alpha);
+  float viewDepth = uCameraZ - vWorldPosition.z;
+  float nearFade = smoothstep(7.0, 26.0, viewDepth);
+  float farFade = 1.0 - smoothstep(25.0, 55.0, viewDepth);
+  float lineStrength = energy * uOpacity * nearFade * farFade;
+
+  float floorLight = smoothstep(5.0, 27.0, viewDepth);
+  vec3 floorColor = mix(vec3(0.001, 0.002, 0.003), vec3(0.018, 0.026, 0.032), floorLight);
+  float haze = smoothstep(20.0, 56.0, viewDepth);
+  floorColor = mix(floorColor, vec3(0.004, 0.006, 0.009), haze * 0.78);
+
+  float contact = 0.0;
+  float grounding = 0.0;
+  for (int i = 0; i < 6; i++) {
+    vec2 offset = vWorldPosition.xz - uCards[i];
+    float footprint = pow(offset.x / 2.35, 2.0) + pow(offset.y / 1.15, 2.0);
+    contact = max(contact, exp(-footprint * 1.8));
+    grounding = max(grounding, exp(-footprint * 0.3));
+  }
+  floorColor += vec3(0.009, 0.011, 0.013) * grounding;
+  floorColor *= 1.0 - contact * 0.46;
+
+  vec2 activeOffset = vWorldPosition.xz - uActiveCard;
+  float reflection = exp(-1.4 * (pow(activeOffset.x / 3.8, 2.0) + pow(activeOffset.y / 2.2, 2.0)));
+  floorColor += vec3(0.008, 0.001, 0.002) * reflection * uActiveWeight;
+
+  float horizonFade = 1.0 - smoothstep(35.0, 65.0, viewDepth);
+  gl_FragColor = vec4(floorColor + tint * lineStrength, horizonFade);
 }`;
 
 export function CapabilityFluxFloor({
   controller,
   portrait,
   geometry,
+  placements,
 }: {
   controller: ChapterProgressController;
   portrait: boolean;
-  geometry: import('three').PlaneGeometry;
+  geometry: PlaneGeometry;
+  placements: readonly { x: number; z: number }[];
 }) {
   const materialRef = useRef<ShaderMaterial>(null);
   const { invalidate } = useThree();
@@ -101,27 +135,45 @@ export function CapabilityFluxFloor({
     () => ({
       uTime: { value: 0 },
       uWorldWidth: { value: portrait ? 30 : 66 },
-      uOpacity: { value: portrait ? 0.48 : 0.56 },
+      uOpacity: { value: portrait ? 0.29 : 0.34 },
+      uCameraZ: { value: 0 },
+      uCards: { value: placements.map((placement) => new Vector2(placement.x, placement.z)) },
+      uActiveCard: { value: new Vector2() },
+      uActiveWeight: { value: 0 },
       uColorA: { value: new Color('#8b3048') },
       uColorB: { value: new Color('#b04d64') },
       uColorC: { value: new Color('#8ca5ad') },
     }),
-    [portrait],
+    [portrait, placements],
   );
 
-  useFrame((_, delta) => {
-    if (controller.progress.current < 0.28 || !materialRef.current) return;
-    materialRef.current.uniforms.uTime.value += Math.min(delta, 0.05);
+  useFrame(({ camera }, delta) => {
+    const progress = controller.progress.current;
+    uniforms.uCameraZ.value = camera.position.z;
+    let activeIndex = 0;
+    for (let index = 1; index < SKILLS_STOPS.length; index += 1) {
+      if (
+        Math.abs(progress - SKILLS_STOPS[index]) < Math.abs(progress - SKILLS_STOPS[activeIndex])
+      ) {
+        activeIndex = index;
+      }
+    }
+    uniforms.uActiveCard.value.copy(uniforms.uCards.value[activeIndex]);
+    const distance = Math.abs(progress - SKILLS_STOPS[activeIndex]);
+    const focus = Math.max(0, 1 - distance / 0.085);
+    uniforms.uActiveWeight.value = focus * focus * (3 - 2 * focus);
+    if (progress < SKILLS_STOPS[0] || !materialRef.current) return;
+    uniforms.uTime.value += Math.min(delta, 0.05);
     invalidate();
   });
 
   return (
     <mesh
       name="capability-flux-lines-floor"
-      position={[0, -2.705, -62]}
+      position={[0, -2.72, -62]}
       rotation={[-Math.PI / 2, 0, 0]}
       geometry={geometry}
-      renderOrder={2}
+      receiveShadow
     >
       <shaderMaterial
         ref={materialRef}
@@ -130,8 +182,6 @@ export function CapabilityFluxFloor({
         uniforms={uniforms}
         transparent
         depthWrite={false}
-        polygonOffset
-        polygonOffsetFactor={-1}
       />
     </mesh>
   );
