@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BounceSkillsCards } from '@/components/skills/BounceSkillsCards';
+import ParticleText from '@/components/skills/ParticleText';
 import { SkillsFallback } from '@/components/skills/SkillsFallback';
 import { skillCategories } from '@/content/skills';
 import {
@@ -19,22 +20,14 @@ function smooth(value: number) {
   return t * t * (3 - 2 * t);
 }
 
-const TITLE_LETTERS = [
-  { id: 'first-s', letter: 'S' },
-  { id: 'k', letter: 'K' },
-  { id: 'i', letter: 'I' },
-  { id: 'first-l', letter: 'L' },
-  { id: 'second-l', letter: 'L' },
-  { id: 'last-s', letter: 'S' },
-] as const;
-
 export function SkillsChapter() {
   const sectionRef = useRef<HTMLElement>(null);
-  const titleLetters = useRef<(HTMLSpanElement | null)[]>([]);
+  const introWordRef = useRef<HTMLDivElement>(null);
   const ownsEtherRef = useRef(false);
   const [controller, setController] = useState<ChapterProgressController | null>(null);
   const [rendererReleased, setRendererReleased] = useState(false);
   const [cardsVisible, setCardsVisible] = useState(false);
+  const [titleInView, setTitleInView] = useState(false);
   const { ready, reducedMotion, portrait, quality, dprCap, finePointer } =
     useExperienceEnvironment();
   const { setMode: setGlobalEtherMode } = useGlobalEther();
@@ -89,13 +82,6 @@ export function SkillsChapter() {
           (opening * (1 - departure)).toFixed(4),
         );
         section.style.setProperty('--skills-intro-rule-scale', opening.toFixed(4));
-        titleLetters.current.forEach((letter, index) => {
-          if (!letter) return;
-          const arrive = smooth((progress + 0.04 - index * 0.003) / 0.055);
-          const leave = smooth((progress - 0.145 - index * 0.002) / 0.09);
-          letter.style.opacity = (arrive * (1 - leave)).toFixed(4);
-          letter.style.transform = `translate3d(${((index - 2.5) * leave * 18).toFixed(1)}px, ${((1 - arrive) * (58 + (index % 2) * 18) - leave * 88).toFixed(1)}px, ${((1 - arrive) * -95 + leave * 120).toFixed(1)}px) rotateX(${((1 - arrive) * 26 - leave * 12).toFixed(1)}deg)`;
-        });
       }
       setCardsVisible((current) => {
         const visible = progress >= 0.27 && progress < 0.999;
@@ -114,6 +100,16 @@ export function SkillsChapter() {
       setController(null);
     };
   }, []);
+
+  useEffect(() => {
+    const title = introWordRef.current;
+    if (!title || staticExperience) return;
+    const observer = new IntersectionObserver(([entry]) => setTitleInView(entry.isIntersecting), {
+      threshold: 0.2,
+    });
+    observer.observe(title);
+    return () => observer.disconnect();
+  }, [staticExperience]);
 
   useEffect(() => {
     if (activity !== 'inactive') {
@@ -175,18 +171,30 @@ export function SkillsChapter() {
                   <span>04 / CAPABILITY LANDSCAPE</span>
                   <span>ANTONIUS JAIRUS</span>
                 </div>
-                <div className="skills-intro-word" role="presentation">
-                  {TITLE_LETTERS.map(({ id, letter }, index) => (
-                    <span
-                      key={id}
-                      ref={(node) => {
-                        titleLetters.current[index] = node;
-                      }}
-                      className="skills-intro-letter"
-                    >
-                      {letter}
-                    </span>
-                  ))}
+                <div ref={introWordRef} className="skills-intro-word" role="presentation">
+                  {titleInView && (
+                    <ParticleText
+                      text="SKILLS"
+                      className="skills-particle-title"
+                      color="#f0eee7"
+                      highlightColor="#d7a1aa"
+                      highlightMode="motion"
+                      intro="gather"
+                      gatherDuration={1000}
+                      stagger={130}
+                      scatter={130}
+                      particleSize={2.3}
+                      density={4}
+                      trigger="mount"
+                      clickBurst={false}
+                      pointerRepel={0}
+                      idleDrift={0}
+                      glow={false}
+                      fontSize="clamp(4.6rem, 16.3vw, 17rem)"
+                      fontWeight={600}
+                      fontFamily="'Clash Display', system-ui, sans-serif"
+                    />
+                  )}
                 </div>
                 <div className="skills-intro-rule" />
                 <p>Different disciplines. One connected system.</p>
