@@ -62,17 +62,26 @@ export function SkillsChapter() {
         '--skills-entry-opacity',
         Math.max(0, 0.28 - progress * 8).toFixed(4),
       );
-      section?.style.setProperty(
-        '--skills-exit-opacity',
-        Math.max(0, Math.min(1, (progress - 0.982) * 55)).toFixed(4),
-      );
       if (section) {
         const opening = smooth((progress + 0.04) / 0.065);
         const departure = smooth((progress - 0.15) / 0.1);
+
+        // Smooth card stage entrance and graceful upward scroll departure
+        const cardIn = smooth((progress - 0.27) / 0.06);
+        const cardOut = 1 - smooth((progress - 0.78) / 0.16);
+        const cardStageOpacity = cardIn * cardOut;
+        const cardStageY = (1 - cardOut) * -70;
+
         section.style.setProperty(
           '--skills-card-stage-opacity',
-          smooth((progress - 0.27) / 0.06).toFixed(4),
+          cardStageOpacity.toFixed(4),
         );
+        section.style.setProperty('--skills-card-stage-y', `${cardStageY.toFixed(1)}px`);
+        section.style.setProperty(
+          '--skills-card-pointer',
+          cardStageOpacity > 0.05 ? 'auto' : 'none',
+        );
+
         section.style.setProperty(
           '--skills-stage-opacity',
           (1 - smooth((progress - 0.18) / 0.1)).toFixed(4),
@@ -82,13 +91,24 @@ export function SkillsChapter() {
           (opening * (1 - departure)).toFixed(4),
         );
         section.style.setProperty('--skills-intro-rule-scale', opening.toFixed(4));
+
+        // Fade out chapter mark and explore cue smoothly
+        const cueOpacity = 1 - smooth((progress - 0.78) / 0.14);
+        section.style.setProperty('--skills-cue-opacity', cueOpacity.toFixed(4));
+
+        // Smoothly dissolve liquid chrome backdrop into #0b0908 for seamless merge into achievements
+        const chromeFade = 1 - smooth((progress - 0.80) / 0.16);
+        document.documentElement.style.setProperty(
+          '--skills-chrome-fade',
+          chromeFade.toFixed(4),
+        );
       }
       setCardsVisible((current) => {
-        const visible = progress >= 0.27 && progress < 0.999;
+        const visible = progress >= 0.24 && progress <= 1.05;
         return current === visible ? current : visible;
       });
       setRendererReleased((current) => {
-        const release = progress >= 0.999;
+        const release = progress >= 1.05;
         return current === release ? current : release;
       });
     };
@@ -98,6 +118,7 @@ export function SkillsChapter() {
       unsubscribe();
       next.dispose();
       setController(null);
+      document.documentElement.style.removeProperty('--skills-chrome-fade');
     };
   }, []);
 

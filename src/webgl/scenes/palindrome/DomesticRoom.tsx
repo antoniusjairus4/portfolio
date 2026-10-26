@@ -293,6 +293,11 @@ export function DomesticRoom({
               color={ROOM_PALETTE.floor}
               finish="stone"
             />
+            <Block
+              position={[0, -0.3, -0.1]}
+              size={[9.05, 0.25, 7.45]}
+              color="#070707"
+            />
             {BACK_WALL_BOXES.map(([position, size]) => (
               <GradientWall
                 key={position.join(':')}

@@ -1,14 +1,15 @@
 /* LiquidChrome remains the backdrop for the Skills title and card fan. */
 .project-experience-layer[data-project-scene="skills"] {
-  background: #05070b;
+  background: #0b0908;
 }
 
 .project-experience-layer[data-project-scene="skills"] .skills-liquid-chrome {
   position: absolute;
   inset: 0;
   z-index: 0;
-  opacity: 0.88;
+  opacity: calc(0.88 * var(--skills-chrome-fade, 1));
   pointer-events: none;
+  transition: opacity 0.15s ease-out;
 }
 
 .skills-chapter.capability-landscape {
@@ -23,13 +24,11 @@
 }
 
 .capability-landscape .skills-sticky::after {
-  z-index: 7;
-  background: #090b0e;
-  opacity: var(--skills-exit-opacity, 0);
+  display: none;
 }
 
 .capability-landscape .skills-render-placeholder {
-  background: #090b0e;
+  background: #0b0908;
 }
 
 .capability-semantic {
@@ -49,7 +48,8 @@
   display: grid;
   place-items: center;
   opacity: var(--skills-card-stage-opacity, 0);
-  pointer-events: auto;
+  transform: translateY(var(--skills-card-stage-y, 0px));
+  pointer-events: var(--skills-card-pointer, auto);
 }
 
 .skills-intro-stage {
@@ -163,6 +163,8 @@
   letter-spacing: 0.2em;
   line-height: 1.5;
   pointer-events: none;
+  opacity: var(--skills-cue-opacity, 1);
+  transition: opacity 0.15s ease-out;
 }
 
 .capability-chapter-mark {

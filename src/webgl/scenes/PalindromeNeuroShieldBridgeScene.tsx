@@ -3,9 +3,11 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { Suspense, useMemo, useRef } from 'react';
 import {
+  type AmbientLight,
   Color,
   type DirectionalLight,
   type Group,
+  type HemisphereLight,
   MathUtils,
   type PerspectiveCamera,
   type PointLight,
@@ -33,10 +35,14 @@ export function PalindromeNeuroShieldBridgeScene({
   const brainAnchor = useRef<Group>(null);
 
   // Palindrome lights
+  const palAmbient = useRef<AmbientLight>(null);
+  const palHemi = useRef<HemisphereLight>(null);
   const reflectedFill = useRef<PointLight>(null);
   const palindromeKey = useRef<DirectionalLight>(null);
 
   // NeuroShield lights
+  const neuroAmbient = useRef<AmbientLight>(null);
+  const neuroHemi = useRef<HemisphereLight>(null);
   const neuroKey1 = useRef<DirectionalLight>(null);
   const neuroKey2 = useRef<DirectionalLight>(null);
 
@@ -57,7 +63,6 @@ export function PalindromeNeuroShieldBridgeScene({
   const bgColor = useMemo(() => new Color(ROOM_PALETTE.ink), []);
 
   const targetScale = portrait ? 0.8 : 0.94;
-
   const heldProgress = useRef(1);
 
   useFrame(() => {
@@ -80,37 +85,42 @@ export function PalindromeNeuroShieldBridgeScene({
     currentTarget.lerpVectors(startTarget, endTarget, ease);
     camera.lookAt(currentTarget);
 
-    // Palindrome room moves back/up and recedes ("it is getting back")
+    // Palindrome room recedes back into depth and dissolves early without lifting into the sky
     if (palindromeGroup.current) {
-      const roomScrollUp = ease * (portrait ? 4.2 : 4.6);
-      const roomRecedeZ = ease * -4.0;
-      palindromeGroup.current.position.set(0, roomScrollUp, roomRecedeZ);
-      palindromeGroup.current.visible = p < 0.98;
+      const roomRecedeZ = ease * -6.0;
+      palindromeGroup.current.position.set(0, 0, roomRecedeZ);
+      // Cleanly hide the room early so its underside is never viewed from below
+      palindromeGroup.current.visible = p < 0.32;
     }
 
-    // Light fading
-    const palLightFade = Math.max(0, 1 - p * 1.25);
+    // Palindrome light fading (complete by p = 0.3)
+    const palLightFade = Math.max(0, 1 - p / 0.28);
+    if (palAmbient.current) palAmbient.current.intensity = 0.33 * palLightFade;
+    if (palHemi.current) palHemi.current.intensity = 0.67 * palLightFade;
     if (palindromeKey.current) palindromeKey.current.intensity = 1.7 * palLightFade;
     if (reflectedFill.current) reflectedFill.current.intensity = 1.45 * palLightFade;
 
-    const neuroLightFade = smoothstep(0.12, 0.88, p);
+    // NeuroShield light fading (fades in as brain arrives)
+    const neuroLightFade = smoothstep(0.15, 0.85, p);
+    if (neuroAmbient.current) neuroAmbient.current.intensity = 0.72 * neuroLightFade;
+    if (neuroHemi.current) neuroHemi.current.intensity = 1.1 * neuroLightFade;
     if (neuroKey1.current) neuroKey1.current.intensity = 2.0 * neuroLightFade;
     if (neuroKey2.current) neuroKey2.current.intensity = 1.25 * neuroLightFade;
 
-    // Brain entrance ("while it is coming the brain must come too by doing a 360 degree rotation")
+    // Brain entrance & 360-degree rotation
     if (brainAnchor.current) {
-      // Moves up from below (-5.4 to 0) into the center like a normal scroll down
-      const brainY = (1 - ease) * (portrait ? -6.2 : -5.4);
+      // Moves up from below into the center like a normal scroll down
+      const brainY = (1 - ease) * (portrait ? -5.8 : -4.8);
       brainAnchor.current.position.set(0, brainY, 0);
 
       // Full 360 degree rotation (from -2*PI to 0)
       brainAnchor.current.rotation.y = (1 - ease) * -Math.PI * 2;
 
-      // Scale from slightly smaller to full scale
+      // Scale smoothly up to target scale
       const currentScale = targetScale * MathUtils.lerp(0.75, 1.0, ease);
       brainAnchor.current.scale.setScalar(currentScale);
 
-      brainAnchor.current.visible = p > 0.01;
+      brainAnchor.current.visible = p > 0.02;
     }
 
     // Background color smoothly shifts from Palindrome ink (#0b0908) to NeuroShield black (#000000)
@@ -123,10 +133,10 @@ export function PalindromeNeuroShieldBridgeScene({
     <>
       <color attach="background" args={[ROOM_PALETTE.ink]} />
 
-      {/* Palindrome Scene (outgoing) */}
+      {/* Palindrome Scene (outgoing - recedes and dissolves cleanly) */}
       <group ref={palindromeGroup}>
-        <ambientLight intensity={0.33} color="#F3F0E9" />
-        <hemisphereLight args={['#E5EBE7', '#686E64', 0.67]} />
+        <ambientLight ref={palAmbient} intensity={0.33} color="#F3F0E9" />
+        <hemisphereLight ref={palHemi} args={['#E5EBE7', '#686E64', 0.67]} />
         <directionalLight
           ref={palindromeKey}
           position={[-3.8, 4.2, 1.5]}
@@ -145,11 +155,11 @@ export function PalindromeNeuroShieldBridgeScene({
         <InformationField progress={heldProgress} portrait={portrait} />
       </group>
 
-      {/* NeuroShield Lights (incoming) */}
-      <ambientLight intensity={0.72} color="#dce3e0" />
-      <hemisphereLight args={['#edf0ea', '#465058', 1.1]} />
-      <directionalLight ref={neuroKey1} position={[-4, 5, 6]} intensity={2.0} color="#f8f3e9" />
-      <directionalLight ref={neuroKey2} position={[3, 2, -4]} intensity={1.25} color="#a5b9c3" />
+      {/* NeuroShield Lights (incoming - illuminating the brain) */}
+      <ambientLight ref={neuroAmbient} intensity={0} color="#dce3e0" />
+      <hemisphereLight ref={neuroHemi} args={['#edf0ea', '#465058', 0]} />
+      <directionalLight ref={neuroKey1} position={[-4, 5, 6]} intensity={0} color="#f8f3e9" />
+      <directionalLight ref={neuroKey2} position={[3, 2, -4]} intensity={0} color="#a5b9c3" />
 
       {/* Brain Model (incoming with 360 degree rotation) */}
       <group ref={brainAnchor}>
