@@ -48,7 +48,11 @@ export function ExperienceCanvas({
       dpr={[1, dprCap]}
       camera={{ fov: portrait ? 46 : 39, near: 0.1, far: 50 }}
       gl={{ antialias: true, alpha: isSkillsScene, powerPreference: 'high-performance' }}
-      style={isSkillsScene ? { position: 'relative', zIndex: 1 } : undefined}
+      style={
+        isSkillsScene
+          ? { position: 'relative', zIndex: 1, opacity: 'var(--skills-scene-reveal, 0)' }
+          : undefined
+      }
       shadows={
         portrait
           ? false

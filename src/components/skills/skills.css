@@ -1,16 +1,13 @@
 /* The visible cards are physical meshes in the shared 3D scene. */
 .project-experience-layer[data-project-scene="skills"] {
-  background:
-    radial-gradient(ellipse 62% 36% at 50% 57%, rgba(16, 38, 52, 0.7), transparent 76%),
-    linear-gradient(180deg, #030507 0%, #07111a 38%, #0b1822 62%, #05090d 100%);
+  background: #05070b;
 }
 
-.project-experience-layer[data-project-scene="skills"]::before {
+.project-experience-layer[data-project-scene="skills"] .skills-liquid-chrome {
   position: absolute;
   inset: 0;
   z-index: 0;
-  content: "";
-  background: radial-gradient(ellipse 56% 9% at 50% 62%, rgba(45, 78, 99, 0.18), transparent 78%);
+  opacity: 0.88;
   pointer-events: none;
 }
 
@@ -52,9 +49,7 @@
   display: grid;
   place-items: center;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 58% 48% at 50% 48%, rgba(31, 62, 79, 0.49), transparent 78%),
-    linear-gradient(180deg, #030608 0%, #07131b 59%, #03070a 100%);
+  background: transparent;
   opacity: var(--skills-stage-opacity, 1);
   pointer-events: none;
   will-change: opacity;
@@ -188,7 +183,7 @@
 .skills-chapter.capability-landscape.skills-static {
   height: auto;
   min-height: 100svh;
-  background: #090b0e;
+  background: radial-gradient(ellipse at 50% 38%, rgba(91, 23, 43, 0.22), transparent 62%), #090b0e;
   pointer-events: auto;
 }
 
@@ -196,7 +191,7 @@
   position: relative;
   height: auto;
   overflow: visible;
-  background: radial-gradient(ellipse at 50% 36%, rgba(39, 58, 67, 0.34), transparent 58%), #090b0e;
+  background: radial-gradient(ellipse at 50% 36%, rgba(86, 26, 44, 0.32), transparent 58%), #090b0e;
 }
 
 .capability-landscape.skills-static .skills-sticky::after {

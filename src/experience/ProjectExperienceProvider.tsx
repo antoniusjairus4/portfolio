@@ -26,6 +26,9 @@ const ExperienceCanvas = dynamic(
   () => import('@/experience/ExperienceCanvas').then((module) => module.ExperienceCanvas),
   { ssr: false },
 );
+const SkillsLiquidChrome = dynamic(() => import('@/components/backgrounds/LiquidChrome'), {
+  ssr: false,
+});
 
 export type ProjectSceneKey =
   | 'kaiforge'
@@ -75,6 +78,7 @@ export function ProjectExperienceProvider({
   const [assetManager, setAssetManager] = useState<AssetLifecycleManager | null>(null);
   const assetManagerRef = useRef<AssetLifecycleManager | null>(null);
   const frameRef = useRef(0);
+  const experienceLayerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!environment.ready || assetManagerRef.current) return;
@@ -275,6 +279,18 @@ export function ProjectExperienceProvider({
   ]);
 
   const activeRegistration = activeKey ? registrations[activeKey] : null;
+  useEffect(() => {
+    const skills = registrations.skills;
+    if (activeKey !== 'skills' || !skills) return;
+    const updateReveal = () => {
+      const value = Math.max(0, Math.min(1, (skills.controller.progress.current - 0.28) / 0.05));
+      const eased = value * value * (3 - 2 * value);
+      experienceLayerRef.current?.style.setProperty('--skills-scene-reveal', eased.toFixed(4));
+    };
+    updateReveal();
+    return skills.controller.subscribe(updateReveal);
+  }, [activeKey, registrations.skills]);
+
   const contextValue = useMemo(
     () => ({ registerScene, assetManager }),
     [assetManager, registerScene],
@@ -285,10 +301,30 @@ export function ProjectExperienceProvider({
       <div className="project-experience-root">
         {activeKey && activeRegistration?.enabled && (
           <div
+            ref={experienceLayerRef}
             className="project-experience-layer"
             data-project-scene={activeKey}
             aria-hidden="true"
           >
+            {activeKey === 'skills' && (
+              <SkillsLiquidChrome
+                className="skills-liquid-chrome"
+                color="#A51F38"
+                speed={0.11}
+                amplitude={0.24}
+                frequencyX={2.4}
+                frequencyY={2.7}
+                detail={3}
+                thickness={1.35}
+                depth={0.85}
+                roughness={0.48}
+                exposure={0.8}
+                rippleStrength={0.6}
+                rippleSize={1.1}
+                tilt={0.4}
+                maxDevicePixelRatio={1}
+              />
+            )}
             <ExperienceCanvas
               scene={activeKey}
               controller={activeRegistration.controller}
