@@ -166,8 +166,9 @@ body {
 }
 
 .hero-portrait-reveal {
-  /* Full portrait opens the story and retires before the name, never over KaiForge. */
-  opacity: var(--hero-portrait-opacity, 1);
+  /* Full portrait retired from initial hero cover so Antonius Jairus is the starting screen. */
+  display: none;
+  opacity: var(--hero-portrait-opacity, 0);
 }
 
 .hero-depth-curtain {
@@ -287,7 +288,7 @@ body {
   height: 1px;
   pointer-events: none;
   background: var(--hero-crimson);
-  opacity: calc(var(--hero-identity-opacity, 0) * clamp(0, 1 - var(--hero-opening) * 3, 1));
+  opacity: calc(var(--hero-identity-opacity, 1) * clamp(0, 1 - var(--hero-opening) * 3, 1));
   transform: translate3d(0, calc(var(--hero-opening) * 18vh), 0);
 }
 
@@ -344,7 +345,7 @@ body {
   perspective: 1400px;
   perspective-origin: 50% 50%;
   mix-blend-mode: difference;
-  opacity: var(--hero-identity-opacity, 0);
+  opacity: var(--hero-identity-opacity, 1);
 }
 
 .hero-editorial-copy-inner,

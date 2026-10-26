@@ -119,10 +119,9 @@ export const PhotoCoverSplit: React.FC = () => {
       );
       container.style.setProperty('--hero-progress', progress.toFixed(4));
       container.style.setProperty('--hero-opening', openingProgress.toFixed(4));
-      // Portrait first, then the complete identity, then the existing KaiForge
-      // rupture. The portrait is fully retired before readable type appears.
-      const portraitOpacity = reducedMotion ? 0 : 1 - ease((progress - 0.04) / 0.14);
-      const identityOpacity = reducedMotion ? 1 : ease((progress - 0.18) / 0.06);
+      // Antonius Jairus identity is the initial starting screen after the bouncing ball loader.
+      const portraitOpacity = 0;
+      const identityOpacity = 1;
       container.style.setProperty('--hero-portrait-opacity', portraitOpacity.toFixed(4));
       container.style.setProperty('--hero-identity-opacity', identityOpacity.toFixed(4));
       container.style.setProperty('--hero-accent-feed',
@@ -367,7 +366,8 @@ export const PhotoCoverSplit: React.FC = () => {
       <span className="hero-role-accent" aria-hidden="true" />
 
       <div
-        className="hero-portrait-reveal pointer-events-none absolute inset-0 z-[5] h-full w-full overflow-hidden"
+        aria-hidden="true"
+        className="hero-portrait-reveal pointer-events-none absolute inset-0 z-[5] hidden h-full w-full overflow-hidden"
       >
         <picture>
           <source
