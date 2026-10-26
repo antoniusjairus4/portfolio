@@ -78,13 +78,17 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   }
 
   if (panel === 'table-tennis') {
-    const travel = smoothstep(rangeProgress(value, 0.06, 0.52));
+    const table = smoothstep(rangeProgress(value, 0.02, 0.24));
+    const travel = smoothstep(rangeProgress(value, 0.12, 0.6));
     return {
       '--achievement-exit': exit,
       '--tt-title': 0.58 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.42,
-      '--tt-ball-x': -46 + travel * 92,
-      '--tt-ball-y': Math.sin(travel * Math.PI * 3) * -12,
-      '--tt-rule-turn': travel * -6,
+      '--tt-table': table,
+      '--tt-ball-x': -42 + travel * 84,
+      '--tt-ball-y': Math.sin(travel * Math.PI) * -22,
+      '--tt-ball-spin': travel * 900,
+      '--tt-rule-turn': -4 + travel * 8,
+      '--tt-trail': travel,
       '--tt-impact': pulse(value, 0.39, 0.45, 0.53),
       '--tt-resolve': 0.1 + smoothstep(rangeProgress(value, 0.39, 0.58)) * 0.9,
     };
@@ -96,6 +100,8 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
       '--achievement-exit': exit,
       '--karate-lock': lock,
       '--karate-title': 0.16 + smoothstep(rangeProgress(value, 0.05, 0.25)) * 0.84,
+      '--karate-belt': smoothstep(rangeProgress(value, 0.03, 0.38)),
+      '--karate-belt-settle': smoothstep(rangeProgress(value, 0.3, 0.58)),
       '--karate-impact': pulse(value, 0.27, 0.34, 0.43),
       '--karate-words': smoothstep(rangeProgress(value, 0.39, 0.66)),
     };
@@ -106,6 +112,8 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
       '--achievement-exit': exit,
       '--chess-grid': smoothstep(rangeProgress(value, 0.03, 0.24)),
       '--chess-path': smoothstep(rangeProgress(value, 0.16, 0.54)),
+      '--chess-pieces': smoothstep(rangeProgress(value, 0.12, 0.48)),
+      '--chess-focus': smoothstep(rangeProgress(value, 0.42, 0.68)),
       '--chess-one': 0.12 + smoothstep(rangeProgress(value, 0.18, 0.35)) * 0.88,
       '--chess-two': smoothstep(rangeProgress(value, 0.34, 0.51)),
       '--chess-three': smoothstep(rangeProgress(value, 0.5, 0.67)),
@@ -117,6 +125,9 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     return {
       '--achievement-exit': exit,
       '--speaking-build': 0.14 + smoothstep(rangeProgress(value, 0.03, 0.23)) * 0.86,
+      '--speaking-stage': smoothstep(rangeProgress(value, 0.02, 0.28)),
+      '--speaking-mic': smoothstep(rangeProgress(value, 0.12, 0.42)),
+      '--speaking-speaker': smoothstep(rangeProgress(value, 0.24, 0.52)),
       '--speaking-audience': audience,
       '--speaking-scale': 0.72 + audience * 0.28,
       '--speaking-reach': smoothstep(rangeProgress(value, 0.54, 0.73)),

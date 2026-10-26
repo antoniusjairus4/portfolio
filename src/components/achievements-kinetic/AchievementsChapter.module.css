@@ -142,39 +142,100 @@
 
 .tableCourt {
   position: absolute;
-  inset: 13vh 4vw 9vh;
-  z-index: 0;
-  border: 1px solid rgba(229, 218, 199, 0.13);
-  opacity: calc((1 - var(--achievement-exit)) * 0.9);
-  transform: perspective(65rem) rotateX(62deg) translateY(21vh);
+  inset: 28vh 2vw 11vh;
+  z-index: 1;
+  perspective: 70rem;
+  opacity: calc(var(--tt-table, 0) * (1 - var(--achievement-exit)));
+  transform: translateY(calc((1 - var(--tt-table, 0)) * 16vh))
+    scale(calc(0.88 + var(--tt-table, 0) * 0.12));
+  transform-origin: center 65%;
+}
+
+.tableTop {
+  position: absolute;
+  top: 12%;
+  right: 5%;
+  left: 5%;
+  height: 54%;
+  overflow: visible;
+  border: 0.22rem solid rgba(227, 209, 178, 0.7);
+  border-radius: 0.45rem;
+  background:
+    linear-gradient(102deg, transparent 42%, rgba(255, 255, 255, 0.1) 50%, transparent 58%),
+    linear-gradient(180deg, #3b2930 0%, #21191d 58%, #120f11 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.08),
+    inset 0 1.8rem 4rem rgba(177, 128, 102, 0.11),
+    0 2.5rem 4.5rem rgba(0, 0, 0, 0.58),
+    0 0 2rem rgba(198, 166, 110, 0.1);
+  transform: rotateX(60deg);
   transform-origin: center bottom;
 }
 
-.tableCourt i {
+.tableCenterLine {
   position: absolute;
-  background: rgba(229, 218, 199, 0.18);
-}
-
-.tableCourt i:first-child {
   top: 50%;
   right: 0;
   left: 0;
   height: 1px;
+  background: rgba(242, 232, 213, 0.58);
 }
 
-.tableCourt i:nth-child(2) {
+.tableEdgeLine {
+  position: absolute;
   top: 0;
   bottom: 0;
   left: 50%;
   width: 1px;
+  background: rgba(242, 232, 213, 0.38);
 }
 
-.tableCourt i:last-child {
-  top: 48%;
-  right: -2vw;
-  left: -2vw;
-  height: 3px;
-  background: rgba(229, 218, 199, 0.56);
+.tableNet {
+  position: absolute;
+  top: 47%;
+  right: -2%;
+  left: -2%;
+  height: 20%;
+  border-top: 2px solid #eee3cf;
+  border-bottom: 1px solid rgba(238, 227, 207, 0.38);
+  background:
+    repeating-linear-gradient(90deg, rgba(238, 227, 207, 0.4) 0 1px, transparent 1px 0.5rem),
+    repeating-linear-gradient(0deg, rgba(238, 227, 207, 0.25) 0 1px, transparent 1px 0.38rem);
+  box-shadow: 0 -0.3rem 1.1rem rgba(242, 232, 213, 0.18);
+  transform: rotateX(-60deg) translateZ(0.35rem);
+  transform-origin: center top;
+}
+
+.tableLeg {
+  position: absolute;
+  top: 51%;
+  width: clamp(0.28rem, 0.45vw, 0.55rem);
+  height: 30%;
+  border-radius: 0 0 0.2rem 0.2rem;
+  background: linear-gradient(90deg, #171719, #665747 48%, #111113);
+  box-shadow: 0 1.5rem 2rem rgba(0, 0, 0, 0.55);
+}
+
+.tableLegNear {
+  left: 17%;
+  transform: rotate(7deg);
+}
+
+.tableLegFar {
+  right: 17%;
+  transform: rotate(-7deg);
+}
+
+.tableUnderlight {
+  position: absolute;
+  right: 13%;
+  bottom: 14%;
+  left: 13%;
+  height: 13%;
+  border-radius: 50%;
+  background: rgba(139, 30, 45, 0.16);
+  filter: blur(1.8rem);
+  transform: scaleX(calc(0.65 + var(--tt-table, 0) * 0.35));
 }
 
 .tableTitle {
@@ -210,24 +271,28 @@
 
 .tableTrajectory i {
   position: absolute;
-  top: 48%;
-  left: 50%;
-  width: min(88vw, 96rem);
-  height: 1px;
-  background: rgba(229, 218, 199, 0.75);
-  transform: translate(-50%, -50%) rotate(calc(var(--tt-rule-turn, 0) * 1deg));
+  top: 31%;
+  left: 7%;
+  width: 86%;
+  height: 34%;
+  border-top: 1px solid rgba(229, 218, 199, 0.68);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 0.45rem rgba(242, 232, 213, 0.24));
+  transform: rotate(calc(var(--tt-rule-turn, 0) * 1deg)) scaleX(var(--tt-table, 0));
 }
 
 .tableTrajectory b {
   position: absolute;
-  top: calc(48% + var(--tt-ball-y, 0) * 1vh);
-  left: calc(50% + var(--tt-ball-x, -46) * 1vw);
-  width: clamp(0.75rem, 1.1vw, 1.15rem);
+  top: calc(49% + var(--tt-ball-y, 0) * 1%);
+  left: calc(50% + var(--tt-ball-x, -42) * 1%);
+  width: clamp(0.8rem, 1.2vw, 1.25rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: #f2e8d5;
-  box-shadow: calc(var(--tt-impact, 0) * -4rem) 0 3rem rgba(242, 232, 213, 0.46);
-  transform: translate(-50%, -50%);
+  background: radial-gradient(circle at 34% 28%, #fffaf0 0 12%, #f2e8d5 42%, #bdae92 100%);
+  box-shadow:
+    0 0 1.2rem rgba(242, 232, 213, 0.46),
+    calc(var(--tt-impact, 0) * -4rem) 0 3rem rgba(242, 232, 213, 0.46);
+  transform: translate(-50%, -50%) rotate(calc(var(--tt-ball-spin, 0) * 1deg));
 }
 
 .tableTrajectory em {
@@ -239,6 +304,38 @@
   background: #8b1e2d;
   opacity: var(--tt-impact, 0);
   transform: translateY(-50%) scaleY(calc(0.2 + var(--tt-impact, 0)));
+}
+
+.tableTrajectory span {
+  position: absolute;
+  top: calc(49% + var(--tt-ball-y, 0) * 1%);
+  left: calc(50% + var(--tt-ball-x, -42) * 1%);
+  width: clamp(3rem, 7vw, 7rem);
+  height: 0.22rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, rgba(242, 232, 213, 0.42));
+  filter: blur(0.16rem);
+  opacity: calc(0.2 + var(--tt-trail, 0) * 0.62);
+  transform: translate(-100%, -50%) rotate(calc(var(--tt-rule-turn, 0) * 1deg));
+}
+
+.tableTelemetry {
+  position: absolute;
+  top: 62%;
+  right: 4vw;
+  left: 4vw;
+  z-index: 5;
+  display: flex;
+  justify-content: space-between;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.48rem, 0.62vw, 0.66rem);
+  letter-spacing: 0.18em;
+  color: rgba(229, 218, 199, 0.56);
+  opacity: calc(var(--tt-table, 0) * (1 - var(--achievement-exit)));
+}
+
+.tableTelemetry span:nth-child(2) {
+  transform: translateY(calc(var(--tt-ball-y, 0) * -0.08vh));
 }
 
 .tableStatement {
@@ -306,6 +403,113 @@
   border: 0;
 }
 
+.karateBelt {
+  position: absolute;
+  top: 22%;
+  right: -5%;
+  left: -8%;
+  z-index: 3;
+  height: 34%;
+  pointer-events: none;
+  opacity: calc(var(--karate-belt, 0) * (1 - var(--achievement-exit)));
+  filter: drop-shadow(0 2.4rem 2.2rem rgba(12, 11, 10, 0.28));
+  transform: translate3d(calc((1 - var(--karate-belt, 0)) * -68%), 0, 0)
+    rotate(calc((1 - var(--karate-belt-settle, 0)) * -7deg));
+}
+
+.beltSweep {
+  position: absolute;
+  top: 31%;
+  right: 13%;
+  left: 2%;
+  display: flex;
+  align-items: center;
+  height: clamp(2.2rem, 4.4vw, 4.7rem);
+  transform: rotate(-5deg) perspective(50rem) rotateY(-5deg);
+  transform-origin: right center;
+}
+
+.beltSweep::after,
+.beltTailOne::after,
+.beltTailTwo::after {
+  position: absolute;
+  inset: 0.32rem 0;
+  content: "";
+  border-top: 1px dashed rgba(229, 218, 199, 0.2);
+  border-bottom: 1px dashed rgba(229, 218, 199, 0.16);
+}
+
+.beltSweep i {
+  position: relative;
+  flex: 1;
+  height: 100%;
+  border-top: 1px solid rgba(255, 255, 255, 0.13);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.72);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 30%, rgba(0, 0, 0, 0.2)),
+    repeating-linear-gradient(95deg, #171717 0 0.42rem, #0f0f0f 0.44rem 0.88rem);
+}
+
+.beltSweep i:first-child {
+  border-radius: 0.35rem 0 0 0.35rem;
+  transform: translateY(1rem) rotate(-4deg);
+}
+
+.beltSweep i:nth-child(2) {
+  transform: translateY(0.15rem) rotate(-2deg) scaleY(1.04);
+}
+
+.beltSweep i:nth-child(3) {
+  transform: translateY(-0.55rem) rotate(1deg) scaleY(1.08);
+}
+
+.beltSweep i:nth-child(4) {
+  transform: translateY(-0.2rem) rotate(2deg) scaleY(1.03);
+}
+
+.beltSweep i:last-child {
+  transform: translateY(0.6rem) rotate(5deg);
+}
+
+.beltKnot {
+  position: absolute;
+  top: 37%;
+  right: 9%;
+  width: clamp(3rem, 5.5vw, 5.8rem);
+  aspect-ratio: 1.35;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 38% 22% 42% 26%;
+  background: linear-gradient(145deg, #2a2a2a, #080808 62%, #1d1d1d);
+  box-shadow:
+    inset 0.65rem 0.45rem 1.1rem rgba(255, 255, 255, 0.09),
+    0 1rem 1.5rem rgba(0, 0, 0, 0.35);
+  transform: rotate(8deg) scale(calc(0.72 + var(--karate-belt, 0) * 0.28));
+}
+
+.beltTailOne,
+.beltTailTwo {
+  position: absolute;
+  top: 53%;
+  right: 10%;
+  width: clamp(2rem, 3.6vw, 3.8rem);
+  height: clamp(8rem, 20vh, 13rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.08), transparent 36%, rgba(0, 0, 0, 0.22)), #111;
+  transform-origin: center top;
+}
+
+.beltTailOne {
+  transform: rotate(20deg) skewY(-4deg);
+}
+
+.beltTailTwo {
+  right: 5%;
+  height: clamp(7rem, 17vh, 11rem);
+  transform: rotate(-7deg) skewY(5deg);
+}
+
 .karate .stage::after {
   position: absolute;
   top: 50%;
@@ -371,24 +575,121 @@
 
 .chessGrid {
   position: absolute;
-  inset: 12vh 4vw 8vh;
+  inset: 24vh 3vw 9vh;
   z-index: 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(3, 1fr);
-  opacity: calc(var(--chess-grid, 0) * (1 - var(--achievement-exit)) * 0.38);
-  border: 1px solid rgba(229, 218, 199, 0.2);
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  overflow: visible;
+  border: clamp(0.2rem, 0.45vw, 0.48rem) solid #5f5549;
+  background: #171513;
+  box-shadow:
+    0 2.5rem 5rem rgba(0, 0, 0, 0.64),
+    0 0 0 1px rgba(229, 218, 199, 0.2),
+    inset 0 0 2.5rem rgba(0, 0, 0, 0.35);
+  opacity: calc(var(--chess-grid, 0) * (1 - var(--achievement-exit)) * 0.72);
+  transform: perspective(75rem) rotateX(56deg) rotateZ(-3deg)
+    translateY(calc((1 - var(--chess-grid, 0)) * 16vh));
+  transform-origin: center bottom;
+  transform-style: preserve-3d;
 }
 
-.chessGrid i {
-  border-right: 1px solid rgba(229, 218, 199, 0.18);
-  border-bottom: 1px solid rgba(229, 218, 199, 0.18);
+.chessGrid > i {
+  position: relative;
+  border: 1px solid rgba(229, 218, 199, 0.025);
+  background: #171513;
 }
 
-.chessGrid i:nth-child(3n + 2),
-.chessGrid i:nth-child(7) {
-  background: rgba(229, 218, 199, 0.08);
-  opacity: var(--chess-path, 0);
+.chessGrid > i:nth-child(16n + 1),
+.chessGrid > i:nth-child(16n + 3),
+.chessGrid > i:nth-child(16n + 5),
+.chessGrid > i:nth-child(16n + 7),
+.chessGrid > i:nth-child(16n + 10),
+.chessGrid > i:nth-child(16n + 12),
+.chessGrid > i:nth-child(16n + 14),
+.chessGrid > i:nth-child(16n + 16) {
+  background: linear-gradient(145deg, #ded4c2, #a99f8e);
+  box-shadow: inset 0 0 1rem rgba(255, 255, 255, 0.13);
+}
+
+.chessGrid > i:nth-child(19),
+.chessGrid > i:nth-child(28),
+.chessGrid > i:nth-child(37) {
+  box-shadow:
+    inset 0 0 0 2px rgba(139, 30, 45, calc(var(--chess-path, 0) * 0.75)),
+    inset 0 0 1.4rem rgba(139, 30, 45, calc(var(--chess-path, 0) * 0.28));
+}
+
+.chessPieces {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  transform-style: preserve-3d;
+}
+
+.chessPieces span {
+  position: absolute;
+  display: grid;
+  place-items: end center;
+  width: 12.5%;
+  height: 25%;
+  color: #eee4d3;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3.2rem, 6.2vw, 6.8rem);
+  line-height: 0.72;
+  text-shadow:
+    0 0.08em 0 #aaa08f,
+    0 0.13em 0 #71685a,
+    0 0.18em 0.3em rgba(0, 0, 0, 0.74);
+  opacity: var(--chess-pieces, 0);
+  transform: translateZ(calc(var(--chess-pieces, 0) * 2.8rem))
+    translateY(calc((1 - var(--chess-pieces, 0)) * 3.5rem)) rotateX(-25deg);
+  transform-origin: center bottom;
+}
+
+.chessPieces .rook {
+  top: 0;
+  left: 0;
+  color: #24211e;
+  text-shadow:
+    0 0.08em 0 #080808,
+    0 0.16em 0.25em rgba(0, 0, 0, 0.8);
+}
+
+.chessPieces .knight {
+  top: 12.5%;
+  left: 25%;
+}
+
+.chessPieces .queen {
+  top: 0;
+  left: 50%;
+  color: #26231f;
+  text-shadow:
+    0 0.08em 0 #090807,
+    0 0.16em 0.25em rgba(0, 0, 0, 0.82);
+}
+
+.chessPieces .king {
+  top: 25%;
+  left: 62.5%;
+}
+
+.chessPieces .bishop {
+  top: 37.5%;
+  left: 37.5%;
+  color: #26231f;
+  text-shadow:
+    0 0.08em 0 #090807,
+    0 0.16em 0.25em rgba(0, 0, 0, 0.82);
+}
+
+.chessPieces .pawn {
+  top: 50%;
+  left: 75%;
+  transform: translateZ(calc(var(--chess-pieces, 0) * 2.8rem))
+    translateY(calc((1 - var(--chess-pieces, 0)) * 3.5rem)) rotateX(-25deg)
+    scale(calc(0.8 + var(--chess-focus, 0) * 0.12));
 }
 
 .chessPath {
@@ -502,6 +803,159 @@
 
 .public-speaking .stage {
   background: #11100f;
+}
+
+.speakingScene {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc((1 - var(--achievement-exit)) * 0.96);
+  perspective: 70rem;
+}
+
+.stagePlatform {
+  position: absolute;
+  right: 3vw;
+  bottom: 4vh;
+  left: 3vw;
+  height: 31%;
+  border-top: 1px solid rgba(229, 218, 199, 0.42);
+  background:
+    linear-gradient(90deg, transparent, rgba(229, 218, 199, 0.06) 50%, transparent),
+    linear-gradient(180deg, #25211e, #0d0c0b 58%);
+  box-shadow:
+    inset 0 1.2rem 3rem rgba(198, 166, 110, 0.05),
+    0 -1.5rem 5rem rgba(198, 166, 110, 0.06);
+  opacity: var(--speaking-stage, 0);
+  transform: rotateX(62deg) translateY(calc((1 - var(--speaking-stage, 0)) * 16vh));
+  transform-origin: center bottom;
+}
+
+.stagePlatform i {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(transparent, rgba(229, 218, 199, 0.26), transparent);
+}
+
+.stagePlatform i:first-child {
+  left: 33%;
+}
+
+.stagePlatform i:last-child {
+  right: 33%;
+}
+
+.microphone {
+  position: absolute;
+  top: 18%;
+  right: 9%;
+  width: clamp(4rem, 7vw, 7.5rem);
+  height: 64%;
+  opacity: var(--speaking-mic, 0);
+  filter: drop-shadow(0 1.2rem 1.8rem rgba(0, 0, 0, 0.62));
+  transform: translateY(calc((1 - var(--speaking-mic, 0)) * 24vh))
+    rotate(calc((1 - var(--speaking-mic, 0)) * 12deg));
+  transform-origin: center bottom;
+}
+
+.microphone b {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 44%;
+  aspect-ratio: 0.72;
+  border: 1px solid rgba(242, 232, 213, 0.42);
+  border-radius: 48% 48% 42% 42%;
+  background:
+    repeating-linear-gradient(0deg, rgba(242, 232, 213, 0.14) 0 1px, transparent 1px 0.25rem),
+    repeating-linear-gradient(90deg, rgba(242, 232, 213, 0.1) 0 1px, transparent 1px 0.24rem),
+    radial-gradient(circle at 35% 25%, #766c5f, #262422 52%, #080808);
+  box-shadow:
+    inset 0.35rem 0.2rem 0.65rem rgba(255, 255, 255, 0.1),
+    0 0 2.4rem rgba(242, 232, 213, calc(var(--speaking-reach, 0) * 0.17));
+  transform: translateX(-50%) rotate(-8deg);
+}
+
+.microphone i {
+  position: absolute;
+  top: 17%;
+  bottom: 8%;
+  left: 50%;
+  width: clamp(0.22rem, 0.35vw, 0.4rem);
+  border-radius: 999px;
+  background: linear-gradient(90deg, #171717, #a69b89 46%, #2a2825);
+  transform: translateX(-50%) rotate(-4deg);
+  transform-origin: center bottom;
+}
+
+.microphone span {
+  position: absolute;
+  right: 2%;
+  bottom: 4%;
+  left: 2%;
+  height: 4%;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #938673, #181614 62%);
+  box-shadow: 0 0.8rem 1.5rem rgba(0, 0, 0, 0.55);
+  transform: perspective(20rem) rotateX(62deg);
+}
+
+.stageSpeaker {
+  position: absolute;
+  right: 3.5%;
+  bottom: 11%;
+  width: clamp(5.2rem, 9.5vw, 10rem);
+  aspect-ratio: 0.72;
+  border: 1px solid rgba(229, 218, 199, 0.16);
+  border-radius: 0.28rem;
+  background: linear-gradient(135deg, #302b26, #0a0908 68%);
+  box-shadow:
+    inset 0.4rem 0.25rem 0.8rem rgba(255, 255, 255, 0.04),
+    0 1.8rem 2.6rem rgba(0, 0, 0, 0.58);
+  opacity: calc(var(--speaking-speaker, 0) * 0.82);
+  transform: translateX(calc((1 - var(--speaking-speaker, 0)) * 9vw)) rotateY(-8deg);
+}
+
+.stageSpeaker i {
+  position: absolute;
+  left: 50%;
+  aspect-ratio: 1;
+  border: 1px solid rgba(229, 218, 199, 0.22);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #0a0908 0 18%,
+    #4c453b 20% 25%,
+    #171513 28% 66%,
+    #4f473c 70%,
+    #0b0a09 74%
+  );
+  box-shadow: inset 0 0 1rem rgba(0, 0, 0, 0.82);
+  transform: translateX(-50%);
+}
+
+.stageSpeaker i:first-child {
+  top: 11%;
+  width: 42%;
+}
+
+.stageSpeaker i:nth-child(2) {
+  bottom: 9%;
+  width: 68%;
+}
+
+.stageSpeaker span {
+  position: absolute;
+  top: 4%;
+  left: 7%;
+  width: 0.25rem;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #8b1e2d;
+  box-shadow: 0 0 0.7rem rgba(139, 30, 45, 0.55);
 }
 
 .audienceField {
@@ -651,15 +1105,23 @@
   --intro-split: 1;
   --intro-scale: 1;
   --tt-title: 1;
+  --tt-table: 1;
   --tt-resolve: 1;
   --karate-lock: 1;
+  --karate-belt: 1;
+  --karate-belt-settle: 1;
   --karate-words: 1;
   --chess-grid: 1;
   --chess-path: 1;
+  --chess-pieces: 1;
+  --chess-focus: 1;
   --chess-one: 1;
   --chess-two: 1;
   --chess-three: 1;
   --speaking-build: 1;
+  --speaking-stage: 1;
+  --speaking-mic: 1;
+  --speaking-speaker: 1;
   --speaking-audience: 1;
   --speaking-scale: 1;
   --speaking-reach: 1;
@@ -746,7 +1208,14 @@
   }
 
   .tableCourt {
-    inset: 14vh 1.25rem 11vh;
+    inset: 21vh 0.75rem 7vh;
+  }
+
+  .tableTelemetry {
+    top: 59%;
+    right: 1.25rem;
+    left: 1.25rem;
+    font-size: 0.44rem;
   }
 
   .tableTitle {
@@ -806,8 +1275,29 @@
     font-size: 0.55rem;
   }
 
+  .karateBelt {
+    top: 29%;
+    right: -18%;
+    left: -20%;
+    height: 31%;
+  }
+
+  .beltSweep {
+    right: 17%;
+    height: 2.4rem;
+  }
+
+  .beltTailOne,
+  .beltTailTwo {
+    height: 7rem;
+  }
+
   .chessGrid {
-    inset: 11vh 1.25rem 7vh;
+    inset: 29vh 0.75rem 7vh;
+  }
+
+  .chessGrid .chessPieces span {
+    font-size: clamp(2.4rem, 12vw, 4.6rem);
   }
 
   .chessStatement {
@@ -870,6 +1360,18 @@
 
   .audienceReach strong {
     font-size: clamp(3.7rem, 18vw, 5.4rem);
+  }
+
+  .microphone {
+    top: 16%;
+    right: 4%;
+    width: 4.5rem;
+  }
+
+  .stageSpeaker {
+    right: 2%;
+    bottom: 9%;
+    width: 5.8rem;
   }
 
   .finalDisciplines,

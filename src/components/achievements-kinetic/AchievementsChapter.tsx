@@ -19,7 +19,15 @@ import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
-const CHESS_CELLS = ['a1', 'b1', 'c1', 'd1', 'a2', 'b2', 'c2', 'd2', 'a3', 'b3', 'c3', 'd3'];
+const CHESS_CELLS = Array.from({ length: 64 }, (_, index) => `square-${index + 1}`);
+const CHESS_PIECES = [
+  { piece: '♜', square: 'rook' },
+  { piece: '♞', square: 'knight' },
+  { piece: '♛', square: 'queen' },
+  { piece: '♚', square: 'king' },
+  { piece: '♝', square: 'bishop' },
+  { piece: '♟', square: 'pawn' },
+] as const;
 const ARCHIVE_TILES: ChromaItem[] = [
   {
     image: '/images/achievements/table-tennis/photo-1-640.webp',
@@ -216,14 +224,25 @@ export function AchievementsChapter() {
           <KineticPanel panel="table-tennis" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="table-tennis" />
             <div className={styles.tableCourt} aria-hidden="true">
-              <i />
-              <i />
-              <i />
+              <div className={styles.tableTop}>
+                <i className={styles.tableCenterLine} />
+                <i className={styles.tableEdgeLine} />
+                <span className={styles.tableNet} />
+              </div>
+              <i className={`${styles.tableLeg} ${styles.tableLegNear}`} />
+              <i className={`${styles.tableLeg} ${styles.tableLegFar}`} />
+              <span className={styles.tableUnderlight} />
             </div>
             <div className={styles.tableTrajectory} aria-hidden="true">
               <i />
               <b />
               <em />
+              <span />
+            </div>
+            <div className={styles.tableTelemetry} aria-hidden="true">
+              <span>VELOCITY</span>
+              <span>SPIN</span>
+              <span>TRAJECTORY</span>
             </div>
             <div className={styles.tableTitle} aria-hidden="true">
               <span>TABLE</span>
@@ -246,6 +265,18 @@ export function AchievementsChapter() {
               <i />
               <i />
             </div>
+            <div className={styles.karateBelt} aria-hidden="true">
+              <div className={styles.beltSweep}>
+                <i />
+                <i />
+                <i />
+                <i />
+                <i />
+              </div>
+              <b className={styles.beltKnot} />
+              <span className={styles.beltTailOne} />
+              <span className={styles.beltTailTwo} />
+            </div>
             <div className={styles.karateStatement}>
               <p>KARATE</p>
               <h3>
@@ -266,6 +297,13 @@ export function AchievementsChapter() {
               {CHESS_CELLS.map((cell) => (
                 <i key={cell} />
               ))}
+              <div className={styles.chessPieces}>
+                {CHESS_PIECES.map(({ piece, square }) => (
+                  <span key={square} className={styles[square]}>
+                    {piece}
+                  </span>
+                ))}
+              </div>
             </div>
             <div className={styles.chessPath} aria-hidden="true">
               <i />
@@ -291,6 +329,22 @@ export function AchievementsChapter() {
           <KineticPanel panel="public-speaking" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="public-speaking" />
             <div className={styles.audienceField} aria-hidden="true" />
+            <div className={styles.speakingScene} aria-hidden="true">
+              <div className={styles.stagePlatform}>
+                <i />
+                <i />
+              </div>
+              <div className={styles.microphone}>
+                <b />
+                <i />
+                <span />
+              </div>
+              <div className={styles.stageSpeaker}>
+                <i />
+                <i />
+                <span />
+              </div>
+            </div>
             <div className={styles.speakingStatement}>
               <p>PUBLIC SPEAKING</p>
               <div className={styles.speeches}>
