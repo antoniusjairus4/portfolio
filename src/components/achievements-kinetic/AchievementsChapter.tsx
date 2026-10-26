@@ -32,8 +32,8 @@ const ARCHIVE_TILES: ChromaItem[] = [
     accent: '#987454',
   },
   {
-    image: '/images/achievements/chess/photo-1-640.webp',
-    alt: 'Chess trophies and awards on display',
+    image: '/images/achievements/table-tennis/kissing-cup.png',
+    alt: 'Jairus kissing a table tennis trophy',
     accent: '#9c8a73',
   },
   {
@@ -176,18 +176,20 @@ export function AchievementsChapter() {
             <LiquidChrome
               className={styles.showcaseChrome}
               color="#ac8656"
-              speed={0.08}
-              amplitude={0.2}
+              speed={0.07}
+              amplitude={0.26}
               frequencyX={2.1}
               frequencyY={2.4}
               detail={3}
-              thickness={1.2}
-              depth={0.7}
+              thickness={1.35}
+              depth={0.82}
               roughness={0.65}
-              exposure={0.55}
-              interactive={false}
+              exposure={0.78}
+              interactive
+              rippleStrength={0.72}
+              rippleSize={0.9}
               intro={false}
-              tilt={0.2}
+              tilt={0.48}
               maxDevicePixelRatio={1}
             />
           )}
@@ -196,7 +198,7 @@ export function AchievementsChapter() {
               items={ARCHIVE_TILES}
               columns={3}
               minCardWidth={100}
-              gap={20}
+              gap={30}
               aspectRatio="1 / 1"
               radius={220}
               softness={0.7}
