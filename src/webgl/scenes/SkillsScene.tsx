@@ -7,6 +7,7 @@ import {
   type Group,
   MathUtils,
   type Mesh,
+  type MeshBasicMaterial,
   type PerspectiveCamera,
   type PointLight,
   Raycaster,
@@ -21,6 +22,7 @@ import {
   createCapabilityTexture,
   paintCapabilityCard,
 } from './skills/capabilityCards';
+import { SKILLS_STOPS } from './skills/timeline';
 
 interface SkillsSceneProps {
   controller: ChapterProgressController;
@@ -30,7 +32,6 @@ interface SkillsSceneProps {
 }
 
 type CardPlacement = { x: number; y: number; z: number; rotation: number };
-const STOPS = [0.28, 0.41, 0.54, 0.67, 0.8, 0.94] as const;
 function smooth(value: number) {
   const t = Math.max(0, Math.min(1, value));
   return t * t * (3 - 2 * t);
@@ -74,6 +75,8 @@ export function SkillsScene({
   const textures = useMemo(() => CAPABILITY_CARDS.map(createCapabilityTexture), []);
   const groups = useRef<(Group | null)[]>([]);
   const slabs = useRef<(Mesh | null)[]>([]);
+  const feet = useRef<(Mesh | null)[]>([]);
+  const faces = useRef<(MeshBasicMaterial | null)[]>([]);
   const focusLight = useRef<PointLight>(null);
   const groundLight = useRef<PointLight>(null);
   const pointer = useRef({ active: false, ndc: new Vector2() });
@@ -151,18 +154,19 @@ export function SkillsScene({
   useFrame((_, delta) => {
     const progress = controller.progress.current;
     let from = 0;
-    while (from < STOPS.length - 2 && progress > STOPS[from + 1]) from += 1;
-    const beforeFirst = progress < STOPS[0];
-    const afterLast = progress > STOPS[STOPS.length - 1];
-    const local = (progress - STOPS[from]) / (STOPS[from + 1] - STOPS[from]);
+    while (from < SKILLS_STOPS.length - 2 && progress > SKILLS_STOPS[from + 1]) from += 1;
+    const beforeFirst = progress < SKILLS_STOPS[0];
+    const afterLast = progress > SKILLS_STOPS[SKILLS_STOPS.length - 1];
+    const local =
+      (progress - SKILLS_STOPS[from]) / (SKILLS_STOPS[from + 1] - SKILLS_STOPS[from]);
     const travel = smooth((local - 0.1) / 0.8);
     eye.copy(poses[from].eye).lerp(poses[from + 1].eye, travel);
     look.copy(poses[from].look).lerp(poses[from + 1].look, travel);
     if (beforeFirst) {
-      eye.z += (1 - smooth(progress / STOPS[0])) * (portrait ? 3.3 : 5.4);
+      eye.z += (1 - smooth(progress / SKILLS_STOPS[0])) * (portrait ? 3.3 : 5.4);
     }
     if (afterLast) {
-      eye.z -= smooth((progress - STOPS[STOPS.length - 1]) / 0.04) * 1.2;
+      eye.z -= smooth((progress - SKILLS_STOPS[SKILLS_STOPS.length - 1]) / 0.04) * 1.2;
     }
     camera.position.copy(eye);
     camera.up.set(0, 1, 0);
@@ -170,8 +174,11 @@ export function SkillsScene({
     camera.updateMatrixWorld();
 
     let activeIndex = 0;
-    for (let index = 1; index < STOPS.length; index += 1) {
-      if (Math.abs(progress - STOPS[index]) < Math.abs(progress - STOPS[activeIndex])) {
+    for (let index = 1; index < SKILLS_STOPS.length; index += 1) {
+      if (
+        Math.abs(progress - SKILLS_STOPS[index]) <
+        Math.abs(progress - SKILLS_STOPS[activeIndex])
+      ) {
         activeIndex = index;
       }
     }
@@ -182,7 +189,7 @@ export function SkillsScene({
         slabs.current.filter((slab): slab is Mesh => Boolean(slab)),
         false,
       )[0];
-      if (hit && Math.abs(progress - STOPS[activeIndex]) < 0.105) {
+      if (hit && Math.abs(progress - SKILLS_STOPS[activeIndex]) < 0.105) {
         hoveredIndex = hit.object.userData.cardIndex === activeIndex ? activeIndex : -1;
       }
     }
@@ -192,14 +199,28 @@ export function SkillsScene({
       if (!group) return;
       const placement = placements[index];
       const hover = hoveredIndex === index ? 1 : 0;
+      const emphasis = 1 - smooth(Math.abs(progress - SKILLS_STOPS[index]) / 0.11);
+      const lift = emphasis * (portrait ? 0.17 : 0.23);
       const targetX = hover ? -pointer.current.ndc.y * 0.025 : 0;
       const targetY = placement.rotation + (hover ? pointer.current.ndc.x * 0.045 : 0);
       const targetZ = placement.z + hover * 0.13;
       group.rotation.x = MathUtils.lerp(group.rotation.x, targetX, ease);
       group.rotation.y = MathUtils.lerp(group.rotation.y, targetY, ease);
+      group.position.y = MathUtils.lerp(group.position.y, placement.y + lift, ease);
       group.position.z = MathUtils.lerp(group.position.z, targetZ, ease);
+      const currentLift = group.position.y - placement.y;
+      const slab = slabs.current[index];
+      if (slab) {
+        slab.position.y = -currentLift * 0.5;
+        slab.scale.y = 1 + currentLift / 5.18;
+      }
+      const foot = feet.current[index];
+      if (foot) foot.position.y = -2.64 - currentLift;
+      const face = faces.current[index];
+      if (face) face.color.setScalar(0.32 + emphasis * 0.68);
       settling ||= Math.abs(group.rotation.x - targetX) > 0.001;
       settling ||= Math.abs(group.rotation.y - targetY) > 0.001;
+      settling ||= Math.abs(group.position.y - placement.y - lift) > 0.001;
       settling ||= Math.abs(group.position.z - targetZ) > 0.001;
     });
     if (focusLight.current || groundLight.current) {
@@ -228,13 +249,13 @@ export function SkillsScene({
 
   return (
     <>
-      <fog attach="fog" args={['#08131b', portrait ? 20 : 24, portrait ? 75 : 92]} />
+      <fog attach="fog" args={['#070a0d', portrait ? 17 : 19, portrait ? 62 : 69]} />
       <ambientLight color="#b3c8cf" intensity={0.64} />
       <hemisphereLight args={['#8daab8', '#101c24', 0.82]} />
       <directionalLight position={[-6, 12, 10]} intensity={1.35} color="#d6d8d1" />
       <pointLight ref={focusLight} color="#c4c6c1" intensity={3.5} distance={17} decay={2} />
       <pointLight ref={groundLight} color="#7694a8" intensity={1.25} distance={11} decay={2} />
-      <CapabilityTerrain portrait={portrait} controller={controller} />
+      <CapabilityTerrain portrait={portrait} controller={controller} placements={placements} />
       <CapabilityAtmosphere portrait={portrait} placements={placements} />
       {CAPABILITY_CARDS.map((card, index) => {
         const placement = placements[index];
@@ -263,6 +284,9 @@ export function SkillsScene({
             <mesh position={[0, 0, 0.111]}>
               <planeGeometry args={[3.55, 4.98]} />
               <meshBasicMaterial
+                ref={(node) => {
+                  faces.current[index] = node;
+                }}
                 map={textures[index]}
                 transparent
                 depthWrite={false}
@@ -278,7 +302,13 @@ export function SkillsScene({
                 roughness={0.58}
               />
             </mesh>
-            <mesh position={[0, -2.64, 0]} receiveShadow>
+            <mesh
+              ref={(node) => {
+                feet.current[index] = node;
+              }}
+              position={[0, -2.64, 0]}
+              receiveShadow
+            >
               <boxGeometry args={[4.05, 0.12, 0.58]} />
               <meshStandardMaterial color="#10161a" roughness={0.9} metalness={0.14} />
             </mesh>

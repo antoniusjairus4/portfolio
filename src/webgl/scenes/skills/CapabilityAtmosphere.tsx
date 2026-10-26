@@ -107,18 +107,6 @@ export function CapabilityAtmosphere({
                 />
               </mesh>
             )}
-            {!portrait && (
-              <>
-                <mesh position={[-10.5, 1.2, placement.z - 12]}>
-                  <boxGeometry args={[1.7, 8.2, 0.75]} />
-                  <meshStandardMaterial color="#10202a" roughness={1} metalness={0.05} />
-                </mesh>
-                <mesh position={[11.4, 0.1, placement.z - 15]}>
-                  <boxGeometry args={[2.1, 6.1, 0.9]} />
-                  <meshStandardMaterial color="#0d1b24" roughness={1} metalness={0.05} />
-                </mesh>
-              </>
-            )}
           </group>
         );
       })}
