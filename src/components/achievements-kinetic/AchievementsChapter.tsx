@@ -284,15 +284,37 @@ export function AchievementsChapter() {
               <span className={styles.tableUnderlight} />
             </div>
             <div className={styles.tableTrajectory} aria-hidden="true">
-              <i />
-              <b />
-              <em />
-              <span />
+              <svg className={styles.trajectorySvg} viewBox="0 0 100 65" preserveAspectRatio="none">
+                <path
+                  d="M 6 28 Q 18 16 28 50 Q 38 22 52 26 Q 66 30 76 52 Q 88 30 96 34"
+                  className={styles.trajectoryArc}
+                />
+              </svg>
+              <b className={styles.trajectoryBall} />
+              <span className={styles.trajectoryTrail} />
             </div>
             <div className={styles.tableTelemetry} aria-hidden="true">
-              <span>VELOCITY</span>
-              <span>SPIN</span>
-              <span>TRAJECTORY</span>
+              <div className={styles.telemetryTrack}>
+                <span className={styles.telemetryLine} />
+                <div className={styles.telemetryTag}>
+                  <span className={styles.telemetryIdx}>01 //</span>
+                  <span className={styles.telemetryName}>VELOCITY</span>
+                  <span className={styles.telemetryMetric}>112 KM/H</span>
+                </div>
+                <span className={styles.telemetryLine} />
+                <div className={styles.telemetryTag}>
+                  <span className={styles.telemetryIdx}>02 //</span>
+                  <span className={styles.telemetryName}>SPIN</span>
+                  <span className={styles.telemetryMetric}>8,400 RPM</span>
+                </div>
+                <span className={styles.telemetryLine} />
+                <div className={styles.telemetryTag}>
+                  <span className={styles.telemetryIdx}>03 //</span>
+                  <span className={styles.telemetryName}>TRAJECTORY</span>
+                  <span className={styles.telemetryMetric}>BALLISTIC ARC</span>
+                </div>
+                <span className={styles.telemetryLine} />
+              </div>
             </div>
             <div className={styles.tableTitle} aria-hidden="true">
               <span>TABLE</span>

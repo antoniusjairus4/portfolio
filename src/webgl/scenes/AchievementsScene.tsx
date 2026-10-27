@@ -2,18 +2,24 @@
 
 import { useGLTF } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
-import { type RefObject, useEffect, useMemo, useRef } from 'react';
+import { type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
+  BufferGeometry,
   Color,
   type Group,
+  Line as ThreeLine,
+  LineBasicMaterial,
   type Material,
   MathUtils,
   type Mesh,
+  MeshBasicMaterial,
   MeshStandardMaterial,
   type Object3D,
   type PerspectiveCamera,
+  type PointLight,
   type ShaderMaterial,
   type SpotLight,
+  Vector3,
 } from 'three';
 import type { ChapterProgressController } from '@/experience/chapterProgress';
 
@@ -234,6 +240,224 @@ function TableTennisBackdrop({ materialRef }: { materialRef: RefObject<ShaderMat
   );
 }
 
+function TableTennisBallTrajectory({ active }: { active: boolean }) {
+  const ballRef = useRef<Mesh>(null);
+  const glowLightRef = useRef<PointLight>(null);
+  const trailGroupRef = useRef<Group>(null);
+  const ripple1Ref = useRef<Mesh>(null);
+  const ripple2Ref = useRef<Mesh>(null);
+
+  // Pre-calculate trajectory curve geometry:
+  // Serve/bounce (P1) -> cross net (P2) -> second bounce (P3) -> exit (P4)
+  const { lineObject } = useMemo(() => {
+    const samplePoints: Vector3[] = [];
+    const count = 90;
+    const x0 = -0.42, x1 = -0.22, x3 = 0.32, x4 = 0.62;
+    const z0 = 2.2, z1 = 0.82, z3 = -0.76, z4 = -1.95;
+
+    for (let i = 0; i <= count; i++) {
+      const t = i / count;
+      let x = 0, y = 0, z = 0;
+      if (t <= 0.28) {
+        const s = t / 0.28;
+        x = x0 + (x1 - x0) * s;
+        z = z0 + (z1 - z0) * s;
+        y = 0.772 + (1.45 - 0.772) * Math.pow(1 - s, 1.8);
+      } else if (t <= 0.72) {
+        const s = (t - 0.28) / 0.44;
+        x = x1 + (x3 - x1) * s;
+        z = z1 + (z3 - z1) * s;
+        y = 0.772 + 4.0 * (1.14 - 0.772) * s * (1.0 - s);
+      } else {
+        const s = (t - 0.72) / 0.28;
+        x = x3 + (x4 - x3) * s;
+        z = z3 + (z4 - z3) * s;
+        y = 0.772 + (1.24 - 0.772) * (1 - Math.pow(1 - s, 2));
+      }
+      samplePoints.push(new Vector3(x, y, z));
+    }
+    const geom = new BufferGeometry().setFromPoints(samplePoints);
+    const mat = new LineBasicMaterial({
+      color: '#f5eee2',
+      transparent: true,
+      opacity: 0.45,
+    });
+    const lineObj = new ThreeLine(geom, mat);
+    return { lineObject: lineObj };
+  }, []);
+
+  const getTrajectoryPoint = useCallback((t: number) => {
+    const clampedT = ((t % 1) + 1) % 1;
+    const x0 = -0.42, x1 = -0.22, x3 = 0.32, x4 = 0.62;
+    const z0 = 2.2, z1 = 0.82, z3 = -0.76, z4 = -1.95;
+    let x = 0, y = 0, z = 0;
+    if (clampedT <= 0.28) {
+      const s = clampedT / 0.28;
+      x = x0 + (x1 - x0) * s;
+      z = z0 + (z1 - z0) * s;
+      y = 0.772 + (1.45 - 0.772) * Math.pow(1 - s, 1.8);
+    } else if (clampedT <= 0.72) {
+      const s = (clampedT - 0.28) / 0.44;
+      x = x1 + (x3 - x1) * s;
+      z = z1 + (z3 - z1) * s;
+      y = 0.772 + 4.0 * (1.14 - 0.772) * s * (1.0 - s);
+    } else {
+      const s = (clampedT - 0.72) / 0.28;
+      x = x3 + (x4 - x3) * s;
+      z = z3 + (z4 - z3) * s;
+      y = 0.772 + (1.24 - 0.772) * (1 - Math.pow(1 - s, 2));
+    }
+    return { x, y, z, t: clampedT };
+  }, []);
+
+  useFrame((state) => {
+    if (!active) return;
+    const time = state.clock.getElapsedTime();
+    // Continuous rally cycle every ~2.3 seconds
+    const cycle = (time * 0.44) % 1;
+    const pos = getTrajectoryPoint(cycle);
+
+    if (ballRef.current) {
+      ballRef.current.position.set(pos.x, pos.y, pos.z);
+      ballRef.current.rotation.x = time * 14;
+      ballRef.current.rotation.z = time * 9;
+    }
+    if (glowLightRef.current) {
+      glowLightRef.current.position.set(pos.x, pos.y + 0.06, pos.z);
+    }
+
+    // Contact ripple at bounce 1 (near court at t = 0.28)
+    if (ripple1Ref.current) {
+      const diff1 = cycle - 0.28;
+      if (diff1 >= 0 && diff1 < 0.16) {
+        const s1 = diff1 / 0.16;
+        ripple1Ref.current.visible = true;
+        ripple1Ref.current.scale.set(1 + s1 * 2.4, 1 + s1 * 2.4, 1);
+        (ripple1Ref.current.material as MeshBasicMaterial).opacity = (1 - s1) * 0.65;
+      } else {
+        ripple1Ref.current.visible = false;
+      }
+    }
+
+    // Contact ripple at bounce 2 (far court at t = 0.72)
+    if (ripple2Ref.current) {
+      const diff2 = cycle - 0.72;
+      if (diff2 >= 0 && diff2 < 0.16) {
+        const s2 = diff2 / 0.16;
+        ripple2Ref.current.visible = true;
+        ripple2Ref.current.scale.set(1 + s2 * 2.4, 1 + s2 * 2.4, 1);
+        (ripple2Ref.current.material as MeshBasicMaterial).opacity = (1 - s2) * 0.65;
+      } else {
+        ripple2Ref.current.visible = false;
+      }
+    }
+
+    // Update motion trail ghosts behind the ball
+    if (trailGroupRef.current) {
+      trailGroupRef.current.children.forEach((ghost, idx) => {
+        const lag = (idx + 1) * 0.014;
+        const ghostPos = getTrajectoryPoint(cycle - lag);
+        ghost.position.set(ghostPos.x, ghostPos.y, ghostPos.z);
+        const fade = 1 - (idx + 1) / (trailGroupRef.current!.children.length + 1);
+        const mat = (ghost as Mesh).material as MeshBasicMaterial;
+        mat.opacity = fade * 0.44;
+      });
+    }
+  });
+
+  return (
+    <group visible={active}>
+      {/* Precision Trajectory Guide Line */}
+      <primitive object={lineObject} />
+
+      {/* Ping-Pong Ball (ITTF 40mm proportion) */}
+      <mesh ref={ballRef} castShadow>
+        <sphereGeometry args={[0.038, 32, 32]} />
+        <meshStandardMaterial
+          color="#fffaf2"
+          emissive="#e0a93b"
+          emissiveIntensity={0.32}
+          roughness={0.24}
+          metalness={0.04}
+        />
+      </mesh>
+
+      {/* Subtle Ball Glow casting light on table */}
+      <pointLight ref={glowLightRef} color="#ffe8b8" intensity={1.8} distance={1.4} decay={2} />
+
+      {/* Motion Trail Ghosts */}
+      <group ref={trailGroupRef}>
+        {[0.032, 0.026, 0.02, 0.015, 0.01].map((radius, i) => (
+          <mesh key={i}>
+            <sphereGeometry args={[radius, 16, 16]} />
+            <meshBasicMaterial color="#ffd88a" transparent opacity={0.3} />
+          </mesh>
+        ))}
+      </group>
+
+      {/* Table Contact Impact Rings on tabletop surface */}
+      <mesh
+        ref={ripple1Ref}
+        position={[-0.22, 0.765, 0.82]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        visible={false}
+      >
+        <ringGeometry args={[0.02, 0.09, 32]} />
+        <meshBasicMaterial color="#f2dfbd" transparent opacity={0.6} depthWrite={false} />
+      </mesh>
+      <mesh
+        ref={ripple2Ref}
+        position={[0.32, 0.765, -0.76]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        visible={false}
+      >
+        <ringGeometry args={[0.02, 0.09, 32]} />
+        <meshBasicMaterial color="#f2dfbd" transparent opacity={0.6} depthWrite={false} />
+      </mesh>
+    </group>
+  );
+}
+
+function SoftRadialFloor({ materialRef }: { materialRef: RefObject<ShaderMaterial | null> }) {
+  const uniforms = useMemo(
+    () => ({
+      uOpacity: { value: 1 },
+      uColor: { value: new Color('#0a0807') },
+    }),
+    [],
+  );
+
+  return (
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.88, 0]} renderOrder={-100}>
+      <planeGeometry args={[26, 26]} />
+      <shaderMaterial
+        ref={materialRef}
+        uniforms={uniforms}
+        transparent
+        depthWrite={false}
+        vertexShader={`
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform float uOpacity;
+          uniform vec3 uColor;
+          varying vec2 vUv;
+          void main() {
+            float d = length(vUv - vec2(0.5)) * 2.0;
+            // Smooth radial Gaussian falloff to zero at edges (no rectangular seams)
+            float radialAlpha = smoothstep(1.0, 0.05, d) * exp(-d * d * 1.5);
+            gl_FragColor = vec4(uColor, radialAlpha * uOpacity * 0.72);
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
 function KarateBackdrop({ materialRef }: { materialRef: RefObject<ShaderMaterial | null> }) {
   const uniforms = useMemo(
     () => ({
@@ -301,7 +525,7 @@ export function AchievementsScene({
   const speakingLight = useRef<SpotLight>(null);
   const tableBackdrop = useRef<ShaderMaterial>(null);
   const karateBackdrop = useRef<ShaderMaterial>(null);
-  const floorMaterial = useRef<MeshStandardMaterial>(null);
+  const floorMaterial = useRef<ShaderMaterial>(null);
 
   useEffect(() => {
     const perspective = camera as PerspectiveCamera;
@@ -342,14 +566,14 @@ export function AchievementsScene({
     // it inside the full browser width.
     const centerX = 0;
 
-    setGroupPresence(table.current, tablePresence, portrait ? 0.92 : 1.2);
+    setGroupPresence(table.current, tablePresence, portrait ? 1.35 : 1.78);
     if (table.current) {
       table.current.position.set(
-        centerX,
-        (portrait ? -1.65 : -1.48) - (1 - smooth(tableProgress / 0.28)) * 0.75,
-        -0.15,
+        -0.08,
+        (portrait ? -2.05 : -1.78) - (1 - smooth(tableProgress / 0.28)) * 0.85,
+        0.92,
       );
-      table.current.rotation.set(-0.03, -0.34 + tableProgress * 0.08, -0.015);
+      table.current.rotation.set(0.24, -0.62 + tableProgress * 0.05, -0.035);
     }
 
     setGroupPresence(belt.current, beltPresence, portrait ? 0.72 : 0.9);
@@ -377,7 +601,7 @@ export function AchievementsScene({
       speaking.current.rotation.set(0, -0.16 + speakingProgress * 0.08, 0);
     }
 
-    if (tableLight.current) tableLight.current.intensity = tablePresence * 52;
+    if (tableLight.current) tableLight.current.intensity = tablePresence * 62;
     if (beltLight.current) beltLight.current.intensity = beltPresence * 44;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 50;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 58;
@@ -387,7 +611,8 @@ export function AchievementsScene({
     }
     if (karateBackdrop.current) karateBackdrop.current.uniforms.uOpacity.value = beltPresence;
     if (floorMaterial.current) {
-      floorMaterial.current.opacity = (1 - beltPresence) * (tablePresence > 0.01 ? 0.35 : 1.0);
+      floorMaterial.current.uniforms.uOpacity.value =
+        (1 - beltPresence) * (tablePresence > 0.01 ? 0.85 : 1.0);
     }
   });
 
@@ -406,11 +631,11 @@ export function AchievementsScene({
       />
       <spotLight
         ref={tableLight}
-        position={[-3.7, 4.8, 4.5]}
-        color="#f2d5a4"
-        distance={14}
-        angle={0.55}
-        penumbra={0.72}
+        position={[-3.2, 5.2, 5.0]}
+        color="#f8e8cd"
+        distance={16}
+        angle={0.65}
+        penumbra={0.78}
         decay={2}
       />
       <spotLight
@@ -442,7 +667,32 @@ export function AchievementsScene({
       />
 
       <group ref={table} visible={false}>
+        {/* Soft Contact Ambient Occlusion Shadow directly grounded under table legs */}
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.005, 0]}>
+          <planeGeometry args={[2.5, 3.8]} />
+          <shaderMaterial
+            transparent
+            depthWrite={false}
+            vertexShader={`
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `}
+            fragmentShader={`
+              varying vec2 vUv;
+              void main() {
+                vec2 p = (vUv - vec2(0.5)) * 2.0;
+                float d = length(vec2(p.x * 1.25, p.y * 0.8));
+                float shadow = exp(-d * d * 2.6) * 0.78 + smoothstep(0.9, 0.0, d) * 0.22;
+                gl_FragColor = vec4(vec3(0.015, 0.012, 0.01), shadow * 0.88);
+              }
+            `}
+          />
+        </mesh>
         <LoadedModel url={`${MODEL_ROOT}/table-tennis.glb`} />
+        <TableTennisBallTrajectory active={presence(panelProgress('table-tennis', portrait)) > 0.01} />
       </group>
 
       <group ref={belt} visible={false}>
@@ -474,17 +724,7 @@ export function AchievementsScene({
         </group>
       </group>
 
-      <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -1.7, 0]}>
-        <planeGeometry args={[8, 7]} />
-        <meshStandardMaterial
-          ref={floorMaterial}
-          color="#0c0a09"
-          roughness={0.92}
-          metalness={0.02}
-          transparent
-          depthWrite={false}
-        />
-      </mesh>
+      <SoftRadialFloor materialRef={floorMaterial} />
     </>
   );
 }

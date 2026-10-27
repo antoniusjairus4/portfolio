@@ -250,26 +250,32 @@
 
 .tableTitle {
   position: absolute;
-  top: 14vh;
-  right: 4vw;
-  left: 4vw;
+  top: 13vh;
+  left: 0;
+  right: 0;
+  max-width: min(100% - 4rem, 36rem);
+  margin: 0 auto;
+  padding: 0 1.5rem;
   z-index: 4;
   display: flex;
   justify-content: space-between;
+  align-items: baseline;
   font-family: var(--font-display);
-  font-size: clamp(4rem, 10vw, 10rem);
-  font-weight: 620;
-  line-height: 0.76;
-  letter-spacing: -0.07em;
+  font-size: clamp(3.2rem, 5.2vw, 5.8rem);
+  font-weight: 650;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  color: #f5eee2;
+  text-shadow: 0 4px 24px rgba(0, 0, 0, 0.7);
   opacity: calc(var(--tt-title, 0) * (1 - var(--achievement-exit)));
 }
 
 .tableTitle span:first-child {
-  transform: translateX(calc((1 - var(--tt-title, 0)) * -24vw));
+  transform: translateX(calc((1 - var(--tt-title, 0)) * -14vw));
 }
 
 .tableTitle span:last-child {
-  transform: translateX(calc((1 - var(--tt-title, 0)) * 24vw));
+  transform: translateX(calc((1 - var(--tt-title, 0)) * 14vw));
 }
 
 .tableTrajectory {
@@ -277,108 +283,153 @@
   inset: 0;
   z-index: 5;
   opacity: calc(1 - var(--achievement-exit));
+  pointer-events: none;
 }
 
-.tableTrajectory i {
+.trajectorySvg {
   position: absolute;
-  top: 31%;
-  left: 7%;
-  width: 86%;
-  height: 34%;
-  border-top: 1px solid rgba(229, 218, 199, 0.68);
-  border-radius: 50%;
-  filter: drop-shadow(0 0 0.45rem rgba(242, 232, 213, 0.24));
-  transform: rotate(calc(var(--tt-rule-turn, 0) * 1deg)) scaleX(var(--tt-table, 0));
+  top: 24%;
+  left: 8%;
+  width: 84%;
+  height: 44%;
+  overflow: visible;
 }
 
-.tableTrajectory b {
+.trajectoryArc {
+  fill: none;
+  stroke: rgba(242, 223, 189, 0.42);
+  stroke-width: 1.2;
+  stroke-dasharray: 4 3;
+  filter: drop-shadow(0 0 4px rgba(242, 232, 213, 0.35));
+}
+
+.trajectoryBall {
   position: absolute;
   top: calc(49% + var(--tt-ball-y, 0) * 1%);
   left: calc(50% + var(--tt-ball-x, -42) * 1%);
-  width: clamp(0.8rem, 1.2vw, 1.25rem);
+  width: clamp(0.75rem, 1.1vw, 1.15rem);
   aspect-ratio: 1;
   border-radius: 50%;
-  background: radial-gradient(circle at 34% 28%, #fffaf0 0 12%, #f2e8d5 42%, #bdae92 100%);
+  background: radial-gradient(circle at 34% 28%, #fffaf0 0 15%, #f2e8d5 45%, #bdae92 100%);
   box-shadow:
-    0 0 1.2rem rgba(242, 232, 213, 0.46),
-    calc(var(--tt-impact, 0) * -4rem) 0 3rem rgba(242, 232, 213, 0.46);
+    0 0 1.2rem rgba(242, 232, 213, 0.55),
+    0 0 2.2rem rgba(224, 169, 59, 0.35);
   transform: translate(-50%, -50%) rotate(calc(var(--tt-ball-spin, 0) * 1deg));
 }
 
-.tableTrajectory em {
-  position: absolute;
-  top: 48%;
-  right: 7vw;
-  width: 1px;
-  height: 40vh;
-  background: #8b1e2d;
-  opacity: var(--tt-impact, 0);
-  transform: translateY(-50%) scaleY(calc(0.2 + var(--tt-impact, 0)));
-}
-
-.tableTrajectory span {
+.trajectoryTrail {
   position: absolute;
   top: calc(49% + var(--tt-ball-y, 0) * 1%);
   left: calc(50% + var(--tt-ball-x, -42) * 1%);
-  width: clamp(3rem, 7vw, 7rem);
-  height: 0.22rem;
+  width: clamp(2.5rem, 6vw, 6rem);
+  height: 0.2rem;
   border-radius: 999px;
-  background: linear-gradient(90deg, transparent, rgba(242, 232, 213, 0.42));
-  filter: blur(0.16rem);
+  background: linear-gradient(90deg, transparent, rgba(242, 232, 213, 0.45));
+  filter: blur(0.14rem);
   opacity: calc(0.2 + var(--tt-trail, 0) * 0.62);
   transform: translate(-100%, -50%) rotate(calc(var(--tt-rule-turn, 0) * 1deg));
 }
 
 .tableTelemetry {
   position: absolute;
-  top: 62%;
-  right: 4vw;
-  left: 4vw;
+  top: 52%;
+  left: 0;
+  right: 0;
+  max-width: min(100% - 3rem, 36rem);
+  margin: 0 auto;
+  padding: 0 1.25rem;
   z-index: 5;
-  display: flex;
-  justify-content: space-between;
-  font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.48rem, 0.62vw, 0.66rem);
-  letter-spacing: 0.18em;
-  color: rgba(229, 218, 199, 0.56);
   opacity: calc(var(--tt-table, 0) * (1 - var(--achievement-exit)));
+  pointer-events: none;
 }
 
-.tableTelemetry span:nth-child(2) {
-  transform: translateY(calc(var(--tt-ball-y, 0) * -0.08vh));
+.telemetryTrack {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.telemetryLine {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(229, 218, 199, 0.38) 25%,
+    rgba(229, 218, 199, 0.38) 75%,
+    transparent
+  );
+}
+
+.telemetryTag {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0.5rem;
+  font-family: "JetBrains Mono Variable", monospace;
+  white-space: nowrap;
+}
+
+.telemetryIdx {
+  font-size: clamp(0.42rem, 0.52vw, 0.58rem);
+  letter-spacing: 0.14em;
+  color: rgba(229, 218, 199, 0.5);
+}
+
+.telemetryName {
+  font-size: clamp(0.54rem, 0.7vw, 0.76rem);
+  font-weight: 650;
+  letter-spacing: 0.22em;
+  color: rgba(245, 238, 226, 0.94);
+  text-shadow: 0 0 12px rgba(224, 169, 59, 0.28);
+}
+
+.telemetryMetric {
+  font-size: clamp(0.44rem, 0.56vw, 0.62rem);
+  letter-spacing: 0.16em;
+  color: #e0a93b;
+  opacity: 0.9;
 }
 
 .tableStatement {
   position: absolute;
-  right: 4vw;
-  bottom: 8vh;
-  left: 4vw;
+  right: 0;
+  bottom: 4.5vh;
+  left: 0;
+  max-width: min(100% - 3rem, 36rem);
+  margin: 0 auto;
+  padding: 0 1.25rem;
   z-index: 6;
   display: flex;
   align-items: flex-end;
-  justify-content: center;
-  gap: clamp(1.2rem, 3.5vw, 4rem);
+  justify-content: space-between;
+  gap: clamp(1rem, 2.5vw, 3rem);
   opacity: calc(var(--tt-resolve, 0) * (1 - var(--achievement-exit)));
-  transform: translateX(calc((1 - var(--tt-resolve, 0)) * -9vw));
+  transform: translateX(calc((1 - var(--tt-resolve, 0)) * -3vw));
 }
 
-.tableStatement strong,
-.speeches strong {
+.tableStatement strong {
   font-family: var(--font-display);
-  font-size: clamp(10rem, 25vw, 28rem);
-  font-weight: 650;
-  line-height: 0.65;
-  letter-spacing: -0.09em;
+  font-size: clamp(6.5rem, 11vw, 12rem);
+  font-weight: 700;
+  line-height: 0.7;
+  letter-spacing: -0.08em;
+  color: rgba(229, 218, 199, 0.22);
+  text-shadow: 0 0 35px rgba(224, 169, 59, 0.08);
+  user-select: none;
 }
 
-.tableStatement h3,
-.speeches h3 {
+.tableStatement h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(3.6rem, 8.2vw, 9rem);
-  font-weight: 590;
-  line-height: 0.78;
-  letter-spacing: -0.065em;
+  font-size: clamp(2.2rem, 3.8vw, 4.2rem);
+  font-weight: 650;
+  line-height: 0.84;
+  letter-spacing: -0.04em;
+  color: rgba(245, 238, 226, 0.96);
+  text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
 }
 
 .karate .stage {
@@ -1510,33 +1561,33 @@
 }
 
 .narrative .tableTitle {
-  right: 2vw;
-  left: 2vw;
-  font-size: clamp(3rem, 4.7vw, 5.6rem);
-}
-
-.narrative .tableTrajectory i {
-  width: 90%;
-}
-
-.narrative .tableTrajectory b {
-  left: calc(50% + var(--tt-ball-x, -46) * 0.43vw);
+  top: 12vh;
+  left: 0;
+  right: 0;
+  max-width: min(100% - 3.5rem, 35rem);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  font-size: clamp(3.2rem, 5vw, 5.6rem);
 }
 
 .narrative .tableStatement {
-  right: 2vw;
-  left: 2vw;
+  right: 0;
+  bottom: 4.5vh;
+  left: 0;
+  max-width: min(100% - 3.5rem, 36rem);
+  margin: 0 auto;
+  padding: 0 1.25rem;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 1rem;
   transform: translateX(calc((1 - var(--tt-resolve, 0)) * -2vw));
 }
 
 .narrative .tableStatement strong {
-  font-size: clamp(6rem, 9.5vw, 10rem);
+  font-size: clamp(6.5rem, 11vw, 11.5rem);
 }
 
 .narrative .tableStatement h3 {
-  font-size: clamp(2.2rem, 3.35vw, 4rem);
+  font-size: clamp(2.2rem, 3.8vw, 4.2rem);
 }
 
 .narrative .karateStatement {
@@ -1730,6 +1781,7 @@
 }
 
 .chapter.webgl .tableCourt,
+.chapter.webgl .tableTrajectory,
 .chapter.webgl .karateBelt,
 .chapter.webgl .chessGrid,
 .chapter.webgl .speakingScene {
