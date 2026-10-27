@@ -1,14 +1,14 @@
 'use client';
 
 import {
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
   useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
-  type CSSProperties,
-  type MouseEvent as ReactMouseEvent,
-  type PointerEvent as ReactPointerEvent,
 } from 'react';
 import { createPortal } from 'react-dom';
 import './Masonry.css';
@@ -116,6 +116,7 @@ export interface MasonryProps {
   lightbox?: boolean;
   draggable?: boolean;
   onItemClick?: (item: MasonryItem, index: number, event: ReactMouseEvent<HTMLElement>) => void;
+  onItemHover?: (item: MasonryItem | null, index: number) => void;
   onReorder?: (items: MasonryItem[]) => void;
   className?: string;
   style?: CSSProperties;
@@ -333,6 +334,7 @@ export const Masonry = ({
   lightbox = true,
   draggable = true,
   onItemClick,
+  onItemHover,
   onReorder,
   className = '',
   style,
@@ -1116,8 +1118,14 @@ export const Masonry = ({
           'data-card': '',
           onClick: (event: ReactMouseEvent<HTMLElement>) => onCardClick(event, item, index),
           onPointerDown: (event: ReactPointerEvent<HTMLElement>) => startDrag(event, id),
-          onPointerEnter: () => onEnter(id),
-          onPointerLeave: onLeave,
+          onPointerEnter: () => {
+            onEnter(id);
+            onItemHover?.(item, index);
+          },
+          onPointerLeave: (event: ReactPointerEvent<HTMLElement>) => {
+            onLeave(event);
+            onItemHover?.(null, index);
+          },
           onPointerMove: onTilt,
         };
         const content = (

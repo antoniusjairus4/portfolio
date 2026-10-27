@@ -1,7 +1,13 @@
 'use client';
 
 import type { ReactNode, RefObject } from 'react';
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  ChessEditorial,
+  KarateEditorial,
+  PublicSpeakingEditorial,
+  TableTennisEditorial,
+} from '@/components/achievements-kinetic/AchievementEditorial';
 import styles from '@/components/achievements-kinetic/AchievementsChapter.module.css';
 import {
   type AchievementPanelKey,
@@ -14,35 +20,11 @@ import EchoText from '@/components/ui/EchoText';
 import {
   type AchievementDisciplineKey,
   achievementDisciplines,
-  achievementHighlights,
-  chessPeakRatings,
 } from '@/content/achievementsKinetic';
-import {
-  type ChapterProgressController,
-  createChapterProgressController,
-} from '@/experience/chapterProgress';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
-import { useProjectSceneRegistration } from '@/experience/ProjectExperienceProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
 
-const CHESS_CELLS = Array.from({ length: 64 }, (_, index) => `square-${index + 1}`);
-const CHESS_PIECES = [
-  { piece: '♜', square: 'rook' },
-  { piece: '♞', square: 'knight' },
-  { piece: '♛', square: 'queen' },
-  { piece: '♚', square: 'king' },
-  { piece: '♝', square: 'bishop' },
-  { piece: '♟', square: 'pawn' },
-] as const;
-const SPEAKING_DOTS = Array.from({ length: 96 }, (_, index) => ({
-  id: `speaking-dot-${index + 1}`,
-  x: 2 + ((index * 61.8033) % 96),
-  y: 9 + ((index * 41.4213) % 80),
-  size: 0.8 + (index % 4) * 0.38,
-  opacity: 0.14 + (index % 5) * 0.055,
-  depth: 0.58 + (index % 7) * 0.065,
-}));
 const ARCHIVE_ITEMS: MasonryItem[] = [
   {
     id: 'school-captain',
@@ -237,159 +219,12 @@ function DisciplineMeta({ discipline }: { discipline: AchievementDisciplineKey }
   );
 }
 
-interface AchievementFactsProps {
-  title: string;
-  items: readonly { label: string; value: string }[];
-  className?: string;
-}
-
-function AchievementFacts({ title, items, className = '' }: AchievementFactsProps) {
-  return (
-    <section
-      className={`${styles.achievementFacts} ${className}`.trim()}
-      aria-label={`${title} highlights`}
-    >
-      <p>{title}</p>
-      <dl>
-        {items.map((item) => (
-          <div className={styles.achievementFact} key={`${item.label}-${item.value}`}>
-            <dt>{item.label}</dt>
-            <dd>{item.value}</dd>
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function PointerAttractedDots({ reducedMotion }: { reducedMotion: boolean }) {
-  const fieldRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const field = fieldRef.current;
-    if (!field || reducedMotion) return;
-
-    const dots = Array.from(field.children) as HTMLElement[];
-    let frame = 0;
-    let pointerX = 0;
-    let pointerY = 0;
-    let inside = false;
-
-    const resetDots = () => {
-      for (const dot of dots) {
-        dot.style.transform = 'translate3d(0, 0, 0) scale(1)';
-        dot.style.opacity = dot.dataset.opacity ?? '0.2';
-      }
-    };
-
-    const updateDots = () => {
-      frame = 0;
-      if (!inside) {
-        resetDots();
-        return;
-      }
-
-      const rect = field.getBoundingClientRect();
-      const attractionRadius = Math.min(rect.width, rect.height) * 0.42;
-      for (const dot of dots) {
-        const baseX = (Number(dot.dataset.x) / 100) * rect.width;
-        const baseY = (Number(dot.dataset.y) / 100) * rect.height;
-        const deltaX = pointerX - rect.left - baseX;
-        const deltaY = pointerY - rect.top - baseY;
-        const distance = Math.hypot(deltaX, deltaY);
-        const influence = Math.max(0, 1 - distance / attractionRadius) ** 2;
-        const depth = Number(dot.dataset.depth ?? 0.7);
-        const pull = (0.22 + depth * 0.16) * influence;
-        const scale = 1 + influence * (0.35 + depth * 0.28);
-        const baseOpacity = Number(dot.dataset.opacity ?? 0.2);
-        dot.style.transform = `translate3d(${deltaX * pull}px, ${deltaY * pull}px, 0) scale(${scale})`;
-        dot.style.opacity = String(Math.min(0.82, baseOpacity + influence * 0.44));
-      }
-    };
-
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(updateDots);
-    };
-
-    const handlePointerMove = (event: PointerEvent) => {
-      const rect = field.getBoundingClientRect();
-      pointerX = event.clientX;
-      pointerY = event.clientY;
-      inside =
-        pointerX >= rect.left &&
-        pointerX <= rect.right &&
-        pointerY >= rect.top &&
-        pointerY <= rect.bottom;
-      schedule();
-    };
-
-    const handlePointerLeave = () => {
-      inside = false;
-      schedule();
-    };
-
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('blur', handlePointerLeave);
-    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener('pointermove', handlePointerMove);
-      window.removeEventListener('blur', handlePointerLeave);
-      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
-    };
-  }, [reducedMotion]);
-
-  return (
-    <div ref={fieldRef} className={styles.pointerDots} aria-hidden="true">
-      {SPEAKING_DOTS.map((dot) => (
-        <i
-          key={dot.id}
-          data-x={dot.x}
-          data-y={dot.y}
-          data-depth={dot.depth}
-          data-opacity={dot.opacity}
-          style={{
-            left: `${dot.x}%`,
-            top: `${dot.y}%`,
-            width: `${dot.size}px`,
-            height: `${dot.size}px`,
-            opacity: dot.opacity,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
 export function AchievementsChapter() {
   const chapterRef = useRef<HTMLElement>(null);
-  const [controller, setController] = useState<ChapterProgressController | null>(null);
-  const { ready, reducedMotion, portrait, quality, dprCap } = useExperienceEnvironment();
+  const [galleryFocus, setGalleryFocus] = useState<string | null>(null);
+  const { reducedMotion } = useExperienceEnvironment();
   const activity = useChapterActivity(chapterRef);
   const { setMode: setGlobalEtherMode } = useGlobalEther();
-  const rendererActive =
-    ready && !reducedMotion && quality !== 'fallback' && activity !== 'inactive';
-  const sceneRegistration = useMemo(
-    () =>
-      controller
-        ? {
-            controller,
-            sectionRef: chapterRef,
-            activity,
-            enabled: rendererActive,
-            portrait: ready && portrait,
-            dprCap,
-          }
-        : null,
-    [activity, controller, dprCap, portrait, ready, rendererActive],
-  );
-  useProjectSceneRegistration('achievements', sceneRegistration);
-
-  useEffect(() => {
-    const next = createChapterProgressController(chapterRef);
-    setController(next);
-    return () => next.dispose();
-  }, []);
 
   useEffect(() => {
     const chapter = chapterRef.current;
@@ -406,7 +241,7 @@ export function AchievementsChapter() {
       ref={chapterRef}
       id="achievements-section"
       aria-labelledby="achievements-title"
-      className={`${styles.chapter} ${reducedMotion ? styles.static : ''} ${rendererActive ? styles.webgl : ''}`}
+      className={`${styles.chapter} ${reducedMotion ? styles.static : ''}`}
       data-achievements-mode={reducedMotion ? 'static' : 'performance-archive'}
     >
       <h2 id="achievements-title" className={styles.srOnly}>
@@ -488,6 +323,7 @@ export function AchievementsChapter() {
               captions="hover"
               lightbox
               draggable
+              onItemHover={(item) => setGalleryFocus(item?.title ?? null)}
               className="achievement-masonry"
             />
           </div>
@@ -495,190 +331,22 @@ export function AchievementsChapter() {
         <div className={styles.narrative}>
           <KineticPanel panel="table-tennis" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="table-tennis" />
-            <div className={styles.tableCourt} aria-hidden="true">
-              <div className={styles.tableTop}>
-                <i className={styles.tableCenterLine} />
-                <i className={styles.tableEdgeLine} />
-                <span className={styles.tableNet} />
-              </div>
-              <i className={`${styles.tableLeg} ${styles.tableLegNear}`} />
-              <i className={`${styles.tableLeg} ${styles.tableLegFar}`} />
-              <span className={styles.tableUnderlight} />
-            </div>
-            <div className={styles.tableTrajectory} aria-hidden="true">
-              <svg className={styles.trajectorySvg} viewBox="0 0 100 65" preserveAspectRatio="none">
-                <title>Table tennis ball trajectory</title>
-                <path
-                  d="M 6 28 Q 18 16 28 50 Q 38 22 52 26 Q 66 30 76 52 Q 88 30 96 34"
-                  className={styles.trajectoryArc}
-                />
-              </svg>
-              <b className={styles.trajectoryBall} />
-              <span className={styles.trajectoryTrail} />
-            </div>
-            <div className={styles.tableTelemetry} aria-hidden="true">
-              <div className={styles.telemetryTrack}>
-                <span className={styles.telemetryLine} />
-                <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>{'01 //'}</span>
-                  <span className={styles.telemetryName}>VELOCITY</span>
-                  <span className={styles.telemetryMetric}>112 KM/H</span>
-                </div>
-                <span className={styles.telemetryLine} />
-                <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>{'02 //'}</span>
-                  <span className={styles.telemetryName}>SPIN</span>
-                  <span className={styles.telemetryMetric}>8,400 RPM</span>
-                </div>
-                <span className={styles.telemetryLine} />
-                <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>{'03 //'}</span>
-                  <span className={styles.telemetryName}>TRAJECTORY</span>
-                  <span className={styles.telemetryMetric}>BALLISTIC ARC</span>
-                </div>
-                <span className={styles.telemetryLine} />
-              </div>
-            </div>
-            <div className={styles.tableTitle} aria-hidden="true">
-              <span>TABLE</span>
-              <span>TENNIS</span>
-            </div>
-            <div className={styles.tableStatement}>
-              <strong>2×</strong>
-              <h3>
-                STATE
-                <br />
-                CHAMPION
-              </h3>
-            </div>
-            <AchievementFacts
-              title="TABLE TENNIS HONORS"
-              items={achievementHighlights.tableTennis}
-              className={styles.tableFacts}
-            />
+            <TableTennisEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
 
           <KineticPanel panel="karate" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="karate" />
-            <div className={styles.karateDivisions} aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </div>
-            <div className={styles.karateBelt} aria-hidden="true">
-              <div className={styles.beltSweep}>
-                <i />
-                <i />
-                <i />
-                <i />
-                <i />
-              </div>
-              <b className={styles.beltKnot} />
-              <span className={styles.beltTailOne} />
-              <span className={styles.beltTailTwo} />
-            </div>
-            <div className={styles.karateStatement}>
-              <p>KARATE</p>
-              <h3>
-                <span>BLACK</span>
-                <span>BELT</span>
-              </h3>
-            </div>
-            <div className={styles.karatePrinciples}>
-              <span>CONTROL</span>
-              <span>POWER</span>
-              <span>DISCIPLINE</span>
-            </div>
-            <AchievementFacts
-              title="KARATE HONORS"
-              items={achievementHighlights.karate}
-              className={styles.karateFacts}
-            />
+            <KarateEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
 
           <KineticPanel panel="chess" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="chess" />
-            <div className={styles.chessGrid} aria-hidden="true">
-              {CHESS_CELLS.map((cell) => (
-                <i key={cell} />
-              ))}
-              <div className={styles.chessPieces}>
-                {CHESS_PIECES.map(({ piece, square }) => (
-                  <span key={square} className={styles[square]}>
-                    {piece}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className={styles.chessPath} aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </div>
-            <div className={styles.chessStatement}>
-              <div className={styles.chessTitle}>
-                <p>CALCULATION / PRECISION / DECISION</p>
-                <h3>CHESS</h3>
-              </div>
-              <dl className={styles.ratings}>
-                {chessPeakRatings.map((rating) => (
-                  <div key={rating.label}>
-                    <dt>{rating.label}</dt>
-                    <dd>{rating.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
+            <ChessEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
 
           <KineticPanel panel="public-speaking" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="public-speaking" />
-            <div className={styles.audienceField} aria-hidden="true" />
-            <PointerAttractedDots reducedMotion={reducedMotion} />
-            <div className={styles.speakingScene} aria-hidden="true">
-              <div className={styles.stagePlatform}>
-                <i />
-                <i />
-              </div>
-              <div className={styles.microphone}>
-                <b />
-                <i />
-                <span />
-              </div>
-              <div className={styles.stageSpeaker}>
-                <i />
-                <i />
-                <span />
-              </div>
-            </div>
-            <div className={styles.speakingStatement}>
-              <p>PUBLIC SPEAKING</p>
-              <div className={styles.speeches}>
-                <strong>15+</strong>
-                <h3>
-                  SUCCESSFUL
-                  <br />
-                  SPEECHES
-                </h3>
-              </div>
-              <div className={styles.audienceReach}>
-                <strong>15,000</strong>
-                <span>PEOPLE ADDRESSED</span>
-              </div>
-            </div>
-            <div className={styles.speakingInfoGrid}>
-              <AchievementFacts
-                title="MUSIC"
-                items={achievementHighlights.music}
-                className={styles.musicFacts}
-              />
-              <AchievementFacts
-                title="SPEAKING"
-                items={achievementHighlights.speeches}
-                className={styles.speechFacts}
-              />
-            </div>
-            <div className={styles.speakingLight} aria-hidden="true" />
+            <PublicSpeakingEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
 
           <KineticPanel panel="finale" reducedMotion={reducedMotion}>
@@ -686,17 +354,6 @@ export function AchievementsChapter() {
               <span>06 / 06</span>
               <i aria-hidden="true" />
               <span>ONE PRACTICE</span>
-            </div>
-            <div className={styles.finalDisciplines} aria-hidden="true">
-              {achievementDisciplines.map((discipline) => (
-                <span key={discipline.key}>{discipline.title}</span>
-              ))}
-            </div>
-            <div className={styles.finalConcepts} aria-hidden="true">
-              <span>SPEED</span>
-              <span>DISCIPLINE</span>
-              <span>PRECISION</span>
-              <span>PRESENCE</span>
             </div>
             <span
               className={styles.sharedLanyardAnchor}

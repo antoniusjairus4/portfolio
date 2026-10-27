@@ -642,7 +642,6 @@ export function AchievementsScene({
   useFrame((state) => {
     void controller.progress.current;
     const tableProgress = panelProgress('table-tennis', portrait);
-    const beltProgress = panelProgress('karate', portrait);
     const chessProgress = panelProgress('chess', portrait);
     const speakingProgress = panelProgress('public-speaking', portrait);
     const tableEntrance = entrancePresence(tableProgress);
@@ -665,33 +664,15 @@ export function AchievementsScene({
 
     setGroupPresence(table.current, tablePresence, portrait ? 1.35 : 1.74);
     if (table.current) {
-      table.current.position.set(
-        -0.08,
-        (portrait ? -2.05 : -1.78) - (1 - smooth(tableProgress / 0.28)) * 0.85,
-        0.92,
-      );
-      table.current.rotation.set(0.24, -0.62 + tableProgress * 0.05, -0.035);
+      table.current.position.set(-0.08, portrait ? -2.05 : -1.78, 0.92);
+      table.current.rotation.set(0.24, -0.57, -0.035);
     }
 
     const beltScale = portrait ? 0.88 : 1.08;
     setGroupPresence(belt.current, beltPresence, beltScale);
     if (belt.current) {
-      const settle = smooth(beltProgress / 0.38);
-      const time = state.clock.getElapsedTime();
-      const clothBreathing = Math.sin(time * 0.9) * 0.015;
-      const clothSway = Math.cos(time * 0.75) * 0.012;
-
-      belt.current.position.set(
-        centerX + (1 - settle) * -0.65,
-        (portrait ? -0.42 : -0.12) + clothBreathing,
-        0.28,
-      );
-      // 3/4 hero angle showing the knot thickness, layered cross-weave, and natural drape
-      belt.current.rotation.set(
-        0.16,
-        -0.32 + (1 - settle) * -0.22 + clothSway,
-        -0.05 + Math.sin(time * 0.6) * 0.008,
-      );
+      belt.current.position.set(centerX, portrait ? -0.42 : -0.12, 0.28);
+      belt.current.rotation.set(0.16, -0.32, -0.05);
     }
 
     setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.08);

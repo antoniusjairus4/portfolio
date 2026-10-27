@@ -15,13 +15,6 @@ export function rangeProgress(progress: number, start: number, end: number) {
   return clamp01((progress - start) / (end - start));
 }
 
-function pulse(progress: number, start: number, peak: number, end: number) {
-  return (
-    smoothstep(rangeProgress(progress, start, peak)) *
-    (1 - smoothstep(rangeProgress(progress, peak, end)))
-  );
-}
-
 export function getAchievementBeat(panel: AchievementPanelKey, progress: number) {
   const value = clamp01(progress);
   if (panel === 'intro') {
@@ -83,30 +76,29 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   }
 
   if (panel === 'table-tennis') {
-    const table = smoothstep(rangeProgress(value, 0.02, 0.24));
-    const travel = smoothstep(rangeProgress(value, 0.12, 0.6));
+    const title = smoothstep(rangeProgress(value, 0.01, 0.16));
+    const trajectory = smoothstep(rangeProgress(value, 0.08, 0.58));
+    const impactIn = smoothstep(rangeProgress(value, 0.25, 0.34));
+    const impactOut = smoothstep(rangeProgress(value, 0.48, 0.64));
     return {
-      '--tt-title': 0.58 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.42,
-      '--tt-table': table,
-      '--tt-ball-x': -42 + travel * 84,
-      '--tt-ball-y': Math.sin(travel * Math.PI) * -22,
-      '--tt-ball-spin': travel * 900,
-      '--tt-rule-turn': -4 + travel * 8,
-      '--tt-trail': travel,
-      '--tt-impact': pulse(value, 0.39, 0.45, 0.53),
-      '--tt-resolve': 0.1 + smoothstep(rangeProgress(value, 0.39, 0.58)) * 0.9,
+      '--tt-title': title,
+      '--tt-trajectory': trajectory,
+      '--tt-impact':
+        impactIn * (1 - impactOut) + smoothstep(rangeProgress(value, 0.6, 0.72)) * 0.18,
+      '--tt-resolve': smoothstep(rangeProgress(value, 0.42, 0.68)),
     };
   }
 
   if (panel === 'karate') {
-    const lock = 0.16 + smoothstep(rangeProgress(value, 0.13, 0.33)) * 0.84;
+    const title = smoothstep(rangeProgress(value, 0.02, 0.18));
+    const impactIn = smoothstep(rangeProgress(value, 0.16, 0.25));
+    const impactOut = smoothstep(rangeProgress(value, 0.33, 0.48));
     return {
-      '--karate-lock': lock,
-      '--karate-title': 0.16 + smoothstep(rangeProgress(value, 0.05, 0.25)) * 0.84,
-      '--karate-belt': smoothstep(rangeProgress(value, 0.03, 0.38)),
-      '--karate-belt-settle': smoothstep(rangeProgress(value, 0.3, 0.58)),
-      '--karate-impact': pulse(value, 0.27, 0.34, 0.43),
-      '--karate-words': smoothstep(rangeProgress(value, 0.39, 0.66)),
+      '--karate-title': title,
+      '--karate-grid': smoothstep(rangeProgress(value, 0.04, 0.22)),
+      '--karate-impact': impactIn * (1 - impactOut),
+      '--karate-settle': smoothstep(rangeProgress(value, 0.36, 0.56)),
+      '--karate-words': smoothstep(rangeProgress(value, 0.3, 0.52)),
     };
   }
 
@@ -135,13 +127,9 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     };
   }
 
-  const concepts = smoothstep(rangeProgress(value, 0.22, 0.47));
-  const statement = smoothstep(rangeProgress(value, 0.48, 0.72));
   return {
     '--achievement-exit': 0,
-    '--final-disciplines': 1 - smoothstep(rangeProgress(value, 0.2, 0.42)),
-    '--final-concepts': concepts * (1 - smoothstep(rangeProgress(value, 0.52, 0.69))),
-    '--final-statement': statement,
-    '--final-wash': smoothstep(rangeProgress(value, 0.65, 0.96)),
+    '--final-statement': 0.2 + smoothstep(rangeProgress(value, 0.02, 0.24)) * 0.8,
+    '--final-wash': smoothstep(rangeProgress(value, 0.16, 0.72)),
   };
 }

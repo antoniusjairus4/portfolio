@@ -42,7 +42,7 @@
 }
 
 .finale {
-  height: 136svh;
+  height: 118svh;
 }
 
 .stage {
@@ -1455,8 +1455,14 @@
   --intro-word-three: 1;
   --intro-word-four: 1;
   --tt-title: 1;
+  --tt-trajectory: 1;
+  --tt-impact: 0.18;
   --tt-table: 1;
   --tt-resolve: 1;
+  --karate-title: 1;
+  --karate-grid: 1;
+  --karate-impact: 0;
+  --karate-settle: 1;
   --karate-lock: 1;
   --karate-belt: 1;
   --karate-belt-settle: 1;
@@ -1517,7 +1523,7 @@
   }
 
   .finale {
-    height: 128svh;
+    height: 112svh;
   }
 
   .meta {
