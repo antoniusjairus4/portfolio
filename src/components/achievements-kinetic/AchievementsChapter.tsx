@@ -8,7 +8,7 @@ import {
   getAchievementBeat,
   getAchievementMotion,
 } from '@/components/achievements-kinetic/achievementsChoreography';
-import ChromaGrid, { type ChromaItem } from '@/components/achievements-kinetic/ChromaGrid';
+import Masonry, { type MasonryItem } from '@/components/achievements-kinetic/Masonry';
 import LiquidChrome from '@/components/backgrounds/LiquidChrome';
 import {
   type AchievementDisciplineKey,
@@ -33,36 +33,60 @@ const CHESS_PIECES = [
   { piece: '♝', square: 'bishop' },
   { piece: '♟', square: 'pawn' },
 ] as const;
-const ARCHIVE_TILES: ChromaItem[] = [
+const ARCHIVE_ITEMS: MasonryItem[] = [
   {
-    image: '/images/achievements/table-tennis/photo-1-640.webp',
+    id: 'tt-trophy',
+    img: '/images/achievements/table-tennis/photo-1-640.webp',
+    width: 349,
+    height: 396,
+    title: 'Table Tennis Championship',
+    description: 'State Championship & Trophies',
     alt: 'Jairus holding a table tennis trophy, certificate, and medals',
-    accent: '#c6a66e',
   },
   {
-    image: '/images/achievements/karate/photo-1-640.webp',
+    id: 'karate-bout',
+    img: '/images/achievements/karate/photo-1-640.webp',
+    width: 640,
+    height: 547,
+    title: 'Karate Black Belt',
+    description: 'Impact / Precision / Stillness',
     alt: 'Jairus competing in a karate match',
-    accent: '#987454',
   },
   {
-    image: '/images/achievements/table-tennis/kissing-cup.png',
+    id: 'kissing-cup',
+    img: '/images/achievements/table-tennis/kissing-cup.png',
+    width: 436,
+    height: 425,
+    title: 'State Champion',
+    description: '2× State Champion Victory',
     alt: 'Jairus kissing a table tennis trophy',
-    accent: '#9c8a73',
   },
   {
-    image: '/images/achievements/music/photo-1-640.webp',
+    id: 'music-stage',
+    img: '/images/achievements/music/photo-1-640.webp',
+    width: 380,
+    height: 518,
+    title: 'Keyboards & Music',
+    description: 'Discipline & Composition',
     alt: 'Jairus speaking at a microphone in a suit',
-    accent: '#c6a66e',
   },
   {
-    image: '/images/achievements/public-speaking/photo-1-640.webp',
+    id: 'speaking-stage',
+    img: '/images/achievements/public-speaking/photo-1-640.webp',
+    width: 640,
+    height: 1033,
+    title: 'Public Speaking',
+    description: '15+ Speeches across venues',
     alt: 'Jairus addressing an audience on stage',
-    accent: '#98856c',
   },
   {
-    image: '/images/achievements/public-speaking/photo-2-640.webp',
+    id: 'speaking-podium',
+    img: '/images/achievements/public-speaking/photo-2-640.webp',
+    width: 640,
+    height: 954,
+    title: 'Guardian of the Grid',
+    description: '15,000 People Addressed',
     alt: 'Jairus speaking from a lectern at an event',
-    accent: '#bdaf94',
   },
 ];
 
@@ -231,21 +255,18 @@ export function AchievementsChapter() {
             />
           )}
           <div className={styles.showcaseInner}>
-            <ChromaGrid
-              items={ARCHIVE_TILES}
-              columns={3}
-              minCardWidth={100}
-              gap={30}
-              aspectRatio="1 / 1"
-              radius={220}
-              softness={0.7}
-              grayscale={0.9}
-              dim={0.1}
-              glow={0.3}
-              borderGlow={0.7}
-              showInfo={false}
-              cardRadius={10}
-              className="achievement-chroma-grid"
+            <Masonry
+              items={ARCHIVE_ITEMS}
+              columns="auto"
+              columnWidth={170}
+              gap={14}
+              radius={12}
+              animateFrom="bottom"
+              hoverEffect="zoom"
+              captions="hover"
+              lightbox
+              draggable
+              className="achievement-masonry"
             />
           </div>
         </aside>

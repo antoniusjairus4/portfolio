@@ -1345,7 +1345,7 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
    renderer inside the narrative half so no model can render underneath the
    pinned photo archive. */
 .project-experience-layer[data-project-scene="achievements"] {
-  right: 56%;
+  right: 40%;
   overflow: hidden;
 }
 

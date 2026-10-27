@@ -211,16 +211,56 @@ a.chroma-card:focus-visible {
   transition-duration: 0.3s;
 }
 
+.achievement-chroma-grid {
+  width: 100%;
+}
+
 .achievement-chroma-grid .chroma-grid-inner {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--chroma-gap, 18px);
+  width: 100%;
 }
 
 .achievement-chroma-grid .chroma-card {
   padding: 6px;
+  flex: 0 1 calc(50% - (var(--chroma-gap, 18px) / 2));
+  width: calc(50% - (var(--chroma-gap, 18px) / 2));
+  max-width: 230px;
+  min-width: 115px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1700px) {
+  .achievement-chroma-grid .chroma-card {
+    max-width: 250px;
+  }
 }
 
 @media (max-width: 860px) {
   .achievement-chroma-grid .chroma-grid-inner {
-    gap: 18px;
+    gap: 16px;
+  }
+
+  .achievement-chroma-grid .chroma-card {
+    flex: 0 1 calc(50% - 8px);
+    width: calc(50% - 8px);
+    max-width: 180px;
+    min-width: 110px;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievement-chroma-grid .chroma-grid-inner {
+    gap: 12px;
+  }
+
+  .achievement-chroma-grid .chroma-card {
+    flex: 0 1 calc(50% - 6px);
+    width: calc(50% - 6px);
+    max-width: 160px;
+    min-width: 100px;
   }
 }

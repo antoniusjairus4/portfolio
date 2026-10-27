@@ -1430,7 +1430,7 @@
 .layout {
   display: grid;
   grid-template-areas: "narrative showcase";
-  grid-template-columns: minmax(0, 44fr) minmax(0, 56fr);
+  grid-template-columns: minmax(0, 60fr) minmax(0, 40fr);
   align-items: start;
 }
 
@@ -1444,11 +1444,13 @@
   position: sticky;
   top: 0;
   grid-area: showcase;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100svh;
   min-width: 0;
-  padding: clamp(1rem, 1.5vw, 1.75rem);
+  padding: clamp(1rem, 1.8vw, 2.5rem);
   overflow: hidden;
   isolation: isolate;
   background:
@@ -1482,7 +1484,11 @@
 .showcaseInner {
   position: relative;
   z-index: 2;
-  width: min(100%, 96svh, 60rem);
+  width: 100%;
+  max-width: min(100%, 75svh, 30rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .narrative .stage {
