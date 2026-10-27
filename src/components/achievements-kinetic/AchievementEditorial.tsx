@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { CSSProperties, ReactNode, PointerEvent as ReactPointerEvent } from 'react';
 import { useRef } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementEditorial.module.css';
@@ -92,6 +93,50 @@ function GallerySignal({ label }: { label?: string | null }) {
   );
 }
 
+function TableTennisPaddle({ reducedMotion }: { reducedMotion: boolean }) {
+  const paddleRef = useRef<HTMLDivElement>(null);
+
+  const handlePointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (reducedMotion || !paddleRef.current) return;
+
+    const rect = paddleRef.current.getBoundingClientRect();
+    const x = Math.min(1, Math.max(0, (event.clientX - rect.left) / rect.width));
+    const y = Math.min(1, Math.max(0, (event.clientY - rect.top) / rect.height));
+
+    paddleRef.current.style.setProperty('--paddle-x', `${(x - 0.5) * 30}px`);
+    paddleRef.current.style.setProperty('--paddle-y', `${(y - 0.5) * 22}px`);
+    paddleRef.current.style.setProperty('--paddle-rotate-x', `${(0.5 - y) * 8}deg`);
+    paddleRef.current.style.setProperty('--paddle-rotate-y', `${(x - 0.5) * 10}deg`);
+  };
+
+  const handlePointerLeave = () => {
+    if (!paddleRef.current) return;
+
+    paddleRef.current.style.setProperty('--paddle-x', '0px');
+    paddleRef.current.style.setProperty('--paddle-y', '0px');
+    paddleRef.current.style.setProperty('--paddle-rotate-x', '0deg');
+    paddleRef.current.style.setProperty('--paddle-rotate-y', '0deg');
+  };
+
+  return (
+    <div
+      ref={paddleRef}
+      className={styles.tablePaddle}
+      onPointerMove={handlePointerMove}
+      onPointerLeave={handlePointerLeave}
+    >
+      <Image
+        src="/images/achievements/table-tennis/black-rubber-racket.png"
+        alt="Black table tennis paddle"
+        width={1199}
+        height={1312}
+        sizes="(max-width: 860px) 42vw, 25vw"
+        draggable={false}
+      />
+    </div>
+  );
+}
+
 export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
   return (
     <InteractiveField className={styles.tableTennis} reducedMotion={reducedMotion}>
@@ -100,6 +145,8 @@ export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialP
         <span>TABLE</span>
         <span>TENNIS</span>
       </div>
+
+      <TableTennisPaddle reducedMotion={reducedMotion} />
 
       <svg
         className={styles.trajectorySystem}

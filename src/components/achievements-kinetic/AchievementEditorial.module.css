@@ -157,6 +157,57 @@
   -webkit-text-stroke: 1px rgba(18, 38, 48, 0.52);
 }
 
+.tablePaddle {
+  --paddle-x: 0px;
+  --paddle-y: 0px;
+  --paddle-rotate-x: 0deg;
+  --paddle-rotate-y: 0deg;
+  position: absolute;
+  top: 28%;
+  left: 34%;
+  z-index: 7;
+  width: clamp(15rem, 25vw, 27rem);
+  aspect-ratio: 1199 / 1312;
+  cursor: crosshair;
+  opacity: calc(0.16 + var(--tt-trajectory, 0) * 0.84);
+  filter: drop-shadow(0 1.4rem 1.25rem rgba(12, 31, 39, 0.2));
+  transform: translateX(-50%) translate3d(var(--paddle-x), var(--paddle-y), 0) perspective(900px)
+    rotateX(var(--paddle-rotate-x)) rotateY(var(--paddle-rotate-y)) rotateZ(-4deg)
+    scale(calc(0.9 + var(--tt-trajectory, 0) * 0.1));
+  transform-origin: 48% 50%;
+  transition:
+    transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    filter 320ms ease,
+    opacity 280ms ease;
+  will-change: transform;
+}
+
+.tablePaddle::before {
+  position: absolute;
+  inset: 12% 4% 16% 5%;
+  z-index: -1;
+  content: "";
+  border-radius: 50%;
+  pointer-events: none;
+  background: rgba(0, 174, 202, 0.22);
+  filter: blur(2.5rem);
+  opacity: calc(var(--tt-impact, 0) * 0.65);
+  transform: scale(0.82);
+}
+
+.tablePaddle:hover {
+  filter: drop-shadow(0 1.8rem 1.6rem rgba(12, 31, 39, 0.28));
+}
+
+.tablePaddle img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
 .trajectorySystem {
   position: absolute;
   inset: 14% -4% 11% 0;
@@ -1054,6 +1105,13 @@
     font-size: clamp(3rem, 13vw, 5rem);
   }
 
+  .tablePaddle {
+    top: 27%;
+    left: 38%;
+    width: clamp(10rem, 42vw, 15rem);
+    opacity: calc(0.12 + var(--tt-trajectory, 0) * 0.76);
+  }
+
   .tableFacts,
   .karateFacts {
     top: 4.5rem;
@@ -1184,5 +1242,10 @@
   .speakingGlow {
     transition: none;
     transform: none;
+  }
+
+  .tablePaddle {
+    transform: translateX(-50%) rotateZ(-4deg);
+    transition: none;
   }
 }
