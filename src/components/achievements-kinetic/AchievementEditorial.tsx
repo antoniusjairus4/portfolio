@@ -300,18 +300,18 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
         </div>
       </div>
 
-      {/* Layer 6: Typography Hierarchy — KARATE as Dominant Hero Typography */}
-      <div className={styles.karateTypographyGroup}>
-        <div className={styles.heroKarateWrapper}>
-          <h3 className={styles.heroKarate}>KARATE</h3>
+      {/* Layer 6A: Subordinate Achievement Title (Top-Left) */}
+      <div className={styles.subordinateBeltTitle}>
+        <span className={styles.beltTitlePrefix}>01 // DAN RANK</span>
+        <div className={styles.beltWordsStack}>
+          <span>BLACK</span>
+          <span>BELT</span>
         </div>
-        <div className={styles.subordinateBeltTitle}>
-          <span className={styles.beltTitlePrefix}>01 // DAN RANK</span>
-          <div className={styles.beltWordsStack}>
-            <span>BLACK</span>
-            <span>BELT</span>
-          </div>
-        </div>
+      </div>
+
+      {/* Layer 6B: Dominant Hero Typography (Bottom-Right) */}
+      <div className={styles.heroKarateWrapper}>
+        <h3 className={styles.heroKarate}>KARATE</h3>
       </div>
 
       {/* Layer 7: Integrated Karate Honors (upper-right) */}
