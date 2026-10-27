@@ -4,8 +4,10 @@ import { useGLTF } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import { type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
+  AdditiveBlending,
   BufferGeometry,
   Color,
+  DoubleSide,
   type Group,
   Line as ThreeLine,
   LineBasicMaterial,
@@ -508,6 +510,79 @@ function KarateBackdrop({ materialRef }: { materialRef: RefObject<ShaderMaterial
   );
 }
 
+function SpeakingSpotlightAtmosphere() {
+  const dustPositions = useMemo(() => {
+    const count = 72;
+    const positions = new Float32Array(count * 3);
+    for (let index = 0; index < count; index += 1) {
+      const progress = (index + 0.5) / count;
+      const angle = index * 2.399963;
+      const radius = (0.12 + progress * 0.82) * (0.38 + ((index * 17) % 31) / 50);
+      positions[index * 3] = -0.42 + Math.cos(angle) * radius;
+      positions[index * 3 + 1] = 0.38 + progress * 5.2;
+      positions[index * 3 + 2] = 0.3 + Math.sin(angle) * radius * 0.56;
+    }
+    return positions;
+  }, []);
+
+  return (
+    <group>
+      <mesh position={[-0.42, 3.05, 0.28]} rotation={[0, 0, -0.035]} renderOrder={-3}>
+        <coneGeometry args={[1.48, 6.3, 48, 1, true]} />
+        <meshBasicMaterial
+          color="#ead5ad"
+          transparent
+          opacity={0.052}
+          depthWrite={false}
+          blending={AdditiveBlending}
+          side={DoubleSide}
+        />
+      </mesh>
+
+      <points position={[0, 0, 0.04]} renderOrder={2}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[dustPositions, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#f1dfbd"
+          size={0.024}
+          sizeAttenuation
+          transparent
+          opacity={0.34}
+          depthWrite={false}
+          blending={AdditiveBlending}
+        />
+      </points>
+
+      <mesh position={[-0.42, 0.045, 0.35]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>
+        <circleGeometry args={[1.72, 64]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          blending={AdditiveBlending}
+          vertexShader={`
+            varying vec2 vUv;
+            void main() {
+              vUv = uv;
+              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+          `}
+          fragmentShader={`
+            varying vec2 vUv;
+            void main() {
+              vec2 p = (vUv - vec2(0.5)) * 2.0;
+              float distanceFromCenter = length(vec2(p.x * 0.82, p.y));
+              float pool = smoothstep(1.0, 0.0, distanceFromCenter);
+              pool = pow(pool, 2.2);
+              gl_FragColor = vec4(vec3(0.93, 0.82, 0.64), pool * 0.22);
+            }
+          `}
+        />
+      </mesh>
+    </group>
+  );
+}
+
 export function AchievementsScene({
   controller,
   portrait,
@@ -525,6 +600,7 @@ export function AchievementsScene({
   const beltRimLight = useRef<SpotLight>(null);
   const chessLight = useRef<SpotLight>(null);
   const speakingLight = useRef<SpotLight>(null);
+  const speakingRimLight = useRef<SpotLight>(null);
   const tableBackdrop = useRef<ShaderMaterial>(null);
   const karateBackdrop = useRef<ShaderMaterial>(null);
   const floorMaterial = useRef<ShaderMaterial>(null);
@@ -626,6 +702,7 @@ export function AchievementsScene({
     if (beltRimLight.current) beltRimLight.current.intensity = beltPresence * 24;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 58;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 68;
+    if (speakingRimLight.current) speakingRimLight.current.intensity = speakingPresence * 32;
     if (tableBackdrop.current) {
       tableBackdrop.current.uniforms.uOpacity.value = tablePresence;
       tableBackdrop.current.uniforms.uTime.value = state.clock.getElapsedTime();
@@ -688,11 +765,20 @@ export function AchievementsScene({
       />
       <spotLight
         ref={speakingLight}
-        position={[1.8, 6.2, 4.5]}
+        position={[0.25, 6.8, 3.2]}
         color="#ead5ad"
         distance={17}
-        angle={0.52}
-        penumbra={0.74}
+        angle={0.4}
+        penumbra={0.82}
+        decay={2}
+      />
+      <spotLight
+        ref={speakingRimLight}
+        position={[-1.8, 4.2, -2.2]}
+        color="#f1dfbd"
+        distance={11}
+        angle={0.48}
+        penumbra={0.88}
         decay={2}
       />
 
@@ -767,6 +853,7 @@ export function AchievementsScene({
       </group>
 
       <group ref={speaking} visible={false}>
+        <SpeakingSpotlightAtmosphere />
         <group position={[0, -0.15, 0]} scale={0.92}>
           <LoadedModel url={`${MODEL_ROOT}/stage-platform.glb`} treatment="charcoal" />
         </group>

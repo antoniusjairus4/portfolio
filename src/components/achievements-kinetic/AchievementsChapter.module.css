@@ -1029,7 +1029,38 @@
 }
 
 .public-speaking .stage {
-  background: #11100f;
+  background:
+    radial-gradient(ellipse 38% 24% at 67% 75%, rgba(205, 172, 119, 0.12), transparent 72%),
+    linear-gradient(180deg, #0d0c0b 0%, #11100f 55%, #090807 100%);
+}
+
+.public-speaking .stage::before {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 0;
+  height: 44%;
+  content: "";
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 33% 22% at 67% 58%, rgba(236, 214, 174, 0.16), transparent 72%),
+    linear-gradient(105deg, transparent 35%, rgba(229, 218, 199, 0.035) 58%, transparent 76%),
+    linear-gradient(180deg, rgba(56, 49, 42, 0.22), rgba(5, 5, 5, 0.7));
+  border-top: 1px solid rgba(229, 218, 199, 0.09);
+  box-shadow: inset 0 1.5rem 4rem rgba(211, 180, 130, 0.025);
+  opacity: calc(var(--speaking-stage, 0) * (1 - var(--achievement-exit)));
+  transform: perspective(70rem) rotateX(57deg) scaleX(1.16);
+  transform-origin: center bottom;
+}
+
+.public-speaking .stage::after {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  content: "";
+  pointer-events: none;
+  background: radial-gradient(ellipse at 66% 48%, transparent 18%, rgba(4, 4, 4, 0.2) 64%, rgba(4, 4, 4, 0.48));
 }
 
 .speakingScene {
@@ -1189,30 +1220,90 @@
   position: absolute;
   inset: 19vh 5vw 6vh;
   z-index: 0;
-  background-image:
-    radial-gradient(circle, rgba(229, 218, 199, 0.54) 0 1px, transparent 1.5px),
-    linear-gradient(90deg, transparent 48%, rgba(229, 218, 199, 0.1) 50%, transparent 52%);
-  background-position:
-    0 0,
-    0 0;
-  background-size:
-    2.3rem 2rem,
-    8rem 100%;
-  opacity: calc(var(--speaking-audience, 0) * 0.48 * (1 - var(--achievement-exit)));
+  background-image: linear-gradient(
+    90deg,
+    transparent 48%,
+    rgba(229, 218, 199, 0.08) 50%,
+    transparent 52%
+  );
+  background-size: 8rem 100%;
+  opacity: calc(var(--speaking-audience, 0) * 0.34 * (1 - var(--achievement-exit)));
   mask-image: radial-gradient(ellipse at center, #000 18%, rgba(0, 0, 0, 0.7) 52%, transparent 84%);
   transform: scale(var(--speaking-scale, 0.72));
 }
 
+.pointerDots {
+  position: absolute;
+  inset: 7vh 1.5vw 10vh;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: calc(var(--speaking-audience, 0) * (1 - var(--achievement-exit)));
+  mask-image: radial-gradient(ellipse at 58% 48%, #000 18%, rgba(0, 0, 0, 0.8) 62%, transparent 100%);
+}
+
+.pointerDots i {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  background: #f2e8d5;
+  box-shadow: 0 0 0.42rem rgba(242, 232, 213, 0.42);
+  transform: translate3d(0, 0, 0) scale(1);
+  transition:
+    transform 110ms cubic-bezier(0.22, 0.72, 0.26, 1),
+    opacity 160ms ease;
+  will-change: transform, opacity;
+}
+
 .speakingLight {
   position: absolute;
-  top: -20vh;
-  left: 50%;
+  top: -12vh;
+  left: 67%;
   z-index: 1;
-  width: 58vw;
-  height: 110vh;
-  background: radial-gradient(ellipse at 50% 0%, rgba(242, 232, 213, 0.2), transparent 67%);
+  width: min(42vw, 44rem);
+  height: 108vh;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 18%, rgba(238, 215, 175, 0.1), transparent 63%);
   opacity: calc(var(--speaking-reach, 0) * (1 - var(--achievement-exit)));
   transform: translateX(-50%);
+}
+
+.speakingLight::before {
+  position: absolute;
+  top: -3%;
+  right: 9%;
+  bottom: 19%;
+  left: 9%;
+  content: "";
+  background:
+    radial-gradient(circle at 28% 31%, rgba(242, 225, 194, 0.2) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 67% 54%, rgba(242, 225, 194, 0.14) 0 1px, transparent 1.5px),
+    linear-gradient(180deg, rgba(242, 225, 194, 0.19), rgba(210, 175, 119, 0.055) 67%, transparent);
+  background-size:
+    3.4rem 4.1rem,
+    4.8rem 5.2rem,
+    100% 100%;
+  clip-path: polygon(43% 0, 57% 0, 92% 100%, 8% 100%);
+  filter: blur(0.65rem);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 9%, #000 82%, transparent 100%);
+}
+
+.speakingLight::after {
+  position: absolute;
+  right: 1%;
+  bottom: 9%;
+  left: 1%;
+  height: 15%;
+  content: "";
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(242, 222, 187, 0.24) 0%,
+    rgba(207, 170, 112, 0.1) 35%,
+    transparent 72%
+  );
+  filter: blur(0.8rem);
+  transform: scaleX(1.18);
 }
 
 .speakingStatement {

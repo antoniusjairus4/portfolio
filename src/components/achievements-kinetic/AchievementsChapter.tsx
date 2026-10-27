@@ -35,6 +35,14 @@ const CHESS_PIECES = [
   { piece: '♝', square: 'bishop' },
   { piece: '♟', square: 'pawn' },
 ] as const;
+const SPEAKING_DOTS = Array.from({ length: 96 }, (_, index) => ({
+  id: `speaking-dot-${index + 1}`,
+  x: 2 + ((index * 61.8033) % 96),
+  y: 9 + ((index * 41.4213) % 80),
+  size: 0.8 + (index % 4) * 0.38,
+  opacity: 0.14 + (index % 5) * 0.055,
+  depth: 0.58 + (index % 7) * 0.065,
+}));
 const ARCHIVE_ITEMS: MasonryItem[] = [
   {
     id: 'school-captain',
@@ -243,6 +251,105 @@ function AchievementFacts({ title, items, className = '' }: AchievementFactsProp
         ))}
       </dl>
     </section>
+  );
+}
+
+function PointerAttractedDots({ reducedMotion }: { reducedMotion: boolean }) {
+  const fieldRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const field = fieldRef.current;
+    if (!field || reducedMotion) return;
+
+    const dots = Array.from(field.children) as HTMLElement[];
+    let frame = 0;
+    let pointerX = 0;
+    let pointerY = 0;
+    let inside = false;
+
+    const resetDots = () => {
+      for (const dot of dots) {
+        dot.style.transform = 'translate3d(0, 0, 0) scale(1)';
+        dot.style.opacity = dot.dataset.opacity ?? '0.2';
+      }
+    };
+
+    const updateDots = () => {
+      frame = 0;
+      if (!inside) {
+        resetDots();
+        return;
+      }
+
+      const rect = field.getBoundingClientRect();
+      const attractionRadius = Math.min(rect.width, rect.height) * 0.42;
+      for (const dot of dots) {
+        const baseX = (Number(dot.dataset.x) / 100) * rect.width;
+        const baseY = (Number(dot.dataset.y) / 100) * rect.height;
+        const deltaX = pointerX - rect.left - baseX;
+        const deltaY = pointerY - rect.top - baseY;
+        const distance = Math.hypot(deltaX, deltaY);
+        const influence = Math.max(0, 1 - distance / attractionRadius) ** 2;
+        const depth = Number(dot.dataset.depth ?? 0.7);
+        const pull = (0.22 + depth * 0.16) * influence;
+        const scale = 1 + influence * (0.35 + depth * 0.28);
+        const baseOpacity = Number(dot.dataset.opacity ?? 0.2);
+        dot.style.transform = `translate3d(${deltaX * pull}px, ${deltaY * pull}px, 0) scale(${scale})`;
+        dot.style.opacity = String(Math.min(0.82, baseOpacity + influence * 0.44));
+      }
+    };
+
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(updateDots);
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const rect = field.getBoundingClientRect();
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      inside =
+        pointerX >= rect.left &&
+        pointerX <= rect.right &&
+        pointerY >= rect.top &&
+        pointerY <= rect.bottom;
+      schedule();
+    };
+
+    const handlePointerLeave = () => {
+      inside = false;
+      schedule();
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('blur', handlePointerLeave);
+    document.documentElement.addEventListener('mouseleave', handlePointerLeave);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.documentElement.removeEventListener('mouseleave', handlePointerLeave);
+    };
+  }, [reducedMotion]);
+
+  return (
+    <div ref={fieldRef} className={styles.pointerDots} aria-hidden="true">
+      {SPEAKING_DOTS.map((dot) => (
+        <i
+          key={dot.id}
+          data-x={dot.x}
+          data-y={dot.y}
+          data-depth={dot.depth}
+          data-opacity={dot.opacity}
+          style={{
+            left: `${dot.x}%`,
+            top: `${dot.y}%`,
+            width: `${dot.size}px`,
+            height: `${dot.size}px`,
+            opacity: dot.opacity,
+          }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -519,6 +626,7 @@ export function AchievementsChapter() {
           <KineticPanel panel="public-speaking" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="public-speaking" />
             <div className={styles.audienceField} aria-hidden="true" />
+            <PointerAttractedDots reducedMotion={reducedMotion} />
             <div className={styles.speakingScene} aria-hidden="true">
               <div className={styles.stagePlatform}>
                 <i />
