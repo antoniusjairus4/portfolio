@@ -317,7 +317,7 @@ export function AchievementsScene({
       />
       <spotLight
         ref={beltLight}
-        position={[-3, 4.2, 4]}
+        position={[-1.8, 4.2, 4]}
         color="#d9cdb9"
         distance={13}
         angle={0.58}

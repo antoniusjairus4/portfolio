@@ -75,16 +75,16 @@ edge = fabric_material("Woven edge highlight", (0.045, 0.046, 0.048, 1.0), 0.62)
 
 
 def sweep(t):
-    x = -2.7 + t * 4.75
-    y = math.sin(t * math.pi * 2.0) * 0.18 + math.sin(t * math.pi * 5.0) * 0.055
-    z = 0.28 + math.sin(t * math.pi) * 0.66 - t * 0.08
+    x = -2.4 + t * 2.45
+    y = math.sin(t * math.pi * 2.0) * 0.16 + math.sin(t * math.pi * 5.0) * 0.045
+    z = 0.32 + math.sin(t * math.pi) * 0.62 - t * 0.06
     return x, y, z
 
 
 main = ribbon_mesh("Black belt sweep", sweep, width=0.5, segments=96, across=8, thickness=0.065)
 main.data.materials.append(black)
 
-knot = bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=4, radius=0.42, location=(1.93, 0.0, 0.36))
+knot = bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=4, radius=0.42, location=(0.0, 0.0, 0.36))
 knot = bpy.context.object
 knot.name = "Layered belt knot"
 knot.scale = (1.0, 0.62, 0.68)
@@ -95,7 +95,7 @@ bpy.ops.object.shade_smooth()
 
 def tail_one(t):
     return (
-        1.88 + math.sin(t * math.pi) * 0.34,
+        -0.05 + math.sin(t * math.pi) * 0.34,
         -0.03 + math.sin(t * math.pi * 2.6) * 0.12,
         0.25 - t * 2.25 + math.sin(t * math.pi) * 0.22,
     )
@@ -103,7 +103,7 @@ def tail_one(t):
 
 def tail_two(t):
     return (
-        2.04 + t * 0.66 + math.sin(t * math.pi) * 0.2,
+        0.11 + t * 0.45 + math.sin(t * math.pi) * 0.2,
         0.05 - math.sin(t * math.pi * 2.2) * 0.1,
         0.24 - t * 1.88 - math.sin(t * math.pi) * 0.18,
     )
