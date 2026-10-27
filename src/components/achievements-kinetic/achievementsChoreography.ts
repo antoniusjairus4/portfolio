@@ -74,6 +74,11 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
       '--intro-title': title,
       '--intro-split': split,
       '--intro-scale': 1.08 - title * 0.08 - split * 0.05,
+      '--intro-beyond': smoothstep(rangeProgress(value, 0.14, 0.34)),
+      '--intro-word-one': 0.16 + smoothstep(rangeProgress(value, 0.17, 0.32)) * 0.84,
+      '--intro-word-two': 0.12 + smoothstep(rangeProgress(value, 0.23, 0.38)) * 0.88,
+      '--intro-word-three': 0.08 + smoothstep(rangeProgress(value, 0.29, 0.44)) * 0.92,
+      '--intro-word-four': 0.05 + smoothstep(rangeProgress(value, 0.35, 0.5)) * 0.95,
     };
   }
 

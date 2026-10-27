@@ -10,6 +10,7 @@ import {
 } from '@/components/achievements-kinetic/achievementsChoreography';
 import Masonry, { type MasonryItem } from '@/components/achievements-kinetic/Masonry';
 import LiquidChrome from '@/components/backgrounds/LiquidChrome';
+import EchoText from '@/components/ui/EchoText';
 import {
   type AchievementDisciplineKey,
   achievementDisciplines,
@@ -260,19 +261,42 @@ export function AchievementsChapter() {
       </h2>
 
       <KineticPanel panel="intro" reducedMotion={reducedMotion}>
+        <div className={styles.introBackdrop} aria-hidden="true" />
         <div className={styles.meta}>
           <span>00 / 06</span>
           <i aria-hidden="true" />
           <span>THE PERFORMANCE ARCHIVE</span>
         </div>
         <div className={styles.introStatement}>
+          <h3>
+            <EchoText
+              text="ACHIEVEMENTS"
+              echoes={18}
+              lag={0.26}
+              offset={62}
+              direction="diagonal"
+              fade={0.78}
+              blur={4}
+              echoColors={['#e5dac7', '#8b1e2d']}
+              echoScale={1.045}
+              mode="both"
+              trail="scroll"
+              clickBurst
+              duration={1100}
+              ease="snappy"
+              fontSize="inherit"
+              fontWeight="inherit"
+              color="currentColor"
+              className={styles.achievementEcho}
+            />
+          </h3>
           <p>BEYOND THE CODE.</p>
-          <h3>ACHIEVEMENTS</h3>
-        </div>
-        <div className={styles.disciplineIndex}>
-          {achievementDisciplines.map((discipline) => (
-            <span key={discipline.key}>{discipline.title}</span>
-          ))}
+          <div className={styles.disciplineIndex}>
+            <span>Table Tennis</span>
+            <span>Karate</span>
+            <span>Chess</span>
+            <span>Speaches</span>
+          </div>
         </div>
       </KineticPanel>
 

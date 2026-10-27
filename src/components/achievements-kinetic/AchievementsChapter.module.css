@@ -26,7 +26,7 @@
 }
 
 .intro {
-  height: 128svh;
+  height: 145svh;
 }
 
 .karate {
@@ -55,6 +55,38 @@
   isolation: isolate;
 }
 
+.intro .stage {
+  background: #080706;
+}
+
+.introBackdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: url("/images/achievements/achievement-arena.png");
+  background-position: center;
+  background-size: cover;
+  filter: saturate(0.92) contrast(1.06);
+  transform: scale(calc(1.06 - var(--intro-split, 0) * 0.04));
+  transform-origin: 50% 58%;
+  will-change: transform, opacity;
+}
+
+.introBackdrop::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5, 4, 3, 0.28),
+      transparent 30%,
+      transparent 72%,
+      rgba(5, 4, 3, 0.36)
+    ),
+    radial-gradient(ellipse at center, transparent 42%, rgba(5, 4, 3, 0.34) 100%);
+}
+
 .meta {
   position: absolute;
   top: clamp(1.25rem, 3vw, 2.7rem);
@@ -81,8 +113,10 @@
   position: absolute;
   inset: 0;
   z-index: 3;
-  display: grid;
-  place-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   padding: 7vw 4vw;
   text-align: center;
   opacity: calc(var(--intro-title, 0) * (1 - var(--achievement-exit)));
@@ -100,34 +134,63 @@
   letter-spacing: 0.19em;
 }
 
+.introStatement p {
+  margin-top: clamp(1.2rem, 2.4vh, 2.2rem);
+  color: rgba(229, 218, 199, 0.86);
+  opacity: calc((0.72 + var(--intro-beyond, 0) * 0.28) * (1 - var(--achievement-exit)));
+  transform: translateY(calc((1 - var(--intro-beyond, 0)) * 1.5rem));
+}
+
 .introStatement h3 {
-  margin: 1.4rem 0 0;
+  width: min(94vw, 112rem);
+  margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(4rem, 14.4vw, 14.5rem);
+  font-size: clamp(4rem, 11vw, 13.5rem);
   font-weight: 650;
   line-height: 0.8;
   letter-spacing: -0.075em;
+  text-shadow: 0 0.08em 0.34em rgba(0, 0, 0, 0.7);
   white-space: nowrap;
 }
 
+.achievementEcho {
+  max-width: 100%;
+}
+
 .disciplineIndex {
-  position: absolute;
-  right: 4vw;
-  bottom: 5vh;
-  left: 4vw;
-  z-index: 4;
+  position: relative;
+  z-index: 5;
   display: grid;
+  width: min(84vw, 88rem);
+  margin-top: clamp(1.25rem, 3vh, 2.8rem);
   grid-template-columns: repeat(4, 1fr);
   border-top: 1px solid rgba(229, 218, 199, 0.28);
-  opacity: calc(var(--intro-split, 0) * (1 - var(--achievement-exit)));
 }
 
 .disciplineIndex span {
-  padding: 1rem 0.8rem 0;
+  --discipline-reveal: var(--intro-word-one, 0);
+  padding: clamp(1rem, 2vh, 1.45rem) 0.8rem 0;
   font-family: var(--font-display);
-  font-size: clamp(0.78rem, 1.15vw, 1.25rem);
+  font-size: clamp(0.9rem, 1.18vw, 1.35rem);
+  font-weight: 540;
+  letter-spacing: 0.045em;
+  color: #e5dac7;
   text-align: center;
-  transform: translateY(calc((1 - var(--intro-split, 0)) * 2rem));
+  opacity: calc((0.78 + var(--discipline-reveal) * 0.22) * (1 - var(--achievement-exit)));
+  transform: translateY(calc((1 - var(--discipline-reveal)) * 2rem));
+  text-shadow: 0 0.12rem 0.8rem rgba(0, 0, 0, 0.9);
+}
+
+.disciplineIndex span:nth-child(2) {
+  --discipline-reveal: var(--intro-word-two, 0);
+}
+
+.disciplineIndex span:nth-child(3) {
+  --discipline-reveal: var(--intro-word-three, 0);
+}
+
+.disciplineIndex span:nth-child(4) {
+  --discipline-reveal: var(--intro-word-four, 0);
 }
 
 .table-tennis .stage {
@@ -1199,6 +1262,11 @@
   --intro-title: 1;
   --intro-split: 1;
   --intro-scale: 1;
+  --intro-beyond: 1;
+  --intro-word-one: 1;
+  --intro-word-two: 1;
+  --intro-word-three: 1;
+  --intro-word-four: 1;
   --tt-title: 1;
   --tt-table: 1;
   --tt-resolve: 1;
