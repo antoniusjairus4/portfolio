@@ -421,10 +421,17 @@
 
 /* 02 — IMPACT / PRECISION / STILLNESS */
 .karate {
-  position: relative;
+  position: absolute;
+  inset: 0;
   overflow: hidden;
   color: #15120f;
-  background: linear-gradient(142deg, #f0e7d8 0%, #e5d9c5 48%, #d8caa7 100%);
+  background:
+    radial-gradient(
+      circle at var(--pointer-x, 50%) var(--pointer-y, 50%),
+      rgba(139, 30, 45, 0.08),
+      transparent 35%
+    ),
+    linear-gradient(142deg, #f4ede1 0%, #ebe0cd 48%, #dfcfb4 100%);
 }
 
 .karateAtmosphere {
@@ -446,7 +453,7 @@
     linear-gradient(rgba(21, 18, 15, 0.065) 1px, transparent 1px),
     linear-gradient(90deg, rgba(21, 18, 15, 0.065) 1px, transparent 1px);
   background-size: 10% 12.5%;
-  opacity: calc(0.6 + var(--karate-grid, 0) * 0.4);
+  opacity: calc(0.65 + var(--karate-grid, 0.35) * 0.35);
   transform: scale(calc(0.99 + var(--karate-impact, 0) * 0.02));
   transition: transform 300ms ease;
 }
@@ -664,7 +671,7 @@
   box-shadow:
     0 1.8rem 3.5rem rgba(12, 10, 8, 0.28),
     0 0.5rem 1.2rem rgba(0, 0, 0, 0.35);
-  transform: rotate(-19deg) translateY(calc((1 - var(--karate-settle, 0)) * -2rem));
+  transform: rotate(-19deg) translateY(calc((1 - var(--karate-settle, 1)) * -1.5rem));
   transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -679,7 +686,7 @@
   border-top: 1px dashed rgba(255, 255, 255, 0.13);
   border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
   box-shadow: 0 1.2rem 2.5rem rgba(12, 10, 8, 0.22);
-  transform: rotate(32deg) translateY(calc((1 - var(--karate-settle, 0)) * 2rem));
+  transform: rotate(32deg) translateY(calc((1 - var(--karate-settle, 1)) * 1.5rem));
   transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -750,8 +757,8 @@
   line-height: 0.72;
   letter-spacing: -0.075em;
   color: #12100e;
-  opacity: var(--karate-title, 0);
-  transform: translateX(calc((1 - var(--karate-title, 0)) * -4rem + (var(--karate-impact, 0) * 3px)));
+  opacity: calc(0.9 + var(--karate-title, 0.1) * 0.1);
+  transform: translateX(calc((1 - var(--karate-title, 1)) * -3.5rem + (var(--karate-impact, 0) * 4px)));
   transition:
     transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 600ms ease;
@@ -783,8 +790,8 @@
   line-height: 0.8;
   letter-spacing: -0.05em;
   color: #15120f;
-  opacity: calc(var(--karate-title, 0) * 0.95);
-  transform: translateX(calc((1 - var(--karate-title, 0)) * -2rem));
+  opacity: calc(0.85 + var(--karate-title, 0.15) * 0.15);
+  transform: translateX(calc((1 - var(--karate-title, 1)) * -1.8rem));
   transition:
     transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 700ms ease;
@@ -795,9 +802,10 @@
   top: clamp(4.8rem, 11vh, 8.2rem);
   right: clamp(1.8rem, 3.5vw, 4.5rem);
   z-index: 10;
-  max-width: min(100%, 22rem);
-  opacity: var(--karate-words, 0);
-  transform: translateY(calc((1 - var(--karate-words, 0)) * 1.5rem));
+  width: min(38%, 24rem);
+  color: #15120f;
+  opacity: calc(0.85 + var(--karate-words, 0.15) * 0.15);
+  transform: translateY(calc((1 - var(--karate-words, 1)) * 1.2rem));
   transition:
     opacity 600ms ease,
     transform 600ms ease;
@@ -826,9 +834,9 @@
   font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.5rem, 0.62vw, 0.68rem);
   letter-spacing: 0.22em;
-  color: rgba(21, 18, 15, 0.52);
+  color: rgba(21, 18, 15, 0.65);
   text-transform: uppercase;
-  opacity: var(--karate-words, 0);
+  opacity: calc(0.8 + var(--karate-words, 0.2) * 0.2);
 }
 
 .annotationDot {
@@ -854,7 +862,7 @@
   color: #15120f;
   list-style: none;
   border-top: 1px solid rgba(21, 18, 15, 0.2);
-  opacity: var(--karate-words, 0);
+  opacity: calc(0.85 + var(--karate-words, 0.15) * 0.15);
 }
 
 .karatePrinciplesRail li i {

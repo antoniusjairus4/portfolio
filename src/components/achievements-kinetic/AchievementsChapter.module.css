@@ -693,15 +693,7 @@
 }
 
 .karate .stage::after {
-  position: absolute;
-  top: 50%;
-  right: 0;
-  left: 0;
-  z-index: 2;
-  height: clamp(0.35rem, 0.6vw, 0.65rem);
-  content: "";
-  background: #7e1f2c;
-  transform: scaleX(var(--karate-impact, 0));
+  display: none !important;
 }
 
 .karateStatement {

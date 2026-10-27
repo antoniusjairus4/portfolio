@@ -90,15 +90,15 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   }
 
   if (panel === 'karate') {
-    const title = smoothstep(rangeProgress(value, 0.02, 0.18));
-    const impactIn = smoothstep(rangeProgress(value, 0.16, 0.25));
-    const impactOut = smoothstep(rangeProgress(value, 0.33, 0.48));
+    const title = smoothstep(rangeProgress(value, 0.01, 0.14));
+    const impactIn = smoothstep(rangeProgress(value, 0.08, 0.18));
+    const impactOut = smoothstep(rangeProgress(value, 0.26, 0.4));
     return {
       '--karate-title': title,
-      '--karate-grid': smoothstep(rangeProgress(value, 0.04, 0.22)),
+      '--karate-grid': smoothstep(rangeProgress(value, 0.02, 0.16)),
       '--karate-impact': impactIn * (1 - impactOut),
-      '--karate-settle': smoothstep(rangeProgress(value, 0.36, 0.56)),
-      '--karate-words': smoothstep(rangeProgress(value, 0.3, 0.52)),
+      '--karate-settle': smoothstep(rangeProgress(value, 0.04, 0.22)),
+      '--karate-words': smoothstep(rangeProgress(value, 0.1, 0.26)),
     };
   }
 
