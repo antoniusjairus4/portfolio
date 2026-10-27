@@ -668,11 +668,9 @@ export function AchievementsScene({
       table.current.rotation.set(0.24, -0.57, -0.035);
     }
 
-    const beltScale = portrait ? 0.88 : 1.08;
-    setGroupPresence(belt.current, beltPresence, beltScale);
+    setGroupPresence(belt.current, 0, 0);
     if (belt.current) {
-      belt.current.position.set(centerX, portrait ? -0.42 : -0.12, 0.28);
-      belt.current.rotation.set(0.16, -0.32, -0.05);
+      belt.current.visible = false;
     }
 
     setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.08);
@@ -698,8 +696,8 @@ export function AchievementsScene({
     }
 
     if (tableLight.current) tableLight.current.intensity = tablePresence * 62;
-    if (beltLight.current) beltLight.current.intensity = beltPresence * 48;
-    if (beltRimLight.current) beltRimLight.current.intensity = beltPresence * 24;
+    if (beltLight.current) beltLight.current.intensity = 0;
+    if (beltRimLight.current) beltRimLight.current.intensity = 0;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 58;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 68;
     if (speakingRimLight.current) speakingRimLight.current.intensity = speakingPresence * 32;
@@ -707,7 +705,7 @@ export function AchievementsScene({
       tableBackdrop.current.uniforms.uOpacity.value = tablePresence;
       tableBackdrop.current.uniforms.uTime.value = state.clock.getElapsedTime();
     }
-    if (karateBackdrop.current) karateBackdrop.current.uniforms.uOpacity.value = beltPresence;
+    if (karateBackdrop.current) karateBackdrop.current.uniforms.uOpacity.value = 0;
     if (floorMaterial.current) {
       floorMaterial.current.uniforms.uOpacity.value =
         (1 - beltPresence) * (tablePresence > 0.01 ? 0.85 : 1.0);

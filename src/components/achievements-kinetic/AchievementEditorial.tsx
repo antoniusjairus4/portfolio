@@ -130,7 +130,7 @@ function TableTennisPaddle({ reducedMotion }: { reducedMotion: boolean }) {
         alt="Black table tennis paddle"
         width={1199}
         height={1312}
-        sizes="(max-width: 860px) 42vw, 25vw"
+        sizes="(max-width: 860px) 60vw, 36vw"
         draggable={false}
       />
     </div>
@@ -222,34 +222,130 @@ export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialP
 export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
   return (
     <InteractiveField className={styles.karate} reducedMotion={reducedMotion}>
-      <div className={styles.karateGrid} aria-hidden="true" />
-      <div className={styles.danMark} aria-hidden="true">
-        01 DAN
+      {/* Layer 1: Warm bone/ivory atmosphere with micro-texture */}
+      <div className={styles.karateAtmosphere} aria-hidden="true" />
+
+      {/* Layer 2: Architectural construction grid & registration ticks */}
+      <div className={styles.karateGrid} aria-hidden="true">
+        <span className={styles.gridCrosshairTL}>+</span>
+        <span className={styles.gridCrosshairTR}>+</span>
+        <span className={styles.gridCrosshairBL}>+</span>
+        <span className={styles.gridCrosshairBR}>+</span>
+        <div className={styles.gridHorizontalRule} />
+        <div className={styles.gridVerticalRule} />
       </div>
-      <div className={styles.karateHeading}>
-        <span>BLACK</span>
-        <span>BELT</span>
+
+      {/* Layer 3: Giant Architectural "01 DAN" background typography */}
+      <div className={styles.danArchitecture} aria-hidden="true">
+        <span className={styles.danNumeral}>01</span>
+        <span className={styles.danWord}>DAN</span>
       </div>
-      <div className={styles.impactAxis} aria-hidden="true" />
-      <div className={styles.impactCore} aria-hidden="true">
-        <b />
-        <i />
-        <span />
-        {IMPACT_RAYS.map((ray) => (
-          <em key={ray} style={{ '--ray-index': ray } as CSSProperties} />
-        ))}
+
+      {/* Layer 4: Precision Technical SVG Environment (Rings, Strike Vectors, Measurement) */}
+      <svg
+        className={styles.karateVectorSystem}
+        viewBox="0 0 1000 680"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        {/* Subtle structural construction lines */}
+        <g className={styles.karateConstructionLines}>
+          <line x1="60" y1="210" x2="940" y2="210" />
+          <line x1="60" y1="470" x2="940" y2="470" />
+          <line x1="360" y1="50" x2="360" y2="630" />
+          <line x1="640" y1="50" x2="640" y2="630" />
+        </g>
+
+        {/* Dynamic Strike Vectors & Diagonal Tension Line */}
+        <g className={styles.karateStrikeVectors}>
+          <line x1="40" y1="560" x2="920" y2="130" className={styles.strikePrimaryRed} />
+          <line x1="180" y1="120" x2="820" y2="580" className={styles.strikeSecondaryLine} />
+          <path d="M880 150 L920 130 L900 170" className={styles.strikeVectorArrow} />
+          <path d="M240 460 L270 460 M320 460 L350 460 M400 460 L430 460" className={styles.strikeDashTicks} />
+        </g>
+
+        {/* Impact System: Concentric Calibration Rings */}
+        <g className={styles.karateImpactRings}>
+          <circle cx="500" cy="360" r="34" className={styles.ringInner} />
+          <circle cx="500" cy="360" r="82" className={styles.ringMid} />
+          <circle cx="500" cy="360" r="156" className={styles.ringOuter} />
+          <circle cx="500" cy="360" r="248" className={styles.ringPerimeter} />
+          <line x1="500" y1="180" x2="500" y2="540" className={styles.impactAxisY} />
+          <line x1="320" y1="360" x2="680" y2="360" className={styles.impactAxisX} />
+        </g>
+
+        {/* Technical Coordinate Annotations */}
+        <g className={styles.karateTechMarks}>
+          <circle cx="500" cy="360" r="4.5" className={styles.impactCenterPoint} />
+          <circle cx="180" cy="120" r="3" className={styles.vectorPoint} />
+          <circle cx="820" cy="580" r="3" className={styles.vectorPoint} />
+          <text x="516" y="352" className={styles.techText}>IMPACT // 0.42s</text>
+          <text x="76" y="202" className={styles.techText}>AXIS // KATA DYNAMICS</text>
+          <text x="760" y="122" className={styles.techText}>STRIKE ANGLE 26.2°</text>
+        </g>
+      </svg>
+
+      {/* Layer 5: Central Visual Motif — Abstract 2D Black Belt Geometry */}
+      <div className={styles.abstractBeltGroup} aria-hidden="true">
+        <div className={styles.beltAbstractShadow} />
+        <div className={styles.beltBandSecondary}>
+          <div className={styles.beltRibbing} />
+        </div>
+        <div className={styles.beltBandPrimary}>
+          <div className={styles.beltRibbing} />
+          <div className={styles.beltRankPatch}>
+            <span className={styles.beltRankStripe} />
+            <span className={styles.beltRankText}>01 DAN</span>
+          </div>
+        </div>
       </div>
-      <p className={styles.stillnessLabel}>STILLNESS → IMPACT → STILLNESS</p>
+
+      {/* Layer 6: Typography Hierarchy — KARATE as Dominant Hero Typography */}
+      <div className={styles.karateTypographyGroup}>
+        <div className={styles.heroKarateWrapper}>
+          <h3 className={styles.heroKarate}>KARATE</h3>
+        </div>
+        <div className={styles.subordinateBeltTitle}>
+          <span className={styles.beltTitlePrefix}>01 // DAN RANK</span>
+          <div className={styles.beltWordsStack}>
+            <span>BLACK</span>
+            <span>BELT</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Layer 7: Integrated Karate Honors (upper-right) */}
       <EditorialFacts
         eyebrow="KARATE HONORS"
         items={achievementHighlights.karate}
         className={styles.karateFacts}
       />
-      <ul className={styles.karatePrinciples} aria-label="Karate principles">
-        <li>CONTROL</li>
-        <li>POWER</li>
-        <li>DISCIPLINE</li>
+
+      {/* Atmospheric Micro-Annotations */}
+      <div className={styles.karateAnnotations} aria-hidden="true">
+        <span>IMPACT / PRECISION / STILLNESS</span>
+        <span className={styles.annotationDot}>•</span>
+        <span>KATA & KUMITE</span>
+      </div>
+
+      {/* Bottom Structural Labels Rail */}
+      <ul className={styles.karatePrinciplesRail} aria-label="Karate structural principles">
+        <li>
+          <i>01</i>
+          <span>CONTROL</span>
+        </li>
+        <li className={styles.principleDivider} aria-hidden="true">/</li>
+        <li>
+          <i>02</i>
+          <span>POWER</span>
+        </li>
+        <li className={styles.principleDivider} aria-hidden="true">/</li>
+        <li>
+          <i>03</i>
+          <span>DISCIPLINE</span>
+        </li>
       </ul>
+
       <GallerySignal label={galleryFocus} />
     </InteractiveField>
   );
