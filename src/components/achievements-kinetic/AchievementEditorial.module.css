@@ -163,22 +163,21 @@
   --paddle-rotate-x: 0deg;
   --paddle-rotate-y: 0deg;
   position: absolute;
-  top: 28%;
-  left: 34%;
-  z-index: 7;
-  width: clamp(15rem, 25vw, 27rem);
+  top: 27%;
+  left: 55%;
+  z-index: 21;
+  width: clamp(18rem, 31vw, 34rem);
   aspect-ratio: 1199 / 1312;
   cursor: crosshair;
-  opacity: calc(0.16 + var(--tt-trajectory, 0) * 0.84);
+  opacity: 1;
   filter: drop-shadow(0 1.4rem 1.25rem rgba(12, 31, 39, 0.2));
   transform: translateX(-50%) translate3d(var(--paddle-x), var(--paddle-y), 0) perspective(900px)
-    rotateX(var(--paddle-rotate-x)) rotateY(var(--paddle-rotate-y)) rotateZ(-4deg)
+    rotateX(var(--paddle-rotate-x)) rotateY(var(--paddle-rotate-y)) rotateZ(-1deg)
     scale(calc(0.9 + var(--tt-trajectory, 0) * 0.1));
   transform-origin: 48% 50%;
   transition:
     transform 420ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    filter 320ms ease,
-    opacity 280ms ease;
+    filter 320ms ease;
   will-change: transform;
 }
 
@@ -204,6 +203,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  opacity: 1;
+  mix-blend-mode: normal;
   pointer-events: none;
   user-select: none;
 }
@@ -1106,10 +1107,10 @@
   }
 
   .tablePaddle {
-    top: 27%;
-    left: 38%;
-    width: clamp(10rem, 42vw, 15rem);
-    opacity: calc(0.12 + var(--tt-trajectory, 0) * 0.76);
+    top: 29%;
+    left: 55%;
+    width: clamp(13rem, 54vw, 19rem);
+    opacity: 1;
   }
 
   .tableFacts,
@@ -1245,7 +1246,7 @@
   }
 
   .tablePaddle {
-    transform: translateX(-50%) rotateZ(-4deg);
+    transform: translateX(-50%) rotateZ(-1deg);
     transition: none;
   }
 }
