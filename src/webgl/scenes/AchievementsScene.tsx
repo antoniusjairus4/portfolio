@@ -586,7 +586,7 @@ export function AchievementsScene({
       const clothSway = Math.cos(time * 0.75) * 0.012;
 
       belt.current.position.set(
-        centerX + (1 - settle) * -0.65,
+        centerX + (portrait ? 0 : -1.85) + (1 - settle) * -0.65,
         (portrait ? -0.42 : -0.12) + clothBreathing,
         0.28,
       );
