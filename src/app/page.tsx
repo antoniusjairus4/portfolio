@@ -85,12 +85,13 @@ export default function Home() {
 
         {/* Phase 6: kinetic editorial achievements sequence */}
         <AchievementsChapter />
-
-        <AchievementsContactLanyard />
       </ProjectExperienceProvider>
 
       {/* Phase 7: quiet contact and document end */}
       <ContactFinale />
+
+      {/* One continuous physical rig spanning the Achievements finale and Contact. */}
+      <AchievementsContactLanyard />
     </main>
   );
 }

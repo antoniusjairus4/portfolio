@@ -6,7 +6,7 @@ import styles from './AchievementsContactLanyard.module.css';
 
 export function AchievementsContactLanyard() {
   const frameRef = useRef(0);
-  const [rig, setRig] = useState({ active: false, anchorInset: 0.035 });
+  const [rig, setRig] = useState({ active: false, anchorInset: 0.035, cardInset: 1.08 });
 
   useEffect(() => {
     let disconnectRig: (() => void) | undefined;
@@ -30,10 +30,15 @@ export function AchievementsContactLanyard() {
         const next = {
           active: finaleAtStatement || contactVisible,
           anchorInset: anchorRect.top / viewportHeight,
+          // The nail belongs to the Achievements finale, while the badge belongs
+          // to Contact. It enters just inside Contact, then settles in its layout.
+          cardInset: Math.min(1.2, Math.max(0.18, contactRect.top / viewportHeight + 0.08)),
         };
 
         setRig((current) =>
-          current.active === next.active && Math.abs(current.anchorInset - next.anchorInset) < 0.001
+          current.active === next.active &&
+          Math.abs(current.anchorInset - next.anchorInset) < 0.001 &&
+          Math.abs(current.cardInset - next.cardInset) < 0.001
             ? current
             : next,
         );
@@ -93,6 +98,7 @@ export function AchievementsContactLanyard() {
         size={0.48}
         anchor="left"
         anchorInset={rig.anchorInset}
+        cardInset={rig.cardInset}
         showAnchor
         strapLength={0.68}
         strapColor="#8b1e2d"

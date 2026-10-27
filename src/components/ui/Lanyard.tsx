@@ -33,6 +33,7 @@ export interface LanyardProps {
   size?: number;
   anchor?: Anchor;
   anchorInset?: number;
+  cardInset?: number;
   showAnchor?: boolean;
   strapLength?: number;
   strapImage?: string;
@@ -64,6 +65,7 @@ interface Settings {
   size: number;
   anchor: Anchor;
   anchorInset: number;
+  cardInset?: number;
   showAnchor: boolean;
   strapLength: number;
   strapImage?: string;
@@ -1000,6 +1002,7 @@ const Lanyard = ({
   size = 0.6,
   anchor = 'center',
   anchorInset = -0.02,
+  cardInset,
   showAnchor = false,
   strapLength = 0.5,
   strapImage,
@@ -1034,6 +1037,7 @@ const Lanyard = ({
     size,
     anchor,
     anchorInset,
+    cardInset,
     showAnchor,
     strapLength,
     strapImage,
@@ -1296,7 +1300,8 @@ const Lanyard = ({
         .transformDirection(camera.matrixWorldInverse);
       const anchorX = ((ANCHORS[s.anchor] ?? 0.5) - 0.5) * viewWidth;
       const anchorY = viewHeight / 2 - viewHeight * clamp(s.anchorInset, -3, 0.3);
-      const cardTop = viewHeight / 2 - viewHeight * mix(0.12, 0.42, clamp(s.strapLength, 0, 1));
+      const cardTopInset = s.cardInset ?? mix(0.12, 0.42, clamp(s.strapLength, 0, 1));
+      const cardTop = viewHeight / 2 - viewHeight * clamp(cardTopInset, -3, 3);
       const hangTop = cardTop + (layout.hangY - layout.height / 2);
       sim.anchor.set(anchorX, anchorY, 0);
       nailGroup.position.copy(sim.anchor);
@@ -1323,7 +1328,7 @@ const Lanyard = ({
         ring.position.set(0, layout.ringY, 0);
         applied.framingKey = '';
       }
-      const framingKey = `${layoutKey}|${s.size}|${s.anchor}|${s.anchorInset}|${s.strapLength}|${view.width}|${view.height}`;
+      const framingKey = `${layoutKey}|${s.size}|${s.anchor}|${s.anchorInset}|${s.cardInset}|${s.strapLength}|${view.width}|${view.height}`;
       if (framingKey !== applied.framingKey) {
         frameView();
         if (!placed) {
