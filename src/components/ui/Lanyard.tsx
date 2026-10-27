@@ -24,22 +24,29 @@ export interface LanyardProps {
   frontImage?: string;
   backImage?: string;
   imageFit?: ImageFit;
+  frontImageFit?: ImageFit;
+  backImageFit?: ImageFit;
   cardColor?: string;
   orientation?: Orientation;
   finish?: Finish;
   cornerRadius?: number;
   size?: number;
   anchor?: Anchor;
+  anchorInset?: number;
+  showAnchor?: boolean;
   strapLength?: number;
   strapImage?: string;
   strapColor?: string;
   strapWidth?: number;
+  tagMark?: string;
+  tagMarkColor?: string;
   metal?: Metal;
   gravity?: number;
   damping?: number;
   elasticity?: number;
   breeze?: number;
   interactive?: boolean;
+  pointerEventsThrough?: boolean;
   intro?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -48,23 +55,29 @@ export interface LanyardProps {
 interface Settings {
   frontImage?: string;
   backImage?: string;
-  imageFit: ImageFit;
+  frontImageFit: ImageFit;
+  backImageFit: ImageFit;
   cardColor: string;
   orientation: Orientation;
   finish: Finish;
   cornerRadius: number;
   size: number;
   anchor: Anchor;
+  anchorInset: number;
+  showAnchor: boolean;
   strapLength: number;
   strapImage?: string;
   strapColor: string;
   strapWidth: number;
+  tagMark: string;
+  tagMarkColor: string;
   metal: Metal;
   gravity: number;
   damping: number;
   elasticity: number;
   breeze: number;
   interactive: boolean;
+  pointerEventsThrough: boolean;
   intro: boolean;
 }
 
@@ -155,6 +168,7 @@ interface Applied {
   faceKey?: string;
   strapColor?: string;
   strapScale?: number;
+  tagKey?: string;
 }
 
 interface Press {
@@ -703,6 +717,20 @@ const paintStrap = (canvas: HTMLCanvasElement, image: HTMLImageElement | null, c
   return along / across;
 };
 
+const paintTagMark = (canvas: HTMLCanvasElement, mark: string, color: Rgb) => {
+  canvas.width = 256;
+  canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (!mark) return;
+  ctx.fillStyle = toCss(color);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '700 92px Georgia, Times New Roman, serif';
+  ctx.fillText(mark.slice(0, 2), canvas.width / 2, canvas.height / 2 + 4);
+};
+
 const createSimulation = (): Simulation => {
   const vectors = () => Array.from({ length: JOINTS + 1 }, () => new THREE.Vector3());
   return {
@@ -963,22 +991,29 @@ const Lanyard = ({
   frontImage,
   backImage,
   imageFit = 'cover',
+  frontImageFit,
+  backImageFit,
   cardColor = '#ffffff',
   orientation = 'portrait',
   finish = 'glossy',
   cornerRadius = 0.3,
   size = 0.6,
   anchor = 'center',
+  anchorInset = -0.02,
+  showAnchor = false,
   strapLength = 0.5,
   strapImage,
   strapColor = '#111111',
   strapWidth = 0.65,
+  tagMark = '',
+  tagMarkColor = '#f2e8d5',
   metal = 'silver',
   gravity = 1,
   damping = 0.5,
   elasticity = 0.5,
   breeze = 0.5,
   interactive = true,
+  pointerEventsThrough = false,
   intro = true,
   className = '',
   style,
@@ -990,23 +1025,29 @@ const Lanyard = ({
   settingsRef.current = {
     frontImage,
     backImage,
-    imageFit: imageFit === 'contain' ? 'contain' : 'cover',
+    frontImageFit: (frontImageFit ?? imageFit) === 'contain' ? 'contain' : 'cover',
+    backImageFit: (backImageFit ?? imageFit) === 'contain' ? 'contain' : 'cover',
     cardColor,
     orientation: orientation === 'landscape' ? 'landscape' : 'portrait',
     finish,
     cornerRadius,
     size,
     anchor,
+    anchorInset,
+    showAnchor,
     strapLength,
     strapImage,
     strapColor,
     strapWidth,
+    tagMark,
+    tagMarkColor,
     metal,
     gravity,
     damping,
     elasticity,
     breeze,
     interactive,
+    pointerEventsThrough,
     intro,
   };
 
@@ -1053,9 +1094,11 @@ const Lanyard = ({
     const frontCanvas = document.createElement('canvas');
     const backCanvas = document.createElement('canvas');
     const strapCanvas = document.createElement('canvas');
+    const tagCanvas = document.createElement('canvas');
     const frontTexture = makeCanvasTexture(frontCanvas, anisotropy);
     const backTexture = makeCanvasTexture(backCanvas, anisotropy);
     const strapTexture = makeCanvasTexture(strapCanvas, anisotropy);
+    const tagTexture = makeCanvasTexture(tagCanvas, anisotropy);
     strapTexture.wrapS = THREE.ClampToEdgeWrapping;
     strapTexture.wrapT = THREE.RepeatWrapping;
     const grain = buildGrainTexture();
@@ -1122,12 +1165,43 @@ const Lanyard = ({
     const clampGroup = new THREE.Group();
     const clampMesh = new THREE.Mesh(buildClampGeometry(STRAP_WIDTH), metalMaterial);
     clampMesh.position.y = EYELET_RADIUS + CLAMP_BODY / 2 - 0.004;
+    const tagMaterial = new THREE.MeshBasicMaterial({
+      map: tagTexture,
+      transparent: true,
+      side: THREE.DoubleSide,
+      toneMapped: false,
+    });
+    const tagMesh = new THREE.Mesh(new THREE.PlaneGeometry(STRAP_WIDTH * 0.58, 0.1), tagMaterial);
+    tagMesh.position.set(0, clampMesh.position.y, 0.026);
     const eyelet = new THREE.Mesh(
       new THREE.TorusGeometry(EYELET_RADIUS, 0.0105, 14, 40),
       metalMaterial,
     );
-    clampGroup.add(clampMesh, eyelet);
+    clampGroup.add(clampMesh, tagMesh, eyelet);
     scene.add(clampGroup);
+
+    const nailGroup = new THREE.Group();
+    const nailShadowMaterial = new THREE.MeshBasicMaterial({
+      color: 0x17130f,
+      transparent: true,
+      opacity: 0.22,
+      depthWrite: false,
+    });
+    const nailShadow = new THREE.Mesh(new THREE.CircleGeometry(0.115, 32), nailShadowMaterial);
+    nailShadow.position.set(0.035, -0.035, -0.025);
+    const nailHead = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.078, 0.062, 0.045, 32, 1),
+      metalMaterial,
+    );
+    nailHead.rotation.x = Math.PI / 2;
+    nailHead.position.z = 0.035;
+    const nailPin = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.014, 0.019, 0.2, 18),
+      metalMaterial,
+    );
+    nailPin.position.y = -0.085;
+    nailGroup.add(nailShadow, nailPin, nailHead);
+    scene.add(nailGroup);
 
     const sim = createSimulation();
     const controls: THREE.Vector3[] = [];
@@ -1168,8 +1242,8 @@ const Lanyard = ({
         frontTexture.dispose();
         backTexture.dispose();
       }
-      paintFace(frontCanvas, images.front, color, s.imageFit);
-      paintFace(backCanvas, images.back || images.front, color, s.imageFit);
+      paintFace(frontCanvas, images.front, color, s.frontImageFit);
+      paintFace(backCanvas, images.back || images.front, color, s.backImageFit);
       frontTexture.needsUpdate = true;
       backTexture.needsUpdate = true;
       start();
@@ -1185,6 +1259,14 @@ const Lanyard = ({
       weave.repeat.set(2, 2 * tileRatio);
       strapTexture.dispose();
       strapTexture.needsUpdate = true;
+      start();
+    };
+
+    const repaintTag = () => {
+      const s = getSettings();
+      paintTagMark(tagCanvas, s.tagMark, parseColor(s.tagMarkColor, [0.95, 0.91, 0.84]));
+      tagTexture.needsUpdate = true;
+      tagMesh.visible = Boolean(s.tagMark);
       start();
     };
 
@@ -1213,10 +1295,11 @@ const Lanyard = ({
         .normalize()
         .transformDirection(camera.matrixWorldInverse);
       const anchorX = ((ANCHORS[s.anchor] ?? 0.5) - 0.5) * viewWidth;
-      const anchorY = viewHeight / 2 + 0.2;
+      const anchorY = viewHeight / 2 - viewHeight * clamp(s.anchorInset, -3, 0.3);
       const cardTop = viewHeight / 2 - viewHeight * mix(0.12, 0.42, clamp(s.strapLength, 0, 1));
       const hangTop = cardTop + (layout.hangY - layout.height / 2);
       sim.anchor.set(anchorX, anchorY, 0);
+      nailGroup.position.copy(sim.anchor);
       configureSimulation(sim, layout, anchorY - hangTop);
       sim.nodes[0].copy(sim.anchor);
       sim.previous[0].copy(sim.anchor);
@@ -1240,7 +1323,7 @@ const Lanyard = ({
         ring.position.set(0, layout.ringY, 0);
         applied.framingKey = '';
       }
-      const framingKey = `${layoutKey}|${s.size}|${s.anchor}|${s.strapLength}|${view.width}|${view.height}`;
+      const framingKey = `${layoutKey}|${s.size}|${s.anchor}|${s.anchorInset}|${s.strapLength}|${view.width}|${view.height}`;
       if (framingKey !== applied.framingKey) {
         frameView();
         if (!placed) {
@@ -1267,9 +1350,11 @@ const Lanyard = ({
           repaintStrap();
         });
       }
-      const faceKey = `${layoutKey}|${s.cardColor}|${s.imageFit}`;
+      const faceKey = `${layoutKey}|${s.cardColor}|${s.frontImageFit}|${s.backImageFit}`;
       if (faceKey !== applied.faceKey) paintFaces();
       if (s.strapColor !== applied.strapColor) repaintStrap();
+      const tagKey = `${s.tagMark}|${s.tagMarkColor}`;
+      if (tagKey !== applied.tagKey) repaintTag();
 
       const finish = FINISHES[s.finish] || FINISHES.glossy;
       const card = parseColor(s.cardColor, [1, 1, 1]);
@@ -1295,14 +1380,27 @@ const Lanyard = ({
       const metalLook = METALS[s.metal] || METALS.silver;
       metalMaterial.color.set(metalLook.color);
       metalMaterial.roughness = metalLook.roughness;
+      nailGroup.visible = s.showAnchor;
       strapScale = STRAP_WIDTH * clamp(s.strapWidth, 0.4, 2);
       if (strapScale !== applied.strapScale) {
         clampMesh.geometry.dispose();
         clampMesh.geometry = buildClampGeometry(strapScale);
+        tagMesh.geometry.dispose();
+        tagMesh.geometry = new THREE.PlaneGeometry(strapScale * 0.58, 0.1);
       }
       canvas.style.touchAction = s.interactive ? 'pan-y' : 'auto';
+      canvas.style.pointerEvents = s.pointerEventsThrough ? 'none' : 'auto';
+      if (s.pointerEventsThrough && !s.interactive) document.documentElement.style.cursor = '';
 
-      applied = { layoutKey, framingKey, imageKey, faceKey, strapColor: s.strapColor, strapScale };
+      applied = {
+        layoutKey,
+        framingKey,
+        imageKey,
+        faceKey,
+        strapColor: s.strapColor,
+        strapScale,
+        tagKey,
+      };
       start();
     };
 
@@ -1470,6 +1568,11 @@ const Lanyard = ({
     };
 
     const setCursor = (value: string) => {
+      if (getSettings().pointerEventsThrough) {
+        if (document.documentElement.style.cursor !== value)
+          document.documentElement.style.cursor = value;
+        return;
+      }
       if (canvas.style.cursor !== value) canvas.style.cursor = value;
     };
 
@@ -1506,7 +1609,7 @@ const Lanyard = ({
         time: performance.now(),
         point: hit.point.clone(),
       };
-      canvas.setPointerCapture?.(event.pointerId);
+      if (!getSettings().pointerEventsThrough) canvas.setPointerCapture?.(event.pointerId);
       setCursor('grabbing');
       event.preventDefault();
       start();
@@ -1532,7 +1635,7 @@ const Lanyard = ({
       if (press && event.type === 'pointerup' && performance.now() - press.time < 450)
         flip(press.point);
       press = null;
-      canvas.releasePointerCapture?.(event.pointerId);
+      if (!getSettings().pointerEventsThrough) canvas.releasePointerCapture?.(event.pointerId);
       setCursor(hovering && event.pointerType !== 'touch' ? 'grab' : '');
       start();
     };
@@ -1543,12 +1646,26 @@ const Lanyard = ({
       if (pickCard()) event.preventDefault();
     };
 
-    canvas.addEventListener('pointerdown', onPointerDown);
-    canvas.addEventListener('pointermove', onPointerMove);
-    canvas.addEventListener('pointerup', onPointerUp);
-    canvas.addEventListener('pointercancel', onPointerUp);
-    canvas.addEventListener('lostpointercapture', onPointerUp);
-    canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+    const useGlobalPointerEvents = getSettings().pointerEventsThrough;
+    const addPointerListeners = () => {
+      const target = useGlobalPointerEvents ? window : canvas;
+      target.addEventListener('pointerdown', onPointerDown as EventListener);
+      target.addEventListener('pointermove', onPointerMove as EventListener);
+      target.addEventListener('pointerup', onPointerUp as EventListener);
+      target.addEventListener('pointercancel', onPointerUp as EventListener);
+      target.addEventListener('touchstart', onTouchStart as EventListener, { passive: false });
+      if (!useGlobalPointerEvents) canvas.addEventListener('lostpointercapture', onPointerUp);
+    };
+    const removePointerListeners = () => {
+      const target = useGlobalPointerEvents ? window : canvas;
+      target.removeEventListener('pointerdown', onPointerDown as EventListener);
+      target.removeEventListener('pointermove', onPointerMove as EventListener);
+      target.removeEventListener('pointerup', onPointerUp as EventListener);
+      target.removeEventListener('pointercancel', onPointerUp as EventListener);
+      target.removeEventListener('touchstart', onTouchStart as EventListener);
+      if (!useGlobalPointerEvents) canvas.removeEventListener('lostpointercapture', onPointerUp);
+    };
+    addPointerListeners();
 
     const resize = () => {
       view.width = Math.max(1, container.clientWidth);
@@ -1581,21 +1698,35 @@ const Lanyard = ({
       resizeObserver.disconnect();
       intersectionObserver.disconnect();
       document.removeEventListener('visibilitychange', onVisibility);
-      canvas.removeEventListener('pointerdown', onPointerDown);
-      canvas.removeEventListener('pointermove', onPointerMove);
-      canvas.removeEventListener('pointerup', onPointerUp);
-      canvas.removeEventListener('pointercancel', onPointerUp);
-      canvas.removeEventListener('lostpointercapture', onPointerUp);
-      canvas.removeEventListener('touchstart', onTouchStart);
-      [bodyMesh, frontMesh, backMesh, ring, clampMesh, eyelet, band].forEach((mesh) => {
+      removePointerListeners();
+      if (useGlobalPointerEvents) document.documentElement.style.cursor = '';
+      [
+        bodyMesh,
+        frontMesh,
+        backMesh,
+        ring,
+        clampMesh,
+        tagMesh,
+        eyelet,
+        band,
+        nailShadow,
+        nailPin,
+        nailHead,
+      ].forEach((mesh) => {
         mesh.geometry?.dispose();
       });
-      [frontMaterial, backMaterial, edgeMaterial, metalMaterial, bandMaterial].forEach(
-        (material) => {
-          material.dispose();
-        },
-      );
-      [frontTexture, backTexture, strapTexture, grain, weave].forEach((texture) => {
+      [
+        frontMaterial,
+        backMaterial,
+        edgeMaterial,
+        metalMaterial,
+        tagMaterial,
+        bandMaterial,
+        nailShadowMaterial,
+      ].forEach((material) => {
+        material.dispose();
+      });
+      [frontTexture, backTexture, strapTexture, tagTexture, grain, weave].forEach((texture) => {
         texture.dispose();
       });
       environment.dispose();

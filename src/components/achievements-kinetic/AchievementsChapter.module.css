@@ -1076,6 +1076,15 @@
   transform: scale(calc(0.9 + var(--final-concepts, 0) * 0.1));
 }
 
+.sharedLanyardAnchor {
+  position: absolute;
+  top: clamp(1rem, 2.2vh, 1.6rem);
+  left: 61.36%;
+  width: 1px;
+  height: 1px;
+  pointer-events: none;
+}
+
 .finalStatement {
   position: absolute;
   inset: 0;
@@ -1664,6 +1673,10 @@
 
   .narrative .finalStatement {
     font-size: clamp(3rem, 9vw, 5rem);
+  }
+
+  .sharedLanyardAnchor {
+    left: 27%;
   }
 
   .narrative .ratings div:first-child {

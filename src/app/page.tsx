@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
+import { AchievementsContactLanyard } from '@/components/contact-finale/AchievementsContactLanyard';
 import { ContactFinale } from '@/components/contact-finale/ContactFinale';
 import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
@@ -84,6 +85,8 @@ export default function Home() {
 
         {/* Phase 6: kinetic editorial achievements sequence */}
         <AchievementsChapter />
+
+        <AchievementsContactLanyard />
       </ProjectExperienceProvider>
 
       {/* Phase 7: quiet contact and document end */}

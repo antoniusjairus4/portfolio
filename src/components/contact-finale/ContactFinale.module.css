@@ -13,12 +13,15 @@
 }
 
 .composition {
+  position: relative;
+  z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   align-items: center;
   gap: clamp(4rem, 9vw, 10rem);
   min-height: 64svh;
   padding: 0 clamp(1.5rem, 6vw, 8rem);
+  pointer-events: none;
 }
 
 .visuallyHidden {
@@ -44,25 +47,20 @@
 }
 
 .kicker {
+  position: absolute;
+  z-index: 3;
+  top: clamp(3.75rem, 6.5svh, 5.5rem);
+  left: clamp(1.5rem, 6vw, 8rem);
   margin: 0;
   color: #645e55;
+  pointer-events: none;
 }
 
 .identity {
   position: relative;
+  align-self: end;
   min-width: 0;
-}
-
-.lanyardStage {
-  width: min(100%, 42rem);
-  height: clamp(26rem, 61svh, 44rem);
-  margin-top: clamp(-1rem, -1.5svh, -0.25rem);
-  overflow: hidden;
-  cursor: grab;
-}
-
-.lanyardStage:active {
-  cursor: grabbing;
+  padding-bottom: clamp(1rem, 5svh, 4rem);
 }
 
 .lanyardHint,
@@ -78,8 +76,8 @@
 
 .lanyardHint {
   width: fit-content;
-  margin: clamp(-2.5rem, -3svh, -1.25rem) auto 0;
-  text-align: center;
+  margin: 0;
+  text-align: left;
 }
 
 .invitation {
@@ -87,10 +85,12 @@
   font-family: var(--font-display);
   font-size: clamp(1.1rem, 1.5vw, 1.55rem);
   font-weight: 500;
-  text-align: center;
+  text-align: left;
 }
 
 .actions {
+  position: relative;
+  z-index: 3;
   padding-top: clamp(2rem, 6svh, 5rem);
 }
 
@@ -117,6 +117,7 @@
   text-decoration-color: rgba(17, 16, 15, 0.35);
   text-decoration-thickness: 1px;
   text-underline-offset: 0.35em;
+  pointer-events: auto;
 }
 
 .email:hover,
@@ -131,9 +132,12 @@
 }
 
 .socials {
+  position: relative;
+  z-index: 3;
   display: flex;
   gap: clamp(1.5rem, 4vw, 4rem);
   padding: 2rem clamp(1.5rem, 6vw, 8rem) clamp(4rem, 9svh, 6rem);
+  pointer-events: none;
 }
 
 .socials a {
@@ -143,6 +147,7 @@
   color: #645e55;
   text-decoration-color: transparent;
   text-underline-offset: 0.35em;
+  pointer-events: auto;
 }
 
 .socials a:hover {
@@ -151,12 +156,15 @@
 }
 
 .end {
+  position: relative;
+  z-index: 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
   min-height: clamp(7rem, 17svh, 11rem);
   margin: 0 clamp(1.5rem, 6vw, 8rem);
   border-top: 1px solid rgba(17, 16, 15, 0.28);
+  pointer-events: none;
 }
 
 .end span {
@@ -170,6 +178,7 @@
   color: inherit;
   text-decoration-color: transparent;
   text-underline-offset: 0.35em;
+  pointer-events: auto;
 }
 
 .email:focus-visible,
@@ -182,10 +191,6 @@
 @media (max-width: 960px) {
   .composition {
     gap: 3rem;
-  }
-
-  .lanyardStage {
-    height: clamp(25rem, 56svh, 38rem);
   }
 
   .email {
@@ -202,16 +207,6 @@
     display: block;
     min-height: 0;
     padding: 0 1.25rem;
-  }
-
-  .kicker {
-    margin-bottom: 0;
-  }
-
-  .lanyardStage {
-    width: 100%;
-    height: clamp(27rem, 62svh, 36rem);
-    margin-top: -0.75rem;
   }
 
   .invitation {

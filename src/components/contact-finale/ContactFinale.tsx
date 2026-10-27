@@ -1,4 +1,3 @@
-import Lanyard from '@/components/ui/Lanyard';
 import styles from './ContactFinale.module.css';
 
 const email = 'antoniusjairusofficial@gmail.com';
@@ -12,35 +11,12 @@ export function ContactFinale() {
         </style>
       </noscript>
       <div className={styles.arrival} aria-hidden="true" />
+      <p className={styles.kicker}>CONTACT</p>
+      <h2 id="contact-name" className={styles.visuallyHidden}>
+        Contact Antonius Jairus
+      </h2>
       <div className={styles.composition}>
         <div className={styles.identity}>
-          <p className={styles.kicker}>CONTACT</p>
-          <h2 id="contact-name" className={styles.visuallyHidden}>
-            Contact Antonius Jairus
-          </h2>
-          <div className={styles.lanyardStage}>
-            <Lanyard
-              frontImage="/images/contact/palindrome-id-front.svg"
-              backImage="/images/contact/whatsapp-qr.jpeg"
-              imageFit="contain"
-              cardColor="#0c0907"
-              orientation="portrait"
-              finish="glossy"
-              cornerRadius={0.22}
-              size={0.68}
-              anchor="center"
-              strapLength={0.2}
-              strapColor="#8b1e2d"
-              strapWidth={0.7}
-              metal="graphite"
-              gravity={0.92}
-              damping={0.56}
-              elasticity={0.44}
-              breeze={0.16}
-              interactive
-              intro
-            />
-          </div>
           <p className={styles.lanyardHint}>Drag the badge · tap to flip · scan WhatsApp</p>
           <p className={styles.invitation}>Write to me.</p>
         </div>

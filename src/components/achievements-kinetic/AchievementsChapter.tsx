@@ -409,6 +409,11 @@ export function AchievementsChapter() {
               <span>PRECISION</span>
               <span>PRESENCE</span>
             </div>
+            <span
+              className={styles.sharedLanyardAnchor}
+              data-shared-lanyard-anchor
+              aria-hidden="true"
+            />
             <div className={styles.finalStatement}>
               <p>BUILT BEYOND</p>
               <p>THE SCREEN.</p>

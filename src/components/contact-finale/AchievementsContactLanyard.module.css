@@ -1,0 +1,18 @@
+.stage {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.stage[data-active="true"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage {
+    transition-duration: 120ms;
+  }
+}
