@@ -144,6 +144,96 @@ function ChessBoard() {
   );
 }
 
+function TableTennisBackdrop({ materialRef }: { materialRef: RefObject<ShaderMaterial | null> }) {
+  const uniforms = useMemo(
+    () => ({
+      uOpacity: { value: 0 },
+      uTime: { value: 0 },
+    }),
+    [],
+  );
+
+  return (
+    <mesh position={[0, 0, -5.1]} renderOrder={-101} frustumCulled={false}>
+      <planeGeometry args={[32, 22]} />
+      <shaderMaterial
+        ref={materialRef}
+        uniforms={uniforms}
+        transparent
+        depthTest
+        depthWrite={false}
+        vertexShader={`
+          varying vec2 vUv;
+          void main() {
+            vUv = uv;
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          }
+        `}
+        fragmentShader={`
+          uniform float uOpacity;
+          uniform float uTime;
+          varying vec2 vUv;
+
+          void main() {
+            // Multi-colored athletic palette referenced from globals.css:
+            // --color-base: #0c0907
+            // --hero-crimson: #8b1e2d
+            // --color-ember: #e8481f
+            // --color-gold: #e0a93b
+            // --v-accent (kaiforge athletic blue): #0ea5e9
+            // --color-blue (cobalt): #4f6bff
+            vec3 colorBase = vec3(0.047, 0.035, 0.027);
+            vec3 colorCrimson = vec3(0.545, 0.118, 0.176);
+            vec3 colorEmber = vec3(0.910, 0.282, 0.122);
+            vec3 colorGold = vec3(0.878, 0.663, 0.231);
+            vec3 colorBlue = vec3(0.055, 0.647, 0.914);
+            vec3 colorCobalt = vec3(0.310, 0.420, 1.000);
+
+            float t = uTime * 0.35;
+            vec2 p1 = vec2(0.20 + sin(t * 0.8) * 0.04, 0.78 + cos(t * 0.7) * 0.03);
+            vec2 p2 = vec2(0.80 + cos(t * 0.6) * 0.04, 0.74 + sin(t * 0.9) * 0.03);
+            vec2 p3 = vec2(0.50 + sin(t * 0.5) * 0.03, 0.44 + cos(t * 0.8) * 0.04);
+            vec2 p4 = vec2(0.76 + cos(t * 0.7) * 0.04, 0.22 + sin(t * 0.6) * 0.03);
+
+            vec3 color = colorBase;
+
+            // 1. Crimson / Ember (top-left behind TABLE & trajectory arc)
+            float d1 = distance(vUv, p1);
+            float w1 = smoothstep(0.75, 0.0, d1);
+            vec3 c1 = mix(colorCrimson, colorEmber, smoothstep(0.45, 0.0, d1));
+            color = mix(color, c1, w1 * 0.82);
+
+            // 2. Championship Gold (top-right behind TENNIS & ball)
+            float d2 = distance(vUv, p2);
+            float w2 = smoothstep(0.70, 0.0, d2);
+            color = mix(color, colorGold, w2 * 0.65);
+
+            // 3. Electric Athletic Blue (around center table)
+            float d3 = distance(vUv, p3);
+            float w3 = smoothstep(0.60, 0.0, d3);
+            vec3 c3 = mix(colorBlue, colorCobalt, smoothstep(0.35, 0.0, d3));
+            color = mix(color, c3, w3 * 0.58);
+
+            // 4. Gold / Ember accent (bottom-right behind 2X STATE CHAMPION)
+            float d4 = distance(vUv, p4);
+            float w4 = smoothstep(0.62, 0.0, d4);
+            color = mix(color, colorGold, w4 * 0.52);
+
+            // Edge vignette to preserve typographic readability
+            float dEdge = distance(vUv, vec2(0.5, 0.5));
+            float edgeMask = smoothstep(0.78, 0.30, dEdge);
+            color = mix(colorBase, color, clamp(edgeMask + 0.32, 0.0, 1.0));
+
+            gl_FragColor = vec4(color, uOpacity);
+            #include <tonemapping_fragment>
+            #include <colorspace_fragment>
+          }
+        `}
+      />
+    </mesh>
+  );
+}
+
 function KarateBackdrop({ materialRef }: { materialRef: RefObject<ShaderMaterial | null> }) {
   const uniforms = useMemo(
     () => ({
@@ -209,6 +299,7 @@ export function AchievementsScene({
   const beltLight = useRef<SpotLight>(null);
   const chessLight = useRef<SpotLight>(null);
   const speakingLight = useRef<SpotLight>(null);
+  const tableBackdrop = useRef<ShaderMaterial>(null);
   const karateBackdrop = useRef<ShaderMaterial>(null);
   const floorMaterial = useRef<MeshStandardMaterial>(null);
 
@@ -236,7 +327,7 @@ export function AchievementsScene({
     };
   }, [camera, invalidate, portrait]);
 
-  useFrame(() => {
+  useFrame((state) => {
     void controller.progress.current;
     const tableProgress = panelProgress('table-tennis', portrait);
     const beltProgress = panelProgress('karate', portrait);
@@ -290,12 +381,19 @@ export function AchievementsScene({
     if (beltLight.current) beltLight.current.intensity = beltPresence * 44;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 50;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 58;
+    if (tableBackdrop.current) {
+      tableBackdrop.current.uniforms.uOpacity.value = tablePresence;
+      tableBackdrop.current.uniforms.uTime.value = state.clock.getElapsedTime();
+    }
     if (karateBackdrop.current) karateBackdrop.current.uniforms.uOpacity.value = beltPresence;
-    if (floorMaterial.current) floorMaterial.current.opacity = 1 - beltPresence;
+    if (floorMaterial.current) {
+      floorMaterial.current.opacity = (1 - beltPresence) * (tablePresence > 0.01 ? 0.35 : 1.0);
+    }
   });
 
   return (
     <>
+      <TableTennisBackdrop materialRef={tableBackdrop} />
       <KarateBackdrop materialRef={karateBackdrop} />
       <fog attach="fog" args={['#0b0908', 8, 24]} />
       <ambientLight color="#8d8477" intensity={0.42} />
