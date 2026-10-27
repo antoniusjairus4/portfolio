@@ -35,6 +35,33 @@ const CHESS_PIECES = [
 ] as const;
 const ARCHIVE_ITEMS: MasonryItem[] = [
   {
+    id: 'school-captain',
+    img: '/images/achievements/leadership/school-captain.webp',
+    width: 1080,
+    height: 1356,
+    title: 'School Captain',
+    description: 'Flag Bearer & Student Leadership',
+    alt: 'Antonius Jairus in blazer with School Captain sash holding the school flag',
+  },
+  {
+    id: 'tt-action',
+    img: '/images/achievements/table-tennis/match-action.webp',
+    width: 1079,
+    height: 679,
+    title: 'Match Point',
+    description: 'State Championship in Action',
+    alt: 'Jairus serving at a table tennis tournament',
+  },
+  {
+    id: 'montfort-cups',
+    img: '/images/achievements/table-tennis/montfort-trophies.webp',
+    width: 1079,
+    height: 1390,
+    title: 'Montfort Tournaments',
+    description: 'Winner & Doubles Runner',
+    alt: 'Montfort School Table Tennis Winner trophies and certificates',
+  },
+  {
     id: 'tt-trophy',
     img: '/images/achievements/table-tennis/photo-1-640.webp',
     width: 349,
@@ -60,6 +87,24 @@ const ARCHIVE_ITEMS: MasonryItem[] = [
     title: 'State Champion',
     description: '2× State Champion Victory',
     alt: 'Jairus kissing a table tennis trophy',
+  },
+  {
+    id: 'medals-collection',
+    img: '/images/achievements/karate/medals-collection.webp',
+    width: 963,
+    height: 1600,
+    title: 'Championship Medals',
+    description: 'Karate & State Tournament Medals',
+    alt: 'Collection of gold, silver, and bronze tournament medals',
+  },
+  {
+    id: 'championship-cups',
+    img: '/images/achievements/table-tennis/championship-cups.webp',
+    width: 926,
+    height: 1600,
+    title: 'Trophy Honors',
+    description: 'Tournament Cups & Certificates',
+    alt: 'Championship trophies with crystal toppers and medals',
   },
   {
     id: 'music-stage',
@@ -258,9 +303,9 @@ export function AchievementsChapter() {
             <Masonry
               items={ARCHIVE_ITEMS}
               columns="auto"
-              columnWidth={170}
-              gap={14}
-              radius={12}
+              columnWidth={270}
+              gap={16}
+              radius={14}
               animateFrom="bottom"
               hoverEffect="zoom"
               captions="hover"

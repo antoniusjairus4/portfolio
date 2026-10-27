@@ -451,7 +451,7 @@
 }
 
 .karateDivisions i {
-  border-right: 1px solid rgba(21, 18, 15, 0.16);
+  border-right: 1px solid rgba(21, 18, 15, 0.08);
   transform: scaleY(var(--karate-lock, 0));
   transform-origin: top;
 }
@@ -586,51 +586,77 @@
   position: absolute;
   inset: 0;
   z-index: 4;
-  display: grid;
-  align-content: center;
-  padding: 8vh 4vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 8vh 3.5vw;
   opacity: calc(1 - var(--achievement-exit));
+  pointer-events: none;
 }
 
 .karateStatement > p {
+  width: 100%;
+  max-width: min(100%, 46rem);
+  margin: 0 auto 0.6rem;
   color: #15120f;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.72rem, 1vw, 0.96rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  opacity: var(--karate-lock, 0);
+  transform: translateX(calc((1 - var(--karate-lock, 0)) * -4vw));
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .karateStatement h3 {
   display: flex;
   justify-content: space-between;
-  margin: 1.8rem 0 0;
+  align-items: baseline;
+  width: 100%;
+  max-width: min(100%, 46rem);
+  margin: 0 auto;
   font-family: var(--font-display);
-  font-size: clamp(6.8rem, 14vw, 14rem);
+  font-size: clamp(6.2rem, 12vw, 12.5rem);
   font-weight: 650;
   line-height: 0.72;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.075em;
+  color: #15120f;
 }
 
 .karateStatement h3 span:first-child {
-  transform: translateY(calc((1 - var(--karate-lock, 0)) * -32vh));
+  transform: translateX(calc((1 - var(--karate-lock, 0)) * -6vw));
+  opacity: var(--karate-lock, 0);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .karateStatement h3 span:last-child {
-  transform: translateY(calc((1 - var(--karate-lock, 0)) * 32vh));
+  transform: translateX(calc((1 - var(--karate-lock, 0)) * 6vw));
+  opacity: var(--karate-lock, 0);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .karatePrinciples {
   position: absolute;
-  right: 4vw;
-  bottom: 6vh;
-  left: 4vw;
+  right: 0;
+  bottom: 5.5vh;
+  left: 0;
   z-index: 5;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.7rem, 1vw, 1.05rem);
-  letter-spacing: 0.18em;
+  font-size: clamp(0.72rem, 1.05vw, 1.08rem);
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  color: rgba(21, 18, 15, 0.74);
   opacity: calc(var(--karate-words, 0) * (1 - var(--achievement-exit)));
+  pointer-events: none;
 }
 
-.karatePrinciples span:nth-child(2) {
-  transform: translateY(calc((1 - var(--karate-words, 0)) * 3rem));
+.karatePrinciples span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .chessGrid {
@@ -1497,16 +1523,33 @@
   grid-area: showcase;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 100svh;
   min-width: 0;
-  padding: clamp(1rem, 1.8vw, 2.5rem);
-  overflow: hidden;
+  padding: clamp(0.75rem, 1.4vw, 1.8rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(229, 218, 199, 0.24) transparent;
   isolation: isolate;
   background:
     radial-gradient(ellipse at 45% 35%, rgba(171, 142, 99, 0.16), transparent 56%),
     radial-gradient(ellipse at 75% 82%, rgba(105, 82, 56, 0.12), transparent 55%), #0e0c0a;
+}
+
+.showcase::-webkit-scrollbar {
+  width: 6px;
+}
+
+.showcase::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.showcase::-webkit-scrollbar-thumb {
+  background: rgba(229, 218, 199, 0.24);
+  border-radius: 9999px;
 }
 
 .showcase::after {
@@ -1536,10 +1579,11 @@
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: min(100%, 75svh, 30rem);
+  max-width: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0.5rem 0;
 }
 
 .narrative .stage {
@@ -1591,18 +1635,23 @@
 }
 
 .narrative .karateStatement {
-  padding-right: 2vw;
-  padding-left: 2vw;
+  padding-right: 3vw;
+  padding-left: 3vw;
+}
+
+.narrative .karateStatement > p {
+  max-width: min(100%, 36rem);
 }
 
 .narrative .karateStatement h3 {
-  font-size: clamp(4rem, 6.3vw, 7rem);
+  max-width: min(100%, 36rem);
+  font-size: clamp(3.8rem, 5.4vw, 6.5rem);
 }
 
 .narrative .karatePrinciples {
-  right: 2vw;
-  left: 2vw;
-  font-size: clamp(0.54rem, 0.75vw, 0.78rem);
+  right: 0;
+  left: 0;
+  font-size: clamp(0.6rem, 0.82vw, 0.9rem);
 }
 
 .narrative .chessGrid {
@@ -1678,7 +1727,8 @@
   }
 
   .showcaseInner {
-    width: min(100%, 38rem);
+    width: 100%;
+    max-width: 100%;
   }
 
   .narrative {
@@ -1798,5 +1848,5 @@
 }
 
 .chapter.webgl .karateDivisions i {
-  border-color: rgba(21, 18, 15, 0.16);
+  border-color: rgba(21, 18, 15, 0.08);
 }

@@ -82,7 +82,7 @@ function LoadedModel({
         if (material instanceof MeshStandardMaterial) {
           if (treatment !== 'original') material.color = new Color(MODEL_COLORS[treatment]);
           if (treatment === 'fabric') {
-            material.roughness = 0.78;
+            material.roughness = 0.88;
             material.metalness = 0;
           } else if (treatment === 'metal') {
             material.roughness = 0.28;
@@ -521,6 +521,7 @@ export function AchievementsScene({
   const speaking = useRef<Group>(null);
   const tableLight = useRef<SpotLight>(null);
   const beltLight = useRef<SpotLight>(null);
+  const beltRimLight = useRef<SpotLight>(null);
   const chessLight = useRef<SpotLight>(null);
   const speakingLight = useRef<SpotLight>(null);
   const tableBackdrop = useRef<ShaderMaterial>(null);
@@ -576,15 +577,25 @@ export function AchievementsScene({
       table.current.rotation.set(0.24, -0.62 + tableProgress * 0.05, -0.035);
     }
 
-    setGroupPresence(belt.current, beltPresence, portrait ? 0.72 : 0.9);
+    const beltScale = portrait ? 0.88 : 1.08;
+    setGroupPresence(belt.current, beltPresence, beltScale);
     if (belt.current) {
-      const arrival = smooth(tableProgress + beltProgress);
+      const settle = smooth(beltProgress / 0.38);
+      const time = state.clock.getElapsedTime();
+      const clothBreathing = Math.sin(time * 0.9) * 0.015;
+      const clothSway = Math.cos(time * 0.75) * 0.012;
+
       belt.current.position.set(
-        centerX - (1 - smooth(beltProgress / 0.38)) * 4.2,
-        portrait ? -0.85 : -0.18,
-        0.2,
+        centerX + (1 - settle) * -0.65,
+        (portrait ? -0.42 : -0.12) + clothBreathing,
+        0.28,
       );
-      belt.current.rotation.set(0.12, -0.12, -0.16 + (1 - arrival) * -0.18);
+      // 3/4 hero angle showing the knot thickness, layered cross-weave, and natural drape
+      belt.current.rotation.set(
+        0.16,
+        -0.32 + (1 - settle) * -0.22 + clothSway,
+        -0.05 + Math.sin(time * 0.6) * 0.008,
+      );
     }
 
     setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.02);
@@ -602,7 +613,8 @@ export function AchievementsScene({
     }
 
     if (tableLight.current) tableLight.current.intensity = tablePresence * 62;
-    if (beltLight.current) beltLight.current.intensity = beltPresence * 44;
+    if (beltLight.current) beltLight.current.intensity = beltPresence * 48;
+    if (beltRimLight.current) beltRimLight.current.intensity = beltPresence * 24;
     if (chessLight.current) chessLight.current.intensity = chessPresence * 50;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 58;
     if (tableBackdrop.current) {
@@ -640,11 +652,20 @@ export function AchievementsScene({
       />
       <spotLight
         ref={beltLight}
-        position={[-1.8, 4.2, 4]}
-        color="#d9cdb9"
-        distance={13}
-        angle={0.58}
-        penumbra={0.78}
+        position={[-2.4, 4.5, 4.2]}
+        color="#ede4d5"
+        distance={14}
+        angle={0.62}
+        penumbra={0.82}
+        decay={2}
+      />
+      <spotLight
+        ref={beltRimLight}
+        position={[2.8, 2.2, 3.2]}
+        color="#d2c4ae"
+        distance={12}
+        angle={0.55}
+        penumbra={0.85}
         decay={2}
       />
       <spotLight
@@ -696,6 +717,30 @@ export function AchievementsScene({
       </group>
 
       <group ref={belt} visible={false}>
+        {/* Soft contact depth shadow behind the belt onto the warm beige wall */}
+        <mesh position={[0.02, -0.35, -0.25]} rotation={[0, 0, -0.05]}>
+          <planeGeometry args={[4.2, 3.2]} />
+          <shaderMaterial
+            transparent
+            depthWrite={false}
+            vertexShader={`
+              varying vec2 vUv;
+              void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+              }
+            `}
+            fragmentShader={`
+              varying vec2 vUv;
+              void main() {
+                vec2 p = (vUv - vec2(0.5)) * 2.0;
+                float d = length(vec2(p.x * 0.88, p.y * 1.25));
+                float shadow = exp(-d * d * 3.4) * 0.48 + smoothstep(0.85, 0.0, d) * 0.16;
+                gl_FragColor = vec4(vec3(0.04, 0.035, 0.03), shadow * 0.72);
+              }
+            `}
+          />
+        </mesh>
         <LoadedModel url={`${MODEL_ROOT}/karate-black-belt.glb`} treatment="fabric" />
       </group>
 
