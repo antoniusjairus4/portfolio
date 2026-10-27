@@ -40,6 +40,31 @@ export const chessPeakRatings = [
   { label: 'BULLET', value: '2198' },
 ] as const;
 
+export const achievementHighlights = {
+  tableTennis: [
+    { label: 'State', value: '2× RDS winner' },
+    { label: 'District', value: "3× Junior & Youth Champion · 1× Men's Champion" },
+    {
+      label: 'All India',
+      value: 'Youth Championship winner, representing Tamil Nadu in Goa',
+    },
+  ],
+  karate: [
+    { label: 'State', value: '4× Gold Medalist in Kata, Kumite & Team Kata' },
+    { label: 'Nationals', value: '2× Silver Medalist in Kata · 1× Bronze Medalist in Kumite' },
+    { label: 'District', value: '3× Champion' },
+  ],
+  music: [
+    { label: 'Trinity', value: '3 Grades' },
+    { label: 'Campofez', value: '2nd Place' },
+  ],
+  speeches: [
+    { label: 'Coimbatore Book Festival', value: '3rd Place' },
+    { label: 'Events', value: 'Conducted 7 events' },
+    { label: 'Stages', value: 'Spoke before Sid Ahmed & Sivakarthikeyan' },
+  ],
+} as const;
+
 export interface AchievementExhibit {
   key: AchievementDisciplineKey;
   index: string;

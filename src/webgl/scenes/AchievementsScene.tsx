@@ -12,7 +12,7 @@ import {
   type Material,
   MathUtils,
   type Mesh,
-  MeshBasicMaterial,
+  type MeshBasicMaterial,
   MeshStandardMaterial,
   type Object3D,
   type PerspectiveCamera,
@@ -262,7 +262,7 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
         const s = t / 0.28;
         x = x0 + (x1 - x0) * s;
         z = z0 + (z1 - z0) * s;
-        y = 0.772 + (1.45 - 0.772) * Math.pow(1 - s, 1.8);
+        y = 0.772 + (1.45 - 0.772) * (1 - s) ** 1.8;
       } else if (t <= 0.72) {
         const s = (t - 0.28) / 0.44;
         x = x1 + (x3 - x1) * s;
@@ -272,7 +272,7 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
         const s = (t - 0.72) / 0.28;
         x = x3 + (x4 - x3) * s;
         z = z3 + (z4 - z3) * s;
-        y = 0.772 + (1.24 - 0.772) * (1 - Math.pow(1 - s, 2));
+        y = 0.772 + (1.24 - 0.772) * (1 - (1 - s) ** 2);
       }
       samplePoints.push(new Vector3(x, y, z));
     }
@@ -295,7 +295,7 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
       const s = clampedT / 0.28;
       x = x0 + (x1 - x0) * s;
       z = z0 + (z1 - z0) * s;
-      y = 0.772 + (1.45 - 0.772) * Math.pow(1 - s, 1.8);
+      y = 0.772 + (1.45 - 0.772) * (1 - s) ** 1.8;
     } else if (clampedT <= 0.72) {
       const s = (clampedT - 0.28) / 0.44;
       x = x1 + (x3 - x1) * s;
@@ -305,7 +305,7 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
       const s = (clampedT - 0.72) / 0.28;
       x = x3 + (x4 - x3) * s;
       z = z3 + (z4 - z3) * s;
-      y = 0.772 + (1.24 - 0.772) * (1 - Math.pow(1 - s, 2));
+      y = 0.772 + (1.24 - 0.772) * (1 - (1 - s) ** 2);
     }
     return { x, y, z, t: clampedT };
   }, []);
@@ -354,11 +354,12 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
 
     // Update motion trail ghosts behind the ball
     if (trailGroupRef.current) {
+      const trailLength = trailGroupRef.current.children.length;
       trailGroupRef.current.children.forEach((ghost, idx) => {
         const lag = (idx + 1) * 0.014;
         const ghostPos = getTrajectoryPoint(cycle - lag);
         ghost.position.set(ghostPos.x, ghostPos.y, ghostPos.z);
-        const fade = 1 - (idx + 1) / (trailGroupRef.current!.children.length + 1);
+        const fade = 1 - (idx + 1) / (trailLength + 1);
         const mat = (ghost as Mesh).material as MeshBasicMaterial;
         mat.opacity = fade * 0.44;
       });
@@ -387,8 +388,8 @@ function TableTennisBallTrajectory({ active }: { active: boolean }) {
 
       {/* Motion Trail Ghosts */}
       <group ref={trailGroupRef}>
-        {[0.032, 0.026, 0.02, 0.015, 0.01].map((radius, i) => (
-          <mesh key={i}>
+        {[0.032, 0.026, 0.02, 0.015, 0.01].map((radius) => (
+          <mesh key={radius}>
             <sphereGeometry args={[radius, 16, 16]} />
             <meshBasicMaterial color="#ffd88a" transparent opacity={0.3} />
           </mesh>
@@ -563,11 +564,11 @@ export function AchievementsScene({
     const chessPresence = presence(chessProgress);
     const speakingPresence = presence(speakingProgress);
     // The achievements renderer is physically clipped to the narrative pane.
-    // Keep every model centered in that local viewport rather than offsetting
-    // it inside the full browser width.
+    // Positions below are authored inside that local viewport so each model
+    // can share the editorial grid without entering the image archive.
     const centerX = 0;
 
-    setGroupPresence(table.current, tablePresence, portrait ? 1.35 : 1.78);
+    setGroupPresence(table.current, tablePresence, portrait ? 1.35 : 1.74);
     if (table.current) {
       table.current.position.set(
         -0.08,
@@ -598,25 +599,33 @@ export function AchievementsScene({
       );
     }
 
-    setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.02);
+    setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.08);
     if (chess.current) {
       const lift = smooth(chessProgress / 0.5);
-      chess.current.position.set(centerX, (portrait ? -2.45 : -1.72) - (1 - lift) * 0.8, -0.2);
-      chess.current.rotation.set(0.02, -0.22 + chessProgress * 0.1, 0);
+      chess.current.position.set(
+        centerX + (portrait ? 0.35 : 1.05),
+        (portrait ? -2.45 : -1.76) - (1 - lift) * 0.8,
+        -0.2,
+      );
+      chess.current.rotation.set(0.02, -0.28 + chessProgress * 0.08, 0);
     }
 
-    setGroupPresence(speaking.current, speakingPresence, portrait ? 0.74 : 0.94);
+    setGroupPresence(speaking.current, speakingPresence, portrait ? 0.74 : 1.03);
     if (speaking.current) {
       const lift = smooth(speakingProgress / 0.44);
-      speaking.current.position.set(centerX, (portrait ? -2.1 : -1.55) - (1 - lift) * 1.25, 0);
-      speaking.current.rotation.set(0, -0.16 + speakingProgress * 0.08, 0);
+      speaking.current.position.set(
+        centerX + (portrait ? 0.28 : 0.92),
+        (portrait ? -2.1 : -1.48) - (1 - lift) * 1.25,
+        0.08,
+      );
+      speaking.current.rotation.set(0, -0.2 + speakingProgress * 0.06, 0);
     }
 
     if (tableLight.current) tableLight.current.intensity = tablePresence * 62;
     if (beltLight.current) beltLight.current.intensity = beltPresence * 48;
     if (beltRimLight.current) beltRimLight.current.intensity = beltPresence * 24;
-    if (chessLight.current) chessLight.current.intensity = chessPresence * 50;
-    if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 58;
+    if (chessLight.current) chessLight.current.intensity = chessPresence * 58;
+    if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 68;
     if (tableBackdrop.current) {
       tableBackdrop.current.uniforms.uOpacity.value = tablePresence;
       tableBackdrop.current.uniforms.uTime.value = state.clock.getElapsedTime();
@@ -670,20 +679,20 @@ export function AchievementsScene({
       />
       <spotLight
         ref={chessLight}
-        position={[-4, 5, 3.5]}
+        position={[2.2, 5.6, 4.2]}
         color="#eee2cc"
         distance={14}
-        angle={0.5}
-        penumbra={0.72}
+        angle={0.56}
+        penumbra={0.76}
         decay={2}
       />
       <spotLight
         ref={speakingLight}
-        position={[-2.5, 5.8, 3.8]}
+        position={[1.8, 6.2, 4.5]}
         color="#ead5ad"
-        distance={15}
-        angle={0.45}
-        penumbra={0.68}
+        distance={17}
+        angle={0.52}
+        penumbra={0.74}
         decay={2}
       />
 
@@ -746,22 +755,22 @@ export function AchievementsScene({
 
       <group ref={chess} visible={false}>
         <ChessBoard />
-        <group position={[-1.08, 0.1, -0.35]} scale={18} rotation={[0, 0.35, 0]}>
+        <group position={[-1.2, 0.1, -0.4]} scale={14.5} rotation={[0, 0.35, 0]}>
           <LoadedModel url={`${MODEL_ROOT}/chess-knight.glb`} treatment="ivory" />
         </group>
-        <group position={[0.15, 0.1, 0.42]} scale={18} rotation={[0, -0.22, 0]}>
+        <group position={[0.18, 0.1, 0.35]} scale={22} rotation={[0, -0.22, 0]}>
           <LoadedModel url={`${MODEL_ROOT}/chess-queen.glb`} treatment="charcoal" />
         </group>
-        <group position={[1.25, 0.1, -0.6]} scale={17} rotation={[0, -0.38, 0]}>
+        <group position={[1.3, 0.1, -0.64]} scale={15.5} rotation={[0, -0.38, 0]}>
           <LoadedModel url={`${MODEL_ROOT}/chess-king.glb`} treatment="ivory" />
         </group>
       </group>
 
       <group ref={speaking} visible={false}>
-        <group position={[0, -0.15, 0]} scale={0.84}>
+        <group position={[0, -0.15, 0]} scale={0.92}>
           <LoadedModel url={`${MODEL_ROOT}/stage-platform.glb`} treatment="charcoal" />
         </group>
-        <group position={[-0.55, 0.18, 0.38]} scale={1.34} rotation={[0, -0.24, 0]}>
+        <group position={[-0.55, 0.18, 0.42]} scale={1.52} rotation={[0, -0.24, 0]}>
           <LoadedModel url={`${MODEL_ROOT}/stage-microphone.glb`} treatment="metal" />
         </group>
         <group position={[1.6, 0.04, -0.2]} scale={1.4} rotation={[0, -0.34, 0]}>

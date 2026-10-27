@@ -119,7 +119,7 @@
   justify-content: center;
   padding: 7vw 4vw;
   text-align: center;
-  opacity: calc(var(--intro-title, 0) * (1 - var(--achievement-exit)));
+  opacity: var(--intro-title, 0);
   transform: scale(var(--intro-scale, 1.08));
 }
 
@@ -137,7 +137,7 @@
 .introStatement p {
   margin-top: clamp(1.2rem, 2.4vh, 2.2rem);
   color: rgba(229, 218, 199, 0.86);
-  opacity: calc((0.72 + var(--intro-beyond, 0) * 0.28) * (1 - var(--achievement-exit)));
+  opacity: calc(0.72 + var(--intro-beyond, 0) * 0.28);
   transform: translateY(calc((1 - var(--intro-beyond, 0)) * 1.5rem));
 }
 
@@ -171,12 +171,12 @@
   --discipline-reveal: var(--intro-word-one, 0);
   padding: clamp(1rem, 2vh, 1.45rem) 0.8rem 0;
   font-family: var(--font-display);
-  font-size: clamp(0.9rem, 1.18vw, 1.35rem);
-  font-weight: 540;
+  font-size: clamp(1.15rem, 1.65vw, 1.9rem);
+  font-weight: 580;
   letter-spacing: 0.045em;
   color: #e5dac7;
   text-align: center;
-  opacity: calc((0.78 + var(--discipline-reveal) * 0.22) * (1 - var(--achievement-exit)));
+  opacity: calc(0.78 + var(--discipline-reveal) * 0.22);
   transform: translateY(calc((1 - var(--discipline-reveal)) * 2rem));
   text-shadow: 0 0.12rem 0.8rem rgba(0, 0, 0, 0.9);
 }
@@ -495,6 +495,65 @@
   text-shadow: 0 2px 18px rgba(0, 0, 0, 0.85);
 }
 
+.achievementFacts {
+  position: absolute;
+  z-index: 16;
+  width: min(30vw, 27rem);
+  padding: clamp(0.75rem, 1.2vw, 1.15rem);
+  border: 1px solid rgba(229, 218, 199, 0.18);
+  border-left: 2px solid #8b1e2d;
+  background: rgba(10, 8, 7, 0.72);
+  box-shadow: 0 1.2rem 3rem rgba(0, 0, 0, 0.2);
+  color: #e5dac7;
+  backdrop-filter: blur(0.7rem);
+}
+
+.achievementFacts > p {
+  margin: 0 0 0.65rem;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.5rem, 0.62vw, 0.68rem);
+  letter-spacing: 0.2em;
+  color: #c89a58;
+}
+
+.achievementFacts dl,
+.achievementFacts dd {
+  margin: 0;
+}
+
+.achievementFacts dl {
+  display: grid;
+  gap: 0.52rem;
+}
+
+.achievementFact {
+  display: grid;
+  grid-template-columns: minmax(4.5rem, 0.42fr) 1fr;
+  gap: 0.75rem;
+  align-items: baseline;
+}
+
+.achievementFacts dt {
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.48rem, 0.58vw, 0.64rem);
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(229, 218, 199, 0.58);
+}
+
+.achievementFacts dd {
+  font-family: var(--font-display);
+  font-size: clamp(0.68rem, 0.88vw, 0.98rem);
+  line-height: 1.25;
+}
+
+.tableFacts {
+  top: 20vh;
+  right: 2.5vw;
+  opacity: var(--tt-resolve, 0);
+  transform: translateX(calc((1 - var(--tt-resolve, 0)) * 4vw));
+}
+
 .karate .stage {
   background: linear-gradient(135deg, #e0d4c1 0%, #cbbba3 50%, #a58f73 100%);
   color: #15120f;
@@ -720,6 +779,25 @@
   align-items: center;
   justify-content: center;
   text-align: center;
+}
+
+.karateFacts {
+  right: 2.5vw;
+  bottom: 12vh;
+  border-color: rgba(21, 18, 15, 0.16);
+  border-left-color: #7e1f2c;
+  background: rgba(242, 232, 213, 0.72);
+  color: #15120f;
+  opacity: var(--karate-words, 0);
+  transform: translateY(calc((1 - var(--karate-words, 0)) * 3vh));
+}
+
+.karateFacts > p {
+  color: #7e1f2c;
+}
+
+.karateFacts dt {
+  color: rgba(21, 18, 15, 0.58);
 }
 
 .chessGrid {
@@ -1180,6 +1258,24 @@
   letter-spacing: -0.07em;
 }
 
+.musicFacts,
+.speechFacts {
+  bottom: 5vh;
+  width: min(26vw, 24rem);
+}
+
+.musicFacts {
+  left: 2.5vw;
+  opacity: var(--speaking-audience, 0);
+  transform: translateX(calc((1 - var(--speaking-audience, 0)) * -4vw));
+}
+
+.speechFacts {
+  right: 2.5vw;
+  opacity: var(--speaking-reach, 0);
+  transform: translateX(calc((1 - var(--speaking-reach, 0)) * 4vw));
+}
+
 .finale .stage::before {
   position: absolute;
   inset: 0;
@@ -1582,6 +1678,7 @@
 .narrative {
   grid-area: narrative;
   min-width: 0;
+  overflow: clip;
   border-right: 1px solid rgba(229, 218, 199, 0.13);
 }
 
@@ -1656,6 +1753,26 @@
 
 .narrative .stage {
   width: 100%;
+  backface-visibility: hidden;
+  will-change: transform;
+}
+
+/* Directional handoffs are confined to the narrative half. The outgoing
+   Table Tennis and Chess scenes remain parked beneath their horizontal
+   successors until those successors have completely covered the panel. */
+.narrative .table-tennis .stage,
+.narrative .chess .stage {
+  transform: translate3d(0, var(--panel-exit-hold-y, 0px), 0);
+}
+
+.narrative .karate .stage {
+  z-index: 2;
+  transform: translate3d(calc((1 - var(--panel-entry, 0)) * -100%), var(--panel-entry-y, 0px), 0);
+}
+
+.narrative .public-speaking .stage {
+  z-index: 2;
+  transform: translate3d(calc((1 - var(--panel-entry, 0)) * 100%), var(--panel-entry-y, 0px), 0);
 }
 
 .introStatement h3 {
@@ -1778,6 +1895,403 @@
   font-size: clamp(3.4rem, 5vw, 6.5rem);
 }
 
+/* Premium achievement-page system. The archive column remains independent;
+   these rules establish one shared editorial grid for the four live pages. */
+.narrative {
+  --achievement-gutter: clamp(1.5rem, 3.15vw, 3.8rem);
+  --achievement-top: clamp(5.8rem, 12vh, 8.5rem);
+  --achievement-rule: rgba(229, 218, 199, 0.2);
+  --achievement-panel: rgba(12, 10, 9, 0.82);
+  --achievement-panel-border: rgba(229, 218, 199, 0.2);
+  container-type: inline-size;
+}
+
+.narrative .panel .stage {
+  box-shadow: inset -1px 0 rgba(229, 218, 199, 0.08);
+}
+
+.narrative .meta {
+  top: clamp(1.25rem, 2.5vh, 2.25rem);
+  right: var(--achievement-gutter);
+  left: var(--achievement-gutter);
+  gap: clamp(0.7rem, 1vw, 1rem);
+  font-size: clamp(0.5rem, 0.58vw, 0.66rem);
+  letter-spacing: 0.2em;
+}
+
+.narrative .meta i {
+  opacity: 0.36;
+}
+
+.narrative .achievementFacts {
+  width: clamp(16.5rem, 21vw, 23.5rem);
+  padding: clamp(0.9rem, 1.15vw, 1.25rem) clamp(1rem, 1.35vw, 1.4rem);
+  overflow: hidden;
+  border: 1px solid var(--achievement-panel-border);
+  border-left: 1px solid var(--achievement-panel-border);
+  border-radius: 0.32rem;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.035), transparent 42%),
+    var(--achievement-panel);
+  box-shadow:
+    0 1.6rem 4.5rem rgba(0, 0, 0, 0.28),
+    inset 0 1px rgba(255, 255, 255, 0.045);
+  backdrop-filter: blur(0.9rem) saturate(0.86);
+}
+
+.narrative .achievementFacts::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, #8b1e2d 0 16%, rgba(229, 218, 199, 0.28) 16% 100%);
+}
+
+.narrative .achievementFacts > p {
+  margin-bottom: clamp(0.75rem, 1.1vh, 1rem);
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid rgba(229, 218, 199, 0.12);
+  font-size: clamp(0.5rem, 0.58vw, 0.64rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+}
+
+.narrative .achievementFacts dl {
+  gap: 0;
+}
+
+.narrative .achievementFact {
+  grid-template-columns: minmax(4.8rem, 0.42fr) minmax(0, 1fr);
+  gap: clamp(0.7rem, 1vw, 1rem);
+  padding: 0.58rem 0;
+}
+
+.narrative .achievementFact + .achievementFact {
+  border-top: 1px solid rgba(229, 218, 199, 0.08);
+}
+
+.narrative .achievementFacts dt {
+  font-size: clamp(0.46rem, 0.52vw, 0.58rem);
+  line-height: 1.35;
+  letter-spacing: 0.14em;
+}
+
+.narrative .achievementFacts dd {
+  font-size: clamp(0.68rem, 0.78vw, 0.9rem);
+  line-height: 1.34;
+  letter-spacing: -0.012em;
+}
+
+/* 01 — Table Tennis */
+.narrative .tableTitle {
+  top: var(--achievement-top);
+  right: auto;
+  left: var(--achievement-gutter);
+  display: flex;
+  width: auto;
+  max-width: 45%;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-start;
+  gap: 0.2em;
+  font-size: clamp(2.9rem, 4.1vw, 5rem);
+  line-height: 0.84;
+  letter-spacing: -0.072em;
+  white-space: nowrap;
+}
+
+.narrative .tableCourt {
+  inset: 30vh 3.5vw 13vh;
+}
+
+.narrative .tableFacts {
+  top: clamp(9.5rem, 18vh, 12rem);
+  right: var(--achievement-gutter);
+}
+
+.narrative .tableTelemetry {
+  top: 53%;
+  right: var(--achievement-gutter);
+  left: var(--achievement-gutter);
+  max-width: none;
+  padding: 0;
+}
+
+.narrative .telemetryTrack {
+  gap: clamp(0.35rem, 0.65vw, 0.75rem);
+}
+
+.narrative .telemetryTag {
+  min-width: clamp(4.9rem, 6.5vw, 7rem);
+  padding: 0 0.35rem;
+}
+
+.narrative .trajectorySvg {
+  top: 29%;
+  left: 7%;
+  width: 86%;
+  height: 35%;
+}
+
+.narrative .trajectoryArc {
+  stroke-width: 0.85;
+  stroke-dasharray: 2 2.5;
+}
+
+.narrative .tableStatement {
+  right: auto;
+  bottom: clamp(2rem, 4.2vh, 3.5rem);
+  left: var(--achievement-gutter);
+  width: min(45%, 31rem);
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  justify-content: flex-start;
+  gap: clamp(0.8rem, 1.4vw, 1.5rem);
+}
+
+.narrative .tableStatement strong {
+  font-size: clamp(5.6rem, 8.2vw, 9.25rem);
+  color: rgba(229, 218, 199, 0.3);
+}
+
+.narrative .tableStatement h3 {
+  padding-bottom: 0.08em;
+  font-size: clamp(1.9rem, 2.7vw, 3.25rem);
+  line-height: 0.84;
+}
+
+/* 02 — Karate */
+.narrative .karateStatement {
+  justify-content: center;
+  padding: 4vh var(--achievement-gutter) 8vh;
+}
+
+.narrative .karateStatement > p {
+  max-width: none;
+  margin-bottom: 0.85rem;
+  font-size: clamp(0.56rem, 0.68vw, 0.76rem);
+}
+
+.narrative .karateStatement h3 {
+  max-width: none;
+  gap: clamp(7.5rem, 15vw, 17rem);
+  font-size: clamp(4.25rem, 5.4vw, 6.65rem);
+  line-height: 0.78;
+  letter-spacing: -0.065em;
+}
+
+.narrative .karateStatement h3 span:last-child {
+  margin-left: auto;
+}
+
+.narrative .karateFacts {
+  top: clamp(8rem, 15vh, 10rem);
+  right: var(--achievement-gutter);
+  bottom: auto;
+  --achievement-panel: rgba(239, 230, 215, 0.84);
+  --achievement-panel-border: rgba(21, 18, 15, 0.2);
+  box-shadow:
+    0 1.6rem 4rem rgba(69, 50, 32, 0.15),
+    inset 0 1px rgba(255, 255, 255, 0.38);
+}
+
+.narrative .karateFacts::before {
+  background: linear-gradient(90deg, #7e1f2c 0 16%, rgba(21, 18, 15, 0.22) 16% 100%);
+}
+
+.narrative .karateFacts > p {
+  border-bottom-color: rgba(21, 18, 15, 0.12);
+}
+
+.narrative .karateFacts .achievementFact + .achievementFact {
+  border-top-color: rgba(21, 18, 15, 0.09);
+}
+
+.narrative .karatePrinciples {
+  right: var(--achievement-gutter);
+  bottom: clamp(2rem, 4.5vh, 3.5rem);
+  left: var(--achievement-gutter);
+  border-top: 1px solid rgba(21, 18, 15, 0.16);
+  padding-top: clamp(0.85rem, 1.2vh, 1.1rem);
+  font-size: clamp(0.52rem, 0.62vw, 0.68rem);
+  letter-spacing: 0.22em;
+}
+
+.narrative .karatePrinciples span:first-child {
+  justify-content: flex-start;
+}
+
+.narrative .karate .karatePrinciples span:last-child {
+  justify-content: flex-end;
+}
+
+/* 03 — Chess */
+.narrative .chessStatement {
+  display: block;
+  padding: 0;
+}
+
+.narrative .chessTitle {
+  position: absolute;
+  top: var(--achievement-top);
+  left: var(--achievement-gutter);
+  width: min(46%, 28rem);
+}
+
+.narrative .chessTitle p {
+  max-width: 22rem;
+  line-height: 1.45;
+}
+
+.narrative .chessTitle h3 {
+  margin-top: clamp(0.8rem, 1.8vh, 1.4rem);
+  font-size: clamp(4.6rem, 6.4vw, 7.7rem);
+  line-height: 0.75;
+}
+
+.narrative .ratings {
+  position: absolute;
+  bottom: clamp(2.2rem, 6vh, 5rem);
+  left: var(--achievement-gutter);
+  width: min(46%, 28rem);
+  gap: 0;
+  padding: 0.35rem 0.95rem 0.25rem;
+  border-top: 1px solid rgba(229, 218, 199, 0.34);
+  border-bottom: 1px solid rgba(229, 218, 199, 0.12);
+  background: linear-gradient(90deg, rgba(229, 218, 199, 0.035), transparent);
+}
+
+.narrative .ratings div {
+  grid-template-columns: minmax(4.6rem, 0.46fr) minmax(0, 1fr);
+  padding: clamp(0.3rem, 0.7vh, 0.55rem) 0;
+  border-bottom-color: rgba(229, 218, 199, 0.13);
+}
+
+.narrative .ratings div:last-child {
+  border-bottom: 0;
+}
+
+.narrative .ratings dt {
+  font-size: clamp(0.5rem, 0.58vw, 0.64rem);
+}
+
+.narrative .ratings dd {
+  font-size: clamp(2.65rem, 3.75vw, 4.5rem);
+  line-height: 0.86;
+  text-align: right;
+}
+
+.narrative .chessGrid {
+  inset: 23vh 2vw 10vh 39%;
+  opacity: calc(var(--chess-grid, 0) * (1 - var(--achievement-exit)) * 0.82);
+}
+
+.narrative .chessPath i:first-child {
+  top: 31%;
+  left: 43%;
+  width: 24%;
+}
+
+.narrative .chessPath i:nth-child(2) {
+  top: 31%;
+  left: 67%;
+  height: 24%;
+}
+
+.narrative .chessPath i:last-child {
+  top: 55%;
+  left: 67%;
+  width: 16%;
+}
+
+/* 04 — Public Speaking */
+.narrative .speakingStatement {
+  padding: var(--achievement-top) var(--achievement-gutter) 6vh;
+}
+
+.narrative .speakingStatement > p {
+  color: rgba(229, 218, 199, 0.68);
+}
+
+.narrative .speeches {
+  display: grid;
+  width: min(46%, 29rem);
+  margin-top: clamp(2rem, 5vh, 4rem);
+  gap: 0.2rem;
+}
+
+.narrative .speeches strong {
+  font-family: var(--font-display);
+  font-size: clamp(7.5rem, 10.5vw, 12.5rem);
+  font-weight: 650;
+  line-height: 0.66;
+  letter-spacing: -0.085em;
+  color: rgba(229, 218, 199, 0.96);
+}
+
+.narrative .speeches h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 3.15vw, 3.8rem);
+  font-weight: 610;
+  line-height: 0.84;
+  letter-spacing: -0.055em;
+}
+
+.narrative .audienceReach {
+  top: clamp(8.5rem, 17vh, 11rem);
+  right: var(--achievement-gutter);
+  bottom: auto;
+  width: min(38%, 22rem);
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(229, 218, 199, 0.22);
+}
+
+.narrative .audienceReach strong {
+  font-size: clamp(3.6rem, 4.8vw, 5.8rem);
+}
+
+.narrative .speakingInfoGrid {
+  position: absolute;
+  right: var(--achievement-gutter);
+  bottom: clamp(1.8rem, 4vh, 3.25rem);
+  left: var(--achievement-gutter);
+  z-index: 16;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(0.8rem, 1.1vw, 1.2rem);
+  align-items: end;
+}
+
+.narrative .musicFacts,
+.narrative .speechFacts {
+  position: relative;
+  inset: auto;
+  width: auto;
+  min-height: 100%;
+}
+
+.narrative .stagePlatform {
+  right: 4%;
+  bottom: 3vh;
+  left: 32%;
+  height: 38%;
+}
+
+.narrative .microphone {
+  top: 17%;
+  right: 18%;
+  width: clamp(5rem, 7.5vw, 8rem);
+}
+
+.narrative .stageSpeaker {
+  right: 4.5%;
+  bottom: 14%;
+}
+
 @media (max-width: 860px) {
   .layout {
     display: flex;
@@ -1843,6 +2357,61 @@
     font-size: clamp(2rem, 8vw, 3.5rem);
   }
 
+  .narrative .achievementFacts {
+    width: auto;
+    padding: 0.62rem;
+    backdrop-filter: blur(0.45rem);
+  }
+
+  .narrative .achievementFacts > p {
+    margin-bottom: 0.42rem;
+    font-size: 0.46rem;
+  }
+
+  .narrative .achievementFacts dl {
+    gap: 0.34rem;
+  }
+
+  .narrative .achievementFact {
+    grid-template-columns: 4.2rem 1fr;
+    gap: 0.45rem;
+  }
+
+  .narrative .achievementFacts dt {
+    font-size: 0.43rem;
+  }
+
+  .narrative .achievementFacts dd {
+    font-size: 0.58rem;
+  }
+
+  .narrative .tableFacts {
+    top: 17vh;
+    right: 1rem;
+    left: 1rem;
+  }
+
+  .narrative .karateFacts {
+    right: 1rem;
+    bottom: 3.5vh;
+    left: 1rem;
+  }
+
+  .narrative .musicFacts,
+  .narrative .speechFacts {
+    top: 36vh;
+    bottom: auto;
+    width: calc(50% - 1.35rem);
+  }
+
+  .narrative .musicFacts {
+    left: 1rem;
+  }
+
+  .narrative .speechFacts {
+    right: 1rem;
+  }
+
   .narrative .karateStatement h3 {
     font-size: clamp(4.2rem, 15vw, 6rem);
   }
@@ -1883,6 +2452,200 @@
     position: relative;
     top: auto;
     height: 60svh;
+  }
+}
+
+@media (max-width: 860px) {
+  .narrative {
+    --achievement-gutter: clamp(0.9rem, 4vw, 1.35rem);
+    --achievement-top: clamp(4.2rem, 9vh, 5.25rem);
+  }
+
+  .narrative .meta {
+    top: 0.9rem;
+    right: var(--achievement-gutter);
+    left: var(--achievement-gutter);
+  }
+
+  .narrative .achievementFacts {
+    width: min(52vw, 19rem);
+    padding: 0.68rem 0.75rem;
+  }
+
+  .narrative .achievementFacts > p {
+    margin-bottom: 0.35rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .narrative .achievementFact {
+    grid-template-columns: minmax(3.9rem, 0.4fr) minmax(0, 1fr);
+    gap: 0.4rem;
+    padding: 0.32rem 0;
+  }
+
+  .narrative .tableTitle {
+    top: var(--achievement-top);
+    left: var(--achievement-gutter);
+    max-width: calc(100% - var(--achievement-gutter) * 2);
+    font-size: clamp(2.4rem, 10vw, 4rem);
+  }
+
+  .narrative .tableFacts {
+    top: clamp(7.5rem, 15vh, 9rem);
+    right: var(--achievement-gutter);
+    left: auto;
+  }
+
+  .narrative .tableCourt {
+    inset: 24% 1rem 13%;
+  }
+
+  .narrative .tableTelemetry {
+    top: 50%;
+    right: var(--achievement-gutter);
+    left: var(--achievement-gutter);
+  }
+
+  .narrative .telemetryLine {
+    display: none;
+  }
+
+  .narrative .telemetryTrack {
+    justify-content: space-between;
+  }
+
+  .narrative .telemetryTag {
+    min-width: 0;
+    padding: 0;
+  }
+
+  .narrative .telemetryMetric {
+    font-size: 0.4rem;
+  }
+
+  .narrative .tableStatement {
+    bottom: 1.2rem;
+    left: var(--achievement-gutter);
+    width: calc(100% - var(--achievement-gutter) * 2);
+  }
+
+  .narrative .tableStatement strong {
+    font-size: clamp(4.3rem, 20vw, 7rem);
+  }
+
+  .narrative .tableStatement h3 {
+    font-size: clamp(1.6rem, 6.7vw, 2.6rem);
+  }
+
+  .narrative .karateStatement {
+    padding-right: var(--achievement-gutter);
+    padding-left: var(--achievement-gutter);
+  }
+
+  .narrative .karateStatement h3 {
+    gap: clamp(5rem, 23vw, 9rem);
+    font-size: clamp(3.5rem, 13vw, 5.6rem);
+  }
+
+  .narrative .karateFacts {
+    top: auto;
+    right: var(--achievement-gutter);
+    bottom: 4.1rem;
+    left: auto;
+  }
+
+  .narrative .karatePrinciples {
+    right: var(--achievement-gutter);
+    bottom: 1.2rem;
+    left: var(--achievement-gutter);
+  }
+
+  .narrative .chessTitle {
+    top: var(--achievement-top);
+    left: var(--achievement-gutter);
+    width: 44%;
+  }
+
+  .narrative .chessTitle p {
+    font-size: 0.48rem;
+  }
+
+  .narrative .chessTitle h3 {
+    font-size: clamp(3.6rem, 16vw, 6rem);
+  }
+
+  .narrative .ratings {
+    bottom: 1.25rem;
+    left: var(--achievement-gutter);
+    width: 48%;
+    padding: 0.2rem 0.55rem;
+  }
+
+  .narrative .ratings div {
+    grid-template-columns: 3.35rem 1fr;
+  }
+
+  .narrative .ratings dd {
+    font-size: clamp(2rem, 8.5vw, 3.2rem);
+  }
+
+  .narrative .chessGrid {
+    inset: 20% 0.8rem 8% 43%;
+  }
+
+  .narrative .speakingStatement {
+    padding: var(--achievement-top) var(--achievement-gutter) 1rem;
+  }
+
+  .narrative .speeches {
+    width: 47%;
+    margin-top: 1.6rem;
+  }
+
+  .narrative .speeches strong {
+    font-size: clamp(5.2rem, 22vw, 8rem);
+  }
+
+  .narrative .speeches h3 {
+    font-size: clamp(1.65rem, 6.8vw, 2.7rem);
+  }
+
+  .narrative .audienceReach {
+    top: var(--achievement-top);
+    right: var(--achievement-gutter);
+    width: 42%;
+  }
+
+  .narrative .audienceReach strong {
+    font-size: clamp(2.6rem, 10vw, 4rem);
+  }
+
+  .narrative .speakingInfoGrid {
+    top: auto;
+    right: var(--achievement-gutter);
+    bottom: 1rem;
+    left: var(--achievement-gutter);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+  }
+
+  .narrative .musicFacts,
+  .narrative .speechFacts {
+    inset: auto;
+    width: auto;
+    min-height: 0;
+  }
+
+  .narrative .speakingInfoGrid .achievementFact {
+    display: block;
+  }
+
+  .narrative .speakingInfoGrid .achievementFacts dt {
+    margin-bottom: 0.08rem;
+  }
+
+  .narrative .stagePlatform {
+    left: 38%;
   }
 }
 

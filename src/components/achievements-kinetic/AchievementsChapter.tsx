@@ -14,6 +14,7 @@ import EchoText from '@/components/ui/EchoText';
 import {
   type AchievementDisciplineKey,
   achievementDisciplines,
+  achievementHighlights,
   chessPeakRatings,
 } from '@/content/achievementsKinetic';
 import {
@@ -156,8 +157,20 @@ function usePanelProgress(
       const rect = section.getBoundingClientRect();
       const viewport = window.innerHeight;
       const start = window.innerWidth <= 860 && panel !== 'intro' ? viewport * 0.4 : 0;
+      const entryDistance = Math.max(1, viewport - start);
+      const entryProgress = Math.min(1, Math.max(0, (viewport - rect.top) / entryDistance));
+      const entryOffset =
+        rect.top > start && rect.top < viewport
+          ? start - rect.top
+          : rect.top >= viewport
+            ? start - viewport
+            : 0;
+      const exitHold = Math.min(viewport, Math.max(0, viewport - rect.bottom));
       const distance = Math.max(1, rect.height - viewport + start);
       const progress = Math.min(1, Math.max(0, (start - rect.top) / distance));
+      section.style.setProperty('--panel-entry', String(entryProgress));
+      section.style.setProperty('--panel-entry-y', `${entryOffset}px`);
+      section.style.setProperty('--panel-exit-hold-y', `${exitHold}px`);
       for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
         section.style.setProperty(property, String(value));
       }
@@ -205,6 +218,31 @@ function DisciplineMeta({ discipline }: { discipline: AchievementDisciplineKey }
       <i aria-hidden="true" />
       <span>{item.principle}</span>
     </div>
+  );
+}
+
+interface AchievementFactsProps {
+  title: string;
+  items: readonly { label: string; value: string }[];
+  className?: string;
+}
+
+function AchievementFacts({ title, items, className = '' }: AchievementFactsProps) {
+  return (
+    <section
+      className={`${styles.achievementFacts} ${className}`.trim()}
+      aria-label={`${title} highlights`}
+    >
+      <p>{title}</p>
+      <dl>
+        {items.map((item) => (
+          <div className={styles.achievementFact} key={`${item.label}-${item.value}`}>
+            <dt>{item.label}</dt>
+            <dd>{item.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }
 
@@ -354,6 +392,7 @@ export function AchievementsChapter() {
             </div>
             <div className={styles.tableTrajectory} aria-hidden="true">
               <svg className={styles.trajectorySvg} viewBox="0 0 100 65" preserveAspectRatio="none">
+                <title>Table tennis ball trajectory</title>
                 <path
                   d="M 6 28 Q 18 16 28 50 Q 38 22 52 26 Q 66 30 76 52 Q 88 30 96 34"
                   className={styles.trajectoryArc}
@@ -366,19 +405,19 @@ export function AchievementsChapter() {
               <div className={styles.telemetryTrack}>
                 <span className={styles.telemetryLine} />
                 <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>01 //</span>
+                  <span className={styles.telemetryIdx}>{'01 //'}</span>
                   <span className={styles.telemetryName}>VELOCITY</span>
                   <span className={styles.telemetryMetric}>112 KM/H</span>
                 </div>
                 <span className={styles.telemetryLine} />
                 <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>02 //</span>
+                  <span className={styles.telemetryIdx}>{'02 //'}</span>
                   <span className={styles.telemetryName}>SPIN</span>
                   <span className={styles.telemetryMetric}>8,400 RPM</span>
                 </div>
                 <span className={styles.telemetryLine} />
                 <div className={styles.telemetryTag}>
-                  <span className={styles.telemetryIdx}>03 //</span>
+                  <span className={styles.telemetryIdx}>{'03 //'}</span>
                   <span className={styles.telemetryName}>TRAJECTORY</span>
                   <span className={styles.telemetryMetric}>BALLISTIC ARC</span>
                 </div>
@@ -397,6 +436,11 @@ export function AchievementsChapter() {
                 CHAMPION
               </h3>
             </div>
+            <AchievementFacts
+              title="TABLE TENNIS HONORS"
+              items={achievementHighlights.tableTennis}
+              className={styles.tableFacts}
+            />
           </KineticPanel>
 
           <KineticPanel panel="karate" reducedMotion={reducedMotion}>
@@ -430,6 +474,11 @@ export function AchievementsChapter() {
               <span>POWER</span>
               <span>DISCIPLINE</span>
             </div>
+            <AchievementFacts
+              title="KARATE HONORS"
+              items={achievementHighlights.karate}
+              className={styles.karateFacts}
+            />
           </KineticPanel>
 
           <KineticPanel panel="chess" reducedMotion={reducedMotion}>
@@ -500,6 +549,18 @@ export function AchievementsChapter() {
                 <strong>15,000</strong>
                 <span>PEOPLE ADDRESSED</span>
               </div>
+            </div>
+            <div className={styles.speakingInfoGrid}>
+              <AchievementFacts
+                title="MUSIC"
+                items={achievementHighlights.music}
+                className={styles.musicFacts}
+              />
+              <AchievementFacts
+                title="SPEAKING"
+                items={achievementHighlights.speeches}
+                className={styles.speechFacts}
+              />
             </div>
             <div className={styles.speakingLight} aria-hidden="true" />
           </KineticPanel>
