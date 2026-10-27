@@ -51,8 +51,8 @@ function panelProgress(panel: string, portrait: boolean) {
   return Math.min(1, Math.max(0, (start - rect.top) / Math.max(1, rect.height - viewport + start)));
 }
 
-function presence(progress: number) {
-  return smooth(progress / 0.14) * (1 - smooth((progress - 0.84) / 0.14));
+function entrancePresence(progress: number) {
+  return smooth(progress / 0.14);
 }
 
 function setGroupPresence(group: Group | null, amount: number, scale: number) {
@@ -635,10 +635,20 @@ export function AchievementsScene({
     const beltProgress = panelProgress('karate', portrait);
     const chessProgress = panelProgress('chess', portrait);
     const speakingProgress = panelProgress('public-speaking', portrait);
-    const tablePresence = presence(tableProgress);
-    const beltPresence = presence(beltProgress);
-    const chessPresence = presence(chessProgress);
-    const speakingPresence = presence(speakingProgress);
+    const finaleProgress = panelProgress('finale', portrait);
+    const tableEntrance = entrancePresence(tableProgress);
+    const beltEntrance = entrancePresence(beltProgress);
+    const chessEntrance = entrancePresence(chessProgress);
+    const speakingEntrance = entrancePresence(speakingProgress);
+    const finaleEntrance = entrancePresence(finaleProgress);
+
+    // Crossfade subjects only when the incoming panel has begun to establish
+    // itself. Previously every subject faded on its own local timeline, which
+    // left an empty black interval before the next sticky panel arrived.
+    const tablePresence = tableEntrance * (1 - beltEntrance);
+    const beltPresence = beltEntrance * (1 - chessEntrance);
+    const chessPresence = chessEntrance * (1 - speakingEntrance);
+    const speakingPresence = speakingEntrance * (1 - finaleEntrance);
     // The achievements renderer is physically clipped to the narrative pane.
     // Positions below are authored inside that local viewport so each model
     // can share the editorial grid without entering the image archive.
