@@ -51,6 +51,16 @@ function panelProgress(panel: string, portrait: boolean) {
   return Math.min(1, Math.max(0, (start - rect.top) / Math.max(1, rect.height - viewport + start)));
 }
 
+function panelArrival(panel: string, portrait: boolean) {
+  const element = document.querySelector<HTMLElement>(`[data-achievement-panel="${panel}"]`);
+  if (!element) return 0;
+  const rect = element.getBoundingClientRect();
+  const viewport = window.innerHeight;
+  const stickyTop = portrait ? viewport * 0.4 : 0;
+  const travel = Math.max(1, viewport - stickyTop);
+  return smooth((viewport - rect.top) / travel);
+}
+
 function entrancePresence(progress: number) {
   return smooth(progress / 0.14);
 }
@@ -635,12 +645,11 @@ export function AchievementsScene({
     const beltProgress = panelProgress('karate', portrait);
     const chessProgress = panelProgress('chess', portrait);
     const speakingProgress = panelProgress('public-speaking', portrait);
-    const finaleProgress = panelProgress('finale', portrait);
     const tableEntrance = entrancePresence(tableProgress);
-    const beltEntrance = entrancePresence(beltProgress);
-    const chessEntrance = entrancePresence(chessProgress);
-    const speakingEntrance = entrancePresence(speakingProgress);
-    const finaleEntrance = entrancePresence(finaleProgress);
+    const beltEntrance = panelArrival('karate', portrait);
+    const chessEntrance = panelArrival('chess', portrait);
+    const speakingEntrance = panelArrival('public-speaking', portrait);
+    const finaleEntrance = panelArrival('finale', portrait);
 
     // Crossfade subjects only when the incoming panel has begun to establish
     // itself. Previously every subject faded on its own local timeline, which
@@ -673,7 +682,7 @@ export function AchievementsScene({
       const clothSway = Math.cos(time * 0.75) * 0.012;
 
       belt.current.position.set(
-        centerX + (portrait ? 0 : -1.85) + (1 - settle) * -0.65,
+        centerX + (1 - settle) * -0.65,
         (portrait ? -0.42 : -0.12) + clothBreathing,
         0.28,
       );
@@ -818,7 +827,9 @@ export function AchievementsScene({
           />
         </mesh>
         <LoadedModel url={`${MODEL_ROOT}/table-tennis.glb`} />
-        <TableTennisBallTrajectory active={presence(panelProgress('table-tennis', portrait)) > 0.01} />
+        <TableTennisBallTrajectory
+          active={entrancePresence(panelProgress('table-tennis', portrait)) > 0.01}
+        />
       </group>
 
       <group ref={belt} visible={false}>

@@ -86,10 +86,6 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
     const table = smoothstep(rangeProgress(value, 0.02, 0.24));
     const travel = smoothstep(rangeProgress(value, 0.12, 0.6));
     return {
-      // The following panel physically covers this one during the authored
-      // horizontal handoff. Keeping the current scene present prevents an
-      // empty frame before Karate reaches the viewport.
-      '--achievement-exit': 0,
       '--tt-title': 0.58 + smoothstep(rangeProgress(value, 0.02, 0.2)) * 0.42,
       '--tt-table': table,
       '--tt-ball-x': -42 + travel * 84,
@@ -105,9 +101,6 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   if (panel === 'karate') {
     const lock = 0.16 + smoothstep(rangeProgress(value, 0.13, 0.33)) * 0.84;
     return {
-      // Karate leaves through the natural vertical section handoff. Its
-      // content stays visible until Chess has replaced it.
-      '--achievement-exit': 0,
       '--karate-lock': lock,
       '--karate-title': 0.16 + smoothstep(rangeProgress(value, 0.05, 0.25)) * 0.84,
       '--karate-belt': smoothstep(rangeProgress(value, 0.03, 0.38)),
@@ -119,9 +112,6 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
 
   if (panel === 'chess') {
     return {
-      // Public Speaking enters horizontally over this scene, so Chess must
-      // remain intact beneath it instead of fading to black first.
-      '--achievement-exit': 0,
       '--chess-grid': smoothstep(rangeProgress(value, 0.03, 0.24)),
       '--chess-path': smoothstep(rangeProgress(value, 0.16, 0.54)),
       '--chess-pieces': smoothstep(rangeProgress(value, 0.12, 0.48)),
@@ -135,7 +125,6 @@ export function getAchievementMotion(panel: AchievementPanelKey, progress: numbe
   if (panel === 'public-speaking') {
     const audience = smoothstep(rangeProgress(value, 0.34, 0.61));
     return {
-      '--achievement-exit': 0,
       '--speaking-build': 0.14 + smoothstep(rangeProgress(value, 0.03, 0.23)) * 0.86,
       '--speaking-stage': smoothstep(rangeProgress(value, 0.02, 0.28)),
       '--speaking-mic': smoothstep(rangeProgress(value, 0.12, 0.42)),

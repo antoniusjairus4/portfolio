@@ -167,6 +167,7 @@ function usePanelProgress(
       const start = window.innerWidth <= 860 && panel !== 'intro' ? viewport * 0.4 : 0;
       const entryDistance = Math.max(1, viewport - start);
       const entryProgress = Math.min(1, Math.max(0, (viewport - rect.top) / entryDistance));
+      const handoffProgress = entryProgress * entryProgress * (3 - 2 * entryProgress);
       const entryOffset =
         rect.top > start && rect.top < viewport
           ? start - rect.top
@@ -181,6 +182,13 @@ function usePanelProgress(
       section.style.setProperty('--panel-exit-hold-y', `${exitHold}px`);
       for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
         section.style.setProperty(property, String(value));
+      }
+      const previousPanel = section.previousElementSibling as HTMLElement | null;
+      if (previousPanel?.hasAttribute('data-achievement-panel')) {
+        // The incoming panel owns the outgoing panel's retirement. This keeps
+        // one complete composition visible throughout the handoff without
+        // leaving both scenes fully drawn on top of one another.
+        previousPanel.style.setProperty('--achievement-exit', String(handoffProgress));
       }
       section.dataset.achievementBeat = getAchievementBeat(panel, progress);
     };
