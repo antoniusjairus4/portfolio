@@ -1,4 +1,4 @@
-import Image from 'next/image';
+import Lanyard from '@/components/ui/Lanyard';
 import styles from './ContactFinale.module.css';
 
 const email = 'antoniusjairusofficial@gmail.com';
@@ -15,7 +15,33 @@ export function ContactFinale() {
       <div className={styles.composition}>
         <div className={styles.identity}>
           <p className={styles.kicker}>CONTACT</p>
-          <h2 id="contact-name">Antonius Jairus.</h2>
+          <h2 id="contact-name" className={styles.visuallyHidden}>
+            Contact Antonius Jairus
+          </h2>
+          <div className={styles.lanyardStage}>
+            <Lanyard
+              frontImage="/images/contact/palindrome-id-front.svg"
+              backImage="/images/contact/whatsapp-qr.jpeg"
+              imageFit="contain"
+              cardColor="#0c0907"
+              orientation="portrait"
+              finish="glossy"
+              cornerRadius={0.22}
+              size={0.68}
+              anchor="center"
+              strapLength={0.2}
+              strapColor="#8b1e2d"
+              strapWidth={0.7}
+              metal="graphite"
+              gravity={0.92}
+              damping={0.56}
+              elasticity={0.44}
+              breeze={0.16}
+              interactive
+              intro
+            />
+          </div>
+          <p className={styles.lanyardHint}>Drag the badge · tap to flip · scan WhatsApp</p>
           <p className={styles.invitation}>Write to me.</p>
         </div>
 
@@ -26,17 +52,9 @@ export function ContactFinale() {
               {email}
             </a>
           </address>
-          <figure className={styles.qr}>
-            <Image
-              src="/contact-email-qr.svg"
-              width={172}
-              height={172}
-              unoptimized
-              alt=""
-              aria-hidden="true"
-            />
-            <figcaption>Scan to email</figcaption>
-          </figure>
+          <p className={styles.whatsappNote}>
+            Flip the identity badge to open the WhatsApp connection.
+          </p>
         </div>
       </div>
 

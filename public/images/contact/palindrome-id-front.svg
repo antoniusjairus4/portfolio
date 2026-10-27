@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1125" role="img" aria-labelledby="title desc">
+  <title id="title">Palindrome Labs identity badge</title>
+  <desc id="desc">A restrained Palindrome Labs badge carrying a single P symbol.</desc>
+  <defs>
+    <linearGradient id="card" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#17110c"/>
+      <stop offset="0.58" stop-color="#0c0907"/>
+      <stop offset="1" stop-color="#24141a"/>
+    </linearGradient>
+    <radialGradient id="halo" cx="70%" cy="18%" r="85%">
+      <stop offset="0" stop-color="#8b1e2d" stop-opacity=".52"/>
+      <stop offset=".55" stop-color="#8b1e2d" stop-opacity=".08"/>
+      <stop offset="1" stop-color="#8b1e2d" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="800" height="1125" rx="42" fill="url(#card)"/>
+  <rect width="800" height="1125" rx="42" fill="url(#halo)"/>
+  <path d="M72 92h656M72 1030h656" fill="none" stroke="#f2e9d8" stroke-opacity=".28" stroke-width="2"/>
+  <path d="M72 92h110M618 1030h110" fill="none" stroke="#8b1e2d" stroke-width="7"/>
+  <text x="400" y="660" text-anchor="middle" fill="#f2e9d8" font-family="Georgia, Times New Roman, serif" font-size="470" font-weight="700">P</text>
+  <text x="72" y="156" fill="#f2e9d8" fill-opacity=".72" font-family="Arial, Helvetica, sans-serif" font-size="24" letter-spacing="11">PALINDROME LABS</text>
+  <text x="72" y="990" fill="#f2e9d8" fill-opacity=".56" font-family="Arial, Helvetica, sans-serif" font-size="19" letter-spacing="8">IDENTITY / 01</text>
+</svg>
