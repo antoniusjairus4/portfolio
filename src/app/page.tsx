@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
 import { AchievementsContactLanyard } from '@/components/contact-finale/AchievementsContactLanyard';
 import { ContactFinale } from '@/components/contact-finale/ContactFinale';
@@ -12,6 +12,11 @@ import { Preloader } from '@/components/preloader/Preloader';
 import { SkillsChapter } from '@/components/skills/SkillsChapter';
 import { KaiPalindromeBridge } from '@/components/transitions/KaiPalindromeBridge';
 import { PalindromeNeuroShieldBridge } from '@/components/transitions/PalindromeNeuroShieldBridge';
+import { ScrollExpand } from '@/components/transitions/ScrollExpand';
+import {
+  WorkWithMeShowcase,
+  type WorkWithMeShowcaseHandle,
+} from '@/components/transitions/WorkWithMeShowcase';
 import { ProjectExperienceProvider } from '@/experience/ProjectExperienceProvider';
 import { useLenis } from '@/motion/lenis/LenisProvider';
 
@@ -25,10 +30,14 @@ export default function Home() {
   const { refresh } = useLenis();
   const [criticalReady, setCriticalReady] = useState(false);
   const [preloaderComplete, setPreloaderComplete] = useState(false);
+  const showcaseRef = useRef<WorkWithMeShowcaseHandle>(null);
   const handleCriticalReady = useCallback(() => setCriticalReady(true), []);
   const handlePreloaderComplete = useCallback(() => {
     setCriticalReady(true);
     setPreloaderComplete(true);
+  }, []);
+  const handleShowcaseProgress = useCallback((progress: number) => {
+    showcaseRef.current?.setProgress(progress);
   }, []);
 
   useEffect(() => {
@@ -92,10 +101,30 @@ export default function Home() {
           <AchievementsChapter />
         </ProjectExperienceProvider>
 
+        <ScrollExpand
+          id="work-with-me"
+          mediaType="none"
+          title={'WORK\nWITH ME'}
+          scrollHint="Scroll to open"
+          startWidth={42}
+          startHeight={50}
+          startRadius={24}
+          endRadius={0}
+          scrollDistance={1.15}
+          holdDistance={0.3}
+          contentDistance={4.8}
+          smoothing={0.08}
+          overlayScrim={0}
+          useWindowScroll
+          onContentProgress={handleShowcaseProgress}
+        >
+          <WorkWithMeShowcase ref={showcaseRef} />
+        </ScrollExpand>
+
         {/* Phase 7: quiet contact and document end */}
         <ContactFinale />
 
-        {/* One continuous physical rig spanning the Achievements finale and Contact. */}
+        {/* Contact's existing draggable identity badge. */}
         <AchievementsContactLanyard />
       </main>
     </>

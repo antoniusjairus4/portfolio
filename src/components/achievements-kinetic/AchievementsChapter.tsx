@@ -349,22 +349,6 @@ export function AchievementsChapter() {
             <PublicSpeakingEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
 
-          <KineticPanel panel="finale" reducedMotion={reducedMotion}>
-            <div className={styles.meta}>
-              <span>06 / 06</span>
-              <i aria-hidden="true" />
-              <span>ONE PRACTICE</span>
-            </div>
-            <span
-              className={styles.sharedLanyardAnchor}
-              data-shared-lanyard-anchor
-              aria-hidden="true"
-            />
-            <div className={styles.finalStatement}>
-              <p>BUILT BEYOND</p>
-              <p>THE SCREEN.</p>
-            </div>
-          </KineticPanel>
         </div>
       </div>
     </section>

@@ -15,23 +15,17 @@ export function AchievementsContactLanyard() {
     const connectRig = () => {
       if (disconnectRig) return true;
 
-      const finale = document.querySelector<HTMLElement>('[data-achievement-panel="finale"]');
       const contact = document.getElementById('contact');
-      const anchor = document.querySelector<HTMLElement>('[data-shared-lanyard-anchor]');
-      if (!finale || !contact || !anchor) return false;
+      if (!contact) return false;
 
       const update = () => {
         frameRef.current = 0;
         const viewportHeight = Math.max(1, window.innerHeight);
-        const anchorRect = anchor.getBoundingClientRect();
         const contactRect = contact.getBoundingClientRect();
-        const finaleAtStatement = finale.dataset.achievementBeat === 'statement';
         const contactVisible = contactRect.top < viewportHeight && contactRect.bottom > 0;
         const next = {
-          active: finaleAtStatement || contactVisible,
-          anchorInset: anchorRect.top / viewportHeight,
-          // The nail belongs to the Achievements finale, while the badge belongs
-          // to Contact. It enters just inside Contact, then settles in its layout.
+          active: contactVisible,
+          anchorInset: Math.max(0.035, contactRect.top / viewportHeight + 0.035),
           cardInset: Math.min(1.2, Math.max(0.18, contactRect.top / viewportHeight + 0.08)),
         };
 
@@ -48,11 +42,6 @@ export function AchievementsContactLanyard() {
         if (!frameRef.current) frameRef.current = requestAnimationFrame(update);
       };
 
-      const beatObserver = new MutationObserver(schedule);
-      beatObserver.observe(finale, {
-        attributes: true,
-        attributeFilter: ['data-achievement-beat'],
-      });
       window.addEventListener('scroll', schedule, { passive: true });
       window.addEventListener('resize', schedule);
       schedule();
@@ -60,7 +49,6 @@ export function AchievementsContactLanyard() {
       disconnectRig = () => {
         if (frameRef.current) cancelAnimationFrame(frameRef.current);
         frameRef.current = 0;
-        beatObserver.disconnect();
         window.removeEventListener('scroll', schedule);
         window.removeEventListener('resize', schedule);
       };
