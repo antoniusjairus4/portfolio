@@ -200,44 +200,51 @@
 
 @media (max-width: 900px) {
   .arrival {
-    height: clamp(5rem, 12svh, 8rem);
+    height: clamp(4rem, 10svh, 6rem);
   }
 
   .composition {
-    display: block;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
-    padding: 0 1.25rem;
+    padding: 0 clamp(1rem, 5vw, 2rem);
+    gap: 1.8rem;
   }
 
   .invitation {
-    margin-top: 2rem;
-    font-size: 1.15rem;
+    margin-top: 1.5rem;
+    font-size: clamp(1.1rem, 4vw, 1.35rem);
   }
 
   .actions {
-    padding-top: clamp(4rem, 10svh, 6rem);
+    padding-top: clamp(2.5rem, 6svh, 4rem);
   }
 
   .address {
-    gap: 1.1rem;
+    gap: 0.8rem;
   }
 
   .email {
-    font-size: clamp(1.1rem, 4.8vw, 1.45rem);
+    font-size: clamp(0.95rem, 4.2vw, 1.45rem);
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .whatsappNote {
-    max-width: 38ch;
+    max-width: 34ch;
+    font-size: 0.85rem;
   }
 
   .socials {
+    display: flex;
     flex-wrap: wrap;
-    gap: 1rem 2rem;
-    padding: clamp(5rem, 13svh, 8rem) 1.25rem 4rem;
+    gap: 0.8rem 1.8rem;
+    padding: clamp(2.5rem, 7svh, 4.5rem) clamp(1rem, 5vw, 2rem) 2.5rem;
   }
 
   .end {
-    min-height: 8rem;
-    margin: 0 1.25rem;
+    min-height: 4.5rem;
+    margin: 0 clamp(1rem, 5vw, 2rem);
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
   }
 }

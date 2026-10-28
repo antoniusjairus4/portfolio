@@ -1363,8 +1363,11 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
 
 @media (max-width: 860px) {
   .project-experience-layer[data-project-scene="achievements"] {
-    top: 40svh;
+    top: 0;
     right: 0;
+    left: 0;
+    bottom: 0;
+    height: 100svh;
   }
 }
 
@@ -1783,40 +1786,40 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
 
 @media (orientation: portrait) {
   .kaiforge-chapter {
-    height: 450svh;
+    height: 380svh;
   }
 
   .kaiforge-semantic-header {
-    top: 8svh;
-    left: 1.25rem;
-    width: calc(100% - 2.5rem);
+    top: clamp(3.8rem, 8svh, 5.5rem);
+    left: clamp(1rem, 4vw, 1.25rem);
+    width: calc(100% - clamp(2rem, 8vw, 2.5rem));
   }
 
   .kaiforge-semantic-header h2 {
-    font-size: clamp(4rem, 20vw, 7rem);
+    font-size: clamp(3rem, 15vw, 6rem);
   }
 
   .kaiforge-semantic-header > p:nth-of-type(2) {
     max-width: 23rem;
-    margin-top: 1rem;
-    font-size: clamp(0.9rem, 3.7vw, 1.1rem);
+    margin-top: 0.75rem;
+    font-size: clamp(0.85rem, 3.5vw, 1.05rem);
   }
 
   .kaiforge-purpose {
     max-width: 22rem;
-    font-size: clamp(0.74rem, 3.15vw, 0.9rem);
+    font-size: clamp(0.72rem, 3vw, 0.88rem);
   }
 
   .kaiforge-beat {
-    right: 1.25rem;
-    left: 1.25rem;
+    right: clamp(1rem, 4vw, 1.25rem);
+    left: clamp(1rem, 4vw, 1.25rem);
     width: auto;
   }
 
   .kaiforge-beat strong,
   .beat-recognition strong,
   .beat-understanding strong {
-    font-size: clamp(2.35rem, 12vw, 4.6rem);
+    font-size: clamp(2rem, 9.2vw, 4rem);
   }
 
   .beat-recognition,
@@ -1839,13 +1842,13 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   }
 
   .kaiforge-chapter-index {
-    top: 1.25rem;
-    right: 1.25rem;
+    top: clamp(0.9rem, 2svh, 1.25rem);
+    right: clamp(1rem, 4vw, 1.25rem);
   }
 
   .kaiforge-destination {
-    left: 1.25rem;
-    bottom: 1.1rem;
+    left: clamp(1rem, 4vw, 1.25rem);
+    bottom: calc(1.1rem + env(safe-area-inset-bottom));
   }
 
   .kaiforge-fallback-stage {
@@ -2183,22 +2186,22 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
 
 @media (orientation: portrait) {
   .palindrome-chapter {
-    height: 460svh;
+    height: 380svh;
   }
 
   .palindrome-semantic-header {
-    top: 8svh;
-    left: 1.25rem;
-    width: calc(100% - 2.5rem);
+    top: clamp(3.8rem, 8svh, 5.5rem);
+    left: clamp(1rem, 4vw, 1.25rem);
+    width: calc(100% - clamp(2rem, 8vw, 2.5rem));
   }
 
   .palindrome-semantic-header h2 {
-    font-size: clamp(2.7rem, 12.4vw, 4.8rem);
+    font-size: clamp(2.2rem, 9.5vw, 4.2rem);
   }
 
   .palindrome-semantic-header > p:nth-of-type(2) {
-    margin-top: 1rem;
-    font-size: clamp(0.88rem, 3.7vw, 1.05rem);
+    margin-top: 0.75rem;
+    font-size: clamp(0.85rem, 3.5vw, 1.05rem);
   }
 
   .palindrome-purpose {
@@ -2212,15 +2215,15 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   .palindrome-beat.beat-organization,
   .palindrome-beat.beat-control {
     top: auto;
-    right: 1.25rem;
+    right: clamp(1rem, 4vw, 1.25rem);
     bottom: 11svh;
-    left: 1.25rem;
+    left: clamp(1rem, 4vw, 1.25rem);
     width: auto;
     text-align: left;
   }
 
   .palindrome-beat strong {
-    font-size: clamp(2.2rem, 11.4vw, 4.4rem);
+    font-size: clamp(1.8rem, 8.5vw, 3.8rem);
   }
 
   .palindrome-beat small,
@@ -2233,13 +2236,13 @@ body:has(#hero[data-hero-depth="active"]) #kaiforge .kaiforge-sticky {
   }
 
   .palindrome-chapter-index {
-    top: 1.25rem;
-    right: 1.25rem;
+    top: clamp(0.9rem, 2svh, 1.25rem);
+    right: clamp(1rem, 4vw, 1.25rem);
   }
 
   .palindrome-disclosure {
-    right: 1.25rem;
-    bottom: 1rem;
+    right: clamp(1rem, 4vw, 1.25rem);
+    bottom: calc(1rem + env(safe-area-inset-bottom));
     left: auto;
     max-width: none;
     text-align: right;

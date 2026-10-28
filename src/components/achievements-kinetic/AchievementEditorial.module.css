@@ -1479,7 +1479,8 @@
 
 @media (max-width: 860px) {
   .editorial {
-    min-height: 60svh;
+    min-height: 100svh;
+    height: 100svh;
   }
 
   .gallerySignal {
@@ -1487,7 +1488,7 @@
   }
 
   .facts {
-    width: min(48%, 20rem);
+    width: min(44%, 16rem);
   }
 
   .facts > p {
@@ -1512,36 +1513,48 @@
   .tableHeading,
   .chessHeading,
   .speakingHeading {
-    top: 4.5rem;
-    left: 1rem;
+    top: clamp(3.8rem, 8svh, 5.2rem);
+    left: clamp(1rem, 4vw, 1.5rem);
   }
 
   .tableHeading {
-    font-size: clamp(3rem, 13vw, 5rem);
+    font-size: clamp(2rem, 8.5vw, 3.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.02em;
   }
 
   .tablePaddle {
-    top: 33%;
-    left: 58%;
-    width: clamp(15rem, 60vw, 22rem);
+    top: 48%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(14deg);
+    width: min(72vw, 250px);
+    max-height: 42svh;
     opacity: 1;
   }
 
   .tableFacts,
   .karateFacts {
-    top: 4.5rem;
-    right: 1rem;
+    top: clamp(3.8rem, 8svh, 5.2rem);
+    right: clamp(1rem, 4vw, 1.5rem);
+  }
+
+  @media (max-width: 480px) {
+    .tableFacts,
+    .karateFacts {
+      display: none;
+    }
   }
 
   .trajectorySystem {
-    inset: 10% -10% 18% -8%;
-    width: 118%;
+    inset: 12% -5% 18% -5%;
+    width: 110%;
   }
 
   .metricRail {
-    right: 1rem;
-    bottom: 0.8rem;
-    left: 1rem;
+    right: clamp(1rem, 4vw, 1.5rem);
+    bottom: clamp(0.6rem, 1.8svh, 1.2rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    font-size: 0.42rem;
   }
 
   .metricRail li:nth-child(4),
@@ -1550,31 +1563,31 @@
   }
 
   .tableVictory {
-    bottom: 3.6rem;
-    left: 1rem;
+    bottom: clamp(3.2rem, 7svh, 4.6rem);
+    left: clamp(1rem, 4vw, 1.5rem);
   }
 
   .tableVictory strong {
-    font-size: clamp(4.8rem, 21vw, 7.5rem);
+    font-size: clamp(3.6rem, 15vw, 6rem);
   }
 
   .tableVictory p {
-    font-size: clamp(1.4rem, 5.5vw, 2.4rem);
+    font-size: clamp(1.05rem, 3.8vw, 1.6rem);
   }
 
   .subordinateBeltTitle {
-    top: 4.5rem;
-    left: 1rem;
+    top: clamp(3.8rem, 8svh, 5.2rem);
+    left: clamp(1rem, 4vw, 1.5rem);
     gap: 0.25rem;
   }
 
   .heroKarateWrapper {
-    right: 1rem;
-    bottom: 2.4rem;
+    right: clamp(1rem, 4vw, 1.5rem);
+    bottom: clamp(2.4rem, 6svh, 3.8rem);
   }
 
   .heroKarate {
-    font-size: clamp(3.8rem, 15vw, 6rem);
+    font-size: clamp(3rem, 12vw, 5rem);
   }
 
   .karateAnnotations {
@@ -1582,46 +1595,83 @@
   }
 
   .beltWordsStack {
-    font-size: clamp(1.8rem, 6.5vw, 2.8rem);
-    gap: 0.6rem;
+    font-size: clamp(1.4rem, 5.5vw, 2.4rem);
+    gap: 0.4rem;
   }
 
   .danArchitecture {
-    top: 15%;
-    right: -2rem;
+    top: 16%;
+    right: -1rem;
+    opacity: 0.25;
   }
 
   .danNumeral {
-    font-size: clamp(8rem, 30vw, 15rem);
+    font-size: clamp(6.5rem, 24vw, 11rem);
   }
 
   .danWord {
-    font-size: clamp(2.4rem, 8vw, 4.2rem);
-    margin-top: -0.6rem;
+    font-size: clamp(2rem, 7vw, 3.5rem);
+    margin-top: -0.4rem;
   }
 
   .abstractBeltGroup {
-    top: 34%;
-    left: 2%;
-    width: 96%;
-    height: 52vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(94vw, 400px);
+    height: min(62vw, 270px);
   }
 
   .karatePrinciplesRail {
-    right: 1rem;
-    bottom: 0.8rem;
-    left: 1rem;
-    font-size: 0.44rem;
-  }
-
-  .karateAnnotations {
-    left: 1rem;
-    bottom: 3.2rem;
+    right: clamp(1rem, 4vw, 1.5rem);
+    bottom: clamp(0.6rem, 1.8svh, 1.2rem);
+    left: clamp(1rem, 4vw, 1.5rem);
     font-size: 0.42rem;
   }
 
-  .chessHeading h3 {
-    font-size: clamp(4.2rem, 17vw, 6.5rem);
+  .chessHeading h3,
+  .heroChess {
+    font-size: clamp(3rem, 13vw, 5.5rem);
+    line-height: 0.85;
+    letter-spacing: 0.01em;
+  }
+
+  .chessHeroContainer {
+    top: 40%;
+    bottom: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(85vw, 23rem);
+    height: min(38svh, 17rem);
+  }
+
+  .chessTechReadout {
+    top: clamp(3.8rem, 8svh, 5.2rem);
+    right: clamp(1rem, 4vw, 1.5rem);
+    font-size: clamp(0.42rem, 1.6vw, 0.58rem);
+    gap: 0.4rem;
+  }
+
+  @media (max-width: 480px) {
+    .chessTechReadout span:nth-child(n+3) {
+      display: none;
+    }
+  }
+
+  .chessRatingsSystem {
+    bottom: clamp(2.4rem, 6svh, 3.8rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    right: clamp(1rem, 4vw, 1.5rem);
+    gap: clamp(0.6rem, 2.5vw, 1.8rem);
+    justify-content: space-between;
+  }
+
+  .ratingBlock strong {
+    font-size: clamp(2rem, 7.5vw, 3.4rem);
+  }
+
+  .ratingBlock span {
+    font-size: clamp(0.46rem, 1.6vw, 0.62rem);
   }
 
   .decisionTree {
@@ -1635,52 +1685,42 @@
     display: none;
   }
 
-  .ratingField {
-    bottom: 1rem;
-    left: 1rem;
-    gap: 1rem;
-  }
-
-  .ratingField dd {
-    font-size: clamp(2.5rem, 9vw, 3.6rem);
-  }
-
   .speakingHeading strong {
-    font-size: clamp(6rem, 23vw, 9rem);
+    font-size: clamp(4.5rem, 18vw, 7.5rem);
   }
 
   .speakingHeading h3 {
-    font-size: clamp(1.8rem, 7vw, 2.8rem);
+    font-size: clamp(1.5rem, 6vw, 2.4rem);
   }
 
   .reachMetric {
-    top: 5rem;
-    right: 1rem;
+    top: clamp(3.8rem, 8svh, 5.2rem);
+    right: clamp(1rem, 4vw, 1.5rem);
   }
 
   .reachMetric strong {
-    font-size: clamp(2.4rem, 9vw, 3.8rem);
+    font-size: clamp(2rem, 7.5vw, 3.4rem);
   }
 
   .soundField {
     top: 29%;
     right: -5%;
     bottom: 29%;
-    left: 30%;
+    left: 20%;
   }
 
   .voiceProgression {
-    right: 1rem;
+    right: clamp(1rem, 4vw, 1.5rem);
     bottom: 27%;
-    left: 30%;
+    left: 20%;
     font-size: 0.4rem;
   }
 
   .speakingFacts {
-    right: 1rem;
-    bottom: 0.8rem;
-    left: 1rem;
-    gap: 0.65rem;
+    right: clamp(1rem, 4vw, 1.5rem);
+    bottom: clamp(0.8rem, 2svh, 1.4rem);
+    left: clamp(1rem, 4vw, 1.5rem);
+    gap: 0.55rem;
   }
 }
 
