@@ -15,7 +15,10 @@ export function getRootStructuredData() {
         nationality: siteMetadata.author.nationality,
         jobTitle: siteMetadata.author.jobTitle,
         description: siteMetadata.author.description,
-        image: `${siteMetadata.siteUrl}/images/contact/antonius-id-photo.png`,
+        image: [
+          `${siteMetadata.siteUrl}/images/contact/antonius-id-photo.png`,
+          `${siteMetadata.siteUrl}/favicon-192x192.png`,
+        ],
         knowsAbout: siteMetadata.author.knowsAbout,
         sameAs: siteMetadata.author.sameAs,
         contactPoint: {
