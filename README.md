@@ -1,34 +1,177 @@
 <div align="center">
 
-# ANTONIUS JAIRUS
-
-### Engineer · Developer · Researcher · Athlete
-
-Building digital experiences, intelligent systems and ideas that move beyond the ordinary.
+<img src="./.github/readme-assets/hero/hero-monolith.webp" alt="Antonius Jairus — 3D Monolith" width="100%" style="max-width: 860px; border-radius: 12px;" />
 
 <br />
 
-[![Portfolio](https://img.shields.io/badge/PORTFOLIO-antoniusjairus.in-111111?style=for-the-badge)](https://antoniusjairus.in)
-[![GitHub](https://img.shields.io/badge/GITHUB-antoniusjairus4-111111?style=for-the-badge&logo=github)](https://github.com/antoniusjairus4)
-[![LinkedIn](https://img.shields.io/badge/LINKEDIN-antoniusjairus4-111111?style=for-the-badge&logo=linkedin)](https://www.linkedin.com/in/antoniusjairus4)
+# ANTONIUS JAIRUS
+
+### Engineer &nbsp;·&nbsp; Developer &nbsp;·&nbsp; Researcher &nbsp;·&nbsp; Athlete
+
+*Building systems, experiences and ideas that move beyond the ordinary.*
+
+<br />
+
+[![Live Portfolio](https://img.shields.io/badge/PORTFOLIO-antoniusjairus.in-14110F?style=for-the-badge&logoColor=EDE6DD)](https://antoniusjairus.in)
+&nbsp;
+[![GitHub](https://img.shields.io/badge/GITHUB-antoniusjairus4-14110F?style=for-the-badge&logo=github&logoColor=EDE6DD)](https://github.com/antoniusjairus4)
+&nbsp;
+[![LinkedIn](https://img.shields.io/badge/LINKEDIN-antoniusjairus4-14110F?style=for-the-badge&logo=linkedin&logoColor=EDE6DD)](https://www.linkedin.com/in/antoniusjairus4)
 
 </div>
 
+<br />
+
+<div align="center">
+  <img src="./.github/readme-assets/separators/separator-3d.webp" alt="3D Geometric Separator" width="100%" style="max-width: 860px;" />
+</div>
+
+<br />
+
+## 01 / PERSPECTIVE
+
+I am a **Computer Science engineer**, developer and researcher creating high-performance digital experiences, machine-learning architectures and visual software systems.
+
+My discipline sits at the convergence of **rigorous systems engineering** and **cinematic interactive craft**:
+
+- **Software Engineering & Web Architecture** — Next.js 16, React, TypeScript, Node.js, distributed database design.
+- **Artificial Intelligence & Machine Learning** — Deep learning, multimodal fusion, computer vision, diagnostic research.
+- **Real-Time 3D & Creative Computing** — WebGL, Three.js, React Three Fiber, GLSL shaders, kinetic scroll choreography.
+- **Cybersecurity & Systems** — Linux systems administration, defensive infrastructure, protocol analysis.
+- **Product Experience** — High-end editorial visual design, micro-interactions, responsive typography.
+
 ---
 
-## PORTFOLIO
+## 02 / SELECTED WORK
 
-**Antonius Jairus — Portfolio** is an experimental interactive portfolio combining engineering, typography, motion, 3D environments and scroll-driven storytelling.
+<br />
 
-The experience is built around large editorial compositions, WebGL scenes, custom animation choreography and responsive interactions across desktop, tablet and mobile.
+### 01 &nbsp;·&nbsp; KAIFORGE
 
-### Live
+**Performance intelligence for competitive table tennis.**
 
-**[antoniusjairus.in](https://antoniusjairus.in)**
+KaiForge transforms daily training, Bo3/Bo5/Bo7 match data, doubles pairings, and tournament progression into actionable predictive insights for elite competitive athletes.
+
+`React` &nbsp;·&nbsp; `Supabase` &nbsp;·&nbsp; `Analytics Architecture` &nbsp;·&nbsp; `PWA` &nbsp;·&nbsp; `TypeScript`
+
+<br />
+
+[<img src="./.github/readme-assets/projects/01-kaiforge.png" alt="KaiForge Sports Analytics Platform" width="100%" />](https://antoniusjairus.in/projects/kaiforge)
+
+<div align="right">
+  <a href="https://antoniusjairus.in/projects/kaiforge"><b>Explore KaiForge Case Study ↗</b></a>
+</div>
+
+<br />
 
 ---
 
-## CONTRIBUTION LANDSCAPE
+<br />
+
+### 02 &nbsp;·&nbsp; PALINDROME
+
+**Financial information without losing the relationships behind the numbers.**
+
+A contextual financial visualization system that reimagines personal wealth tracking through interconnected node topologies rather than static tabular ledgers.
+
+`Next.js` &nbsp;·&nbsp; `WebGL` &nbsp;·&nbsp; `Three.js` &nbsp;·&nbsp; `Data Experience` &nbsp;·&nbsp; `UI/UX`
+
+<br />
+
+[<img src="./.github/readme-assets/projects/02-palindrome.png" alt="Palindrome Financial Visualization" width="100%" />](https://antoniusjairus.in/projects/palindrome)
+
+<div align="right">
+  <a href="https://antoniusjairus.in/projects/palindrome"><b>Explore Palindrome Case Study ↗</b></a>
+</div>
+
+<br />
+
+---
+
+<br />
+
+### 03 &nbsp;·&nbsp; NEUROSHIELD.AI
+
+**AI-assisted research for Alzheimer's disease prediction.**
+
+A multimodal machine-learning research framework integrating structural MRI, PET, EEG and biomarker metrics for early-stage neurodegenerative condition assessment.
+
+`Python` &nbsp;·&nbsp; `PyTorch` &nbsp;·&nbsp; `Multimodal AI` &nbsp;·&nbsp; `Deep Learning` &nbsp;·&nbsp; `Medical Imaging`
+
+<br />
+
+[<img src="./.github/readme-assets/projects/03-neuroshield.png" alt="NeuroShield.ai Healthcare Research" width="100%" />](https://antoniusjairus.in/projects/neuroshield)
+
+<div align="right">
+  <a href="https://antoniusjairus.in/projects/neuroshield"><b>Explore NeuroShield Case Study ↗</b></a>
+</div>
+
+<br />
+
+---
+
+<br />
+
+### 04 &nbsp;·&nbsp; RAJAMANICKAM CHIT FUND
+
+**An admin-first chit fund management system.**
+
+An enterprise operational portal engineered specifically for ledger reconciliation, live auction cycles, defaulter risk modeling, and regulatory reporting across recurring chit groups.
+
+`Mobile-First` &nbsp;·&nbsp; `Financial Operations` &nbsp;·&nbsp; `Admin Portal` &nbsp;·&nbsp; `TypeScript`
+
+<br />
+
+[<img src="./.github/readme-assets/projects/04-rajamanickam-chit-fund.png" alt="Rajamanickam Chit Fund Management System" width="100%" />](https://antoniusjairus.in/projects/rajamanickam-chit-fund)
+
+<div align="right">
+  <a href="https://antoniusjairus.in/projects/rajamanickam-chit-fund"><b>Explore Rajamanickam Case Study ↗</b></a>
+</div>
+
+<br />
+
+---
+
+<br />
+
+### 05 &nbsp;·&nbsp; ANTONIUS JAIRUS PORTFOLIO
+
+**An experimental interactive portfolio combining engineering, typography, motion and real-time 3D.**
+
+An Awwwards-inspired digital showcase built with real-time WebGL, dynamic physics simulations, kinetic GSAP timelines, responsive art direction across 12 viewports, and static SEO architecture.
+
+`Next.js 16` &nbsp;·&nbsp; `Three.js` &nbsp;·&nbsp; `React Three Fiber` &nbsp;·&nbsp; `GSAP Choreography` &nbsp;·&nbsp; `WebGL`
+
+<br />
+
+[<img src="./.github/readme-assets/projects/05-portfolio.png" alt="Antonius Jairus Portfolio Showcase" width="100%" />](https://antoniusjairus.in)
+
+<div align="right">
+  <a href="https://antoniusjairus.in"><b>Launch Live Interactive Experience ↗</b></a>
+</div>
+
+<br />
+
+<div align="center">
+  <img src="./.github/readme-assets/separators/separator-3d.webp" alt="3D Geometric Separator" width="100%" style="max-width: 860px;" />
+</div>
+
+<br />
+
+## 03 / TOOLS & SYSTEMS
+
+```text
+PROGRAMMING         C++  ·  C  ·  Python  ·  Java  ·  TypeScript  ·  JavaScript  ·  GLSL
+FRONTEND            Next.js  ·  React  ·  Tailwind CSS  ·  HTML5  ·  CSS3  ·  Bootstrap
+3D & MOTION         Three.js  ·  React Three Fiber  ·  WebGL  ·  GSAP  ·  Lenis Scroll
+BACKEND & DATA      Node.js  ·  Express  ·  Supabase  ·  PostgreSQL  ·  MongoDB  ·  REST
+AI & RESEARCH       PyTorch  ·  NumPy  ·  Pandas  ·  Deep Learning  ·  Multimodal Fusion
+INFRA & WORKFLOW    Linux  ·  Kali Linux  ·  Git  ·  GitHub Actions  ·  VS Code
+```
+
+---
+
+## 04 / CONTRIBUTION LANDSCAPE
 
 <div align="center">
 
@@ -36,289 +179,81 @@ The experience is built around large editorial compositions, WebGL scenes, custo
   src="./profile-3d-contrib/profile-night-green.svg"
   alt="Antonius Jairus GitHub 3D contribution graph"
   width="100%"
+  style="max-width: 860px; border-radius: 8px;"
 />
 
 </div>
 
-> The contribution landscape is generated from my real GitHub activity using `github-profile-3d-contrib`.
+> *Live automated daily 3D landscape rendered via `github-profile-3d-contrib`.*
 
 ---
 
-## ABOUT
+## 05 / BEYOND THE CODE
 
-I'm **Antonius Jairus**, a Computer Science engineering student focused on building interactive software, research-oriented systems and digital experiences.
+```text
+TABLE TENNIS        2× Tamil Nadu State Champion · Indo-Nepal Championship Gold Medalist
+KARATE              Black Belt (Dan 1) · Multiple State & National Championship Medals
+CHESS               Competitive online ratings across Bullet, Blitz & Rapid disciplines
+PUBLIC SPEAKING     Keynote host & speaker before audiences of 15,000+
+```
 
-My interests currently span:
-
-- Artificial Intelligence & Machine Learning
-- Interactive Web Development
-- WebGL / Three.js
-- Software Engineering
-- Cybersecurity
-- UI / UX
-- Research-driven projects
-- Freelance web and application development
-
-I particularly enjoy projects that combine **engineering with visual storytelling** rather than treating design and development as separate disciplines.
+Athletic discipline and strategic competition directly inform how I engineer software: high endurance under load, instant tactical adaptability, and relentless technical precision.
 
 ---
 
-# SELECTED WORK
+## 06 / CURRENTLY EXPLORING
 
-## 01 — KaiForge
-
-**Performance intelligence for competitive table tennis.**
-
-KaiForge is a table-tennis performance tracking platform built to record and analyse:
-
-- practice sessions
-- match results
-- tournament performance
-- singles and doubles
-- Bo3 / Bo5 / Bo7 matches
-- player statistics
-- performance trends
-
-The project was built around the idea of turning everyday training and match information into something athletes can actually use.
-
-**Focus:** Sports Analytics · Performance Tracking · Web Application
+- **Multimodal AI & Foundation Models** — Cross-attentive neural network fusions between imaging modalities and high-dimensional clinical embeddings.
+- **Real-Time WebGL Compute & Shaders** — GPU-accelerated procedural geometry and cinematic volumetric post-processing directly inside browser canvas pipelines.
+- **Distributed Edge Computing** — Offline-first local synchronization algorithms with zero-latency optimistic state resolution.
 
 ---
 
-## 02 — Palindrome
+## 07 / LET'S BUILD AND SCALE TO THE NEXT LEVEL.
 
-**Financial information without losing the relationships behind the numbers.**
+Open for engineering collaborations, research initiatives, and technical leadership:
 
-Palindrome explores personal financial information through contextual visualisation rather than presenting isolated totals.
+<br />
 
-The project focuses on making spending information easier to understand by connecting values, categories and behaviour through an interactive visual experience.
+<div align="center">
 
-**Focus:** Financial Visualisation · Interactive UI · Data Experience
+<a href="https://github.com/antoniusjairus4">
+  <img src="./.github/readme-assets/icons/github.svg" alt="GitHub" width="22" height="22" />
+  &nbsp;<b>GitHub</b>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.linkedin.com/in/antoniusjairus4">
+  <img src="./.github/readme-assets/icons/linkedin.svg" alt="LinkedIn" width="22" height="22" />
+  &nbsp;<b>LinkedIn</b>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://www.instagram.com/antoniusjairus4">
+  <img src="./.github/readme-assets/icons/instagram.svg" alt="Instagram" width="22" height="22" />
+  &nbsp;<b>Instagram</b>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="https://x.com/antoniusjairus4">
+  <img src="./.github/readme-assets/icons/x.svg" alt="X" width="22" height="22" />
+  &nbsp;<b>X</b>
+</a>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="mailto:antoniusjairusofficial@gmail.com">
+  <img src="./.github/readme-assets/icons/gmail.svg" alt="Email" width="22" height="22" />
+  &nbsp;<b>Email</b>
+</a>
 
----
+<br /><br />
 
-## 03 — NeuroShield.ai
+`antoniusjairusofficial@gmail.com`
 
-**AI-assisted research for Alzheimer's disease prediction.**
+</div>
 
-NeuroShield.ai is a research-oriented machine-learning project exploring early Alzheimer's prediction using medical data including imaging modalities.
-
-The project investigates approaches involving:
-
-- MRI
-- PET
-- EEG
-- Amyloid PET
-- blood-based information
-- multimodal model fusion
-
-The goal is to explore how multiple machine-learning models and medical modalities can contribute to early-stage prediction research.
-
-> NeuroShield.ai is a research project and is not presented as a clinical diagnostic system.
-
-**Focus:** Machine Learning · Medical Imaging · Research · Multimodal AI
-
----
-
-## 04 — Rajamanickam Chit Fund
-
-**An admin-first chit fund management system.**
-
-A mobile-first administration portal designed for managing chit-fund operations including:
-
-- chit groups
-- member management
-- payments
-- auctions
-- collection tracking
-- outstanding dues
-- defaulter analysis
-- reports
-- historical group records
-
-The system was designed around practical day-to-day administration rather than a customer-facing dashboard.
-
-**Focus:** Business Application · Dashboard · Financial Operations
+<br />
 
 ---
 
-## 05 — Dr. J.S. Yogesh Kumar
+<div align="center">
 
-**A digital archive designed as an immersive research experience.**
+<sub>© 2026 Antonius Jairus — Designed &amp; developed by Antonius Jairus</sub>
 
-This project explores an unconventional digital portfolio/archive experience around the work of **Dr. J.S. Yogesh Kumar**, associated with the **Zoological Survey of India**, with a visual direction inspired by marine ecosystems and underwater environments.
-
-**Focus:** Digital Archive · Research Portfolio · Immersive Web Design
-
----
-
-## 06 — Antonius Jairus Portfolio
-
-The repository you're currently viewing.
-
-The portfolio is designed as a sequence of interactive visual environments rather than a conventional collection of website sections.
-
-It combines:
-
-- Three.js / WebGL
-- React Three Fiber
-- GSAP choreography
-- scroll-driven animation
-- large editorial typography
-- 3D assets
-- dynamic project showcases
-- responsive mobile recomposition
-- cinematic transitions
-- motion-aware accessibility
-
-**Live → [antoniusjairus.in](https://antoniusjairus.in)**
-
----
-
-# PORTFOLIO HIGHLIGHTS
-
-### Interactive 3D
-
-Several sections use real-time WebGL environments and 3D assets instead of static decorative imagery.
-
-### Scroll Choreography
-
-Transitions and section states are driven by scroll progress using custom GSAP timelines.
-
-### Responsive Art Direction
-
-Mobile layouts are intentionally recomposed instead of simply scaling desktop compositions down.
-
-### Cinematic Project Showcase
-
-Selected work is presented through large device mockups, contextual imagery, blurred environments and scroll-based transitions.
-
-### Achievement Experiences
-
-Table Tennis, Karate, Chess and Public Speaking each use their own visual language and interaction system.
-
-### Performance Awareness
-
-Heavy scenes and assets are managed with rendering cost, image optimisation and responsive behaviour in mind.
-
----
-
-# STACK
-
-## Frontend
-
-![Next.js](https://img.shields.io/badge/Next.js-111111?style=flat-square&logo=nextdotjs)
-![React](https://img.shields.io/badge/React-111111?style=flat-square&logo=react)
-![TypeScript](https://img.shields.io/badge/TypeScript-111111?style=flat-square&logo=typescript)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-111111?style=flat-square&logo=tailwindcss)
-
-## Motion / 3D
-
-![Three.js](https://img.shields.io/badge/Three.js-111111?style=flat-square&logo=threedotjs)
-![GSAP](https://img.shields.io/badge/GSAP-111111?style=flat-square)
-![WebGL](https://img.shields.io/badge/WebGL-111111?style=flat-square&logo=webgl)
-
-- React Three Fiber
-- Lenis
-- custom WebGL scenes
-- custom scroll choreography
-
-## Programming / AI
-
-![Python](https://img.shields.io/badge/Python-111111?style=flat-square&logo=python)
-![C++](https://img.shields.io/badge/C++-111111?style=flat-square&logo=cplusplus)
-![Java](https://img.shields.io/badge/Java-111111?style=flat-square)
-
-- NumPy
-- Pandas
-- PyTorch
-- Machine Learning
-- Deep Learning
-
-## Backend / Data
-
-- Node.js
-- Express
-- Supabase
-- PostgreSQL
-- MongoDB
-
-## Tools
-
-![Git](https://img.shields.io/badge/Git-111111?style=flat-square&logo=git)
-![GitHub](https://img.shields.io/badge/GitHub-111111?style=flat-square&logo=github)
-![Linux](https://img.shields.io/badge/Linux-111111?style=flat-square&logo=linux)
-![Kali Linux](https://img.shields.io/badge/Kali_Linux-111111?style=flat-square&logo=kalilinux)
-
----
-
-# BEYOND THE CODE
-
-## Table Tennis
-
-Competitive table-tennis player with achievements including:
-
-- 2× Tamil Nadu State Champion
-- Indo-Nepal Championship Gold
-- multiple state and district-level results
-
-Table tennis is also what inspired the development of **KaiForge**.
-
----
-
-## Karate
-
-- Black Belt — Dan 1
-- multiple state-level titles
-- national-level medals
-- Kata and Kumite competition experience
-
----
-
-## Chess
-
-Competitive online chess player across:
-
-- Bullet
-- Blitz
-- Rapid
-
-Chess also forms part of the visual storytelling inside the portfolio's Achievements experience.
-
----
-
-## Public Speaking
-
-Experience in:
-
-- event hosting
-- stage speaking
-- technical events
-- school leadership
-- large-scale annual functions
-
-The Public Speaking section of the portfolio visualises voice, delivery, presence and audience through an animated audio-inspired interface.
-
----
-
-# ENGINEERING PRINCIPLES
-
-The portfolio is developed around several constraints beyond visual design.
-
-### Responsive
-
-Designed and tested across:
-
-- desktop
-- laptop
-- tablet
-- mobile
-- portrait
-- landscape
-
-### Motion Accessibility
-
-Supports reduced-motion experiences where appropriate using:
-
-```css
-prefers-reduced-motion: reduce
+</div>
