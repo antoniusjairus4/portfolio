@@ -52,7 +52,7 @@
   line-height: 0.76;
   letter-spacing: -0.05em;
   color: #11100f;
-  opacity: 0.024;
+  opacity: 0.4;
   white-space: nowrap;
   transform: translate3d(
     calc(var(--parallax-x) * -0.7),
@@ -67,10 +67,12 @@
   z-index: 2;
   width: 100%;
   max-width: 1440px;
+  min-height: 100svh;
   margin: 0 auto;
-  padding: clamp(4.5rem, 9svh, 7rem) clamp(1.5rem, 5vw, 5.5rem) clamp(2.5rem, 5svh, 4rem);
+  padding: clamp(3.5rem, 7svh, 5.5rem) clamp(1.5rem, 5vw, 5.5rem) calc(1rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 }
 
 /* ==========================================================================
@@ -82,7 +84,7 @@
   align-items: center;
   gap: clamp(3rem, 6.5vw, 7.5rem);
   min-height: clamp(380px, 48svh, 540px);
-  margin-bottom: clamp(60px, 7.5vw, 90px);
+  margin-bottom: clamp(60px, 10vh, 120px);
 }
 
 /* Left: Badge Staging Zone */
@@ -224,7 +226,8 @@
    ========================================================================== */
 .socialRail {
   width: 100%;
-  margin-bottom: clamp(70px, 8.5vw, 100px);
+  margin-top: auto;
+  margin-bottom: clamp(18px, 2.5vh, 28px);
   border-top: 1px solid rgba(20, 20, 20, 0.18);
   border-bottom: 1px solid rgba(20, 20, 20, 0.18);
   opacity: 0;
@@ -545,7 +548,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
-  padding-top: clamp(1.2rem, 2.5vh, 1.8rem);
+  padding-top: clamp(0.65rem, 1.2vh, 1rem);
+  padding-bottom: 0.15rem;
   font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.64rem, 0.72vw, 0.78rem);
   letter-spacing: 0.08em;
@@ -631,7 +635,7 @@
    ========================================================================== */
 @media (max-width: 767px) {
   .contentContainer {
-    padding: clamp(3.5rem, 8svh, 5.5rem) clamp(1rem, 5vw, 1.5rem) clamp(2rem, 5svh, 3rem);
+    padding: clamp(3rem, 6svh, 4.5rem) clamp(1rem, 5vw, 1.5rem) calc(0.8rem + env(safe-area-inset-bottom));
   }
 
   .heroRow {
@@ -639,7 +643,7 @@
     flex-direction: column;
     gap: 0;
     min-height: auto;
-    margin-bottom: clamp(36px, 8vw, 50px);
+    margin-bottom: clamp(28px, 6vw, 40px);
   }
 
   .contactHero {
@@ -693,14 +697,17 @@
 
   .socialRail {
     order: 4;
+    margin-top: auto;
+    margin-bottom: clamp(18px, 4vw, 28px);
   }
 
   .footer {
     order: 5;
     flex-direction: column-reverse;
     align-items: flex-start;
-    gap: 1.2rem;
-    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+    gap: 1rem;
+    padding-top: 0.6rem;
+    padding-bottom: calc(0.8rem + env(safe-area-inset-bottom));
   }
 }
 

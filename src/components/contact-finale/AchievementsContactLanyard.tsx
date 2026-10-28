@@ -36,8 +36,8 @@ export function AchievementsContactLanyard() {
             ? Math.max(0.015, contactRect.top / viewportHeight + 0.02)
             : Math.max(0.035, contactRect.top / viewportHeight + 0.035),
           cardInset: isMobile
-            ? Math.min(1.05, Math.max(0.22, contactRect.top / viewportHeight + 0.18))
-            : Math.min(1.18, Math.max(0.2, contactRect.top / viewportHeight + 0.09)),
+            ? Math.min(1.02, Math.max(0.2, contactRect.top / viewportHeight + 0.16))
+            : Math.min(1.12, Math.max(0.16, contactRect.top / viewportHeight + 0.05)),
         };
 
         setRig((current) =>
@@ -100,7 +100,7 @@ export function AchievementsContactLanyard() {
         anchorInset={rig.anchorInset}
         cardInset={rig.cardInset}
         showAnchor
-        strapLength={0.66}
+        strapLength={0.62}
         strapColor="#8b1e2d"
         strapWidth={0.68}
         tagMark="P"
