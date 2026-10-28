@@ -41,13 +41,13 @@
 /* Background Layer 3: Gigantic ghost typography "CONNECT" */
 .ghostTypography {
   position: absolute;
-  top: 14%;
+  top: clamp(0.75rem, 2.5vh, 2rem);
   left: 3%;
   z-index: 1;
   pointer-events: none;
   user-select: none;
   font-family: var(--font-display);
-  font-size: clamp(8rem, 24vw, 25rem);
+  font-size: clamp(5.8rem, 16.5vw, 16.5rem);
   font-weight: 800;
   line-height: 0.76;
   letter-spacing: -0.05em;
@@ -81,10 +81,10 @@
 .heroRow {
   display: grid;
   grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
-  align-items: center;
+  align-items: flex-start;
   gap: clamp(3rem, 6.5vw, 7.5rem);
   min-height: clamp(380px, 48svh, 540px);
-  margin-bottom: clamp(36px, 5.5vh, 72px);
+  margin-bottom: clamp(20px, 3.5vh, 44px);
 }
 
 /* Left: Badge Staging Zone */
@@ -125,7 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-top: clamp(2.5rem, 6.5vh, 5.5rem);
+  padding-top: clamp(10.5rem, 20vh, 15.5rem);
 }
 
 .contactHeroHeader {
@@ -635,6 +635,12 @@
    5. Divider & Footer
    ========================================================================== */
 @media (max-width: 767px) {
+  .ghostTypography {
+    top: 4svh;
+    font-size: clamp(4.5rem, 18vw, 7rem);
+    opacity: 0.22;
+  }
+
   .contentContainer {
     padding: clamp(3rem, 6svh, 4.5rem) clamp(1rem, 5vw, 1.5rem) calc(0.8rem + env(safe-area-inset-bottom));
   }
