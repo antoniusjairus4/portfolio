@@ -1,10 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import type { CSSProperties, ReactNode, PointerEvent as ReactPointerEvent } from 'react';
 import { useRef } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementEditorial.module.css';
 import { achievementHighlights, chessPeakRatings } from '@/content/achievementsKinetic';
+
+const ChessHero3D = dynamic(() => import('@/components/achievements-kinetic/ChessHero3D'), {
+  ssr: false,
+});
 
 interface EditorialProps {
   reducedMotion: boolean;
@@ -219,6 +224,416 @@ export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialP
   );
 }
 
+function TiedBlackBeltSVG() {
+  return (
+    <svg
+      className={styles.abstractBeltSvg}
+      viewBox="0 0 1000 680"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <defs>
+        <filter id="beltPageShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow dx="0" dy="18" stdDeviation="22" floodColor="#080705" floodOpacity="0.36" />
+          <feDropShadow dx="0" dy="5" stdDeviation="7" floodColor="#020101" floodOpacity="0.52" />
+        </filter>
+
+        <filter id="creaseShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow
+            dx="-1"
+            dy="3.5"
+            stdDeviation="3.5"
+            floodColor="#000000"
+            floodOpacity="0.95"
+          />
+        </filter>
+
+        <filter id="patchShadow" x="-30%" y="-30%" width="160%" height="160%">
+          <feDropShadow
+            dx="0.8"
+            dy="1.6"
+            stdDeviation="2"
+            floodColor="#000000"
+            floodOpacity="0.65"
+          />
+        </filter>
+
+        <pattern
+          id="beltCanvasTwill"
+          width="4"
+          height="4"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <line x1="0" y1="0" x2="0" y2="4" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="0.85" />
+          <line x1="0" y1="0" x2="4" y2="0" stroke="rgba(0, 0, 0, 0.7)" strokeWidth="0.85" />
+        </pattern>
+
+        <linearGradient id="waistGrad" x1="0.2" y1="0" x2="0.8" y2="1">
+          <stop offset="0%" stopColor="#24211e" />
+          <stop offset="25%" stopColor="#171513" />
+          <stop offset="70%" stopColor="#0d0c0a" />
+          <stop offset="100%" stopColor="#050403" />
+        </linearGradient>
+
+        <linearGradient id="tail1Grad" x1="0.9" y1="0.1" x2="0.1" y2="0.9">
+          <stop offset="0%" stopColor="#282522" />
+          <stop offset="15%" stopColor="#191715" />
+          <stop offset="60%" stopColor="#0d0c0a" />
+          <stop offset="100%" stopColor="#040302" />
+        </linearGradient>
+
+        <linearGradient id="tail2Grad" x1="0.1" y1="0.1" x2="0.9" y2="0.9">
+          <stop offset="0%" stopColor="#2a2724" />
+          <stop offset="20%" stopColor="#1a1816" />
+          <stop offset="70%" stopColor="#0d0c0a" />
+          <stop offset="100%" stopColor="#040302" />
+        </linearGradient>
+
+        <linearGradient id="knotBaseLoopGrad" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#262320" />
+          <stop offset="35%" stopColor="#181613" />
+          <stop offset="100%" stopColor="#070605" />
+        </linearGradient>
+
+        <linearGradient id="cinchCollarGrad" x1="0" y1="0" x2="1" y2="0.9">
+          <stop offset="0%" stopColor="#151311" />
+          <stop offset="22%" stopColor="#322d27" />
+          <stop offset="55%" stopColor="#1e1b18" />
+          <stop offset="85%" stopColor="#0d0c0a" />
+          <stop offset="100%" stopColor="#040302" />
+        </linearGradient>
+
+        <linearGradient id="cinchTopLipGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#3d372e" />
+          <stop offset="50%" stopColor="#24201b" />
+          <stop offset="100%" stopColor="#090807" />
+        </linearGradient>
+
+        <linearGradient id="patchGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#8a1e2b" />
+          <stop offset="55%" stopColor="#741520" />
+          <stop offset="100%" stopColor="#5a0d16" />
+        </linearGradient>
+
+        <linearGradient id="goldStripeGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#deb448" />
+          <stop offset="45%" stopColor="#fced9d" />
+          <stop offset="100%" stopColor="#b28822" />
+        </linearGradient>
+      </defs>
+
+      <g filter="url(#beltPageShadow)">
+        {/* 1. Continuous Waist Band */}
+        <g>
+          <path
+            d="M -30 190 C 130 198, 360 224, 560 254 L 554 304 C 352 274, 125 248, -30 240 Z"
+            fill="url(#waistGrad)"
+          />
+          <path
+            d="M -30 190 C 130 198, 360 224, 560 254 L 554 304 C 352 274, 125 248, -30 240 Z"
+            fill="url(#beltCanvasTwill)"
+          />
+          <path
+            d="M -30 190 C 130 198, 360 224, 560 254"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth={0.8}
+            fill="none"
+          />
+          <path
+            d="M -30 202 C 130 210, 360 236, 558 266"
+            stroke="rgba(44,40,36,0.72)"
+            strokeWidth={0.75}
+            strokeDasharray="6 3"
+            fill="none"
+          />
+          <path
+            d="M -30 215 C 128 223, 358 249, 556 279"
+            stroke="rgba(44,40,36,0.72)"
+            strokeWidth={0.75}
+            strokeDasharray="6 3"
+            fill="none"
+          />
+          <path
+            d="M -30 227 C 126 235, 355 261, 554 292"
+            stroke="rgba(44,40,36,0.72)"
+            strokeWidth={0.75}
+            strokeDasharray="6 3"
+            fill="none"
+          />
+          <path
+            d="M -30 240 C 125 248, 352 274, 554 304"
+            stroke="rgba(0,0,0,0.65)"
+            strokeWidth={1.2}
+            fill="none"
+          />
+        </g>
+
+        {/* 2. Tail 1 (Major Diagonal Tail Sweeping Down-Left) */}
+        <g>
+          <path
+            d="M 548 286 C 485 362, 396 450, 282 516 C 228 546, 172 568, 108 584 L 126 634 C 190 618, 248 594, 306 560 C 424 492, 516 394, 594 322 Z"
+            fill="url(#tail1Grad)"
+          />
+          <path
+            d="M 548 286 C 485 362, 396 450, 282 516 C 228 546, 172 568, 108 584 L 126 634 C 190 618, 248 594, 306 560 C 424 492, 516 394, 594 322 Z"
+            fill="url(#beltCanvasTwill)"
+          />
+          <path
+            d="M 548 286 C 485 362, 396 450, 282 516 C 228 546, 172 568, 108 584"
+            stroke="rgba(255,255,255,0.09)"
+            strokeWidth={0.85}
+            fill="none"
+          />
+          <path
+            d="M 126 634 C 190 618, 248 594, 306 560 C 424 492, 516 394, 594 322"
+            stroke="rgba(0,0,0,0.75)"
+            strokeWidth={1.3}
+            fill="none"
+          />
+          <path
+            d="M 108 584 Q 112 587 114 597 L 121 621 Q 123 631 126 634"
+            stroke="rgba(50,45,41,0.85)"
+            strokeWidth={1.2}
+            fill="none"
+          />
+          <path
+            d="M 556 296 C 493 372, 404 460, 289 527 C 236 557, 180 580, 113 596"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+          <path
+            d="M 564 306 C 501 382, 412 470, 297 538 C 243 569, 188 592, 118 608"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+          <path
+            d="M 572 316 C 509 392, 420 480, 304 549 C 251 580, 196 604, 123 621"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+        </g>
+
+        {/* 3. Tail 2 (Right Tail with 01 DAN Rank Patch) */}
+        <g>
+          <path
+            d="M 622 258 C 686 254, 764 274, 826 312 C 870 335, 908 364, 938 396 L 910 442 C 882 413, 844 386, 802 363 C 742 328, 674 310, 612 312 Z"
+            fill="url(#tail2Grad)"
+          />
+          <path
+            d="M 622 258 C 686 254, 764 274, 826 312 C 870 335, 908 364, 938 396 L 910 442 C 882 413, 844 386, 802 363 C 742 328, 674 310, 612 312 Z"
+            fill="url(#beltCanvasTwill)"
+          />
+          <path
+            d="M 622 258 C 686 254, 764 274, 826 312 C 870 335, 908 364, 938 396"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth={0.8}
+            fill="none"
+          />
+          <path
+            d="M 910 442 C 882 413, 844 386, 802 363 C 742 328, 674 310, 612 312"
+            stroke="rgba(0,0,0,0.72)"
+            strokeWidth={1.3}
+            fill="none"
+          />
+          <path
+            d="M 938 396 Q 933 403 929 415 L 918 435 Q 913 440 910 442"
+            stroke="rgba(50,45,41,0.85)"
+            strokeWidth={1.2}
+            fill="none"
+          />
+          <path
+            d="M 620 270 C 682 266, 758 287, 819 325 C 862 348, 899 376, 931 407"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+          <path
+            d="M 617 283 C 677 278, 752 299, 813 338 C 854 361, 891 389, 924 419"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+          <path
+            d="M 614 296 C 672 291, 745 311, 807 350 C 846 373, 883 401, 916 431"
+            stroke="rgba(44,40,36,0.75)"
+            strokeWidth={0.8}
+            strokeDasharray="7 3"
+            fill="none"
+          />
+
+          {/* 01 DAN Embroidered Crimson Rank Patch */}
+          <g
+            transform="translate(856, 380) rotate(26) translate(-32, -22)"
+            filter="url(#patchShadow)"
+          >
+            <rect x="0" y="0" width="64" height="44" rx="2.5" fill="url(#patchGrad)" />
+            <rect
+              x="0"
+              y="0"
+              width="64"
+              height="44"
+              rx="2.5"
+              fill="url(#beltCanvasTwill)"
+              opacity={0.4}
+            />
+            <rect
+              x="2.5"
+              y="2.5"
+              width="59"
+              height="39"
+              rx="1.5"
+              fill="none"
+              stroke="#440d12"
+              strokeWidth={0.9}
+              strokeDasharray="3 1.5"
+            />
+            <rect
+              x="10"
+              y="7"
+              width="4.5"
+              height="30"
+              rx="1"
+              fill="url(#goldStripeGrad)"
+              stroke="#8e6819"
+              strokeWidth={0.5}
+            />
+            <text
+              x="21"
+              y="27"
+              fontFamily="'JetBrains Mono Variable', monospace"
+              fontSize="11"
+              fontWeight="700"
+              letterSpacing="0.12em"
+              fill="#f4ede1"
+              filter="drop-shadow(0 1px 1px rgba(0,0,0,0.6))"
+            >
+              01 DAN
+            </text>
+          </g>
+        </g>
+
+        {/* 4. Obi Square Knot Core */}
+        <ellipse
+          cx="592"
+          cy="274"
+          rx="54"
+          ry="36"
+          fill="#010101"
+          opacity={0.9}
+          filter="blur(6px)"
+        />
+
+        <path
+          d="M 536 248 C 548 238, 580 236, 612 242 C 614 260, 608 282, 596 298 C 572 306, 544 300, 530 284 C 522 270, 526 254, 536 248 Z"
+          fill="url(#knotBaseLoopGrad)"
+        />
+        <path
+          d="M 536 248 C 548 238, 580 236, 612 242 C 614 260, 608 282, 596 298 C 572 306, 544 300, 530 284 C 522 270, 526 254, 536 248 Z"
+          fill="url(#beltCanvasTwill)"
+        />
+        <path
+          d="M 530 284 C 522 270, 526 254, 536 248"
+          stroke="rgba(255,255,255,0.14)"
+          strokeWidth={0.9}
+          fill="none"
+        />
+
+        <path
+          d="M 602 238 C 630 234, 662 242, 678 260 C 684 278, 676 298, 656 310 C 634 316, 606 310, 594 296 Z"
+          fill="url(#knotBaseLoopGrad)"
+        />
+        <path
+          d="M 602 238 C 630 234, 662 242, 678 260 C 684 278, 676 298, 656 310 C 634 316, 606 310, 594 296 Z"
+          fill="url(#beltCanvasTwill)"
+        />
+        <path
+          d="M 662 242 C 678 260, 684 278, 676 298"
+          stroke="rgba(255,255,255,0.14)"
+          strokeWidth={0.9}
+          fill="none"
+        />
+
+        <g transform="rotate(11, 592, 274)" filter="url(#creaseShadow)">
+          <path
+            d="M 564 220 C 586 212, 616 214, 632 222 C 640 244, 636 288, 628 312 C 612 320, 584 320, 566 312 C 556 290, 558 244, 564 220 Z"
+            fill="url(#cinchCollarGrad)"
+          />
+          <path
+            d="M 564 220 C 586 212, 616 214, 632 222 C 640 244, 636 288, 628 312 C 612 320, 584 320, 566 312 C 556 290, 558 244, 564 220 Z"
+            fill="url(#beltCanvasTwill)"
+          />
+          <path
+            d="M 564 220 C 584 213, 614 215, 632 222 C 630 228, 604 231, 574 227 Z"
+            fill="url(#cinchTopLipGrad)"
+          />
+          <path
+            d="M 564 220 C 584 213, 614 215, 632 222"
+            stroke="rgba(255,255,255,0.24)"
+            strokeWidth={1}
+            fill="none"
+          />
+          <path
+            d="M 566 312 C 586 320, 612 320, 628 312 C 626 305, 602 303, 574 305 Z"
+            fill="#040302"
+          />
+          <path
+            d="M 566 312 C 586 320, 612 320, 628 312"
+            stroke="rgba(0,0,0,0.95)"
+            strokeWidth={1.3}
+            fill="none"
+          />
+          <path
+            d="M 572 225 L 570 308"
+            stroke="rgba(44,40,36,0.72)"
+            strokeWidth={0.75}
+            strokeDasharray="5 2.5"
+            fill="none"
+          />
+          <path
+            d="M 622 226 L 620 308"
+            stroke="rgba(44,40,36,0.72)"
+            strokeWidth={0.75}
+            strokeDasharray="5 2.5"
+            fill="none"
+          />
+          <path
+            d="M 558 230 C 556 258, 554 286, 558 308"
+            stroke="#000000"
+            strokeWidth={3}
+            strokeLinecap="round"
+            fill="none"
+            opacity={0.95}
+          />
+          <path
+            d="M 636 228 C 640 256, 638 286, 634 306"
+            stroke="#000000"
+            strokeWidth={3}
+            strokeLinecap="round"
+            fill="none"
+            opacity={0.95}
+          />
+          <path
+            d="M 590 226 C 595 250, 594 280, 589 304"
+            stroke="rgba(255,255,255,0.14)"
+            strokeWidth={0.95}
+            strokeLinecap="round"
+            fill="none"
+          />
+        </g>
+      </g>
+    </svg>
+  );
+}
+
 export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
   return (
     <InteractiveField className={styles.karate} reducedMotion={reducedMotion}>
@@ -261,7 +676,10 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
           <line x1="40" y1="560" x2="920" y2="130" className={styles.strikePrimaryRed} />
           <line x1="180" y1="120" x2="820" y2="580" className={styles.strikeSecondaryLine} />
           <path d="M880 150 L920 130 L900 170" className={styles.strikeVectorArrow} />
-          <path d="M240 460 L270 460 M320 460 L350 460 M400 460 L430 460" className={styles.strikeDashTicks} />
+          <path
+            d="M240 460 L270 460 M320 460 L350 460 M400 460 L430 460"
+            className={styles.strikeDashTicks}
+          />
         </g>
 
         {/* Impact System: Concentric Calibration Rings */}
@@ -279,25 +697,21 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
           <circle cx="500" cy="360" r="4.5" className={styles.impactCenterPoint} />
           <circle cx="180" cy="120" r="3" className={styles.vectorPoint} />
           <circle cx="820" cy="580" r="3" className={styles.vectorPoint} />
-          <text x="516" y="352" className={styles.techText}>IMPACT // 0.42s</text>
-          <text x="76" y="202" className={styles.techText}>AXIS // KATA DYNAMICS</text>
-          <text x="760" y="122" className={styles.techText}>STRIKE ANGLE 26.2°</text>
+          <text x="516" y="352" className={styles.techText}>
+            IMPACT // 0.42s
+          </text>
+          <text x="76" y="202" className={styles.techText}>
+            AXIS // KATA DYNAMICS
+          </text>
+          <text x="760" y="122" className={styles.techText}>
+            STRIKE ANGLE 26.2°
+          </text>
         </g>
       </svg>
 
-      {/* Layer 5: Central Visual Motif — Abstract 2D Black Belt Geometry */}
+      {/* Layer 5: Central Visual Motif — Master Tied Black Belt */}
       <div className={styles.abstractBeltGroup} aria-hidden="true">
-        <div className={styles.beltAbstractShadow} />
-        <div className={styles.beltBandSecondary}>
-          <div className={styles.beltRibbing} />
-        </div>
-        <div className={styles.beltBandPrimary}>
-          <div className={styles.beltRibbing} />
-          <div className={styles.beltRankPatch}>
-            <span className={styles.beltRankStripe} />
-            <span className={styles.beltRankText}>01 DAN</span>
-          </div>
-        </div>
+        <TiedBlackBeltSVG />
       </div>
 
       {/* Layer 6A: Subordinate Achievement Title (Top-Left) */}
@@ -334,12 +748,16 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
           <i>01</i>
           <span>CONTROL</span>
         </li>
-        <li className={styles.principleDivider} aria-hidden="true">/</li>
+        <li className={styles.principleDivider} aria-hidden="true">
+          /
+        </li>
         <li>
           <i>02</i>
           <span>POWER</span>
         </li>
-        <li className={styles.principleDivider} aria-hidden="true">/</li>
+        <li className={styles.principleDivider} aria-hidden="true">
+          /
+        </li>
         <li>
           <i>03</i>
           <span>DISCIPLINE</span>
@@ -351,107 +769,189 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
   );
 }
 
-const TREE_NODES = [
-  [500, 98, 'A0'],
-  [360, 208, 'B1'],
-  [640, 208, 'B2'],
-  [252, 330, 'C1'],
-  [420, 330, 'C2'],
-  [578, 330, 'C3'],
-  [758, 330, 'C4'],
-  [170, 468, 'D1'],
-  [310, 468, 'D2'],
-  [506, 468, 'D3'],
-  [676, 468, 'D4'],
-  [842, 468, 'D5'],
-] as const;
-
-const TREE_PATHS = [
-  'M500 98 L360 208',
-  'M500 98 L640 208',
-  'M360 208 L252 330',
-  'M360 208 L420 330',
-  'M640 208 L578 330',
-  'M640 208 L758 330',
-  'M252 330 L170 468',
-  'M252 330 L310 468',
-  'M420 330 L506 468',
-  'M578 330 L506 468',
-  'M578 330 L676 468',
-  'M758 330 L842 468',
-] as const;
-
 export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
   return (
     <InteractiveField className={styles.chess} reducedMotion={reducedMotion}>
-      <div className={styles.chessCoordinates} aria-hidden="true" />
+      {/* Layer 3: Monumental Hero Heading (Left-Top) */}
       <div className={styles.chessHeading}>
-        <p>CALCULATION / PRECISION / DECISION</p>
-        <h3>CHESS</h3>
+        <span className={styles.chessPrefix}>03 // CALCULATION / PRECISION / DECISION</span>
+        <h3 className={styles.heroChess}>CHESS</h3>
+        <p className={styles.chessConcept}>TACTICAL CALCULATION / DEPTH 18</p>
       </div>
 
+      {/* Layer 4: Tactical Calculation Tree (Behind and around pieces) */}
       <svg
-        className={styles.decisionTree}
-        viewBox="0 0 1000 600"
-        preserveAspectRatio="xMidYMid meet"
-        aria-label="Abstract branching chess decision tree"
+        className={styles.chessCalculationSystem}
+        viewBox="0 0 1000 680"
+        preserveAspectRatio="none"
+        aria-hidden="true"
       >
-        <g className={styles.treeGrid}>
-          {TREE_VERTICALS.map((coordinate) => (
-            <path key={`v-${coordinate}`} d={`M${coordinate} 40 V560`} />
-          ))}
-          {TREE_HORIZONTALS.map((coordinate) => (
-            <path key={`h-${coordinate}`} d={`M70 ${coordinate} H930`} />
-          ))}
+        <defs>
+          <filter id="crimsonGlow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="0" stdDeviation="5" floodColor="#c42838" floodOpacity="0.85" />
+          </filter>
+        </defs>
+
+        {/* Alternative variations (rejected calculation branches in faint warm grey) */}
+        <g className={styles.alternativeBranches}>
+          <path d="M 340 220 L 440 145 L 560 120" />
+          <path d="M 440 145 L 520 85" />
+          <path d="M 500 280 L 600 215 L 740 185" />
+          <path d="M 500 280 L 580 395 L 700 445" />
+          <path d="M 670 345 L 780 275 L 890 250" />
+          <path d="M 670 345 L 750 425" />
         </g>
-        <g className={styles.treeBranches}>
-          {TREE_PATHS.map((path, index) => (
-            <path
-              key={path}
-              d={path}
-              pathLength="1"
-              style={{ '--branch': index } as CSSProperties}
-            />
-          ))}
-        </g>
-        <g className={styles.treeNodes}>
-          {TREE_NODES.map(([x, y, label], index) => (
-            <g
-              key={label}
-              transform={`translate(${x} ${y})`}
-              style={{ '--node': index } as CSSProperties}
-            >
-              <circle r={index === 0 ? 13 : 8} />
-              <circle className={styles.nodeHalo} r={index === 0 ? 29 : 20} />
-              <text x="15" y="-13">
-                {label}
-              </text>
-            </g>
-          ))}
-        </g>
+
+        {/* Primary calculated line (Crimson variation: A0 -> B1 -> C2 -> D3) */}
         <path
-          className={styles.evaluationLine}
-          d="M500 98 L360 208 L420 330 L506 468"
-          pathLength="1"
+          className={styles.primaryVariationPath}
+          d="M 340 220 L 500 280 L 670 345 L 830 395"
+          filter="url(#crimsonGlow)"
         />
+
+        {/* Crimson decision splits: the active calculation explores both sides */}
+        <g className={styles.primaryVariationBranches} filter="url(#crimsonGlow)">
+          <path d="M 340 220 L 440 145 L 560 120" />
+          <path d="M 440 145 L 520 85" />
+          <path d="M 500 280 L 600 215 L 740 185" />
+          <path d="M 500 280 L 580 395 L 700 445" />
+          <path d="M 670 345 L 780 275 L 890 250" />
+          <path d="M 670 345 L 750 425" />
+        </g>
+
+        <g className={styles.primaryBranchTerminals}>
+          <circle cx="560" cy="120" r="4" />
+          <circle cx="520" cy="85" r="4" />
+          <circle cx="740" cy="185" r="4" />
+          <circle cx="700" cy="445" r="4" />
+          <circle cx="890" cy="250" r="4" />
+          <circle cx="750" cy="425" r="4" />
+        </g>
+
+        {/* Alternative node markers */}
+        <g className={styles.alternativeNodes}>
+          <circle cx="440" cy="145" r="3.5" />
+          <circle cx="560" cy="120" r="3" />
+          <circle cx="600" cy="215" r="3.5" />
+          <circle cx="740" cy="185" r="3" />
+          <circle cx="580" cy="395" r="3.5" />
+          <circle cx="700" cy="445" r="3" />
+          <circle cx="780" cy="275" r="3.5" />
+          <text x="448" y="141">
+            B0 // e5
+          </text>
+          <text x="608" y="211">
+            C1 // Nc3
+          </text>
+          <text x="588" y="407">
+            C3 // c3
+          </text>
+        </g>
+
+        {/* Primary variation nodes */}
+        <g className={styles.primaryNodes}>
+          {/* A0 */}
+          <g transform="translate(340, 220)">
+            <circle r="6" className={styles.nodeCore} />
+            <circle r="14" className={styles.nodeRing} />
+            <text x="14" y="-8">
+              A0 // 1. e4
+            </text>
+          </g>
+
+          {/* B1 */}
+          <g transform="translate(500, 280)">
+            <circle r="6.5" className={styles.nodeCore} />
+            <circle r="16" className={styles.nodeRing} />
+            <text x="14" y="-8">
+              B1 // 1... c5
+            </text>
+          </g>
+
+          {/* C2 */}
+          <g transform="translate(670, 345)">
+            <circle r="7" className={styles.nodeCore} />
+            <circle r="18" className={styles.nodeRing} />
+            <text x="14" y="-8">
+              C2 // 2. Nf3
+            </text>
+          </g>
+
+          {/* D3 (Active Target Node) */}
+          <g transform="translate(830, 395)">
+            <circle r="8" className={styles.activeNodeCore} />
+            <circle r="24" className={styles.activeTerminalHalo} />
+            <circle r="36" className={styles.activeTerminalWave} />
+            <text x="16" y="-10" className={styles.activeNodeLabel}>
+              D3 // 2... d6 [ACTIVE]
+            </text>
+          </g>
+        </g>
       </svg>
 
-      <div className={styles.analysisLabels} aria-hidden="true">
-        <span>DEPTH / 18</span>
+      {/* Layer 5: Dedicated 3D Hero Composition (Oversized King, Queen, Knight, Board) */}
+      <div className={styles.chessHeroContainer} aria-hidden="true">
+        <ChessHero3D reducedMotion={reducedMotion} />
+      </div>
+
+      {/* Layer 6: Floating Tactical Micro-Readouts */}
+      <div className={styles.chessTechReadout} aria-hidden="true">
+        <span>DEPTH / 18 PLY</span>
+        <span className={styles.readoutDot}>•</span>
         <span>POSITION / ACTIVE</span>
-        <span>CALCULATING</span>
-        <span>EVALUATION / +0.42</span>
+        <span className={styles.readoutDot}>•</span>
+        <span>EVAL / +0.42</span>
+        <span className={styles.readoutDot}>•</span>
         <span>SEQUENCE / 04</span>
       </div>
 
-      <dl className={styles.ratingField}>
-        {chessPeakRatings.map((rating, index) => (
-          <div key={rating.label} style={{ '--rating-index': index } as CSSProperties}>
-            <dd>{rating.value}</dd>
-            <dt>{rating.label}</dt>
-          </div>
-        ))}
-      </dl>
+      {/* Layer 7: Reworked Dominant Rating Blocks (Visual Triangle Anchor) */}
+      <div className={styles.chessRatingsSystem} aria-label="Peak competitive chess ratings">
+        <div className={styles.ratingBlock} style={{ '--rating-order': 0 } as CSSProperties}>
+          <span className={styles.ratingIndex}>01 // RAPID</span>
+          <strong className={styles.ratingValue}>1984</strong>
+          <span className={styles.ratingLabel}>PEAK RATING</span>
+        </div>
+
+        <div className={styles.ratingSeparator} aria-hidden="true" />
+
+        <div className={styles.ratingBlock} style={{ '--rating-order': 1 } as CSSProperties}>
+          <span className={styles.ratingIndex}>02 // BLITZ</span>
+          <strong className={styles.ratingValue}>2010</strong>
+          <span className={styles.ratingLabel}>PEAK RATING</span>
+        </div>
+
+        <div className={styles.ratingSeparator} aria-hidden="true" />
+
+        <div className={styles.ratingBlock} style={{ '--rating-order': 2 } as CSSProperties}>
+          <span className={styles.ratingIndex}>03 // BULLET</span>
+          <strong className={styles.ratingValue}>2198</strong>
+          <span className={styles.ratingLabel}>PEAK RATING</span>
+        </div>
+      </div>
+
+      {/* Layer 8: Bottom Structural Principles Rail */}
+      <ul className={styles.chessPrinciplesRail} aria-label="Chess strategic principles">
+        <li>
+          <i>01</i>
+          <span>CALCULATION</span>
+        </li>
+        <li className={styles.principleDivider} aria-hidden="true">
+          /
+        </li>
+        <li>
+          <i>02</i>
+          <span>PRESSURE</span>
+        </li>
+        <li className={styles.principleDivider} aria-hidden="true">
+          /
+        </li>
+        <li>
+          <i>03</i>
+          <span>DECISION</span>
+        </li>
+      </ul>
+
       <GallerySignal label={galleryFocus} />
     </InteractiveField>
   );

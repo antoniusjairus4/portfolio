@@ -519,7 +519,11 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  transform: translate3d(calc(var(--pointer-shift-x) * -0.25), calc(var(--pointer-shift-y) * -0.25), 0);
+  transform: translate3d(
+    calc(var(--pointer-shift-x) * -0.25),
+    calc(var(--pointer-shift-y) * -0.25),
+    0
+  );
   transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
   user-select: none;
 }
@@ -551,7 +555,11 @@
   height: 100%;
   pointer-events: none;
   overflow: visible;
-  transform: translate3d(calc(var(--pointer-shift-x) * 0.35), calc(var(--pointer-shift-y) * 0.35), 0);
+  transform: translate3d(
+    calc(var(--pointer-shift-x) * 0.35),
+    calc(var(--pointer-shift-y) * 0.35),
+    0
+  );
   transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
@@ -638,98 +646,22 @@
 
 .abstractBeltGroup {
   position: absolute;
-  top: 20%;
-  left: 12%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 5;
-  width: clamp(24rem, 46vw, 54rem);
-  height: clamp(20rem, 38vw, 42rem);
   pointer-events: none;
   transform: translate3d(calc(var(--pointer-shift-x) * 0.7), calc(var(--pointer-shift-y) * 0.7), 0);
   transition: transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.beltAbstractShadow {
-  position: absolute;
-  inset: 15% 10% 15% 10%;
-  z-index: 0;
-  background: radial-gradient(ellipse at 50% 50%, rgba(15, 12, 10, 0.26), transparent 68%);
-  filter: blur(2.5rem);
-}
-
-.beltBandPrimary {
-  position: absolute;
-  top: 38%;
-  left: -8%;
-  z-index: 2;
-  width: 118%;
-  height: clamp(4.2rem, 7.8vw, 8.4rem);
-  background:
-    linear-gradient(180deg, #1e1b18 0%, #11100e 35%, #0c0b09 100%),
-    repeating-linear-gradient(90deg, #161513 0px, #161513 3px, #0e0d0c 3px, #0e0d0c 6px);
-  border-top: 1px dashed rgba(255, 255, 255, 0.16);
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.12);
-  box-shadow:
-    0 1.8rem 3.5rem rgba(12, 10, 8, 0.28),
-    0 0.5rem 1.2rem rgba(0, 0, 0, 0.35);
-  transform: rotate(-19deg) translateY(calc((1 - var(--karate-settle, 1)) * -1.5rem));
-  transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.beltBandSecondary {
-  position: absolute;
-  top: 10%;
-  left: 32%;
-  z-index: 1;
-  width: 78%;
-  height: clamp(3.8rem, 6.8vw, 7.2rem);
-  background: linear-gradient(180deg, #181614 0%, #0d0c0b 50%, #080807 100%);
-  border-top: 1px dashed rgba(255, 255, 255, 0.13);
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-  box-shadow: 0 1.2rem 2.5rem rgba(12, 10, 8, 0.22);
-  transform: rotate(32deg) translateY(calc((1 - var(--karate-settle, 1)) * 1.5rem));
-  transition: transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.beltRibbing {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(
-    90deg,
-    transparent 0px,
-    transparent 4px,
-    rgba(255, 255, 255, 0.02) 4px,
-    rgba(255, 255, 255, 0.02) 8px
-  );
-}
-
-.beltRankPatch {
-  position: absolute;
-  top: 50%;
-  right: 6%;
-  display: flex;
-  gap: 0.6rem;
-  align-items: center;
-  padding: 0.35rem 0.65rem;
-  background: #8b1e2d;
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-  transform: translateY(-50%);
-}
-
-.beltRankStripe {
-  width: 3px;
-  height: 1.4rem;
-  background: #d4af37;
-  border-radius: 1px;
-}
-
-.beltRankText {
-  font-family: "JetBrains Mono Variable", monospace;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.15em;
-  color: #f2e9dc;
+.abstractBeltSvg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 14px 28px rgba(10, 8, 6, 0.22));
+  transform: translateY(calc((1 - var(--karate-settle, 1)) * -1.2rem));
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .subordinateBeltTitle {
@@ -789,7 +721,9 @@
   color: #12100e;
   text-align: right;
   opacity: calc(0.9 + var(--karate-title, 0.1) * 0.1);
-  transform: translateX(calc((1 - var(--karate-title, 1)) * 3.5rem + (var(--karate-impact, 0) * -3px)));
+  transform: translateX(
+    calc((1 - var(--karate-title, 1)) * 3.5rem + (var(--karate-impact, 0) * -3px))
+  );
   transition:
     transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
     opacity 600ms ease;
@@ -883,181 +817,364 @@
 }
 
 /* 03 — CALCULATION / STRUCTURE / SEQUENCE */
+/* 03 — CALCULATION / PRESSURE / DECISION / DEPTH */
 .chess {
-  color: #eee4d2;
-  background:
-    radial-gradient(
-      circle at var(--pointer-x) var(--pointer-y),
-      rgba(139, 30, 45, 0.2),
-      transparent 18%
-    ),
-    #050505;
-}
-
-.chessCoordinates {
   position: absolute;
   inset: 0;
-  z-index: 0;
-  background-image:
-    linear-gradient(rgba(238, 228, 210, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(238, 228, 210, 0.045) 1px, transparent 1px);
-  background-size: 7.5% 12.5%;
-  mask-image: linear-gradient(90deg, #000, transparent 95%);
+  overflow: hidden;
+  color: #f2ede4;
+  background: #101820;
 }
 
 .chessHeading {
   position: absolute;
-  top: clamp(5.8rem, 12vh, 8.5rem);
-  left: clamp(1.5rem, 3.15vw, 3.8rem);
-  z-index: 10;
-}
-
-.chessHeading p {
-  margin: 0 0 1rem;
-  font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.5rem, 0.62vw, 0.7rem);
-  letter-spacing: 0.2em;
-  opacity: 0.55;
-}
-
-.chessHeading h3 {
-  margin: 0;
-  font-size: clamp(6rem, 11vw, 13rem);
-  font-weight: 670;
-  line-height: 0.72;
-  letter-spacing: -0.085em;
-}
-
-.decisionTree {
-  position: absolute;
-  top: 15%;
-  right: -3%;
-  z-index: 3;
-  width: 73%;
-  height: 66%;
-  overflow: visible;
-  transform: translate3d(var(--pointer-shift-x), var(--pointer-shift-y), 0);
-  transition: transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-.treeGrid path {
-  fill: none;
-  stroke: rgba(238, 228, 210, 0.055);
-  stroke-width: 1;
-  vector-effect: non-scaling-stroke;
-}
-
-.treeBranches path,
-.evaluationLine {
-  fill: none;
-  stroke: rgba(238, 228, 210, 0.42);
-  stroke-width: 1.3;
-  stroke-dasharray: 1;
-  stroke-dashoffset: calc(1 - var(--chess-path, 0));
-  vector-effect: non-scaling-stroke;
-}
-
-.treeBranches path {
-  transition-delay: calc(var(--branch) * 24ms);
-}
-
-.evaluationLine {
-  stroke: #8b1e2d;
-  stroke-width: 2.4;
-  opacity: var(--chess-focus, 0);
-  stroke-dashoffset: calc(1 - var(--chess-focus, 0));
-}
-
-.treeNodes circle {
-  fill: #050505;
-  stroke: #eee4d2;
-  stroke-width: 1.4;
-  opacity: var(--chess-grid, 0);
-  transform-box: fill-box;
-  transform-origin: center;
-  transform: scale(calc(0.35 + var(--chess-grid, 0) * 0.65));
-  transition:
-    fill 220ms ease,
-    stroke 220ms ease,
-    transform 220ms ease;
-}
-
-.treeNodes g:hover circle:first-child {
-  fill: #8b1e2d;
-  stroke: #8b1e2d;
-  transform: scale(1.45);
-}
-
-.treeNodes .nodeHalo {
-  fill: transparent;
-  stroke: rgba(238, 228, 210, 0.12);
-  stroke-dasharray: 2 4;
-}
-
-.treeNodes text {
-  fill: rgba(238, 228, 210, 0.48);
-  font-family: "JetBrains Mono Variable", monospace;
-  font-size: 12px;
-  letter-spacing: 0.12em;
-  opacity: var(--chess-grid, 0);
-}
-
-.analysisLabels {
-  position: absolute;
-  top: 18%;
-  right: 3%;
-  bottom: 18%;
-  z-index: 6;
+  top: clamp(4.5rem, 10.5vh, 7.8rem);
+  left: clamp(1.8rem, 3.5vw, 4.5rem);
+  z-index: 5;
+  pointer-events: none;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
-  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.chessPrefix {
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.42rem, 0.5vw, 0.58rem);
-  letter-spacing: 0.15em;
-  opacity: calc(var(--chess-grid, 0) * 0.5);
+  font-size: clamp(0.52rem, 0.65vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  color: #8b1e2d;
+  text-transform: uppercase;
 }
 
-.ratingField {
-  position: absolute;
-  bottom: clamp(2.2rem, 6vh, 5rem);
-  left: clamp(1.5rem, 3.15vw, 3.8rem);
-  z-index: 10;
-  display: flex;
-  gap: clamp(1.2rem, 2.2vw, 2.6rem);
+.heroChess {
   margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(6.5rem, 13vw, 14.5rem);
+  font-weight: 700;
+  line-height: 0.72;
+  letter-spacing: -0.015em;
+  color: #f2ede4;
+  text-shadow: 0 12px 36px rgba(0, 0, 0, 0.6);
+  opacity: calc(0.9 + var(--chess-grid, 0.1) * 0.1);
+  transform: translateX(calc((1 - var(--chess-grid, 1)) * -2rem));
+  transition:
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 700ms ease;
 }
 
-.chess .ratingField > div {
+.chessConcept {
+  margin: 0.4rem 0 0;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.55rem, 0.68vw, 0.75rem);
+  letter-spacing: 0.2em;
+  color: rgba(238, 228, 210, 0.45);
+  font-weight: 500;
+}
+
+.chessCalculationSystem {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  pointer-events: none;
+  overflow: visible;
+  transform: translate3d(calc(var(--pointer-shift-x) * 0.4), calc(var(--pointer-shift-y) * 0.4), 0);
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.alternativeBranches path {
+  fill: none;
+  stroke: rgba(238, 228, 210, 0.14);
+  stroke-width: 1px;
+  stroke-dasharray: 4 5;
+}
+
+.primaryVariationPath {
+  fill: none;
+  stroke: #c42838;
+  stroke-width: 2.2px;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: calc(1000 * (1 - var(--chess-path, 0)));
+  transition: stroke-dashoffset 850ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primaryVariationBranches path {
+  fill: none;
+  stroke: #c42838;
+  stroke-width: 1.45px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: calc(1000 * (1 - var(--chess-path, 0)));
+  opacity: calc(0.48 + var(--chess-focus, 0) * 0.42);
+  transition:
+    stroke-dashoffset 950ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 500ms ease;
+}
+
+.primaryVariationBranches path:nth-child(2),
+.primaryVariationBranches path:nth-child(4) {
+  transition-delay: 90ms;
+}
+
+.primaryBranchTerminals circle {
+  fill: #c42838;
+  stroke: #f2ede4;
+  stroke-width: 1.4px;
+  opacity: var(--chess-focus, 0);
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: scale(calc(0.45 + var(--chess-focus, 0) * 0.55));
+  transition:
+    opacity 450ms ease,
+    transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.alternativeNodes circle {
+  fill: rgba(238, 228, 210, 0.25);
+}
+
+.alternativeNodes text {
+  fill: rgba(238, 228, 210, 0.35);
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.12em;
+}
+
+.primaryNodes text {
+  fill: rgba(238, 228, 210, 0.75);
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+}
+
+.nodeCore {
+  fill: #f2ede4;
+  stroke: #050505;
+  stroke-width: 2px;
+}
+
+.nodeRing {
+  fill: none;
+  stroke: rgba(238, 228, 210, 0.22);
+  stroke-width: 1px;
+  stroke-dasharray: 2 3;
+}
+
+.activeNodeCore {
+  fill: #c42838;
+  stroke: #f2ede4;
+  stroke-width: 2px;
+}
+
+.activeTerminalHalo {
+  fill: rgba(196, 40, 56, 0.15);
+  stroke: #c42838;
+  stroke-width: 1.2px;
+  opacity: var(--chess-focus, 0);
+  animation: pulseHalo 2.5s ease-in-out infinite;
+}
+
+.activeTerminalWave {
+  fill: none;
+  stroke: rgba(196, 40, 56, 0.4);
+  stroke-width: 1px;
+  stroke-dasharray: 3 3;
+  opacity: var(--chess-focus, 0);
+  animation: pulseWave 2.5s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+}
+
+.activeNodeLabel {
+  fill: #f87171 !important;
+  font-weight: 700 !important;
+}
+
+@keyframes pulseHalo {
+  0%,
+  100% {
+    transform: scale(0.95);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 0.85;
+  }
+}
+
+@keyframes pulseWave {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.4);
+    opacity: 0;
+  }
+}
+
+/* 3D Hero Chess Composition Container (Positioned in bottom-left above rapid rating) */
+.chessHeroContainer {
+  position: absolute;
+  bottom: clamp(12rem, 23vh, 18.5rem);
+  left: clamp(1.8rem, 3.5vw, 4.5rem);
+  z-index: 6;
+  width: clamp(18rem, 32vw, 29rem);
+  height: clamp(15rem, 25vw, 23rem);
+  pointer-events: none;
+  opacity: var(--chess-pieces, 0);
+  transform: translateY(calc((1 - var(--chess-pieces, 0)) * 2rem))
+    scale(calc(0.94 + var(--chess-pieces, 0) * 0.06));
+  transition:
+    transform 750ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 700ms ease;
+}
+
+.chess3dContainer,
+.chess3dPlaceholder {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.chess3dContainer canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+  filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.75));
+}
+
+.chessTechReadout {
+  position: absolute;
+  top: clamp(5.2rem, 11vh, 8.2rem);
+  right: clamp(1.8rem, 3.5vw, 4.5rem);
+  z-index: 7;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.48rem, 0.6vw, 0.65rem);
+  letter-spacing: 0.18em;
+  color: rgba(238, 228, 210, 0.52);
+  opacity: calc(0.6 + var(--chess-grid, 0) * 0.4);
+}
+
+.readoutDot {
+  color: #8b1e2d;
+  font-size: 0.8em;
+}
+
+/* Dominant Bottom Ratings System */
+.chessRatingsSystem {
+  position: absolute;
+  bottom: clamp(3.2rem, 7vh, 5.2rem);
+  left: clamp(1.8rem, 3.5vw, 4.5rem);
+  z-index: 8;
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(1.6rem, 3.2vw, 4.2rem);
+}
+
+.ratingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  opacity: var(--rating-opacity, 0);
+  transform: translateY(calc((1 - var(--rating-opacity, 0)) * 1.8rem));
+  transition:
+    transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 600ms ease;
+}
+
+.chessRatingsSystem div:nth-child(1) {
   --rating-opacity: var(--chess-one, 0);
-  display: grid;
-  gap: 0.15rem;
-  opacity: var(--rating-opacity);
-  transform: translateY(calc((1 - var(--rating-opacity)) * 2.5rem));
 }
 
-.ratingField div:nth-child(2) {
+.chessRatingsSystem div:nth-child(3) {
   --rating-opacity: var(--chess-two, 0);
 }
 
-.ratingField div:nth-child(3) {
+.chessRatingsSystem div:nth-child(5) {
   --rating-opacity: var(--chess-three, 0);
 }
 
-.ratingField dd {
-  margin: 0;
-  font-size: clamp(3.7rem, 5.3vw, 6.4rem);
-  font-weight: 620;
-  line-height: 0.8;
-  letter-spacing: -0.07em;
-  font-variant-numeric: tabular-nums;
+.ratingIndex {
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.52rem, 0.65vw, 0.7rem);
+  color: #8b1e2d;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.ratingField dt {
+.ratingValue {
+  font-family: var(--font-display);
+  font-size: clamp(4.2rem, 7.2vw, 7.8rem);
+  font-weight: 700;
+  line-height: 0.82;
+  letter-spacing: -0.06em;
+  color: #f2ede4;
+}
+
+.ratingCategory {
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.48rem, 0.58vw, 0.66rem);
-  letter-spacing: 0.19em;
-  color: #b7a88f;
+  font-size: clamp(0.55rem, 0.68vw, 0.72rem);
+  color: rgba(238, 228, 210, 0.6);
+  letter-spacing: 0.2em;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.ratingSeparator {
+  width: 1px;
+  height: clamp(3.2rem, 5.5vh, 4.8rem);
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(238, 228, 210, 0.16) 30%,
+    rgba(238, 228, 210, 0.16) 70%,
+    transparent 100%
+  );
+  margin-bottom: 0.4rem;
+}
+
+.chessPrinciplesRail {
+  position: absolute;
+  bottom: 1.25rem;
+  left: clamp(1.8rem, 3.5vw, 4.5rem);
+  right: clamp(1.8rem, 3.5vw, 4.5rem);
+  z-index: 9;
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 2.5rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.52rem, 0.65vw, 0.72rem);
+  letter-spacing: 0.2em;
+  color: rgba(238, 228, 210, 0.65);
+}
+
+.chessPrinciplesRail li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.chessPrinciplesRail i {
+  color: #8b1e2d;
+  font-style: normal;
+  font-weight: 600;
+}
+
+.chess .gallerySignal {
+  right: auto;
+  bottom: 14%;
+  left: clamp(1.5rem, 3.15vw, 3.8rem);
+  justify-items: start;
+  text-align: left;
 }
 
 /* 04 — AMPLIFICATION / SCALE / PRESENCE */

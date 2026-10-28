@@ -673,15 +673,9 @@ export function AchievementsScene({
       belt.current.visible = false;
     }
 
-    setGroupPresence(chess.current, chessPresence, portrait ? 0.78 : 1.08);
+    setGroupPresence(chess.current, 0, 0);
     if (chess.current) {
-      const lift = smooth(chessProgress / 0.5);
-      chess.current.position.set(
-        centerX + (portrait ? 0.35 : 1.05),
-        (portrait ? -2.45 : -1.76) - (1 - lift) * 0.8,
-        -0.2,
-      );
-      chess.current.rotation.set(0.02, -0.28 + chessProgress * 0.08, 0);
+      chess.current.visible = false;
     }
 
     setGroupPresence(speaking.current, speakingPresence, portrait ? 0.74 : 1.03);
@@ -698,7 +692,7 @@ export function AchievementsScene({
     if (tableLight.current) tableLight.current.intensity = tablePresence * 62;
     if (beltLight.current) beltLight.current.intensity = 0;
     if (beltRimLight.current) beltRimLight.current.intensity = 0;
-    if (chessLight.current) chessLight.current.intensity = chessPresence * 58;
+    if (chessLight.current) chessLight.current.intensity = 0;
     if (speakingLight.current) speakingLight.current.intensity = speakingPresence * 68;
     if (speakingRimLight.current) speakingRimLight.current.intensity = speakingPresence * 32;
     if (tableBackdrop.current) {
