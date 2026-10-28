@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { CSSProperties, ReactNode, PointerEvent as ReactPointerEvent } from 'react';
 import { useRef } from 'react';
 import styles from '@/components/achievements-kinetic/AchievementEditorial.module.css';
-import { achievementHighlights, chessPeakRatings } from '@/content/achievementsKinetic';
+import { achievementHighlights } from '@/content/achievementsKinetic';
 
 const ChessHero3D = dynamic(() => import('@/components/achievements-kinetic/ChessHero3D'), {
   ssr: false,
@@ -23,9 +23,6 @@ interface EditorialFactsProps {
 }
 
 const TRAJECTORY_GHOSTS = Array.from({ length: 7 }, (_, index) => index);
-const IMPACT_RAYS = Array.from({ length: 18 }, (_, index) => index);
-const TREE_VERTICALS = Array.from({ length: 9 }, (_, index) => 100 + index * 100);
-const TREE_HORIZONTALS = Array.from({ length: 6 }, (_, index) => 70 + index * 95);
 const SOUND_BARS = Array.from({ length: 42 }, (_, index) => {
   const wave = Math.abs(Math.sin(index * 0.58) * 0.72 + Math.sin(index * 0.19) * 0.28);
   return { id: `sound-${index}`, height: 12 + wave * 78, delay: index * 0.018 };
@@ -698,10 +695,10 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
           <circle cx="180" cy="120" r="3" className={styles.vectorPoint} />
           <circle cx="820" cy="580" r="3" className={styles.vectorPoint} />
           <text x="516" y="352" className={styles.techText}>
-            IMPACT // 0.42s
+            IMPACT {'//'} 0.42s
           </text>
           <text x="76" y="202" className={styles.techText}>
-            AXIS // KATA DYNAMICS
+            AXIS {'//'} KATA DYNAMICS
           </text>
           <text x="760" y="122" className={styles.techText}>
             STRIKE ANGLE 26.2°
@@ -716,7 +713,7 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
 
       {/* Layer 6A: Subordinate Achievement Title (Top-Left) */}
       <div className={styles.subordinateBeltTitle}>
-        <span className={styles.beltTitlePrefix}>01 // DAN RANK</span>
+        <span className={styles.beltTitlePrefix}>01 {'//'} DAN RANK</span>
         <div className={styles.beltWordsStack}>
           <span>BLACK</span>
           <span>BELT</span>
@@ -774,7 +771,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
     <InteractiveField className={styles.chess} reducedMotion={reducedMotion}>
       {/* Layer 3: Monumental Hero Heading (Left-Top) */}
       <div className={styles.chessHeading}>
-        <span className={styles.chessPrefix}>03 // CALCULATION / PRECISION / DECISION</span>
+        <span className={styles.chessPrefix}>03 {'//'} CALCULATION / PRECISION / DECISION</span>
         <h3 className={styles.heroChess}>CHESS</h3>
         <p className={styles.chessConcept}>TACTICAL CALCULATION / DEPTH 18</p>
       </div>
@@ -838,13 +835,13 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
           <circle cx="700" cy="445" r="3" />
           <circle cx="780" cy="275" r="3.5" />
           <text x="448" y="141">
-            B0 // e5
+            B0 {'//'} e5
           </text>
           <text x="608" y="211">
-            C1 // Nc3
+            C1 {'//'} Nc3
           </text>
           <text x="588" y="407">
-            C3 // c3
+            C3 {'//'} c3
           </text>
         </g>
 
@@ -855,7 +852,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
             <circle r="6" className={styles.nodeCore} />
             <circle r="14" className={styles.nodeRing} />
             <text x="14" y="-8">
-              A0 // 1. e4
+              A0 {'//'} 1. e4
             </text>
           </g>
 
@@ -864,7 +861,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
             <circle r="6.5" className={styles.nodeCore} />
             <circle r="16" className={styles.nodeRing} />
             <text x="14" y="-8">
-              B1 // 1... c5
+              B1 {'//'} 1... c5
             </text>
           </g>
 
@@ -873,7 +870,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
             <circle r="7" className={styles.nodeCore} />
             <circle r="18" className={styles.nodeRing} />
             <text x="14" y="-8">
-              C2 // 2. Nf3
+              C2 {'//'} 2. Nf3
             </text>
           </g>
 
@@ -883,7 +880,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
             <circle r="24" className={styles.activeTerminalHalo} />
             <circle r="36" className={styles.activeTerminalWave} />
             <text x="16" y="-10" className={styles.activeNodeLabel}>
-              D3 // 2... d6 [ACTIVE]
+              D3 {'//'} 2... d6 [ACTIVE]
             </text>
           </g>
         </g>
@@ -906,9 +903,9 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
       </div>
 
       {/* Layer 7: Reworked Dominant Rating Blocks (Visual Triangle Anchor) */}
-      <div className={styles.chessRatingsSystem} aria-label="Peak competitive chess ratings">
+      <section className={styles.chessRatingsSystem} aria-label="Peak competitive chess ratings">
         <div className={styles.ratingBlock} style={{ '--rating-order': 0 } as CSSProperties}>
-          <span className={styles.ratingIndex}>01 // RAPID</span>
+          <span className={styles.ratingIndex}>01 {'//'} RAPID</span>
           <strong className={styles.ratingValue}>1984</strong>
           <span className={styles.ratingLabel}>PEAK RATING</span>
         </div>
@@ -916,7 +913,7 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
         <div className={styles.ratingSeparator} aria-hidden="true" />
 
         <div className={styles.ratingBlock} style={{ '--rating-order': 1 } as CSSProperties}>
-          <span className={styles.ratingIndex}>02 // BLITZ</span>
+          <span className={styles.ratingIndex}>02 {'//'} BLITZ</span>
           <strong className={styles.ratingValue}>2010</strong>
           <span className={styles.ratingLabel}>PEAK RATING</span>
         </div>
@@ -924,11 +921,11 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
         <div className={styles.ratingSeparator} aria-hidden="true" />
 
         <div className={styles.ratingBlock} style={{ '--rating-order': 2 } as CSSProperties}>
-          <span className={styles.ratingIndex}>03 // BULLET</span>
+          <span className={styles.ratingIndex}>03 {'//'} BULLET</span>
           <strong className={styles.ratingValue}>2198</strong>
           <span className={styles.ratingLabel}>PEAK RATING</span>
         </div>
-      </div>
+      </section>
 
       {/* Layer 8: Bottom Structural Principles Rail */}
       <ul className={styles.chessPrinciplesRail} aria-label="Chess strategic principles">

@@ -1,8 +1,8 @@
 'use client';
 
-import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
 import { useGLTF } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Color,
   type Group,
@@ -91,7 +91,9 @@ function DualChessPiece({ url, isDark = false, position, scale, rotation }: Piec
         if (!mesh.isMesh) return;
         if (mesh.material) {
           if (Array.isArray(mesh.material)) {
-            mesh.material.forEach((m) => m.dispose());
+            mesh.material.forEach((m) => {
+              m.dispose();
+            });
           } else {
             mesh.material.dispose();
           }
@@ -110,8 +112,18 @@ function SceneContent({ reducedMotion }: { reducedMotion: boolean }) {
     if (!stageRef.current || reducedMotion) return;
     const targetRotY = state.pointer.x * 0.14;
     const targetRotX = -state.pointer.y * 0.1;
-    stageRef.current.rotation.y = MathUtils.damp(stageRef.current.rotation.y, targetRotY, 3.5, delta);
-    stageRef.current.rotation.x = MathUtils.damp(stageRef.current.rotation.x, targetRotX, 3.5, delta);
+    stageRef.current.rotation.y = MathUtils.damp(
+      stageRef.current.rotation.y,
+      targetRotY,
+      3.5,
+      delta,
+    );
+    stageRef.current.rotation.x = MathUtils.damp(
+      stageRef.current.rotation.x,
+      targetRotX,
+      3.5,
+      delta,
+    );
   });
 
   return (
