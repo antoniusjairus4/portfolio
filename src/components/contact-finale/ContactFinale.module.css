@@ -4,247 +4,723 @@
   width: 100%;
   min-height: 100svh;
   overflow: clip;
-  background: #e5dac7;
+  background: #ede6dd;
   color: #11100f;
+  --mouse-x: 50%;
+  --mouse-y: 50%;
+  --parallax-x: 0px;
+  --parallax-y: 0px;
 }
 
-.arrival {
-  height: clamp(5rem, 16svh, 11rem);
+/* Background Layer 1: Fine paper/noise texture */
+.bgGrain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  mix-blend-mode: multiply;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='128' height='128' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.composition {
+/* Background Layer 2: Cursor-following ambient light with inertia */
+.bgAmbientLight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    circle 560px at var(--mouse-x) var(--mouse-y),
+    rgba(255, 250, 240, 0.52) 0%,
+    rgba(250, 244, 232, 0.22) 42%,
+    transparent 72%
+  );
+  transition: opacity 400ms ease;
+}
+
+/* Background Layer 3: Gigantic ghost typography "CONNECT" */
+.ghostTypography {
+  position: absolute;
+  top: 14%;
+  left: 3%;
+  z-index: 1;
+  pointer-events: none;
+  user-select: none;
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 24vw, 25rem);
+  font-weight: 800;
+  line-height: 0.76;
+  letter-spacing: -0.05em;
+  color: #11100f;
+  opacity: 0.024;
+  white-space: nowrap;
+  transform: translate3d(
+    calc(var(--parallax-x) * -0.7),
+    calc(var(--parallax-y) * -0.7),
+    0
+  );
+  will-change: transform;
+}
+
+.contentContainer {
   position: relative;
   z-index: 2;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: clamp(4.5rem, 9svh, 7rem) clamp(1.5rem, 5vw, 5.5rem) clamp(2.5rem, 5svh, 4rem);
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   Hero Row: Left 40% Hanging Badge Zone, Right 50% Contact Hero
+   ========================================================================== */
+.heroRow {
   display: grid;
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.12fr);
   align-items: center;
-  gap: clamp(4rem, 9vw, 10rem);
-  min-height: 64svh;
-  padding: 0 clamp(1.5rem, 6vw, 8rem);
-  pointer-events: none;
+  gap: clamp(3rem, 6.5vw, 7.5rem);
+  min-height: clamp(380px, 48svh, 540px);
+  margin-bottom: clamp(60px, 7.5vw, 90px);
 }
 
-.visuallyHidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+/* Left: Badge Staging Zone */
+.badgeStageArea {
+  position: relative;
+  height: 100%;
+  min-height: 380px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding-bottom: clamp(1rem, 3svh, 2.5rem);
 }
 
-.kicker,
-.label,
-.socials,
-.end {
+.badgeHint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.68rem, 0.74vw, 0.82rem);
+  font-size: clamp(0.56rem, 0.64vw, 0.7rem);
   font-weight: 500;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #6a6358;
+  opacity: 0.82;
+}
+
+.hintDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #8b1e2d;
+  opacity: 0.85;
+}
+
+/* Right: Contact Hero Typography & Email CTA */
+.contactHero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.contactHeroHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .kicker {
-  position: absolute;
-  z-index: 3;
-  top: clamp(3.75rem, 6.5svh, 5.5rem);
-  left: clamp(1.5rem, 6vw, 8rem);
-  margin: 0;
-  color: #645e55;
-  pointer-events: none;
-}
-
-.identity {
-  position: relative;
-  align-self: end;
-  min-width: 0;
-  padding-bottom: clamp(1rem, 5svh, 4rem);
-}
-
-.lanyardHint,
-.whatsappNote {
+  display: block;
   font-family: "JetBrains Mono Variable", monospace;
-  font-size: clamp(0.62rem, 0.68vw, 0.76rem);
-  font-weight: 500;
-  line-height: 1.7;
-  letter-spacing: 0.14em;
+  font-size: clamp(0.68rem, 0.74vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #787065;
+  margin-bottom: clamp(0.9rem, 2vh, 1.5rem);
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1), transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.headline {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 4.4vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: #11100f;
+  text-transform: uppercase;
+}
+
+.lineWrap {
+  display: block;
+  overflow: hidden;
+}
+
+.lineInner {
+  display: block;
+  transform: translateY(105%);
+  transition: transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.subline {
+  margin: clamp(1.1rem, 2.4vh, 1.8rem) 0 0;
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.62rem, 0.7vw, 0.76rem);
+  font-weight: 600;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: #645e55;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 650ms ease, transform 650ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.lanyardHint {
-  width: fit-content;
-  margin: 0;
-  text-align: left;
+.emailWrapper {
+  margin-top: clamp(1.8rem, 3.6vh, 2.8rem);
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 700ms ease, transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.invitation {
-  margin: clamp(1.5rem, 3svh, 2.5rem) 0 0;
-  font-family: var(--font-display);
-  font-size: clamp(1.1rem, 1.5vw, 1.55rem);
-  font-weight: 500;
-  text-align: left;
-}
-
-.actions {
-  position: relative;
-  z-index: 3;
-  padding-top: clamp(2rem, 6svh, 5rem);
-}
-
-.address {
-  display: grid;
-  gap: 1.2rem;
-  font-style: normal;
-}
-
-.label {
-  color: #645e55;
-}
-
-.email {
-  width: fit-content;
-  max-width: 100%;
-  color: inherit;
-  font-family: var(--font-display);
-  font-size: clamp(1.35rem, 2vw, 2.5rem);
-  font-weight: 550;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  overflow-wrap: anywhere;
-  text-decoration-color: rgba(17, 16, 15, 0.35);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.35em;
-  pointer-events: auto;
-}
-
-.email:hover,
-.end a:hover {
-  text-decoration-color: currentColor;
-}
-
-.whatsappNote {
-  max-width: 34ch;
-  margin: clamp(2.25rem, 5svh, 4rem) 0 0;
-  color: #645e55;
-}
-
-.socials {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  gap: clamp(1.5rem, 4vw, 4rem);
-  padding: 2rem clamp(1.5rem, 6vw, 8rem) clamp(4rem, 9svh, 6rem);
-  pointer-events: none;
-}
-
-.socials a {
+.emailCta {
   display: inline-flex;
-  align-items: center;
-  min-height: 2.75rem;
-  color: #645e55;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.35em;
-  pointer-events: auto;
-}
-
-.socials a:hover {
+  align-items: baseline;
+  gap: 0.45rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.1vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: -0.03em;
   color: #11100f;
-  text-decoration-color: currentColor;
+  text-decoration: underline;
+  text-decoration-color: rgba(17, 16, 15, 0.3);
+  text-underline-offset: 0.36em;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  transition: text-decoration-color 280ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.end {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  min-height: clamp(7rem, 17svh, 11rem);
-  margin: 0 clamp(1.5rem, 6vw, 8rem);
-  border-top: 1px solid rgba(17, 16, 15, 0.28);
-  pointer-events: none;
+.emailArrow {
+  display: inline-block;
+  font-family: sans-serif;
+  font-size: 0.9em;
+  transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.end span {
-  color: #645e55;
+.emailCta:hover {
+  text-decoration-color: #11100f;
 }
 
-.end a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 3rem;
-  color: inherit;
-  text-decoration-color: transparent;
-  text-underline-offset: 0.35em;
-  pointer-events: auto;
+.emailCta:hover .emailArrow {
+  transform: translateX(4px);
 }
 
-.email:focus-visible,
-.socials a:focus-visible,
-.end a:focus-visible {
-  outline: 2px solid #11100f;
-  outline-offset: 5px;
+/* ==========================================================================
+   Continuous Social Identity Rail
+   ========================================================================== */
+.socialRail {
+  width: 100%;
+  margin-bottom: clamp(70px, 8.5vw, 100px);
+  border-top: 1px solid rgba(20, 20, 20, 0.18);
+  border-bottom: 1px solid rgba(20, 20, 20, 0.18);
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 750ms ease, transform 750ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (max-width: 960px) {
-  .composition {
-    gap: 3rem;
+/* Desktop: 5-column grid (>= 1100px) */
+@media (min-width: 1100px) {
+  .socialRail {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    min-height: 116px;
   }
 
-  .email {
-    font-size: clamp(1.15rem, 2.25vw, 2rem);
-  }
-}
-
-@media (max-width: 900px) {
-  .arrival {
-    height: clamp(4rem, 10svh, 6rem);
-  }
-
-  .composition {
+  .socialCell {
     display: flex;
     flex-direction: column;
-    min-height: 0;
-    padding: 0 clamp(1rem, 5vw, 2rem);
-    gap: 1.8rem;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1.5rem clamp(1.4rem, 1.9vw, 2rem);
+    text-decoration: none;
+    color: inherit;
+    border-right: 1px solid rgba(20, 20, 20, 0.12);
+    position: relative;
+    background: transparent;
+    transition: background-color 280ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .invitation {
-    margin-top: 1.5rem;
-    font-size: clamp(1.1rem, 4vw, 1.35rem);
+  .socialCell:last-child {
+    border-right: none;
   }
 
-  .actions {
-    padding-top: clamp(2.5rem, 6svh, 4rem);
+  .cellIconWrap {
+    display: flex;
+    align-items: center;
+    color: #11100f;
+    opacity: 0.65;
+    margin-bottom: 0.65rem;
+    transform: scale(1);
+    transition:
+      opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .address {
-    gap: 0.8rem;
+  .socialIcon {
+    width: 19px;
+    height: 19px;
+    display: block;
   }
 
-  .email {
-    font-size: clamp(0.95rem, 4.2vw, 1.45rem);
-    word-break: break-word;
+  .cellContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+  }
+
+  .cellHeader {
+    display: flex;
+    align-items: center;
+  }
+
+  .cellPlatform {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: clamp(0.72rem, 0.78vw, 0.82rem);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #11100f;
+    text-transform: uppercase;
+    display: block;
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .cellUsername {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: clamp(0.76rem, 0.84vw, 0.88rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: #11100f;
+    opacity: 0.42;
+    transform: translateY(5px);
+    transition:
+      opacity 300ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.2rem;
+  }
+
+  .desktopArrow {
+    display: inline-block;
+    transition: transform 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .mobileArrow {
+    display: none;
+  }
+
+  /* Refined cell hover states */
+  .socialCell:hover {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+
+  .socialCell:hover .cellIconWrap {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+
+  .socialCell:hover .cellPlatform {
+    transform: translateY(-4px);
+  }
+
+  .socialCell:hover .cellUsername {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .socialCell:hover .desktopArrow {
+    transform: translateX(4px);
+  }
+}
+
+/* Tablet: 2-column grid with Gmail spanning both (768px - 1099px) */
+@media (min-width: 768px) and (max-width: 1099px) {
+  .socialRail {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .socialCell {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100px;
+    padding: 1.4rem 1.8rem;
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    transition: background-color 280ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .socialCell:nth-child(1),
+  .socialCell:nth-child(3) {
+    border-right: 1px solid rgba(20, 20, 20, 0.12);
+  }
+
+  .socialCell:nth-child(1),
+  .socialCell:nth-child(2),
+  .socialCell:nth-child(3),
+  .socialCell:nth-child(4) {
+    border-bottom: 1px solid rgba(20, 20, 20, 0.12);
+  }
+
+  .socialCell[data-platform="gmail"] {
+    grid-column: 1 / -1;
+    border-right: none;
+  }
+
+  .cellIconWrap {
+    display: flex;
+    align-items: center;
+    color: #11100f;
+    opacity: 0.68;
+    margin-bottom: 0.5rem;
+    transition: opacity 300ms ease;
+  }
+
+  .socialIcon {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  .cellContent {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .cellHeader {
+    display: flex;
+    align-items: center;
+  }
+
+  .cellPlatform {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.76rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #11100f;
+    text-transform: uppercase;
+  }
+
+  .cellUsername {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #11100f;
+    opacity: 0.45;
+    transition: opacity 300ms ease;
+  }
+
+  .desktopArrow {
+    display: inline-block;
+  }
+
+  .mobileArrow {
+    display: none;
+  }
+
+  .socialCell:hover {
+    background-color: rgba(0, 0, 0, 0.025);
+  }
+
+  .socialCell:hover .cellIconWrap {
+    opacity: 1;
+  }
+
+  .socialCell:hover .cellUsername {
+    opacity: 1;
+  }
+}
+
+/* Mobile: Single vertical list (< 768px) */
+@media (max-width: 767px) {
+  .socialRail {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid rgba(20, 20, 20, 0.18);
+    border-bottom: none;
+    margin-bottom: clamp(40px, 10vw, 56px);
+  }
+
+  .socialCell {
+    min-height: 72px;
+    width: 100%;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 14px;
+    text-decoration: none;
+    color: inherit;
+    border-bottom: 1px solid rgba(20, 20, 20, 0.12);
+    transition: background-color 180ms ease;
+  }
+
+  .socialCell:active {
+    background-color: rgba(0, 0, 0, 0.035);
+  }
+
+  .cellIconWrap {
+    margin-top: 2px;
+    color: #11100f;
+    opacity: 0.82;
+  }
+
+  .socialIcon {
+    width: 18px;
+    height: 18px;
+    display: block;
+  }
+
+  .cellContent {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .cellHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+  }
+
+  .cellPlatform {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #11100f;
+    text-transform: uppercase;
+  }
+
+  .mobileArrow {
+    display: inline-block;
+    font-family: sans-serif;
+    font-size: 0.85rem;
+    color: #11100f;
+    opacity: 0.65;
+  }
+
+  .cellUsername {
+    font-family: "JetBrains Mono Variable", monospace;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #11100f;
+    opacity: 0.65;
+    word-break: break-all;
     overflow-wrap: anywhere;
   }
 
-  .whatsappNote {
-    max-width: 34ch;
-    font-size: 0.85rem;
+  .desktopArrow {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1.5rem;
+  padding-top: clamp(1.2rem, 2.5vh, 1.8rem);
+  font-family: "JetBrains Mono Variable", monospace;
+  font-size: clamp(0.64rem, 0.72vw, 0.78rem);
+  letter-spacing: 0.08em;
+  color: #645e55;
+}
+
+.copyright {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.backToTop {
+  color: #11100f;
+  text-decoration: none;
+  font-weight: 600;
+  min-height: 2.75rem;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  transition: opacity 200ms ease;
+}
+
+.backToTop:hover {
+  opacity: 0.6;
+}
+
+.backToTop:focus-visible,
+.emailCta:focus-visible,
+.socialCell:focus-visible {
+  outline: 2px solid #11100f;
+  outline-offset: 4px;
+}
+
+/* ==========================================================================
+   Entry Animations (Triggered on Scroll Entry)
+   ========================================================================== */
+.chapter[data-revealed="true"] .kicker {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.chapter[data-revealed="true"] .lineWrap:nth-child(1) .lineInner {
+  transform: translateY(0);
+  transition-delay: 100ms;
+}
+
+.chapter[data-revealed="true"] .lineWrap:nth-child(2) .lineInner {
+  transform: translateY(0);
+  transition-delay: 180ms;
+}
+
+.chapter[data-revealed="true"] .lineWrap:nth-child(3) .lineInner {
+  transform: translateY(0);
+  transition-delay: 260ms;
+}
+
+.chapter[data-revealed="true"] .subline {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 340ms;
+}
+
+.chapter[data-revealed="true"] .emailWrapper {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 420ms;
+}
+
+.chapter[data-revealed="true"] .socialRail {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 500ms;
+}
+
+/* ==========================================================================
+   Mobile Layout Recomposition (< 768px)
+   Order:
+   1. CONTACT / 05 & Headline & Subline
+   2. Hanging Identity Badge Zone
+   3. Email CTA
+   4. Social Links
+   5. Divider & Footer
+   ========================================================================== */
+@media (max-width: 767px) {
+  .contentContainer {
+    padding: clamp(3.5rem, 8svh, 5.5rem) clamp(1rem, 5vw, 1.5rem) clamp(2rem, 5svh, 3rem);
   }
 
-  .socials {
+  .heroRow {
     display: flex;
-    flex-wrap: wrap;
-    gap: 0.8rem 1.8rem;
-    padding: clamp(2.5rem, 7svh, 4.5rem) clamp(1rem, 5vw, 2rem) 2.5rem;
+    flex-direction: column;
+    gap: 0;
+    min-height: auto;
+    margin-bottom: clamp(36px, 8vw, 50px);
   }
 
-  .end {
-    min-height: 4.5rem;
-    margin: 0 clamp(1rem, 5vw, 2rem);
+  .contactHero {
+    display: contents;
+  }
+
+  .contactHeroHeader {
+    order: 1;
+    width: 100%;
+  }
+
+  .kicker {
+    margin-bottom: 0.8rem;
+  }
+
+  .headline {
+    font-size: clamp(2rem, 9.4vw, 3.4rem);
+    line-height: 1.05;
+  }
+
+  .subline {
+    margin-top: 0.9rem;
+    font-size: clamp(0.56rem, 2.5vw, 0.68rem);
+  }
+
+  .badgeStageArea {
+    order: 2;
+    width: min(84vw, 420px);
+    min-height: 340px;
+    margin: 1.5rem auto 1.2rem;
+    align-items: center;
+    padding-bottom: 0.5rem;
+  }
+
+  .badgeHint {
+    font-size: 0.52rem;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+
+  .emailWrapper {
+    order: 3;
+    width: 100%;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+  }
+
+  .emailCta {
+    font-size: clamp(1rem, 4.4vw, 1.4rem);
+  }
+
+  .socialRail {
+    order: 4;
+  }
+
+  .footer {
+    order: 5;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 1.2rem;
     padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
+  }
+}
+
+/* ==========================================================================
+   Accessibility & Reduced Motion
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  .kicker,
+  .lineInner,
+  .subline,
+  .emailWrapper,
+  .socialRail,
+  .cellPlatform,
+  .cellUsername,
+  .cellIconWrap,
+  .desktopArrow,
+  .emailArrow,
+  .ghostTypography {
+    transform: none !important;
+    opacity: 1 !important;
+    transition: none !important;
   }
 }

@@ -6,7 +6,12 @@ import styles from './AchievementsContactLanyard.module.css';
 
 export function AchievementsContactLanyard() {
   const frameRef = useRef(0);
-  const [rig, setRig] = useState({ active: false, anchorInset: 0.035, cardInset: 1.08 });
+  const [rig, setRig] = useState({
+    active: false,
+    isMobile: false,
+    anchorInset: 0.035,
+    cardInset: 1.08,
+  });
 
   useEffect(() => {
     let disconnectRig: (() => void) | undefined;
@@ -23,14 +28,21 @@ export function AchievementsContactLanyard() {
         const viewportHeight = Math.max(1, window.innerHeight);
         const contactRect = contact.getBoundingClientRect();
         const contactVisible = contactRect.top < viewportHeight && contactRect.bottom > 0;
+        const isMobile = window.innerWidth < 768;
         const next = {
           active: contactVisible,
-          anchorInset: Math.max(0.035, contactRect.top / viewportHeight + 0.035),
-          cardInset: Math.min(1.2, Math.max(0.18, contactRect.top / viewportHeight + 0.08)),
+          isMobile,
+          anchorInset: isMobile
+            ? Math.max(0.015, contactRect.top / viewportHeight + 0.02)
+            : Math.max(0.035, contactRect.top / viewportHeight + 0.035),
+          cardInset: isMobile
+            ? Math.min(1.05, Math.max(0.22, contactRect.top / viewportHeight + 0.18))
+            : Math.min(1.18, Math.max(0.2, contactRect.top / viewportHeight + 0.09)),
         };
 
         setRig((current) =>
           current.active === next.active &&
+          current.isMobile === next.isMobile &&
           Math.abs(current.anchorInset - next.anchorInset) < 0.001 &&
           Math.abs(current.cardInset - next.cardInset) < 0.001
             ? current
@@ -83,21 +95,21 @@ export function AchievementsContactLanyard() {
         orientation="portrait"
         finish="glossy"
         cornerRadius={0.22}
-        size={0.48}
-        anchor="left"
+        size={rig.isMobile ? 0.42 : 0.46}
+        anchor={rig.isMobile ? 'center' : 'left'}
         anchorInset={rig.anchorInset}
         cardInset={rig.cardInset}
         showAnchor
-        strapLength={0.68}
+        strapLength={0.66}
         strapColor="#8b1e2d"
-        strapWidth={0.7}
+        strapWidth={0.68}
         tagMark="P"
         tagMarkColor="#f2e8d5"
         metal="graphite"
-        gravity={0.7}
-        damping={0.36}
-        elasticity={0.6}
-        breeze={rig.active ? 0.34 : 0}
+        gravity={0.68}
+        damping={0.38}
+        elasticity={0.58}
+        breeze={rig.active ? (rig.isMobile ? 0.14 : 0.18) : 0}
         interactive={rig.active}
         pointerEventsThrough
         intro
