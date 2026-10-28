@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 import type React from 'react';
 import '@fontsource/inter/500.css';
@@ -16,14 +16,74 @@ import '@/styles/globals.css';
 import { ExperienceEnvironmentProvider } from '@/experience/ExperienceEnvironment';
 import { GlobalEtherProvider } from '@/experience/GlobalEtherProvider';
 import { LenisProvider } from '@/motion/lenis/LenisProvider';
+import { siteMetadata } from '@/seo/siteMetadata';
+import { getRootStructuredData } from '@/seo/structuredData';
+
+export const viewport: Viewport = {
+  themeColor: '#0C0907',
+  colorScheme: 'dark',
+  width: 'device-width',
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
-  title: 'Antonius Jairus — Portfolio',
-  description:
-    'Personal portfolio of Antonius Jairus: cybersecurity student, table tennis state champion, and founder.',
+  metadataBase: new URL(siteMetadata.siteUrl),
+  title: {
+    default: siteMetadata.title,
+    template: '%s',
+  },
+  description: siteMetadata.description,
+  applicationName: siteMetadata.siteName,
+  authors: [{ name: siteMetadata.author.name, url: siteMetadata.siteUrl }],
+  creator: siteMetadata.author.name,
+  publisher: siteMetadata.siteName,
+  alternates: {
+    canonical: '/',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: siteMetadata.siteUrl,
+    siteName: siteMetadata.siteName,
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    images: [
+      {
+        url: siteMetadata.ogImage.url,
+        width: siteMetadata.ogImage.width,
+        height: siteMetadata.ogImage.height,
+        alt: siteMetadata.ogImage.alt,
+        type: siteMetadata.ogImage.type,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    creator: siteMetadata.twitter.handle,
+    site: siteMetadata.twitter.handle,
+    images: [siteMetadata.ogImage.url],
+  },
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const rootJsonLd = getRootStructuredData();
+
   return (
     <html lang="en" className="dark bg-[#0C0907]">
       <head>
@@ -34,6 +94,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="/images/cover-1536.avif"
           type="image/avif"
           fetchPriority="high"
+        />
+        {/* Person, WebSite & ProfilePage Structured Data (JSON-LD) */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(rootJsonLd) }}
         />
       </head>
       <body className="bg-[#0C0907] text-[#F2E9D8] antialiased selection:bg-[#E0A93B] selection:text-[#0C0907]">

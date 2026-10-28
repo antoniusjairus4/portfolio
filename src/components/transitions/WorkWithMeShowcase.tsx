@@ -17,6 +17,7 @@ const projects = [
     image: '/images/work-with-me/project-01-workspace.png',
     alt: 'A laptop displaying a management dashboard on a warmly lit desk',
     position: 'center',
+    slug: 'rajamanickam-chit-fund',
   },
   {
     id: '02',
@@ -25,6 +26,7 @@ const projects = [
     image: '/images/work-with-me/project-02-pricing.png',
     alt: 'A foldable tablet displaying a pricing interface in a bright workspace',
     position: 'center',
+    slug: 'palindrome',
   },
   {
     id: '03',
@@ -33,6 +35,7 @@ const projects = [
     image: '/images/work-with-me/project-03-sports-app.png',
     alt: 'A hand holding a phone with a sports dashboard in a moody workspace',
     position: '42% center',
+    slug: 'kaiforge',
   },
   {
     id: '04',
@@ -41,6 +44,7 @@ const projects = [
     image: '/images/work-with-me/project-04-marine-portfolio.png',
     alt: 'A wide monitor displaying a marine research portfolio in a dark workspace',
     position: 'center',
+    slug: 'dr-js-yogesh-kumar-zsi',
   },
 ] as const;
 
@@ -276,6 +280,9 @@ export const WorkWithMeShowcase = forwardRef<WorkWithMeShowcaseHandle>(
               <h3>{project.title}</h3>
               <p>{project.description}</p>
               <p>{project.alt}</p>
+              <a href={`/projects/${project.slug}`}>
+                Explore {project.title} by Antonius Jairus
+              </a>
             </li>
           ))}
         </ol>

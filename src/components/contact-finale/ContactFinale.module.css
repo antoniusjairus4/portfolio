@@ -41,15 +41,15 @@
 /* Background Layer 3: Gigantic ghost typography "CONNECT" */
 .ghostTypography {
   position: absolute;
-  top: clamp(0.75rem, 2.5vh, 2rem);
+  top: clamp(0.5rem, 1.8vh, 1.5rem);
   left: 3%;
   z-index: 1;
   pointer-events: none;
   user-select: none;
   font-family: var(--font-display);
-  font-size: clamp(5.8rem, 16.5vw, 16.5rem);
+  font-size: clamp(5.4rem, 15vw, 15rem);
   font-weight: 800;
-  line-height: 0.76;
+  line-height: 0.74;
   letter-spacing: -0.05em;
   color: #11100f;
   opacity: 0.4;
@@ -69,7 +69,7 @@
   max-width: 1440px;
   min-height: 100svh;
   margin: 0 auto;
-  padding: clamp(3.5rem, 7svh, 5.5rem) clamp(1.5rem, 5vw, 5.5rem) calc(1rem + env(safe-area-inset-bottom));
+  padding: clamp(2.2rem, 4.2svh, 3.6rem) clamp(1.5rem, 5vw, 5.5rem) calc(0.75rem + env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -125,7 +125,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  padding-top: clamp(10.5rem, 20vh, 15.5rem);
+  padding-top: clamp(13rem, 22vh, 18rem);
 }
 
 .contactHeroHeader {
@@ -228,7 +228,7 @@
 .socialRail {
   width: 100%;
   margin-top: auto;
-  margin-bottom: clamp(18px, 2.5vh, 28px);
+  margin-bottom: clamp(10px, 1.6vh, 18px);
   border-top: 1px solid rgba(20, 20, 20, 0.18);
   border-bottom: 1px solid rgba(20, 20, 20, 0.18);
   opacity: 0;
@@ -549,8 +549,8 @@
   justify-content: space-between;
   align-items: center;
   gap: 1.5rem;
-  padding-top: clamp(0.65rem, 1.2vh, 1rem);
-  padding-bottom: 0.15rem;
+  padding-top: clamp(0.35rem, 0.7vh, 0.65rem);
+  padding-bottom: 0.1rem;
   font-family: "JetBrains Mono Variable", monospace;
   font-size: clamp(0.64rem, 0.72vw, 0.78rem);
   letter-spacing: 0.08em;
@@ -560,6 +560,24 @@
 .copyright {
   margin: 0;
   line-height: 1.5;
+}
+
+.footerActions {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(1.2rem, 2vw, 2.2rem);
+}
+
+.projectLink {
+  color: #645e55;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 200ms ease;
+  white-space: nowrap;
+}
+
+.projectLink:hover {
+  color: #11100f;
 }
 
 .backToTop {

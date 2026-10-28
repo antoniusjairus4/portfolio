@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import styles from './ContactFinale.module.css';
 
 const email = 'antoniusjairusofficial@gmail.com';
@@ -257,9 +258,14 @@ export function ContactFinale() {
           <p className={styles.copyright}>
             © 2026 Antonius Jairus — Designed &amp; developed by Antonius Jairus
           </p>
-          <a href="#top" onClick={handleBackToTop} className={styles.backToTop}>
-            BACK TO TOP ↑
-          </a>
+          <div className={styles.footerActions}>
+            <Link href="/projects" className={styles.projectLink}>
+              PROJECT ARCHIVE ↗
+            </Link>
+            <a href="#top" onClick={handleBackToTop} className={styles.backToTop}>
+              BACK TO TOP ↑
+            </a>
+          </div>
         </footer>
       </div>
     </section>
