@@ -1,91 +1,165 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 export type ReadinessStatus = 'loading' | 'ready' | 'degraded';
+export type ResourceStatus = 'pending' | 'ready' | 'deferred';
+export type CriticalResource = 'system' | 'images' | 'type' | 'scenes' | 'motion';
 
 export interface CriticalReadiness {
   status: ReadinessStatus;
   completed: number;
   total: number;
   progress: number;
+  resources: Record<CriticalResource, ResourceStatus>;
 }
 
-const INITIAL: CriticalReadiness = { status: 'loading', completed: 0, total: 2, progress: 0 };
+interface CriticalReadinessOptions {
+  environmentReady: boolean;
+  timeoutMs?: number;
+}
+
+const RESOURCE_WEIGHTS: Record<CriticalResource, number> = {
+  system: 10,
+  images: 28,
+  type: 22,
+  scenes: 25,
+  motion: 15,
+};
+
+const INITIAL_RESOURCES: Record<CriticalResource, ResourceStatus> = {
+  system: 'pending',
+  images: 'pending',
+  type: 'pending',
+  scenes: 'pending',
+  motion: 'pending',
+};
 
 export function criticalProgress(completed: number, total: number) {
   return total === 0 ? 100 : Math.round((completed / total) * 100);
 }
 
-function waitForHeroPortrait() {
-  const image = document.querySelector<HTMLImageElement>('img[alt="Jairus Portfolio Cover"]');
-  if (image?.decode) return image.decode();
-
-  return new Promise<void>((resolve, reject) => {
-    const fallback = new Image();
-    fallback.onload = () => resolve();
-    fallback.onerror = () => reject(new Error('Hero portrait unavailable'));
-    fallback.src = '/images/cover-1536.jpeg';
+function waitForDocument() {
+  if (document.readyState !== 'loading') return Promise.resolve();
+  return new Promise<void>((resolve) => {
+    document.addEventListener('DOMContentLoaded', () => resolve(), { once: true });
   });
 }
 
-function waitForIdentityFont() {
-  if (!document.fonts?.load) return Promise.resolve();
-  return document.fonts.load('700 32px "Cinzel Decorative"').then((faces) => {
-    if (faces.length === 0) throw new Error('Identity font unavailable');
+async function decodeImage(image: HTMLImageElement) {
+  if (!image.complete) {
+    await new Promise<void>((resolve, reject) => {
+      image.addEventListener('load', () => resolve(), { once: true });
+      image.addEventListener('error', () => reject(new Error('Critical image unavailable')), {
+        once: true,
+      });
+    });
+  }
+
+  if (image.naturalWidth === 0) throw new Error('Critical image unavailable');
+  if (image.decode) await image.decode();
+}
+
+async function waitForHeroMedia() {
+  const mountedHero = document.querySelector<HTMLImageElement>('#hero img');
+  if (mountedHero) {
+    await decodeImage(mountedHero);
+    return;
+  }
+
+  const preload = new Image();
+  preload.decoding = 'async';
+  preload.src = '/images/cover-1536.avif';
+  await decodeImage(preload);
+}
+
+async function waitForCriticalFonts() {
+  if (!document.fonts?.load) return;
+
+  await document.fonts.ready;
+  await Promise.all([
+    document.fonts.load('700 96px "Clash Display"'),
+    document.fonts.load('700 72px "Cinzel Decorative"'),
+    document.fonts.load('400 12px "JetBrains Mono"'),
+  ]);
+}
+
+function waitForMotionSetup() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
   });
 }
 
-/** Progress counts successfully prepared resources; timeout is a separate failure release. */
-export function useCriticalReadiness(timeoutMs = 8000): CriticalReadiness {
-  const [readiness, setReadiness] = useState<CriticalReadiness>(INITIAL);
+/** Tracks only resources required for the first safe paint. */
+export function useCriticalReadiness({
+  environmentReady,
+  timeoutMs = 10_000,
+}: CriticalReadinessOptions): CriticalReadiness {
+  const [resources, setResources] = useState(INITIAL_RESOURCES);
+
+  const settle = useCallback((resource: CriticalResource, state: ResourceStatus) => {
+    setResources((current) => {
+      if (current[resource] !== 'pending') return current;
+      return { ...current, [resource]: state };
+    });
+  }, []);
+
+  useEffect(() => {
+    if (environmentReady) settle('scenes', 'ready');
+  }, [environmentReady, settle]);
 
   useEffect(() => {
     let cancelled = false;
-    let settled = 0;
-    let completed = 0;
-    let failed = false;
-    let finished = false;
-    const total = 2;
 
-    const timeout = window.setTimeout(() => {
-      if (cancelled || finished) return;
-      finished = true;
-      setReadiness({
-        status: 'degraded',
-        completed,
-        total,
-        progress: criticalProgress(completed, total),
-      });
-    }, timeoutMs);
-
-    for (const resource of [waitForHeroPortrait(), waitForIdentityFont()]) {
-      resource.then(
-        () => settle(false),
-        () => settle(true),
+    const track = (resource: CriticalResource, task: Promise<unknown>) => {
+      void task.then(
+        () => {
+          if (!cancelled) settle(resource, 'ready');
+        },
+        () => {
+          if (!cancelled) settle(resource, 'deferred');
+        },
       );
-    }
+    };
 
-    function settle(didFail: boolean) {
-      if (cancelled || finished) return;
-      settled += 1;
-      if (!didFail) completed += 1;
-      failed ||= didFail;
-      if (settled === total) {
-        finished = true;
-        window.clearTimeout(timeout);
-      }
-      setReadiness({
-        status: finished ? (failed ? 'degraded' : 'ready') : 'loading',
-        completed,
-        total,
-        progress: criticalProgress(completed, total),
-      });
-    }
+    track('system', waitForDocument());
+    track('images', waitForHeroMedia());
+    track('type', waitForCriticalFonts());
+    track('motion', waitForMotionSetup());
 
     return () => {
       cancelled = true;
-      window.clearTimeout(timeout);
     };
+  }, [settle]);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => {
+      setResources((current) => {
+        const next = { ...current };
+        (Object.keys(next) as CriticalResource[]).forEach((resource) => {
+          if (next[resource] === 'pending') next[resource] = 'deferred';
+        });
+        return next;
+      });
+    }, timeoutMs);
+
+    return () => window.clearTimeout(timeout);
   }, [timeoutMs]);
 
-  return readiness;
+  return useMemo(() => {
+    const entries = Object.entries(resources) as [CriticalResource, ResourceStatus][];
+    const settled = entries.filter(([, state]) => state !== 'pending');
+    const weightedProgress = settled.reduce(
+      (total, [resource]) => total + RESOURCE_WEIGHTS[resource],
+      0,
+    );
+    const finished = settled.length === entries.length;
+    const degraded = entries.some(([, state]) => state === 'deferred');
+
+    return {
+      status: finished ? (degraded ? 'degraded' : 'ready') : 'loading',
+      completed: entries.filter(([, state]) => state === 'ready').length,
+      total: entries.length,
+      progress: Math.min(100, weightedProgress),
+      resources,
+    };
+  }, [resources]);
 }

@@ -1,224 +1,356 @@
 'use client';
 
-import type React from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useLenis } from '@/motion/lenis/LenisProvider';
-import { useCriticalReadiness } from './useCriticalReadiness';
+import { PRELOADER_TIMINGS } from '@/motion/tokens';
+import styles from './Preloader.module.css';
+import {
+  type CriticalResource,
+  type ResourceStatus,
+  useCriticalReadiness,
+} from './useCriticalReadiness';
 
 interface PreloaderProps {
+  onCriticalReady?: () => void;
   onComplete: () => void;
 }
 
-export const Preloader: React.FC<PreloaderProps> = ({ onComplete }) => {
-  const [isServing, setIsServing] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const { ready, reducedMotion } = useExperienceEnvironment();
+type LoaderPhase = 'loading' | 'ready' | 'exiting' | 'dismissed';
+
+const READY_HOLD_MS = 360;
+const EXIT_DURATION_MS = 760;
+const REDUCED_EXIT_DURATION_MS = 320;
+const DISPLAY_FRAME_INTERVAL_MS = 42;
+const MILESTONES = new Set([25, 50, 75, 100]);
+const COUNTER_COLUMNS = ['hundreds', 'tens', 'ones'] as const;
+const BLUEPRINT_TICKS = Array.from({ length: 25 }, (_, index) => 64 + index * 62);
+const STATUS_ROWS: Array<[string, CriticalResource]> = [
+  ['SCENES', 'scenes'],
+  ['IMAGES', 'images'],
+  ['TYPE', 'type'],
+  ['MOTION', 'motion'],
+];
+
+function stageFor(progress: number, phase: LoaderPhase) {
+  if (phase === 'ready' || phase === 'exiting') return 'SYSTEM CALIBRATION COMPLETE';
+  if (progress < 20) return 'INITIALIZING SYSTEM';
+  if (progress < 40) return 'LOADING ASSETS';
+  if (progress < 60) return 'PREPARING TYPE';
+  if (progress < 80) return 'BUILDING SCENES';
+  if (progress < 95) return 'PREPARING MOTION';
+  return 'FINALIZING EXPERIENCE';
+}
+
+function resourceValue(resource: CriticalResource, status: ResourceStatus) {
+  if (status === 'deferred') return 'SAFE';
+  if (resource === 'motion') return status === 'ready' ? 'READY' : 'INIT';
+  if (resource === 'scenes') return status === 'ready' ? '06 / 06' : '00 / 06';
+  if (resource === 'type') return status === 'ready' ? '03 / 03' : '00 / 03';
+  return status === 'ready' ? '01 / 01' : '00 / 01';
+}
+
+function progressReveal(progress: number, start: number, end: number) {
+  return Math.min(1, Math.max(0, (progress - start) / (end - start)));
+}
+
+function MechanicalCounter({ value, major }: { value: string; major: boolean }) {
+  return (
+    <div className={styles.mechanicalCounter} data-major={major || undefined} aria-hidden="true">
+      {value.split('').map((digit, index) => (
+        <span className={styles.digitViewport} key={COUNTER_COLUMNS[index]}>
+          <span
+            className={styles.digit}
+            key={`${COUNTER_COLUMNS[index]}-${digit}`}
+            style={{ '--digit-delay': `${index * 24}ms` } as CSSProperties}
+          >
+            {digit}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+export function Preloader({ onCriticalReady, onComplete }: PreloaderProps) {
+  const { ready: environmentReady, reducedMotion } = useExperienceEnvironment();
   const { acquireScrollLock } = useLenis();
-  const readiness = useCriticalReadiness();
+  const readiness = useCriticalReadiness({ environmentReady });
+  const [displayedProgress, setDisplayedProgress] = useState(0);
+  const [phase, setPhase] = useState<LoaderPhase>('loading');
+  const rootRef = useRef<HTMLDivElement>(null);
+  const displayedRef = useRef(0);
+  const lastDisplayFrameRef = useRef(0);
+  const mountedAtRef = useRef(0);
   const releaseRef = useRef<(() => void) | null>(null);
-  const finishTimerRef = useRef<number | null>(null);
-  const finishingRef = useRef(false);
+  const completedRef = useRef(false);
+  const criticalReadyRef = useRef(false);
   const completeRef = useRef(onComplete);
+  const criticalCompleteRef = useRef(onCriticalReady);
+  const timersRef = useRef<number[]>([]);
   completeRef.current = onComplete;
+  criticalCompleteRef.current = onCriticalReady;
 
   useEffect(() => {
-    const release = acquireScrollLock();
-    releaseRef.current = release;
+    mountedAtRef.current = performance.now();
+    releaseRef.current = acquireScrollLock();
+
     return () => {
-      if (finishTimerRef.current !== null) window.clearTimeout(finishTimerRef.current);
-      release();
+      timersRef.current.forEach((timer) => {
+        window.clearTimeout(timer);
+      });
+      releaseRef.current?.();
       releaseRef.current = null;
     };
   }, [acquireScrollLock]);
 
-  const finish = useCallback((instant: boolean) => {
-    if (finishingRef.current) return;
-    finishingRef.current = true;
-    try {
-      sessionStorage.setItem('jairus_portfolio_visited', 'true');
-    } catch { /* Storage can be unavailable. */ }
-
-    const dismiss = () => {
-      releaseRef.current?.();
-      releaseRef.current = null;
-      setIsDismissed(true);
-      completeRef.current();
-    };
-    if (instant) {
-      dismiss();
-      return;
-    }
-    setIsServing(true);
-    finishTimerRef.current = window.setTimeout(dismiss, 700);
-  }, []);
+  useEffect(() => {
+    if (readiness.status === 'loading' || criticalReadyRef.current) return;
+    criticalReadyRef.current = true;
+    criticalCompleteRef.current?.();
+  }, [readiness.status]);
 
   useEffect(() => {
-    if (!ready) return;
-    let visited = false;
-    try { visited = sessionStorage.getItem('jairus_portfolio_visited') === 'true'; } catch { /* ignore */ }
-    if (reducedMotion || visited) finish(true);
-    else if (readiness.status !== 'loading') finish(false);
-  }, [ready, reducedMotion, readiness.status, finish]);
+    if (phase !== 'loading') return;
 
-  if (isDismissed) {
-    return <div className="hidden pointer-events-none" aria-hidden="true" />;
-  }
+    let frame = 0;
+    const animate = (now: number) => {
+      const elapsed = Math.max(0, now - mountedAtRef.current);
+      const timelineProgress =
+        elapsed >= PRELOADER_TIMINGS.targetMs
+          ? 100
+          : Math.min(99.4, (elapsed / PRELOADER_TIMINGS.targetMs) * 100);
+      const realProgress = readiness.status === 'loading' ? readiness.progress : 100;
+      const next = Math.min(timelineProgress, realProgress);
 
-  const formattedCounter = String(readiness.progress).padStart(2, '0');
+      if (
+        next > displayedRef.current &&
+        (now - lastDisplayFrameRef.current >= DISPLAY_FRAME_INTERVAL_MS || next >= 100)
+      ) {
+        lastDisplayFrameRef.current = now;
+        displayedRef.current = next;
+        setDisplayedProgress(next);
+      }
+
+      frame = requestAnimationFrame(animate);
+    };
+
+    frame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(frame);
+  }, [phase, readiness.progress, readiness.status]);
+
+  useEffect(() => {
+    if (
+      completedRef.current ||
+      phase !== 'loading' ||
+      readiness.status === 'loading' ||
+      displayedProgress < 99.95
+    )
+      return;
+
+    completedRef.current = true;
+    displayedRef.current = 100;
+    setDisplayedProgress(100);
+    setPhase('ready');
+
+    const exitDuration = reducedMotion ? REDUCED_EXIT_DURATION_MS : EXIT_DURATION_MS;
+    const exitTimer = window.setTimeout(() => setPhase('exiting'), READY_HOLD_MS);
+    const dismissTimer = window.setTimeout(() => {
+      releaseRef.current?.();
+      releaseRef.current = null;
+      setPhase('dismissed');
+      completeRef.current();
+    }, READY_HOLD_MS + exitDuration);
+
+    timersRef.current.push(exitTimer, dismissTimer);
+  }, [displayedProgress, phase, readiness.status, reducedMotion]);
+
+  useEffect(() => {
+    if (reducedMotion) return;
+    const root = rootRef.current;
+    if (!root) return;
+
+    const handlePointerMove = (event: PointerEvent) => {
+      const x = event.clientX / window.innerWidth - 0.5;
+      const y = event.clientY / window.innerHeight - 0.5;
+      root.style.setProperty('--pointer-x', x.toFixed(3));
+      root.style.setProperty('--pointer-y', y.toFixed(3));
+    };
+    const settlePointer = () => {
+      root.style.setProperty('--pointer-x', '0');
+      root.style.setProperty('--pointer-y', '0');
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerleave', settlePointer);
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerleave', settlePointer);
+    };
+  }, [reducedMotion]);
+
+  const progress = Math.min(100, Math.floor(displayedProgress));
+  const counter = String(progress).padStart(3, '0');
+  const stage = stageFor(progress, phase);
+  const frame = String(Math.max(1, Math.round(displayedProgress * 2.4))).padStart(3, '0');
+  const major = MILESTONES.has(progress);
+  const crosshairX = 18 + displayedProgress * 0.62;
+  const crosshairY = 24 + displayedProgress * 0.48;
+  const coordinateX = (124.04 + displayedProgress * 0.61).toFixed(2);
+  const coordinateY = (81.22 + displayedProgress * 0.37).toFixed(2);
+  const rootStyle = useMemo(
+    () =>
+      ({
+        '--loader-progress': displayedProgress / 100,
+        '--measurement-reveal': progressReveal(displayedProgress, 20, 40),
+        '--crosshair-reveal': progressReveal(displayedProgress, 38, 55),
+        '--metadata-reveal': progressReveal(displayedProgress, 55, 72),
+        '--nodes-reveal': progressReveal(displayedProgress, 76, 90),
+        '--precision-reveal': progressReveal(displayedProgress, 45, 78),
+        '--crosshair-x': `${crosshairX}%`,
+        '--crosshair-y': `${crosshairY}%`,
+      }) as CSSProperties,
+    [crosshairX, crosshairY, displayedProgress],
+  );
+
+  if (phase === 'dismissed') return null;
 
   return (
     <div
+      ref={rootRef}
+      className={styles.preloader}
+      data-phase={phase}
+      data-progress-band={Math.min(4, Math.floor(progress / 25))}
+      style={rootStyle}
       role="progressbar"
-      aria-valuenow={readiness.progress}
       aria-valuemin={0}
       aria-valuemax={100}
+      aria-valuenow={progress}
       aria-label="Site preloader"
-      className={`fixed inset-0 z-50 flex flex-col justify-between p-6 sm:p-10 bg-[#0C0907] select-none pointer-events-auto transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-        isServing ? '-translate-y-full' : 'translate-y-0'
-      }`}
-      style={{ willChange: 'transform' }}
     >
-      {/* Screen reader live region */}
-      <div className="sr-only" aria-live="polite">
-        {readiness.status === 'degraded'
-          ? 'Continuing with available resources'
-          : readiness.status === 'ready'
-            ? 'Critical resources ready'
-            : `${readiness.completed} of ${readiness.total} critical resources ready`}
+      <div className={styles.majorGrid} aria-hidden="true" />
+      <div className={styles.minorGrid} aria-hidden="true" />
+      <div className={styles.grain} aria-hidden="true" />
+      <div className={styles.scanLine} aria-hidden="true" />
+
+      <svg
+        className={styles.blueprint}
+        viewBox="0 0 1600 900"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <g className={styles.primaryConstruction}>
+          <path d="M64 178 H510 L642 316 H1084 L1238 148 H1528" />
+          <path d="M138 718 H472 L618 574 H1136 L1284 724 H1498" />
+          <path d="M308 74 V224 M1294 676 V832" />
+          <circle cx="308" cy="224" r="42" />
+          <circle cx="1294" cy="676" r="42" />
+        </g>
+        <g className={styles.measurementGeometry}>
+          <path d="M202 286 H622 M590 250 V548 M232 550 H804" />
+          <path d="M906 292 H1338 M1002 262 V610 M898 614 H1380" />
+          <path d="M206 278 v16 M310 278 v16 M414 278 v16 M518 278 v16 M622 278 v16" />
+        </g>
+        <path
+          className={styles.dottedPath}
+          d="M104 442 C384 302 542 626 808 440 S1262 272 1494 446"
+        />
+        <g className={styles.registrationMarks}>
+          <path d="M74 68 h52 M100 42 v52 M1474 806 h52 M1500 780 v52" />
+          <path d="M780 450 h40 M800 430 v40" />
+          <path d="M84 810 h78 v-16 M1438 90 h78 v16" />
+        </g>
+        <g className={styles.blueprintTicks}>
+          {BLUEPRINT_TICKS.map((x, index) => (
+            <path key={`tick-${x}`} d={`M${x} 874 v${index % 5 === 0 ? -18 : -9}`} />
+          ))}
+        </g>
+      </svg>
+
+      <div className={styles.nodeField} aria-hidden="true">
+        <span className={`${styles.pathNode} ${styles.nodeOne}`} />
+        <span className={`${styles.pathNode} ${styles.nodeTwo}`} />
+        <span className={`${styles.pathNode} ${styles.nodeThree}`} />
+        <span className={`${styles.pathNode} ${styles.nodeFour}`} />
       </div>
 
-      {/* Top bar with minimal skip button */}
-      <div className="flex justify-end w-full z-40">
-        <button
-          type="button"
-          onClick={() => finish(true)}
-          className="text-xs uppercase tracking-widest text-[#A89880] hover:text-[#E0A93B] focus-visible:ring-2 focus-visible:ring-[#E0A93B] transition-colors py-2 px-3 rounded"
-        >
-          Skip
-        </button>
+      <header className={styles.topRail}>
+        <span>FRAME / {frame}</span>
+        <span className={styles.topRule} aria-hidden="true" />
+        <span>SYSTEM / PORTFOLIO</span>
+      </header>
+
+      <div className={styles.coordinateLeft}>
+        X {coordinateX}
+        <br />Y {coordinateY}
+      </div>
+      <div className={styles.coordinateRight}>
+        NODE / ACTIVE
+        <br />
+        INIT / 2026
       </div>
 
-      {/* Main Counter Display (Behind Ball) */}
-      <div className="flex flex-col items-center justify-center flex-1 my-auto z-10">
-        <span className="font-display-enormous text-[#F2E9D8] tracking-tighter tabular-nums opacity-90">
-          {formattedCounter}
+      <div className={styles.crosshair} aria-hidden="true">
+        <span className={styles.crosshairRing} />
+        <span className={styles.crosshairHorizontal} />
+        <span className={styles.crosshairVertical} />
+        <span className={styles.crosshairLabel}>
+          X {coordinateX}
+          <br />Y {coordinateY}
         </span>
       </div>
 
-      {/* Table Tennis Ball & 8-Bounce Settling Arena (In Front of Counter) */}
-      <div className="relative w-full h-[65vh] max-h-[600px] overflow-hidden flex items-end justify-center pb-12 z-30 pointer-events-none">
-        {/* Table Line */}
-        <div className="absolute bottom-12 left-0 right-0 h-[2px] bg-[#E0A93B]/40 shadow-[0_0_12px_rgba(224,169,59,0.3)]" />
+      <main className={styles.primary}>
+        <div className={styles.counterWrap}>
+          <div className={styles.outlineCounter} aria-hidden="true">
+            {counter}
+          </div>
+          <span className={styles.counterReference} aria-hidden="true" />
+          <MechanicalCounter value={counter} major={major} />
+          <div className={styles.counterMeasure} aria-hidden="true">
+            <span>000</span>
+            <span>100</span>
+          </div>
+          <div className={styles.loadLabel}>LOAD / {counter}</div>
+          <div className={styles.stage}>{stage}</div>
+        </div>
 
-        {/* Dynamic Contact Shadow */}
-        {!reducedMotion && (
-          <div
-            className={`absolute bottom-[42px] w-[clamp(60px,8vw,140px)] h-3 rounded-[50%] bg-[#E0A93B]/30 blur-sm transition-all ${
-              isServing ? 'animate-shadow-serve' : 'animate-shadow-bounce-8'
-            }`}
-          />
-        )}
+        <section className={styles.statusPanel} aria-label="System status">
+          <div className={styles.statusHeading}>SYSTEM STATUS</div>
+          {STATUS_ROWS.map(([label, resource]) => (
+            <div className={styles.statusRow} data-status-resource={resource} key={resource}>
+              <span>{label}</span>
+              <span data-resource-state={readiness.resources[resource]}>
+                {resourceValue(resource, readiness.resources[resource])}
+              </span>
+            </div>
+          ))}
+          <div className={styles.statusFrame}>
+            <span>FRAME</span>
+            <span>{frame}</span>
+          </div>
+        </section>
+      </main>
 
-        {/* Large Ember Ball (clamp 96px to 220px) with Gold Glow */}
-        {!reducedMotion && (
-          <div
-            className={`w-[clamp(96px,12vw,220px)] h-[clamp(96px,12vw,220px)] rounded-full bg-[#E8481F] shadow-[0_0_50px_rgba(224,169,59,0.45),0_0_20px_rgba(232,72,31,0.8)] border border-[#E0A93B]/30 ${
-              isServing ? 'animate-ball-serve' : 'animate-ball-bounce-8'
-            }`}
-          />
-        )}
+      <footer className={styles.dataRail}>
+        <div className={styles.dataRailMeta}>
+          <span>SYS / AJ26</span>
+          <span>FRAME / {frame}</span>
+          <span>LOAD / {counter}</span>
+          <span>BUILD / {phase === 'loading' ? 'CALIBRATING' : 'READY'}</span>
+        </div>
+        <div className={styles.progressRail} aria-hidden="true">
+          <span className={styles.progressFill} />
+          <span className={styles.progressCursor} />
+          <div className={styles.progressTicks} />
+        </div>
+      </footer>
+
+      <div className={styles.sweep} aria-hidden="true" />
+      <div className="sr-only" aria-live="polite">
+        {stage}. {progress} percent.
       </div>
-
-      {/* Keyframe animation inline styles for 6.5s 8-bounce settling sequence */}
-      <style jsx>{`
-        @keyframes ballBounce8 {
-          /* Bounce 1: ~60% viewport */
-          0% { transform: translateY(-58vh) scale(0.9, 1.15); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          7% { transform: translateY(0) scale(1.25, 0.75); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 2: ~44% viewport */
-          15% { transform: translateY(-44vh) scale(0.92, 1.1); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          22% { transform: translateY(0) scale(1.22, 0.78); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 3: ~30% viewport */
-          30% { transform: translateY(-30vh) scale(0.94, 1.08); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          37% { transform: translateY(0) scale(1.18, 0.82); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 4: ~20% viewport */
-          44% { transform: translateY(-20vh) scale(0.95, 1.05); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          51% { transform: translateY(0) scale(1.15, 0.85); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 5: ~13% viewport */
-          58% { transform: translateY(-13vh) scale(0.96, 1.04); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          64% { transform: translateY(0) scale(1.12, 0.88); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 6: ~7% viewport */
-          70% { transform: translateY(-7vh) scale(0.97, 1.03); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          76% { transform: translateY(0) scale(1.08, 0.92); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 7: ~3% viewport */
-          82% { transform: translateY(-3vh) scale(0.98, 1.02); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          87% { transform: translateY(0) scale(1.04, 0.96); animation-timing-function: cubic-bezier(0.15, 0.7, 0.25, 1); }
-          
-          /* Bounce 8: Settling */
-          93% { transform: translateY(-1vh) scale(0.99, 1.01); animation-timing-function: cubic-bezier(0.75, 0.05, 0.85, 0.3); }
-          100% { transform: translateY(0) scale(1, 1); }
-        }
-
-        @keyframes shadowBounce8 {
-          0%, 15%, 30%, 44%, 58%, 70%, 82%, 93% {
-            transform: scale(0.25);
-            opacity: 0.15;
-          }
-          7%, 22%, 37%, 51%, 64%, 76%, 87%, 100% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-        }
-
-        @keyframes ballServe {
-          0% {
-            transform: translateY(0) scale(1);
-          }
-          15% {
-            transform: translateY(20px) scale(1.3, 0.7);
-          }
-          100% {
-            transform: translateY(-140vh) scale(0.75, 1.25);
-            opacity: 0.9;
-          }
-        }
-
-        @keyframes shadowServe {
-          0% {
-            transform: scale(1);
-            opacity: 0.8;
-          }
-          100% {
-            transform: scale(0.1);
-            opacity: 0;
-          }
-        }
-
-        .animate-ball-bounce-8 {
-          animation: ballBounce8 6.5s infinite;
-          transform-origin: bottom center;
-        }
-
-        .animate-shadow-bounce-8 {
-          animation: shadowBounce8 6.5s infinite;
-        }
-
-        .animate-ball-serve {
-          animation: ballServe 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-          transform-origin: bottom center;
-        }
-
-        .animate-shadow-serve {
-          animation: shadowServe 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-      `}</style>
     </div>
   );
-};
+}

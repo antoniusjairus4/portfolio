@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { AchievementsChapter } from '@/components/achievements-kinetic/AchievementsChapter';
 import { AchievementsContactLanyard } from '@/components/contact-finale/AchievementsContactLanyard';
 import { ContactFinale } from '@/components/contact-finale/ContactFinale';
@@ -8,6 +8,7 @@ import { KaiForgeChapter } from '@/components/kaiforge/KaiForgeChapter';
 import { PhotoCoverSplit } from '@/components/layout/PhotoCoverSplit';
 import { NeuroShieldChapter } from '@/components/neuroshield/NeuroShieldChapter';
 import { PalindromeChapter } from '@/components/palindrome/PalindromeChapter';
+import { Preloader } from '@/components/preloader/Preloader';
 import { SkillsChapter } from '@/components/skills/SkillsChapter';
 import { KaiPalindromeBridge } from '@/components/transitions/KaiPalindromeBridge';
 import { PalindromeNeuroShieldBridge } from '@/components/transitions/PalindromeNeuroShieldBridge';
@@ -23,9 +24,15 @@ declare global {
 export default function Home() {
   const { refresh } = useLenis();
   const [criticalReady, setCriticalReady] = useState(false);
+  const [preloaderComplete, setPreloaderComplete] = useState(false);
+  const handleCriticalReady = useCallback(() => setCriticalReady(true), []);
+  const handlePreloaderComplete = useCallback(() => {
+    setCriticalReady(true);
+    setPreloaderComplete(true);
+  }, []);
 
   useEffect(() => {
-    setCriticalReady(true);
+    if (!preloaderComplete) return;
     requestAnimationFrame(() => {
       refresh();
       requestAnimationFrame(() => {
@@ -55,39 +62,42 @@ export default function Home() {
         restoreScrollPosition();
       });
     });
-  }, [refresh]);
+  }, [preloaderComplete, refresh]);
 
   return (
-    <main id="top" className="relative w-full bg-[#0C0907]">
-      {/* Page 0 Cover & Pinned Scroll Story Reveal */}
-      <PhotoCoverSplit />
+    <>
+      <Preloader onCriticalReady={handleCriticalReady} onComplete={handlePreloaderComplete} />
+      <main id="top" className="relative w-full bg-[#0C0907]">
+        {/* Page 0 Cover & Pinned Scroll Story Reveal */}
+        <PhotoCoverSplit />
 
-      <ProjectExperienceProvider criticalReady={criticalReady}>
-        {/* Phase 2: accepted KaiForge spatial and camera greybox */}
-        <KaiForgeChapter />
+        <ProjectExperienceProvider criticalReady={criticalReady}>
+          {/* Phase 2: accepted KaiForge spatial and camera greybox */}
+          <KaiForgeChapter />
 
-        <KaiPalindromeBridge />
+          <KaiPalindromeBridge />
 
-        {/* Phase 3: Palindrome domestic-information greybox */}
-        <PalindromeChapter />
+          {/* Phase 3: Palindrome domestic-information greybox */}
+          <PalindromeChapter />
 
-        <PalindromeNeuroShieldBridge />
+          <PalindromeNeuroShieldBridge />
 
-        {/* Phase 4: NeuroShield research-uncertainty greybox */}
-        <NeuroShieldChapter />
+          {/* Phase 4: NeuroShield research-uncertainty greybox */}
+          <NeuroShieldChapter />
 
-        {/* Phase 5: continuous spatial capability landscape */}
-        <SkillsChapter />
+          {/* Phase 5: continuous spatial capability landscape */}
+          <SkillsChapter />
 
-        {/* Phase 6: kinetic editorial achievements sequence */}
-        <AchievementsChapter />
-      </ProjectExperienceProvider>
+          {/* Phase 6: kinetic editorial achievements sequence */}
+          <AchievementsChapter />
+        </ProjectExperienceProvider>
 
-      {/* Phase 7: quiet contact and document end */}
-      <ContactFinale />
+        {/* Phase 7: quiet contact and document end */}
+        <ContactFinale />
 
-      {/* One continuous physical rig spanning the Achievements finale and Contact. */}
-      <AchievementsContactLanyard />
-    </main>
+        {/* One continuous physical rig spanning the Achievements finale and Contact. */}
+        <AchievementsContactLanyard />
+      </main>
+    </>
   );
 }

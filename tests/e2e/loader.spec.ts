@@ -10,8 +10,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
     await expect(preloader).toBeVisible();
 
-    // Readiness may finish quickly; eight seconds is a failure fallback, not a minimum.
-    await expect(preloader).toBeHidden({ timeout: 12000 });
+    await expect(preloader).toBeHidden({ timeout: 22000 });
 
     // Photo cover is visible
     const coverImage = page.getByAltText('Portrait of Antonius Jairus');
@@ -21,14 +20,8 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
   test('scrolling scrubs the Hero story forward through its stable beats', async ({ page }) => {
     await page.goto('http://localhost:3000');
 
-    // Skip preloader
-    const skipBtn = page.getByRole('button', { name: 'Skip' });
-    if (await skipBtn.isVisible()) {
-      await skipBtn.click({ force: true }).catch(() => {});
-    }
-
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
-    await expect(preloader).toBeHidden({ timeout: 2500 });
+    await expect(preloader).toBeHidden({ timeout: 22000 });
 
     const totalDistance = 4.2 * 720;
     const percentages = [0, 0.24, 0.42, 0.66, 1.0];
@@ -68,13 +61,8 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
   test('keyboard path advances story beat by beat', async ({ page }) => {
     await page.goto('http://localhost:3000');
 
-    const skipBtn = page.getByRole('button', { name: 'Skip' });
-    if (await skipBtn.isVisible()) {
-      await skipBtn.click({ force: true }).catch(() => {});
-    }
-
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
-    await expect(preloader).toBeHidden({ timeout: 2500 });
+    await expect(preloader).toBeHidden({ timeout: 22000 });
 
     // Advance beat by beat
     await page.keyboard.press('ArrowDown');
@@ -91,7 +79,7 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     // First Visit Path
     await page.goto('http://localhost:3000');
     const preloader = page.getByRole('progressbar', { name: 'Site preloader' });
-    await expect(preloader).toBeHidden({ timeout: 12000 });
+    await expect(preloader).toBeHidden({ timeout: 22000 });
 
     // Assert strictly zero scroll occurred
     const scrollYBefore = await page.evaluate(() => window.scrollY);
@@ -117,9 +105,11 @@ test.describe('Phase 2 Preloader & Pinned Scroll Story Reveal E2E Tests', () => 
     expect(coverInfoFirst.leftOpacity).toBe('1');
     expect(['none', 'matrix(1, 0, 0, 1, 0, 0)']).toContain(coverInfoFirst.rightTransform);
 
-    // Repeat Visit Path (sessionStorage skip)
+    // Cached resources still use the authored calibration sequence, then reveal the same cover.
     await page.reload();
-    await page.waitForTimeout(300);
+    await expect(page.getByRole('progressbar', { name: 'Site preloader' })).toBeHidden({
+      timeout: 22000,
+    });
 
     const coverInfoRepeat = await page.evaluate(() => {
       const container = document.querySelector('#hero');

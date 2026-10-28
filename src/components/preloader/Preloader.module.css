@@ -1,0 +1,913 @@
+.preloader {
+  --ink: #0c0c0b;
+  --paper: #f2e9d8;
+  --muted: #968f82;
+  --line: rgba(242, 233, 216, 0.16);
+  --accent: #8b1e2d;
+  --pointer-x: 0;
+  --pointer-y: 0;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  overflow: hidden;
+  color: var(--paper);
+  background: var(--ink);
+  isolation: isolate;
+  user-select: none;
+  clip-path: inset(0);
+  will-change: clip-path, opacity;
+}
+
+.majorGrid,
+.minorGrid,
+.grain,
+.scanLine,
+.blueprint,
+.nodeField,
+.preloader::before,
+.preloader::after {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.majorGrid,
+.minorGrid {
+  z-index: -4;
+  transform: translate(calc(var(--pointer-x) * 2px), calc(var(--pointer-y) * 2px));
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.majorGrid {
+  opacity: 0;
+  background-image:
+    linear-gradient(rgba(242, 233, 216, 0.082) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 233, 216, 0.082) 1px, transparent 1px);
+  background-size: 120px 120px;
+  animation:
+    gridReveal 520ms ease-out 40ms forwards,
+    gridDrift 16s linear infinite;
+}
+
+.minorGrid {
+  opacity: calc(0.06 + var(--precision-reveal) * 0.48);
+  background-image:
+    linear-gradient(rgba(242, 233, 216, 0.052) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(242, 233, 216, 0.052) 1px, transparent 1px);
+  background-size: 24px 24px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 9%, #000 91%, transparent);
+}
+
+.grain {
+  z-index: 9;
+  opacity: 0.075;
+  background-image:
+    repeating-radial-gradient(
+      circle at 17% 31%,
+      transparent 0 1px,
+      rgba(255, 255, 255, 0.11) 1px 2px
+    ),
+    repeating-linear-gradient(127deg, transparent 0 4px, rgba(255, 255, 255, 0.016) 4px 5px);
+  background-size:
+    7px 9px,
+    13px 11px;
+  mix-blend-mode: soft-light;
+}
+
+.preloader::before,
+.preloader::after {
+  content: "";
+  z-index: -1;
+  border: 1px solid rgba(242, 233, 216, 0.12);
+}
+
+.preloader::before {
+  inset: 30px;
+}
+
+.preloader::after {
+  inset: 42px;
+  border-color: transparent;
+  border-left-color: rgba(139, 30, 45, 0.55);
+  border-right-color: rgba(139, 30, 45, 0.24);
+}
+
+.scanLine {
+  z-index: 0;
+  inset: -8% 0 auto;
+  height: 1px;
+  opacity: 0.24;
+  background: linear-gradient(90deg, transparent 4%, rgba(242, 233, 216, 0.46), transparent 96%);
+  box-shadow: 0 10px 34px rgba(242, 233, 216, 0.035);
+  animation: scanDown 8.5s linear 900ms infinite;
+}
+
+.blueprint {
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  fill: none;
+  stroke: rgba(242, 233, 216, 0.18);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transform: translate(calc(var(--pointer-x) * 2px), calc(var(--pointer-y) * 2px));
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.primaryConstruction {
+  stroke-dasharray: 1500;
+  stroke-dashoffset: 1500;
+  animation: drawBlueprint 1.4s cubic-bezier(0.2, 0.8, 0.2, 1) 100ms forwards;
+}
+
+.measurementGeometry {
+  opacity: var(--measurement-reveal);
+  stroke-dasharray: 480;
+  stroke-dashoffset: calc((1 - var(--measurement-reveal)) * 480);
+}
+
+.dottedPath {
+  opacity: calc(0.14 + var(--precision-reveal) * 0.54);
+  stroke-dasharray: 3 12;
+}
+
+.registrationMarks,
+.blueprintTicks {
+  opacity: calc(0.18 + var(--precision-reveal) * 0.58);
+}
+
+.registrationMarks {
+  stroke-dasharray: 160;
+  stroke-dashoffset: calc((1 - var(--precision-reveal)) * 160);
+}
+
+.topRail {
+  position: absolute;
+  z-index: 3;
+  top: clamp(38px, 5.2vw, 74px);
+  left: clamp(48px, 6vw, 110px);
+  right: clamp(48px, 6vw, 110px);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  font:
+    500 10px / 1.2 "JetBrains Mono",
+    monospace;
+  letter-spacing: 0.24em;
+  color: var(--muted);
+  opacity: 0;
+  animation: metadataIn 420ms ease-out 110ms forwards;
+}
+
+.topRule {
+  height: 1px;
+  transform: scaleX(var(--loader-progress));
+  transform-origin: left;
+  background: linear-gradient(90deg, rgba(242, 233, 216, 0.28), rgba(139, 30, 45, 0.7));
+}
+
+.coordinateLeft,
+.coordinateRight {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  font:
+    500 9px / 1.8 "JetBrains Mono",
+    monospace;
+  letter-spacing: 0.2em;
+  color: rgba(242, 233, 216, 0.34);
+  opacity: var(--crosshair-reveal);
+  transition: opacity 180ms ease;
+}
+
+.coordinateLeft {
+  left: clamp(48px, 4.5vw, 86px);
+  transform: translateY(-50%);
+}
+
+.coordinateRight {
+  right: clamp(48px, 4.5vw, 86px);
+  text-align: right;
+  transform: translateY(-50%);
+}
+
+.crosshair {
+  position: absolute;
+  z-index: 1;
+  left: var(--crosshair-x);
+  top: var(--crosshair-y);
+  width: 72px;
+  height: 72px;
+  opacity: var(--crosshair-reveal);
+  transform: translate(calc(-50% + var(--pointer-x) * 4px), calc(-50% + var(--pointer-y) * 4px));
+  transition:
+    left 240ms linear,
+    top 240ms linear,
+    opacity 180ms ease,
+    transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.crosshairRing {
+  position: absolute;
+  inset: 18px;
+  border: 1px solid rgba(242, 233, 216, 0.36);
+  border-radius: 50%;
+}
+
+.crosshairHorizontal,
+.crosshairVertical {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: rgba(242, 233, 216, 0.42);
+}
+
+.crosshairHorizontal {
+  width: 100%;
+  height: 1px;
+  transform: translate(-50%, -50%);
+}
+
+.crosshairVertical {
+  width: 1px;
+  height: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.crosshairLabel {
+  position: absolute;
+  left: calc(100% + 10px);
+  top: calc(50% + 7px);
+  width: max-content;
+  font:
+    500 7px / 1.55 "JetBrains Mono",
+    monospace;
+  letter-spacing: 0.14em;
+  color: rgba(242, 233, 216, 0.34);
+}
+
+.nodeField {
+  z-index: 0;
+  opacity: var(--nodes-reveal);
+  transition: opacity 240ms ease;
+}
+
+.pathNode {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border: 1px solid rgba(242, 233, 216, 0.56);
+  background: var(--ink);
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  offset-rotate: 0deg;
+}
+
+.nodeOne {
+  offset-path: path("M 105 440 C 386 300 542 626 808 440 S 1262 272 1494 446");
+  animation-name: travelNode;
+  animation-duration: 13s;
+}
+
+.nodeTwo {
+  offset-path: path("M 200 286 H 622 V 548 H 804");
+  animation-name: travelNode;
+  animation-duration: 17s;
+  animation-delay: -8s;
+}
+
+.nodeThree {
+  offset-path: path("M 138 718 H 472 L 618 574 H 1136 L 1284 724 H 1498");
+  animation-name: travelNode;
+  animation-duration: 19s;
+  animation-delay: -4s;
+}
+
+.nodeFour {
+  width: 6px;
+  height: 6px;
+  border-color: var(--accent);
+  background: var(--accent);
+  offset-path: path("M 906 292 H 1338 V 610 H 1380");
+  animation-name: travelNode, nodeSignal;
+  animation-duration: 15s, 4.5s;
+  animation-delay: -10s, 0s;
+}
+
+.primary {
+  position: relative;
+  z-index: 2;
+  width: min(1380px, calc(100vw - 12vw));
+  height: 100%;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(230px, 0.34fr);
+  align-items: center;
+  gap: clamp(36px, 7vw, 130px);
+}
+
+.counterWrap {
+  position: relative;
+  width: fit-content;
+  opacity: 0;
+  transform: translateY(14px);
+  animation: counterIn 520ms cubic-bezier(0.16, 1, 0.3, 1) 140ms forwards;
+}
+
+.mechanicalCounter {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  color: var(--paper);
+  font-family: "Clash Display", Arial, sans-serif;
+  font-size: clamp(150px, 25vw, 440px);
+  font-weight: 650;
+  line-height: 0.72;
+  letter-spacing: -0.075em;
+  font-variant-numeric: tabular-nums;
+  text-indent: -0.055em;
+}
+
+.digitViewport {
+  display: block;
+  overflow: hidden;
+  width: 0.62em;
+  height: 0.78em;
+}
+
+.digit {
+  display: block;
+  animation: indexDigit 300ms cubic-bezier(0.2, 0.78, 0.22, 1) var(--digit-delay) both;
+  will-change: transform, opacity;
+}
+
+.mechanicalCounter[data-major] .digit {
+  animation-name: indexMilestone;
+  animation-duration: 440ms;
+}
+
+.outlineCounter {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  left: 50%;
+  color: transparent;
+  font-family: "Clash Display", Arial, sans-serif;
+  font-size: clamp(270px, 39vw, 680px);
+  font-weight: 650;
+  line-height: 0.7;
+  letter-spacing: -0.085em;
+  white-space: nowrap;
+  -webkit-text-stroke: 1px rgba(242, 233, 216, 0.055);
+  transform: translate(calc(-45% + var(--pointer-x) * 4px), calc(-54% + var(--pointer-y) * 3px))
+    scale(calc(0.97 + var(--loader-progress) * 0.03));
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.counterReference {
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  top: -28%;
+  width: 1px;
+  height: 142%;
+  opacity: calc(0.16 + var(--measurement-reveal) * 0.45);
+  background: linear-gradient(transparent, rgba(242, 233, 216, 0.34), transparent);
+  transform: translateX(-50%);
+}
+
+.counterMeasure {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: -17px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid rgba(242, 233, 216, 0.18);
+  padding-top: 5px;
+  opacity: var(--measurement-reveal);
+  font:
+    500 7px / 1 "JetBrains Mono",
+    monospace;
+  letter-spacing: 0.18em;
+  color: rgba(242, 233, 216, 0.35);
+}
+
+.loadLabel,
+.stage,
+.statusHeading,
+.statusRow,
+.statusFrame,
+.dataRailMeta {
+  font-family: "JetBrains Mono", monospace;
+  text-transform: uppercase;
+}
+
+.loadLabel {
+  position: relative;
+  z-index: 4;
+  margin-top: clamp(42px, 5vw, 70px);
+  font-size: clamp(12px, 1.1vw, 17px);
+  letter-spacing: 0.25em;
+  clip-path: inset(0 0 0 0);
+  animation: labelTracking 1.1s cubic-bezier(0.16, 1, 0.3, 1) 180ms both;
+}
+
+.stage {
+  position: relative;
+  z-index: 4;
+  margin-top: 12px;
+  min-height: 1.2em;
+  color: var(--accent);
+  font-size: clamp(9px, 0.75vw, 12px);
+  letter-spacing: 0.22em;
+}
+
+.statusPanel {
+  align-self: center;
+  width: 100%;
+  max-width: 360px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 18px 0 14px;
+  opacity: var(--metadata-reveal);
+  transform: translateX(calc((1 - var(--metadata-reveal)) * 18px));
+  transition:
+    opacity 220ms ease,
+    transform 360ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.statusHeading {
+  margin-bottom: 16px;
+  color: rgba(242, 233, 216, 0.44);
+  font-size: 9px;
+  letter-spacing: 0.24em;
+}
+
+.statusRow,
+.statusFrame {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 5px 0;
+  color: rgba(242, 233, 216, 0.58);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+}
+
+.statusFrame {
+  margin-top: 8px;
+  border-top: 1px solid rgba(242, 233, 216, 0.1);
+  padding-top: 12px;
+  color: rgba(242, 233, 216, 0.34);
+}
+
+.statusRow [data-resource-state="ready"] {
+  color: var(--paper);
+  animation: statusLock 640ms ease-out both;
+}
+
+.statusRow [data-resource-state="deferred"] {
+  color: #c58c76;
+}
+
+.dataRail {
+  position: absolute;
+  z-index: 3;
+  left: clamp(48px, 6vw, 110px);
+  right: clamp(48px, 6vw, 110px);
+  bottom: clamp(44px, 6vw, 86px);
+}
+
+.dataRailMeta {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 13px;
+  color: rgba(242, 233, 216, 0.4);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  opacity: calc(0.42 + var(--metadata-reveal) * 0.58);
+}
+
+.dataRailMeta span:nth-child(2),
+.dataRailMeta span:nth-child(3) {
+  text-align: center;
+}
+
+.dataRailMeta span:last-child {
+  text-align: right;
+}
+
+.progressRail {
+  position: relative;
+  height: 17px;
+  border-top: 1px solid rgba(242, 233, 216, 0.16);
+}
+
+.progressFill {
+  position: absolute;
+  top: -1px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  transform: scaleX(var(--loader-progress));
+  transform-origin: left;
+  background: var(--paper);
+  will-change: transform;
+}
+
+.progressCursor {
+  position: absolute;
+  top: -4px;
+  left: calc(var(--loader-progress) * 100%);
+  width: 2px;
+  height: 8px;
+  background: var(--accent);
+  transform: translateX(-1px);
+}
+
+.progressTicks {
+  height: 8px;
+  margin-top: 5px;
+  background: repeating-linear-gradient(90deg, rgba(242, 233, 216, 0.18) 0 1px, transparent 1px 4%);
+}
+
+.sweep {
+  position: absolute;
+  z-index: 12;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 1px;
+  transform: translateX(-50%) scaleX(0);
+  transform-origin: center;
+  background: var(--paper);
+  box-shadow: 0 0 18px rgba(242, 233, 216, 0.32);
+  opacity: 0;
+}
+
+.preloader[data-phase="ready"] .mechanicalCounter,
+.preloader[data-phase="exiting"] .mechanicalCounter {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(242, 233, 216, 0.88);
+  transform: scaleX(1.025);
+  transition:
+    color 160ms ease,
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    -webkit-text-stroke-color 160ms ease;
+}
+
+.preloader[data-phase="ready"] .outlineCounter,
+.preloader[data-phase="exiting"] .outlineCounter {
+  -webkit-text-stroke-color: rgba(242, 233, 216, 0.13);
+  transform: translate(-45%, -54%) scale(1.08);
+}
+
+.preloader[data-phase="ready"] .pathNode,
+.preloader[data-phase="exiting"] .pathNode {
+  animation-play-state: paused;
+}
+
+.preloader[data-phase="ready"] .crosshair,
+.preloader[data-phase="exiting"] .crosshair {
+  left: 50%;
+  top: 50%;
+  opacity: 0.72;
+}
+
+.preloader[data-phase="ready"] .stage {
+  color: var(--paper);
+}
+
+.preloader[data-phase="ready"] :is(.topRail, .coordinateLeft, .coordinateRight, .statusPanel) {
+  opacity: 0.24;
+  transition: opacity 180ms ease;
+}
+
+.preloader[data-phase="ready"] .sweep {
+  opacity: 1;
+  transform: translateX(-50%) scaleX(1);
+  transition:
+    transform 330ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 100ms ease;
+}
+
+.preloader[data-phase="exiting"] {
+  animation: blueprintCollapse 760ms cubic-bezier(0.7, 0, 0.2, 1) forwards;
+}
+
+.preloader[data-phase="exiting"] :is(.majorGrid, .minorGrid, .blueprint) {
+  transform: scaleY(0.012);
+  transform-origin: center;
+  transition: transform 410ms cubic-bezier(0.7, 0, 0.2, 1);
+}
+
+.preloader[data-phase="exiting"]
+  :is(
+    .topRail,
+    .coordinateLeft,
+    .coordinateRight,
+    .crosshair,
+    .statusPanel,
+    .dataRail,
+    .loadLabel,
+    .stage,
+    .counterMeasure
+  ) {
+  opacity: 0;
+  transition: opacity 130ms ease;
+}
+
+.preloader[data-phase="exiting"] .mechanicalCounter,
+.preloader[data-phase="exiting"] .outlineCounter {
+  transform: scale(1.32);
+  opacity: 0;
+  transition:
+    transform 700ms cubic-bezier(0.7, 0, 0.2, 1),
+    opacity 360ms ease 140ms;
+}
+
+.preloader[data-phase="exiting"] .sweep {
+  opacity: 0;
+  transform: translateX(-50%) scaleX(1);
+  transition: opacity 300ms ease 220ms;
+}
+
+@keyframes gridReveal {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes gridDrift {
+  to {
+    background-position:
+      4px 2px,
+      4px 2px;
+  }
+}
+
+@keyframes scanDown {
+  0% {
+    top: -8%;
+  }
+  100% {
+    top: 108%;
+  }
+}
+
+@keyframes drawBlueprint {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes metadataIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes counterIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes indexDigit {
+  0% {
+    opacity: 0;
+    transform: translateY(68%) scaleX(0.91);
+  }
+  62% {
+    opacity: 1;
+    transform: translateY(-5%) scaleX(1.025);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+@keyframes indexMilestone {
+  0% {
+    opacity: 0;
+    transform: translateY(82%) scaleX(0.86);
+  }
+  56% {
+    opacity: 1;
+    transform: translateY(-8%) scaleX(1.045);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
+}
+
+@keyframes labelTracking {
+  from {
+    opacity: 0;
+    letter-spacing: 0.46em;
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.25em;
+    clip-path: inset(0);
+  }
+}
+
+@keyframes statusLock {
+  0% {
+    color: var(--paper);
+    opacity: 0.2;
+  }
+  36% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.82;
+  }
+}
+
+@keyframes travelNode {
+  from {
+    offset-distance: 0%;
+  }
+  47%,
+  53% {
+    offset-distance: 50%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+@keyframes nodeSignal {
+  0%,
+  47%,
+  53%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes blueprintCollapse {
+  0%,
+  30% {
+    clip-path: inset(0);
+  }
+  100% {
+    clip-path: inset(49.95% 0);
+  }
+}
+
+@media (max-width: 760px) {
+  .preloader::before {
+    inset: 18px;
+  }
+
+  .preloader::after {
+    inset: 26px;
+  }
+
+  .topRail {
+    top: 34px;
+    left: 34px;
+    right: 34px;
+    gap: 10px;
+    font-size: 8px;
+  }
+
+  .primary {
+    width: calc(100vw - 68px);
+    grid-template-columns: 1fr;
+    align-content: center;
+    gap: 54px;
+  }
+
+  .counterWrap {
+    margin-top: -8vh;
+  }
+
+  .mechanicalCounter {
+    font-size: clamp(122px, 39vw, 220px);
+  }
+
+  .outlineCounter {
+    font-size: clamp(210px, 66vw, 340px);
+  }
+
+  .loadLabel {
+    margin-top: 38px;
+  }
+
+  .statusPanel {
+    align-self: auto;
+    max-width: none;
+  }
+
+  .statusRow[data-status-resource="type"],
+  .statusRow[data-status-resource="motion"],
+  .statusFrame,
+  .coordinateLeft,
+  .coordinateRight,
+  .nodeField {
+    display: none;
+  }
+
+  .crosshair {
+    width: 52px;
+    height: 52px;
+  }
+
+  .crosshairLabel {
+    display: none;
+  }
+
+  .dataRail {
+    left: 34px;
+    right: 34px;
+    bottom: 40px;
+  }
+
+  .dataRailMeta {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dataRailMeta span:nth-child(2),
+  .dataRailMeta span:nth-child(3) {
+    display: none;
+  }
+
+  .dataRailMeta span:last-child {
+    text-align: right;
+  }
+
+  .blueprint {
+    opacity: 0.66;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .majorGrid,
+  .scanLine,
+  .primaryConstruction,
+  .pathNode,
+  .topRail,
+  .counterWrap,
+  .digit,
+  .loadLabel,
+  .statusRow [data-resource-state="ready"] {
+    animation: none;
+  }
+
+  .majorGrid,
+  .topRail,
+  .counterWrap {
+    opacity: 1;
+    transform: none;
+  }
+
+  .primaryConstruction {
+    stroke-dashoffset: 0;
+  }
+
+  .digit {
+    opacity: 1;
+    transform: none;
+  }
+
+  .scanLine,
+  .nodeField {
+    display: none;
+  }
+
+  .preloader[data-phase="exiting"] {
+    animation: reducedExit 320ms ease forwards;
+  }
+
+  .preloader[data-phase="exiting"] :is(.majorGrid, .minorGrid, .blueprint) {
+    transform: none;
+  }
+}
+
+@keyframes reducedExit {
+  to {
+    opacity: 0;
+  }
+}

@@ -28,9 +28,9 @@ export const SCROLL_STORY = {
   },
 } as const;
 
-// Phase 2: Longer Preloader Timing (6.0s - 8.0s)
+// Deliberate blueprint calibration window. Critical assets continue warming behind the loader.
 export const PRELOADER_TIMINGS = {
-  minDurationMs: 6000,
-  maxDurationMs: 8000,
-  targetMs: 6500,
+  minDurationMs: 15000,
+  maxDurationMs: 20000,
+  targetMs: 16500,
 } as const;
