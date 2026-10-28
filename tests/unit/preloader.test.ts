@@ -11,12 +11,12 @@ describe('Preloader readiness and story constants', () => {
   });
 
   it('exports valid scroll story beat boundary constants', () => {
-    expect(SCROLL_STORY.beats.revealEnd).toBe(0.24);
-    expect(SCROLL_STORY.beats.readEnd).toBe(0.42);
-    expect(SCROLL_STORY.beats.exitEnd).toBe(0.62);
-    expect(SCROLL_STORY.beats.holdEnd).toBe(0.66);
-    expect(SCROLL_STORY.beats.collapseEnd).toBe(0.94);
-    expect(SCROLL_STORY.totalDistanceVh).toBe(420);
+    expect(SCROLL_STORY.beats.revealEnd).toBe(0.03);
+    expect(SCROLL_STORY.beats.readEnd).toBe(0.05);
+    expect(SCROLL_STORY.beats.exitEnd).toBe(0.08);
+    expect(SCROLL_STORY.beats.holdEnd).toBe(0.08);
+    expect(SCROLL_STORY.beats.collapseEnd).toBe(0.88);
+    expect(SCROLL_STORY.totalDistanceVh).toBe(180);
   });
 
   it('contains the updated role copy: Student, Freelancer, Entrepreneur', () => {

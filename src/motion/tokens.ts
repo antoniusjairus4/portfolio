@@ -17,13 +17,13 @@ export const COLOR_TOKENS = {
 } as const;
 
 export const SCROLL_STORY = {
-  totalDistanceVh: 420,
+  totalDistanceVh: 180,
   beats: {
-    revealEnd: 0.24,
-    readEnd: 0.42,
-    exitEnd: 0.62,
-    holdEnd: 0.66,
-    collapseEnd: 0.94,
+    revealEnd: 0.03,
+    readEnd: 0.05,
+    exitEnd: 0.08,
+    holdEnd: 0.08,
+    collapseEnd: 0.88,
     handoffEnd: 1,
   },
 } as const;
