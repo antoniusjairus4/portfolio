@@ -155,22 +155,79 @@ function SceneContent({ reducedMotion }: { reducedMotion: boolean }) {
 
 export default function ChessHero3D({ reducedMotion = false }: { reducedMotion?: boolean }) {
   const [mounted, setMounted] = useState(false);
+  const [renderActive, setRenderActive] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
+    const container = containerRef.current;
+    const visualLayer = container?.parentElement;
+    const editorial = visualLayer?.parentElement;
+    const panel = container?.closest<HTMLElement>('[data-achievement-panel]');
+    if (!container || !visualLayer || !editorial || !panel) return;
+
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const rect = container.getBoundingClientRect();
+      const pieceTarget =
+        Number.parseFloat(getComputedStyle(panel).getPropertyValue('--chess-pieces')) || 0;
+      const currentOpacity = Number.parseFloat(getComputedStyle(visualLayer).opacity) || 0;
+      const editorialOpacity = Number.parseFloat(getComputedStyle(editorial).opacity) || 0;
+      const visible =
+        document.visibilityState === 'visible' &&
+        rect.width > 0 &&
+        rect.height > 0 &&
+        rect.bottom > 0 &&
+        rect.top < window.innerHeight &&
+        rect.right > 0 &&
+        rect.left < window.innerWidth &&
+        editorialOpacity > 0.001 &&
+        (pieceTarget > 0.001 || currentOpacity > 0.001);
+      setRenderActive((current) => (current === visible ? current : visible));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const observer = new IntersectionObserver(schedule);
+    observer.observe(container);
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    document.addEventListener('visibilitychange', schedule);
+    visualLayer.addEventListener('transitionend', schedule);
+    update();
+
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      observer.disconnect();
+      window.removeEventListener('scroll', schedule);
+      window.removeEventListener('resize', schedule);
+      document.removeEventListener('visibilitychange', schedule);
+      visualLayer.removeEventListener('transitionend', schedule);
+    };
+  }, [mounted]);
 
   if (!mounted) {
     return <div className={styles.chess3dPlaceholder} aria-hidden="true" />;
   }
 
   return (
-    <div className={styles.chess3dContainer} aria-hidden="true">
+    <div
+      ref={containerRef}
+      className={styles.chess3dContainer}
+      aria-hidden="true"
+      data-render-active={renderActive}
+    >
       <Canvas
         camera={{ position: [0, 0.35, 3.1], fov: 28 }}
         gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
         shadows
-        dpr={[1, 1.5]}
+        dpr={[1, 1.75]}
+        frameloop={renderActive ? 'always' : 'never'}
       >
         <ambientLight color="#1e1814" intensity={0.52} />
 

@@ -14,6 +14,7 @@ const ChessHero3D = dynamic(() => import('@/components/achievements-kinetic/Ches
 interface EditorialProps {
   reducedMotion: boolean;
   galleryFocus?: string | null;
+  visualsEnabled?: boolean;
 }
 
 interface EditorialFactsProps {
@@ -139,7 +140,11 @@ function TableTennisPaddle({ reducedMotion }: { reducedMotion: boolean }) {
   );
 }
 
-export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
+export function TableTennisEditorial({
+  reducedMotion,
+  galleryFocus,
+  visualsEnabled = true,
+}: EditorialProps) {
   return (
     <InteractiveField className={styles.tableTennis} reducedMotion={reducedMotion}>
       <div className={styles.coordinateGrid} aria-hidden="true" />
@@ -148,7 +153,7 @@ export function TableTennisEditorial({ reducedMotion, galleryFocus }: EditorialP
         <span>TENNIS</span>
       </div>
 
-      <TableTennisPaddle reducedMotion={reducedMotion} />
+      {visualsEnabled && <TableTennisPaddle reducedMotion={reducedMotion} />}
 
       <svg
         className={styles.trajectorySystem}
@@ -766,7 +771,11 @@ export function KarateEditorial({ reducedMotion, galleryFocus }: EditorialProps)
   );
 }
 
-export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) {
+export function ChessEditorial({
+  reducedMotion,
+  galleryFocus,
+  visualsEnabled = true,
+}: EditorialProps) {
   return (
     <InteractiveField className={styles.chess} reducedMotion={reducedMotion}>
       {/* Layer 3: Monumental Hero Heading (Left-Top) */}
@@ -887,9 +896,11 @@ export function ChessEditorial({ reducedMotion, galleryFocus }: EditorialProps) 
       </svg>
 
       {/* Layer 5: Dedicated 3D Hero Composition (Oversized King, Queen, Knight, Board) */}
-      <div className={styles.chessHeroContainer} aria-hidden="true">
-        <ChessHero3D reducedMotion={reducedMotion} />
-      </div>
+      {visualsEnabled && (
+        <div className={styles.chessHeroContainer} aria-hidden="true">
+          <ChessHero3D reducedMotion={reducedMotion} />
+        </div>
+      )}
 
       {/* Layer 6: Floating Tactical Micro-Readouts */}
       <div className={styles.chessTechReadout} aria-hidden="true">

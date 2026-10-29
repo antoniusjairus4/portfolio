@@ -219,10 +219,26 @@ function DisciplineMeta({ discipline }: { discipline: AchievementDisciplineKey }
   );
 }
 
+function useDesktopAchievementVisuals() {
+  // Start without visual assets so mobile never mounts them during hydration.
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 861px)');
+    const update = () => setEnabled(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return enabled;
+}
+
 export function AchievementsChapter() {
   const chapterRef = useRef<HTMLElement>(null);
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null);
   const { reducedMotion } = useExperienceEnvironment();
+  const desktopVisuals = useDesktopAchievementVisuals();
   const activity = useChapterActivity(chapterRef);
   const { setMode: setGlobalEtherMode } = useGlobalEther();
 
@@ -249,7 +265,7 @@ export function AchievementsChapter() {
       </h2>
 
       <KineticPanel panel="intro" reducedMotion={reducedMotion}>
-        <div className={styles.introBackdrop} aria-hidden="true" />
+        {desktopVisuals && <div className={styles.introBackdrop} aria-hidden="true" />}
         <div className={styles.meta}>
           <span>00 / 06</span>
           <i aria-hidden="true" />
@@ -289,49 +305,55 @@ export function AchievementsChapter() {
       </KineticPanel>
 
       <div className={styles.layout}>
-        <aside className={styles.showcase} aria-label="Achievement image archive">
-          {activity !== 'inactive' && !reducedMotion && (
-            <LiquidChrome
-              className={styles.showcaseChrome}
-              color="#ac8656"
-              speed={0.07}
-              amplitude={0.26}
-              frequencyX={2.1}
-              frequencyY={2.4}
-              detail={3}
-              thickness={1.35}
-              depth={0.82}
-              roughness={0.65}
-              exposure={0.78}
-              interactive
-              rippleStrength={0.72}
-              rippleSize={0.9}
-              intro={false}
-              tilt={0.48}
-              maxDevicePixelRatio={1}
-            />
-          )}
-          <div className={styles.showcaseInner}>
-            <Masonry
-              items={ARCHIVE_ITEMS}
-              columns="auto"
-              columnWidth={270}
-              gap={16}
-              radius={14}
-              animateFrom="bottom"
-              hoverEffect="zoom"
-              captions="hover"
-              lightbox
-              draggable
-              onItemHover={(item) => setGalleryFocus(item?.title ?? null)}
-              className="achievement-masonry"
-            />
-          </div>
-        </aside>
+        {desktopVisuals && (
+          <aside className={styles.showcase} aria-label="Achievement image archive">
+            {activity !== 'inactive' && !reducedMotion && (
+              <LiquidChrome
+                className={styles.showcaseChrome}
+                color="#ac8656"
+                speed={0.07}
+                amplitude={0.26}
+                frequencyX={2.1}
+                frequencyY={2.4}
+                detail={3}
+                thickness={1.35}
+                depth={0.82}
+                roughness={0.65}
+                exposure={0.78}
+                interactive
+                rippleStrength={0.72}
+                rippleSize={0.9}
+                intro={false}
+                tilt={0.48}
+                maxDevicePixelRatio={1.75}
+              />
+            )}
+            <div className={styles.showcaseInner}>
+              <Masonry
+                items={ARCHIVE_ITEMS}
+                columns="auto"
+                columnWidth={270}
+                gap={16}
+                radius={14}
+                animateFrom="bottom"
+                hoverEffect="zoom"
+                captions="hover"
+                lightbox
+                draggable
+                onItemHover={(item) => setGalleryFocus(item?.title ?? null)}
+                className="achievement-masonry"
+              />
+            </div>
+          </aside>
+        )}
         <div className={styles.narrative}>
           <KineticPanel panel="table-tennis" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="table-tennis" />
-            <TableTennisEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
+            <TableTennisEditorial
+              reducedMotion={reducedMotion}
+              galleryFocus={galleryFocus}
+              visualsEnabled={desktopVisuals}
+            />
           </KineticPanel>
 
           <KineticPanel panel="karate" reducedMotion={reducedMotion}>
@@ -341,14 +363,17 @@ export function AchievementsChapter() {
 
           <KineticPanel panel="chess" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="chess" />
-            <ChessEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
+            <ChessEditorial
+              reducedMotion={reducedMotion}
+              galleryFocus={galleryFocus}
+              visualsEnabled={desktopVisuals}
+            />
           </KineticPanel>
 
           <KineticPanel panel="public-speaking" reducedMotion={reducedMotion}>
             <DisciplineMeta discipline="public-speaking" />
             <PublicSpeakingEditorial reducedMotion={reducedMotion} galleryFocus={galleryFocus} />
           </KineticPanel>
-
         </div>
       </div>
     </section>
