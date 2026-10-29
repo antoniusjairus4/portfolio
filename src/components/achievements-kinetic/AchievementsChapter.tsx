@@ -299,7 +299,7 @@ export function AchievementsChapter() {
             <span>Table Tennis</span>
             <span>Karate</span>
             <span>Chess</span>
-            <span>Speaches</span>
+            <span>Speeches</span>
           </div>
         </div>
       </KineticPanel>

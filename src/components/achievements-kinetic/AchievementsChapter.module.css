@@ -2785,3 +2785,43 @@
 .chapter.webgl .karateDivisions i {
   border-color: rgba(21, 18, 15, 0.08);
 }
+
+/* Keep the intro headline and discipline index legible on narrow screens. */
+@media (max-width: 600px) {
+  .introStatement {
+    align-items: stretch;
+    padding-right: clamp(1.25rem, 5vw, 2rem);
+    padding-left: clamp(1.25rem, 5vw, 2rem);
+    text-align: left;
+  }
+
+  .introStatement h3 {
+    width: 100%;
+    font-size: clamp(1.8rem, 8.5vw, 4.1rem);
+    line-height: 1;
+    letter-spacing: -0.065em;
+    white-space: nowrap;
+  }
+
+  .introStatement p {
+    margin-top: 1.5rem;
+    font-size: clamp(0.62rem, 2vw, 0.75rem);
+    line-height: 1.4;
+  }
+
+  .disciplineIndex {
+    inset: auto;
+    width: 100%;
+    margin-top: clamp(2.5rem, 5vh, 3.5rem);
+    padding-top: 0.8rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem 1.25rem;
+  }
+
+  .disciplineIndex span {
+    padding: 0.2rem 0;
+    font-size: clamp(0.82rem, 2.6vw, 1rem);
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+  }
+}
