@@ -1,7 +1,3 @@
-<p align="center">
-  <a href="https://antoniusjairus.in"><img src="./.github/readme-assets/hero/hero-monolith.gif" alt="Animated 3D monolith from the Antonius Jairus portfolio" width="860" /></a>
-</p>
-
 <h1 align="center">ANTONIUS JAIRUS / PORTFOLIO</h1>
 
 <p align="center"><strong>An interactive portfolio built as a scroll-driven story.</strong></p>
@@ -34,10 +30,6 @@ flowchart LR
     Start --> Index[Projects index]
     Index --> Cases[Five case-study routes]
 ```
-
-<div align="center">
-  <img src="./.github/readme-assets/separators/separator-3d.gif" alt="Animated gold wireframe separator" width="860" />
-</div>
 
 ## Tech stack
 
@@ -88,7 +80,7 @@ flowchart TB
 
 ```text
 .
-├── .github/readme-assets/     Animated README artwork and project images
+├── .github/readme-assets/     Project images and README assets
 ├── public/                    Static images, fonts, models and textures
 ├── scripts/                   Asset generation and capture utilities
 ├── src/

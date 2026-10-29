@@ -1,8 +1,12 @@
 'use client';
 
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { CSSProperties, ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import './ScrollExpand.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
@@ -86,6 +90,7 @@ export function ScrollExpand({
     let target = 0;
     let initialWidth = startWidth;
     let initialHeight = startHeight;
+    const mobileFlow = () => useWindowScroll && contentDistance > 0 && window.innerWidth <= 768;
 
     const applyProgress = (progress: number) => {
       // The frame is the animation target. Media is optional, including in
@@ -128,7 +133,7 @@ export function ScrollExpand({
     };
 
     const readContentProgress = () => {
-      if (contentDistance <= 0) return 0;
+      if (contentDistance <= 0 || mobileFlow()) return 0;
       const viewHeight = Math.max(1, window.innerHeight);
       const scrolled = useWindowScroll ? -track.getBoundingClientRect().top : root.scrollTop;
       const start = reducedMotion ? viewHeight * 0.3 : viewHeight * (scrollDistance + holdDistance);
@@ -137,7 +142,7 @@ export function ScrollExpand({
     };
 
     const updateContent = () => {
-      if (contentDistance <= 0) return;
+      if (contentDistance <= 0 || mobileFlow()) return;
       const progress = readContentProgress();
       if (overlayRef.current) {
         const reveal = smoothstep(0, 0.025, progress);
@@ -151,6 +156,11 @@ export function ScrollExpand({
     };
 
     const measure = () => {
+      if (mobileFlow()) {
+        stage.style.height = 'auto';
+        track.style.height = 'auto';
+        return;
+      }
       const viewHeight = Math.max(1, window.innerHeight);
       initialWidth = window.innerWidth <= 600 ? 86 : window.innerWidth <= 900 ? 62 : startWidth;
       initialHeight = window.innerWidth <= 600 ? 46 : startHeight;
@@ -178,6 +188,7 @@ export function ScrollExpand({
     };
 
     const onScroll = () => {
+      if (mobileFlow()) return;
       target = readProgress();
       if (reducedMotion || smoothing <= 0) {
         current = target;
@@ -192,6 +203,14 @@ export function ScrollExpand({
       if (raf) cancelAnimationFrame(raf);
       raf = 0;
       measure();
+      if (mobileFlow()) {
+        current = target = 1;
+        frame.style.clipPath = 'none';
+        if (overlayRef.current) overlayRef.current.style.opacity = '1';
+        if (hintRef.current) hintRef.current.style.opacity = '0';
+        onContentProgress?.(0);
+        return;
+      }
       current = readProgress();
       target = current;
       applyProgress(current);
@@ -234,6 +253,36 @@ export function ScrollExpand({
     enabled,
     onContentProgress,
   ]);
+
+  useEffect(() => {
+    const media = gsap.matchMedia();
+    media.add('(max-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+      const titleElement = titleRef.current;
+      if (!titleElement) return;
+      const timeline = gsap.fromTo(
+        titleElement,
+        { autoAlpha: 0.35, y: 16 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          ease: 'none',
+          scrollTrigger: {
+            trigger: titleElement,
+            start: 'top 90%',
+            end: 'bottom 45%',
+            scrub: 0.25,
+            invalidateOnRefresh: true,
+          },
+        },
+      );
+      return () => {
+        timeline.scrollTrigger?.kill();
+        timeline.kill();
+        gsap.set(titleElement, { clearProps: 'opacity,visibility,transform' });
+      };
+    });
+    return () => media.revert();
+  }, []);
 
   const media =
     mediaType === 'none' || !src ? null : mediaType === 'video' ? (

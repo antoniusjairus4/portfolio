@@ -2825,3 +2825,40 @@
     letter-spacing: 0.01em;
   }
 }
+
+/* Mobile pages scroll in document order; the desktop pinned handoffs stay above 768px. */
+@media (max-width: 768px) {
+  .chapter,
+  .narrative {
+    overflow: visible;
+  }
+
+  .layout {
+    height: auto;
+  }
+
+  .intro,
+  .narrative .panel,
+  .narrative .karate,
+  .narrative .chess,
+  .narrative .public-speaking {
+    height: auto;
+    min-height: max(100svh, 44rem);
+  }
+
+  .intro .stage,
+  .narrative .stage,
+  .static .narrative .stage {
+    position: relative;
+    top: auto;
+    height: max(100svh, 44rem);
+    min-height: max(100svh, 44rem);
+  }
+
+  .narrative .table-tennis .stage,
+  .narrative .chess .stage,
+  .narrative .karate .stage,
+  .narrative .public-speaking .stage {
+    transform: none;
+  }
+}

@@ -159,3 +159,51 @@
     pointer-events: none;
   }
 }
+
+/* The Work chapter opens briefly, then its projects scroll as separate mobile pages. */
+@media (max-width: 768px) {
+  .scroll-expand--with-content {
+    background: #050505;
+  }
+
+  .scroll-expand--with-content .scroll-expand__track,
+  .scroll-expand--with-content .scroll-expand__stage {
+    height: auto;
+  }
+
+  .scroll-expand--with-content .scroll-expand__stage {
+    position: relative;
+    top: auto;
+    overflow: visible;
+    background: #050505;
+  }
+
+  .scroll-expand--with-content .scroll-expand__frame {
+    position: relative;
+    inset: auto;
+    overflow: visible;
+    clip-path: none;
+    will-change: auto;
+  }
+
+  .scroll-expand--with-content .scroll-expand__title {
+    position: relative;
+    inset: auto;
+    min-height: 38svh;
+    padding: 2rem 10%;
+    background: linear-gradient(180deg, #0b0908 0%, #050505 22%, #050505 100%);
+  }
+
+  .scroll-expand--with-content .scroll-expand__overlay {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    opacity: 1;
+  }
+
+  .scroll-expand--with-content .scroll-expand__hint {
+    display: none;
+  }
+}

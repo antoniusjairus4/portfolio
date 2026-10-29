@@ -1,7 +1,11 @@
 'use client';
 
-import { forwardRef, useCallback, useImperativeHandle, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import './WorkWithMeShowcase.css';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const smoothstep = (start: number, end: number, value: number) => {
@@ -69,7 +73,7 @@ export const WorkWithMeShowcase = forwardRef<WorkWithMeShowcaseHandle>(
 
     const setProgress = useCallback((progress: number) => {
       const root = rootRef.current;
-      if (!root) return;
+      if (!root || window.innerWidth <= 768) return;
 
       const p = clamp(progress);
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -147,6 +151,46 @@ export const WorkWithMeShowcase = forwardRef<WorkWithMeShowcaseHandle>(
         squareProgressRef.current.style.strokeDashoffset = `${320 * (1 - (position + 1) / projects.length)}`;
       }
       root.style.setProperty('--work-ui-opacity', `${revealRail * exit}`);
+    }, []);
+
+    useEffect(() => {
+      const media = gsap.matchMedia();
+      media.add('(max-width: 768px) and (prefers-reduced-motion: no-preference)', () => {
+        const slides = Array.from(
+          rootRef.current?.querySelectorAll<HTMLElement>('.work-showcase__mobile-slide') ?? [],
+        );
+        const timelines = slides.map((slide) => {
+          const image = slide.querySelector<HTMLElement>('.work-showcase__mobile-image');
+          const copy = slide.querySelector<HTMLElement>('.work-showcase__mobile-copy');
+          const timeline = gsap.timeline({
+            scrollTrigger: {
+              trigger: slide,
+              start: 'top 85%',
+              end: 'top 30%',
+              scrub: 0.25,
+              invalidateOnRefresh: true,
+            },
+          });
+          if (image) timeline.fromTo(image, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.7 }, 0);
+          if (copy) timeline.fromTo(copy, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.7 }, 0.2);
+          return timeline;
+        });
+        return () => {
+          for (const timeline of timelines) {
+            timeline.scrollTrigger?.kill();
+            timeline.kill();
+          }
+          gsap.set(
+            slides.flatMap((slide) =>
+              Array.from(
+                slide.querySelectorAll('.work-showcase__mobile-image, .work-showcase__mobile-copy'),
+              ),
+            ),
+            { clearProps: 'opacity,visibility' },
+          );
+        };
+      });
+      return () => media.revert();
     }, []);
 
     useImperativeHandle(ref, () => ({ setProgress }), [setProgress]);
@@ -235,7 +279,13 @@ export const WorkWithMeShowcase = forwardRef<WorkWithMeShowcaseHandle>(
 
           <div className="work-showcase__index">
             <svg viewBox="0 0 84 84" aria-hidden="true" focusable="false">
-              <rect className="work-showcase__square-track" x="2" y="2" width="80" height="80" />
+              <rect
+                    className="work-showcase__square-track"
+                    x="2"
+                    y="2"
+                    width="80"
+                    height="80"
+                  />
               <rect
                 ref={squareProgressRef}
                 className="work-showcase__square-progress"
@@ -272,6 +322,68 @@ export const WorkWithMeShowcase = forwardRef<WorkWithMeShowcaseHandle>(
               </span>
             ))}
           </div>
+        </div>
+
+        <div className="work-showcase__mobile" aria-hidden="true">
+          {projects.map((project, index) => (
+            <article className="work-showcase__mobile-slide" key={project.id}>
+              <div className="work-showcase__mobile-background">
+                {/* biome-ignore lint/performance/noImgElement: The background reuses the slide image. */}
+                <img
+                  src={project.image}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  style={{ objectPosition: project.position }}
+                />
+              </div>
+              <div className="work-showcase__mobile-shade" />
+              <p className="work-showcase__mark">WORK / SELECTED PROJECTS</p>
+              <figure className="work-showcase__mobile-image">
+                {/* biome-ignore lint/performance/noImgElement: Keep the existing full-size project image. */}
+                <img
+                  src={project.image}
+                  alt=""
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding="async"
+                  style={{ objectPosition: project.position }}
+                />
+              </figure>
+              <div className="work-showcase__mobile-index">
+                <svg viewBox="0 0 84 84" focusable="false" aria-hidden="true">
+                  <rect
+                    className="work-showcase__square-track"
+                    x="2"
+                    y="2"
+                    width="80"
+                    height="80"
+                  />
+                  <rect
+                    className="work-showcase__square-progress"
+                    x="2"
+                    y="2"
+                    width="80"
+                    height="80"
+                  />
+                </svg>
+                <span>{project.id}</span>
+              </div>
+              <div
+                className={`work-showcase__mobile-copy${index === 0 ? ' work-showcase__mobile-copy--long' : ''}`}
+              >
+                <span className="work-showcase__eyebrow">SELECTED WORK / {project.id}</span>
+                <strong>{project.title}</strong>
+                <p>{project.description}</p>
+              </div>
+              <div className="work-showcase__mobile-rail">
+                {rail.map((label, railIndex) => (
+                  <span key={label}>
+                    {String(railIndex + 1).padStart(2, '0')} {label}
+                  </span>
+                ))}
+              </div>
+            </article>
+          ))}
         </div>
 
         <ol className="work-showcase__accessible">

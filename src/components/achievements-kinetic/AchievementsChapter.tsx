@@ -1,5 +1,7 @@
 'use client';
 
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
@@ -24,6 +26,8 @@ import {
 import { useExperienceEnvironment } from '@/experience/ExperienceEnvironment';
 import { useGlobalEther } from '@/experience/GlobalEtherProvider';
 import { useChapterActivity } from '@/experience/useChapterActivity';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const ARCHIVE_ITEMS: MasonryItem[] = [
   {
@@ -141,53 +145,92 @@ function usePanelProgress(
   useLayoutEffect(() => {
     const section = sectionRef.current;
     if (!section || reducedMotion) return;
-    let frame = 0;
-    const update = () => {
-      frame = 0;
-      const rect = section.getBoundingClientRect();
-      const viewport = window.innerHeight;
-      const start = window.innerWidth <= 860 && panel !== 'intro' ? viewport * 0.4 : 0;
-      const entryDistance = Math.max(1, viewport - start);
-      const entryProgress = Math.min(1, Math.max(0, (viewport - rect.top) / entryDistance));
-      const handoffProgress = entryProgress * entryProgress * (3 - 2 * entryProgress);
-      const entryOffset =
-        rect.top > start && rect.top < viewport
-          ? start - rect.top
-          : rect.top >= viewport
-            ? start - viewport
-            : 0;
-      const exitHold = Math.min(viewport, Math.max(0, viewport - rect.bottom));
-      const distance = Math.max(1, rect.height - viewport + start);
-      const progress = Math.min(1, Math.max(0, (start - rect.top) / distance));
-      section.style.setProperty('--panel-entry', String(entryProgress));
-      section.style.setProperty('--panel-entry-y', `${entryOffset}px`);
-      section.style.setProperty('--panel-exit-hold-y', `${exitHold}px`);
-      for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
-        section.style.setProperty(property, String(value));
-      }
-      const previousPanel = section.previousElementSibling as HTMLElement | null;
-      if (previousPanel?.hasAttribute('data-achievement-panel')) {
-        // The incoming panel owns the outgoing panel's retirement. This keeps
-        // one complete composition visible throughout the handoff without
-        // leaving both scenes fully drawn on top of one another.
-        previousPanel.style.setProperty('--achievement-exit', String(handoffProgress));
-      }
-      section.dataset.achievementBeat = getAchievementBeat(panel, progress);
-    };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    const resizeObserver = new ResizeObserver(schedule);
-    resizeObserver.observe(section);
-    window.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    update();
-    return () => {
-      if (frame) cancelAnimationFrame(frame);
-      resizeObserver.disconnect();
-      window.removeEventListener('scroll', schedule);
-      window.removeEventListener('resize', schedule);
-    };
+
+    const media = gsap.matchMedia();
+    media.add('(max-width: 768px)', () => {
+      const state = { progress: 0 };
+      const render = () => {
+        const progress = state.progress;
+        for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
+          if (property !== '--achievement-exit') section.style.setProperty(property, String(value));
+        }
+        section.style.setProperty('--achievement-exit', '0');
+        section.dataset.achievementBeat = getAchievementBeat(panel, progress);
+      };
+      const animation = gsap.to(state, {
+        progress: 0.78,
+        ease: 'none',
+        onUpdate: render,
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 95%',
+          end: 'top 12%',
+          scrub: 0.25,
+          invalidateOnRefresh: true,
+        },
+      });
+      render();
+      return () => {
+        animation.scrollTrigger?.kill();
+        animation.kill();
+        for (const property of Object.keys(getAchievementMotion(panel, 0))) {
+          section.style.removeProperty(property);
+        }
+        section.style.removeProperty('--achievement-exit');
+      };
+    });
+
+    media.add('(min-width: 769px)', () => {
+      let frame = 0;
+      const update = () => {
+        frame = 0;
+        const rect = section.getBoundingClientRect();
+        const viewport = window.innerHeight;
+        const start = window.innerWidth <= 860 && panel !== 'intro' ? viewport * 0.4 : 0;
+        const entryDistance = Math.max(1, viewport - start);
+        const entryProgress = Math.min(1, Math.max(0, (viewport - rect.top) / entryDistance));
+        const handoffProgress = entryProgress * entryProgress * (3 - 2 * entryProgress);
+        const entryOffset =
+          rect.top > start && rect.top < viewport
+            ? start - rect.top
+            : rect.top >= viewport
+              ? start - viewport
+              : 0;
+        const exitHold = Math.min(viewport, Math.max(0, viewport - rect.bottom));
+        const distance = Math.max(1, rect.height - viewport + start);
+        const progress = Math.min(1, Math.max(0, (start - rect.top) / distance));
+        section.style.setProperty('--panel-entry', String(entryProgress));
+        section.style.setProperty('--panel-entry-y', `${entryOffset}px`);
+        section.style.setProperty('--panel-exit-hold-y', `${exitHold}px`);
+        for (const [property, value] of Object.entries(getAchievementMotion(panel, progress))) {
+          section.style.setProperty(property, String(value));
+        }
+        const previousPanel = section.previousElementSibling as HTMLElement | null;
+        if (previousPanel?.hasAttribute('data-achievement-panel')) {
+          // The incoming panel owns the outgoing panel's retirement. This keeps
+          // one complete composition visible throughout the handoff without
+          // leaving both scenes fully drawn on top of one another.
+          previousPanel.style.setProperty('--achievement-exit', String(handoffProgress));
+        }
+        section.dataset.achievementBeat = getAchievementBeat(panel, progress);
+      };
+      const schedule = () => {
+        if (!frame) frame = requestAnimationFrame(update);
+      };
+      const resizeObserver = new ResizeObserver(schedule);
+      resizeObserver.observe(section);
+      window.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      update();
+      return () => {
+        if (frame) cancelAnimationFrame(frame);
+        resizeObserver.disconnect();
+        window.removeEventListener('scroll', schedule);
+        window.removeEventListener('resize', schedule);
+      };
+    });
+
+    return () => media.revert();
   }, [panel, reducedMotion, sectionRef]);
 }
 
