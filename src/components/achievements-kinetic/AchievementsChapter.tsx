@@ -277,11 +277,27 @@ function useDesktopAchievementVisuals() {
   return enabled;
 }
 
+function useMobileAchievementHeroes() {
+  const [enabled, setEnabled] = useState(false);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 768px)');
+    const update = () => setEnabled(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
+
+  return enabled;
+}
+
 export function AchievementsChapter() {
   const chapterRef = useRef<HTMLElement>(null);
   const [galleryFocus, setGalleryFocus] = useState<string | null>(null);
   const { reducedMotion } = useExperienceEnvironment();
   const desktopVisuals = useDesktopAchievementVisuals();
+  const mobileHeroes = useMobileAchievementHeroes();
+  const heroVisuals = desktopVisuals || mobileHeroes;
   const activity = useChapterActivity(chapterRef);
   const { setMode: setGlobalEtherMode } = useGlobalEther();
 
@@ -395,7 +411,7 @@ export function AchievementsChapter() {
             <TableTennisEditorial
               reducedMotion={reducedMotion}
               galleryFocus={galleryFocus}
-              visualsEnabled={desktopVisuals}
+              visualsEnabled={heroVisuals}
             />
           </KineticPanel>
 
@@ -409,7 +425,7 @@ export function AchievementsChapter() {
             <ChessEditorial
               reducedMotion={reducedMotion}
               galleryFocus={galleryFocus}
-              visualsEnabled={desktopVisuals}
+              visualsEnabled={heroVisuals}
             />
           </KineticPanel>
 

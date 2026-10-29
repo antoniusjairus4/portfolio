@@ -156,10 +156,20 @@ function SceneContent({ reducedMotion }: { reducedMotion: boolean }) {
 export default function ChessHero3D({ reducedMotion = false }: { reducedMotion?: boolean }) {
   const [mounted, setMounted] = useState(false);
   const [renderActive, setRenderActive] = useState(false);
+  const [mobile, setMobile] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches,
+  );
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 768px)');
+    const update = () => setMobile(media.matches);
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
   }, []);
 
   useEffect(() => {
@@ -222,51 +232,53 @@ export default function ChessHero3D({ reducedMotion = false }: { reducedMotion?:
       aria-hidden="true"
       data-render-active={renderActive}
     >
-      <Canvas
-        camera={{ position: [0, 0.35, 3.1], fov: 28 }}
-        gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-        shadows
-        dpr={[1, 1.75]}
-        frameloop={renderActive ? 'always' : 'never'}
-      >
-        <ambientLight color="#1e1814" intensity={0.52} />
+      {(!mobile || renderActive) && (
+        <Canvas
+          camera={{ position: [0, 0.35, 3.1], fov: 28 }}
+          gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
+          shadows
+          dpr={[1, 1.75]}
+          frameloop={renderActive ? 'always' : 'never'}
+        >
+          <ambientLight color="#1e1814" intensity={0.52} />
 
-        {/* Primary warm key spotlight */}
-        <spotLight
-          position={[-2.8, 5.5, 3.8]}
-          color="#fdf4e6"
-          intensity={65}
-          angle={0.48}
-          penumbra={0.8}
-          distance={15}
-          castShadow
-        />
+          {/* Primary warm key spotlight */}
+          <spotLight
+            position={[-2.8, 5.5, 3.8]}
+            color="#fdf4e6"
+            intensity={65}
+            angle={0.48}
+            penumbra={0.8}
+            distance={15}
+            castShadow
+          />
 
-        {/* Subtle warm rim light behind the black Queen */}
-        <spotLight
-          position={[-2.2, 1.8, -2.4]}
-          color="#f0dfc8"
-          intensity={42}
-          angle={0.52}
-          penumbra={0.85}
-          distance={12}
-        />
+          {/* Subtle warm rim light behind the black Queen */}
+          <spotLight
+            position={[-2.2, 1.8, -2.4]}
+            color="#f0dfc8"
+            intensity={42}
+            angle={0.52}
+            penumbra={0.85}
+            distance={12}
+          />
 
-        {/* Crimson tactical rim light from rear-right */}
-        <spotLight
-          position={[3.5, 2.5, -2.2]}
-          color="#c82d3e"
-          intensity={32}
-          angle={0.62}
-          penumbra={0.75}
-          distance={14}
-        />
+          {/* Crimson tactical rim light from rear-right */}
+          <spotLight
+            position={[3.5, 2.5, -2.2]}
+            color="#c82d3e"
+            intensity={32}
+            angle={0.62}
+            penumbra={0.75}
+            distance={14}
+          />
 
-        {/* Soft front fill */}
-        <directionalLight position={[0.2, 1.2, 3.5]} color="#ede2d2" intensity={0.35} />
+          {/* Soft front fill */}
+          <directionalLight position={[0.2, 1.2, 3.5]} color="#ede2d2" intensity={0.35} />
 
-        <SceneContent reducedMotion={reducedMotion} />
-      </Canvas>
+          <SceneContent reducedMotion={reducedMotion} />
+        </Canvas>
+      )}
     </div>
   );
 }
